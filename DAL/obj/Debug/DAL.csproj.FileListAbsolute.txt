@@ -1,0 +1,9 @@
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\DAL\obj\Debug\DAL.csproj.AssemblyReference.cache
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\DAL\obj\Debug\DAL.csproj.CoreCompileInputs.cache
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\DAL\bin\Debug\DAL.dll
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\DAL\bin\Debug\DAL.pdb
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\DAL\bin\Debug\Entity.dll
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\DAL\bin\Debug\Entity.pdb
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\DAL\obj\Debug\DAL.csproj.Up2Date
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\DAL\obj\Debug\DAL.dll
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\DAL\obj\Debug\DAL.pdb
