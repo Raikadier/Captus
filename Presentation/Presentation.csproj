@@ -146,5 +146,20 @@
   <ItemGroup>
     <None Include="Resources\iconToDoList.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\iconCalculoWh.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\iconUserWh.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\iconLogout.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\iconCalculoWh %281%29.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\iconLogout %281%29.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

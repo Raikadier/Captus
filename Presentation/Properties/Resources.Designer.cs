@@ -123,9 +123,49 @@ namespace Presentation.Properties {
         /// <summary>
         ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap iconCalculoWh {
+            get {
+                object obj = ResourceManager.GetObject("iconCalculoWh", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap iconCalculoWh__1_ {
+            get {
+                object obj = ResourceManager.GetObject("iconCalculoWh (1)", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap iconComputer {
             get {
                 object obj = ResourceManager.GetObject("iconComputer", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap iconLogout {
+            get {
+                object obj = ResourceManager.GetObject("iconLogout", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap iconLogout__1_ {
+            get {
+                object obj = ResourceManager.GetObject("iconLogout (1)", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -166,6 +206,16 @@ namespace Presentation.Properties {
         internal static System.Drawing.Bitmap iconToDoList {
             get {
                 object obj = ResourceManager.GetObject("iconToDoList", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap iconUserWh {
+            get {
+                object obj = ResourceManager.GetObject("iconUserWh", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

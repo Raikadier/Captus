@@ -15,7 +15,7 @@ namespace Presentation
         bool isExpanding = false;
         bool isCollapsing = false;
         int expandedWidth = 200;
-        int collapsedWidth = 88;
+        int collapsedWidth = 45;
         int step = 7; // velocidad de animación
        
         
@@ -36,9 +36,13 @@ namespace Presentation
             {
                 if (ctrl is Button btn)
                 {
-                    btn.TextImageRelation = TextImageRelation.ImageBeforeText;
-                    btn.ImageAlign = ContentAlignment.MiddleLeft;
-                    btn.TextAlign = ContentAlignment.MiddleLeft;
+                    //btn.TextImageRelation = TextImageRelation.ImageAboveText; // imagen arriba del texto
+                    ////btn.ImageAlign = ContentAlignment.MiddleCenter;
+                    //btn.TextAlign = ContentAlignment.MiddleCenter;
+
+                    //btn.TextImageRelation = TextImageRelation.ImageAboveText; // imagen arriba del texto
+                    //btn.ImageAlign = ContentAlignment.MiddleCenter;
+                    btn.TextAlign = ContentAlignment.MiddleCenter;
                 }
             }
         }
@@ -47,7 +51,7 @@ namespace Presentation
         {
             picLogoCaptus.SizeMode = PictureBoxSizeMode.Zoom;
             picLogoCaptus.Width = panel1.Width;
-
+            
             // Establecer el tamaño inicial del panel (expandido)
             panel1.Width = expandedWidth;
             // Actualizar UI del panel al estado expandido
@@ -66,24 +70,44 @@ namespace Presentation
             );
 
             // --- Ajustar label debajo del logo ---
-            label1.Font = new Font("Segoe UI", expanded ? 12 : 8, FontStyle.Bold);
+            //label1.Font = new Font("Segoe UI", expanded ? 12 : 8, FontStyle.Bold);
             label1.Visible = expanded;
             label1.Location = new Point(
                 (panel1.Width - label1.PreferredWidth) / 2,
                 picLogoCaptus.Bottom + 5
             );
 
-            // --- Ajustar botones ---
             foreach (Control ctrl in panel1.Controls)
             {
                 if (ctrl is Button btn)
                 {
-                    btn.Text = expanded ? btn.Tag?.ToString() ?? "" : "";
-                    btn.TextImageRelation = expanded ? TextImageRelation.ImageBeforeText : TextImageRelation.Overlay;
-                    btn.ImageAlign = ContentAlignment.MiddleCenter;
-                    btn.TextAlign = ContentAlignment.MiddleLeft;
+                    
+                    btn.Width = expanded ? 180 : 50;
+
+                    //btn.TextImageRelation = expanded ? TextImageRelation.ImageAboveText : TextImageRelation.Overlay;
+                    //btn.ImageAlign = ContentAlignment.MiddleCenter;
+                    btn.TextAlign = ContentAlignment.MiddleCenter;
                 }
             }
+
+            // --- Ajustar botones ---
+            //foreach (Control ctrl in panel1.Controls)
+            //{
+            //    if (ctrl is Button btn)
+            //    {
+            //        //btn.Text = expanded ? btn.Tag?.ToString() ?? "" : "";
+            //        //btn.TextImageRelation = expanded ? TextImageRelation.ImageBeforeText : TextImageRelation.Overlay;
+            //        //btn.ImageAlign = ContentAlignment.MiddleCenter;
+            //        //btn.TextAlign = ContentAlignment.MiddleLeft;
+
+            //        //btn.Text = expanded ? btn.Tag?.ToString() ?? "" : "";
+            //        btn.Width = expanded ? 180 : 50;
+            //        btn.TextImageRelation = expanded ? TextImageRelation.ImageBeforeText : TextImageRelation.Overlay;
+            //        btn.ImageAlign = ContentAlignment.MiddleLeft;
+            //        btn.TextAlign = ContentAlignment.MiddleCenter;
+
+            //    }
+            //}
         }
 
         private void btnMinimizar_Click(object sender, EventArgs e)
@@ -165,15 +189,15 @@ namespace Presentation
             picLogoCaptus.Height = logoSize;
             picLogoCaptus.Location = new Point(
                 (panel1.Width - picLogoCaptus.Width) / 2,
-                20 // margen superior
+                30 // margen superior
             );
 
             // Ajustar label debajo del logo
             label1.Font = new Font("Segoe UI", panel1.Width >= expandedWidth ? 12 : 8, FontStyle.Bold);
-            label1.Visible = panel1.Width >= expandedWidth;
+            label1.Visible = panel1.Width >= expandedWidth - 5;
             label1.Location = new Point(
                 (panel1.Width - label1.PreferredWidth) / 2,
-                picLogoCaptus.Bottom + 5 // justo debajo del logo
+                picLogoCaptus.Bottom + 30 // justo debajo del logo
             );
 
             //// Ajustar label de los botones
@@ -184,24 +208,26 @@ namespace Presentation
             //    picLogoCaptus.Bottom + 5 // justo debajo del logo
             //);
 
+            
+
 
         }
 
-        private void UpdatePanelContent(bool expanded)
-        {
-            label1.Visible = expanded;
+        //private void UpdatePanelContent(bool expanded)
+        //{
+        //    label1.Visible = expanded;
 
-            foreach (Control ctrl in panel1.Controls)
-            {
-                if (ctrl is Button btn)
-                {
-                    btn.Text = expanded ? btn.Tag?.ToString() ?? "" : "";
-                    btn.TextImageRelation = expanded ? TextImageRelation.ImageBeforeText : TextImageRelation.Overlay;
-                    btn.ImageAlign = ContentAlignment.MiddleCenter;
-                    btn.TextAlign = ContentAlignment.MiddleLeft;
-                }
-            }
-        }
+        //    foreach (Control ctrl in panel1.Controls)
+        //    {
+        //        if (ctrl is Button btn)
+        //        {
+        //            btn.Text = expanded ? btn.Tag?.ToString() ?? "" : "";
+        //            btn.TextImageRelation = expanded ? TextImageRelation.ImageBeforeText : TextImageRelation.Overlay;
+        //            btn.ImageAlign = ContentAlignment.MiddleCenter;
+        //            btn.TextAlign = ContentAlignment.MiddleLeft;
+        //        }
+        //    }
+        //}
 
         private void picLogoCaptus_Click(object sender, EventArgs e)
         {
@@ -209,6 +235,21 @@ namespace Presentation
         }
 
         private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtCalculo_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtUserP_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtTaskList_Click(object sender, EventArgs e)
         {
 
         }
