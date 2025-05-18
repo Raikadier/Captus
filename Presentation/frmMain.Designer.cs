@@ -43,6 +43,7 @@
             this.btnCalculo = new System.Windows.Forms.Button();
             this.btnTaskList = new System.Windows.Forms.Button();
             this.picLogoCaptus = new System.Windows.Forms.PictureBox();
+            this.panelContenedor = new System.Windows.Forms.Panel();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.btnMenu)).BeginInit();
@@ -176,6 +177,7 @@
             this.btnLogout.Size = new System.Drawing.Size(197, 54);
             this.btnLogout.TabIndex = 44;
             this.btnLogout.UseVisualStyleBackColor = true;
+            this.btnLogout.Click += new System.EventHandler(this.btnLogout_Click);
             // 
             // btnProfile
             // 
@@ -224,6 +226,7 @@
             this.btnTaskList.TabIndex = 41;
             this.btnTaskList.Text = "TaskList";
             this.btnTaskList.UseVisualStyleBackColor = true;
+            this.btnTaskList.Click += new System.EventHandler(this.btnTaskList_Click);
             // 
             // picLogoCaptus
             // 
@@ -236,12 +239,21 @@
             this.picLogoCaptus.TabStop = false;
             this.picLogoCaptus.Click += new System.EventHandler(this.picLogoCaptus_Click);
             // 
+            // panelContenedor
+            // 
+            this.panelContenedor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelContenedor.Location = new System.Drawing.Point(200, 43);
+            this.panelContenedor.Name = "panelContenedor";
+            this.panelContenedor.Size = new System.Drawing.Size(790, 518);
+            this.panelContenedor.TabIndex = 2;
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Honeydew;
             this.ClientSize = new System.Drawing.Size(990, 561);
+            this.Controls.Add(this.panelContenedor);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -277,5 +289,6 @@
         private System.Windows.Forms.Button btnCalculo;
         private System.Windows.Forms.Button btnProfile;
         private System.Windows.Forms.Button btnLogout;
+        private System.Windows.Forms.Panel panelContenedor;
     }
 }
