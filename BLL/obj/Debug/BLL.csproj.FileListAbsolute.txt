@@ -1,0 +1,11 @@
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\BLL\obj\Debug\BLL.csproj.AssemblyReference.cache
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\BLL\obj\Debug\BLL.csproj.CoreCompileInputs.cache
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\BLL\bin\Debug\BLL.dll
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\BLL\bin\Debug\BLL.pdb
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\BLL\bin\Debug\DAL.dll
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\BLL\bin\Debug\Entity.dll
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\BLL\bin\Debug\DAL.pdb
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\BLL\bin\Debug\Entity.pdb
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\BLL\obj\Debug\BLL.csproj.Up2Date
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\BLL\obj\Debug\BLL.dll
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\BLL\obj\Debug\BLL.pdb

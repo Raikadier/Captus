@@ -1,0 +1,193 @@
+﻿using Entity;
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DAL
+{
+    public class TaskRepository : BDRepository<Entity.Task>
+    {
+        private readonly UserRepository userRepository;
+        private readonly PriorityRepository priorityRepository;
+        private readonly CategoryRepository categoryRepository;
+        public TaskRepository() { userRepository = new UserRepository(); priorityRepository = new PriorityRepository(); categoryRepository = new CategoryRepository(); }
+
+        public override bool Delete(int id)
+        {
+            try
+            {
+                if (id <= 0) return false;
+                bd.OpenConection();
+                SqlCommand cmd = new SqlCommand("DELETE FROM [dbo].[Task] WHERE Id_Task= @Id_Task", bd.connection);
+                cmd.Parameters.AddWithValue("@Id_Task", id);
+                int affectedRows = cmd.ExecuteNonQuery();
+                if (affectedRows > 0) return true;
+                return false;
+            }
+            catch (SqlException)
+            {
+                
+                return false;
+            }
+            catch (Exception)
+            {
+                
+                return false;
+            }
+            finally
+            {
+                bd.CloseConection();
+            }
+
+        }
+
+        public override List<Entity.Task> GetAll()
+        {
+            List<Entity.Task> task = new List<Entity.Task>();
+            try
+            {
+                bd.OpenConection();
+                SqlCommand cmd = new SqlCommand("SELECT * FROM [dbo].[Task]", bd.connection);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        task.Add(MappingType(reader));
+                    }
+                }
+            }
+            catch (SqlException)
+            {
+                return null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+                bd.CloseConection();
+            }
+            return task;
+        }
+
+        public List<Entity.Task> GetAllByUserId(int id)
+        {
+            List<Entity.Task> task = new List<Entity.Task>();
+            try
+            {
+                bd.OpenConection();
+                SqlCommand cmd = new SqlCommand("SELECT * FROM [dbo].[Task] WHERE Id_User= @Id_User", bd.connection);
+                cmd.Parameters.AddWithValue("@Id_User", id);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        task.Add(MappingType(reader));
+                    }
+                }
+            }
+            catch (SqlException)
+            {
+                return null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+                bd.CloseConection();
+            }
+            return task;
+        }
+        public override Entity.Task GetById(int id)
+        {
+            Entity.Task task = null;
+            try
+            {
+                if (id <= 0) return null;
+                bd.OpenConection();
+                SqlCommand cmd = new SqlCommand("SELECT * FROM [dbo].[Task] WHERE Id_Task = @Id_Task", bd.connection);
+                cmd.Parameters.AddWithValue("@Id_Task", id);
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    task = MappingType(reader);
+                }
+                reader.Close();
+            }
+            catch (SqlException)
+            {
+                return null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+                bd.CloseConection();
+            }
+            return task;
+
+        }
+
+        public override Entity.Task MappingType(SqlDataReader reader)
+        {
+            Entity.Task task = new Entity.Task
+            {
+                id = reader.GetInt32(reader.GetOrdinal("Id_Task")),
+                Title = reader.GetString(reader.GetOrdinal("Title")),
+                Category = SearchEntity.SearchCategoryById(categoryRepository.GetAll(), Convert.ToInt32(reader.GetOrdinal("Id_Category"))),
+                Description = reader.IsDBNull(reader.GetOrdinal("Description")) ? null : reader.GetString(reader.GetOrdinal("Description")),
+                CreationDate = reader.GetDateTime(reader.GetOrdinal("CreationDate")),
+                EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                Priority = SearchEntity.SearchPriorityById(priorityRepository.GetAll(), Convert.ToInt32(reader.GetOrdinal("Id_Priority"))),
+                State = reader.GetBoolean(reader.GetOrdinal("State")),
+                User = SearchEntity.SearchUserById(userRepository.GetAll(), Convert.ToInt32(reader.GetOrdinal("Id_User")))
+            };
+            return task;
+        }
+
+        public override bool Update(Entity.Task entity)
+        {
+            try
+            {
+                if (entity == null) return false;
+                bd.OpenConection();
+                SqlCommand cmd = entity.SQLCommandInsert(bd.connection);
+                cmd.CommandText = "UPDATE [dbo].[Task] SET Title=@Title, Id_Category=@Id_Category, Description=@Description, CreationDate=@CreationDate, EndDate=@EndDate, Id_Priority=@Id_Priority, State=@State WHERE Id_Task=@Id_Task";
+                cmd.Parameters.AddWithValue("@Id_Task", entity.id);
+                cmd.Parameters.AddWithValue("@Title", entity.Title);
+                cmd.Parameters.AddWithValue("@Id_Category", entity.Category.id);
+                if (string.IsNullOrEmpty(entity.Description))
+                    cmd.Parameters.AddWithValue("@Description", DBNull.Value);
+                else
+                    cmd.Parameters.AddWithValue("@Description", entity.Description);
+                cmd.Parameters.AddWithValue("@CreationDate", entity.CreationDate);
+                cmd.Parameters.AddWithValue("@EndDate", entity.EndDate);
+                cmd.Parameters.AddWithValue("@Id_Priority", entity.Priority.Id_Priority);
+                cmd.Parameters.AddWithValue("@State", entity.State);
+                int affectedRows = cmd.ExecuteNonQuery();
+                if (affectedRows > 0) return true;
+                return false;
+            }
+            catch (SqlException)
+            {
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally
+            {
+                bd.CloseConection();
+            }
+        }
+    }
+}

@@ -1,0 +1,6 @@
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\Entity\obj\Debug\Entity.csproj.AssemblyReference.cache
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\Entity\obj\Debug\Entity.csproj.CoreCompileInputs.cache
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\Entity\bin\Debug\Entity.dll
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\Entity\bin\Debug\Entity.pdb
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\Entity\obj\Debug\Entity.dll
+E:\Documents\ING SISTEMAS - Semestre 5\Programacion III\Proyecto de aula\Captus\Entity\obj\Debug\Entity.pdb
