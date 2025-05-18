@@ -123,6 +123,16 @@ namespace Presentation.Properties {
         /// <summary>
         ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap iconComputer {
+            get {
+                object obj = ResourceManager.GetObject("iconComputer", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap icons8_close_window_50__2_ {
             get {
                 object obj = ResourceManager.GetObject("icons8-close-window-50 (2)", resourceCulture);
@@ -136,6 +146,26 @@ namespace Presentation.Properties {
         internal static System.Drawing.Bitmap icons8_maximize_window_50__1_ {
             get {
                 object obj = ResourceManager.GetObject("icons8-maximize-window-50 (1)", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap iconTask {
+            get {
+                object obj = ResourceManager.GetObject("iconTask", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap iconToDoList {
+            get {
+                object obj = ResourceManager.GetObject("iconToDoList", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -166,6 +196,16 @@ namespace Presentation.Properties {
         internal static System.Drawing.Bitmap Logo_Captus {
             get {
                 object obj = ResourceManager.GetObject("Logo_Captus", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap menu_hamburguesa {
+            get {
+                object obj = ResourceManager.GetObject("menu_hamburguesa", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
