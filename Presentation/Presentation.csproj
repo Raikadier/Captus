@@ -170,5 +170,11 @@
   <ItemGroup>
     <None Include="Resources\iconLogout %281%29.png" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BLL\BLL.csproj">
+      <Project>{5378cbfe-3c0a-4b23-a7c6-3b5c90913a31}</Project>
+      <Name>BLL</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

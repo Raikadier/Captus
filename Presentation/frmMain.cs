@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BLL;
 
 namespace Presentation
 {
@@ -17,14 +18,17 @@ namespace Presentation
         int expandedWidth = 200;
         int collapsedWidth = 45;
         int step = 7; // velocidad de animación
-       
         
+        private ChatBot bot;
+
+
 
         public frmMain()
         {
             InitializeComponent();
             timer1.Interval = 10;
             InitializeLayout(); // Config inicial
+            bot = new ChatBot();
         }
 
         private void InitializeLayout()
@@ -47,11 +51,15 @@ namespace Presentation
             }
         }
 
-        private void frmMain_Load(object sender, EventArgs e)
+        
+
+        private async void frmMain_Load(object sender, EventArgs e)
         {
             picLogoCaptus.SizeMode = PictureBoxSizeMode.Zoom;
             picLogoCaptus.Width = panel1.Width;
-            
+
+            await bot.StartReceiver(); // arranca el bot al iniciar el form
+
             // Establecer el tamaño inicial del panel (expandido)
             panel1.Width = expandedWidth;
             // Actualizar UI del panel al estado expandido
