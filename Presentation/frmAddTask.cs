@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BLL;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -13,9 +14,15 @@ namespace Presentation
 {
     public partial class frmAddTask : Form
     {
+        private readonly CategoryLogic categoryService;
+        private readonly PriorityLogic priorityService;
         public frmAddTask()
         {
             InitializeComponent();
+            categoryService = new CategoryLogic();
+            priorityService = new PriorityLogic();
+            LoadPriorities();
+            LoadCategories();
 
         }
 
@@ -32,7 +39,21 @@ namespace Presentation
                 this.Location = Screen.FromHandle(this.Handle).WorkingArea.Location;
             }
         }
+        private void LoadPriorities()
+        {
+            var priorities = priorityService.GetAll();
 
+            cbPriority.DataSource = priorities;
+            cbPriority.DisplayMember = "Name";
+            cbPriority.ValueMember = "Id_Priority";
+        }
+        private void LoadCategories()
+        {
+            var categories = categoryService.GetAll();
+            cbCategories.DataSource = categories;
+            cbCategories.DisplayMember = "Name";
+            cbCategories.ValueMember = "Id";
+        }
         private void Panel1_MouseDown(object sender, MouseEventArgs e)
         {
             ReleaseCapture();
