@@ -46,6 +46,7 @@ namespace Presentation
             cbPriority.DataSource = priorities;
             cbPriority.DisplayMember = "Name";
             cbPriority.ValueMember = "Id_Priority";
+            //holaaa
         }
         private void LoadCategories()
         {
