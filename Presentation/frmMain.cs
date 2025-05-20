@@ -19,7 +19,7 @@ namespace Presentation
         int collapsedWidth = 45;
         int step = 7; // velocidad de animación
         
-        private ChatBot bot;
+        
 
 
 
@@ -28,7 +28,6 @@ namespace Presentation
             InitializeComponent();
             timer1.Interval = 10;
             InitializeLayout(); // Config inicial
-            bot = new ChatBot();
         }
 
         private void InitializeLayout()
@@ -58,7 +57,7 @@ namespace Presentation
             picLogoCaptus.SizeMode = PictureBoxSizeMode.Zoom;
             picLogoCaptus.Width = panel1.Width;
 
-            await bot.StartReceiver(); // arranca el bot al iniciar el form
+            
 
             // Establecer el tamaño inicial del panel (expandido)
             panel1.Width = expandedWidth;
@@ -283,6 +282,11 @@ namespace Presentation
         private void btnLogout_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void panelContenedor_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }
