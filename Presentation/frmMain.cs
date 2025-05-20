@@ -20,7 +20,7 @@ namespace Presentation
         int collapsedWidth = 45;
         int step = 7; // velocidad de animación
         
-        
+
 
 
 
@@ -67,12 +67,11 @@ namespace Presentation
 
         
 
-        private async void frmMain_Load(object sender, EventArgs e)
+        private void frmMain_Load(object sender, EventArgs e)
         {
             picLogoCaptus.SizeMode = PictureBoxSizeMode.Zoom;
             picLogoCaptus.Width = panel1.Width;
 
-            
 
             // Establecer el tamaño inicial del panel (expandido)
             panel1.Width = expandedWidth;
