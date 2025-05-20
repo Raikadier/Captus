@@ -180,13 +180,17 @@
     <None Include="Resources\iconLogout %281%29.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BLL\BLLbot.csproj">
-      <Project>{5378cbfe-3c0a-4b23-a7c6-3b5c90913a31}</Project>
-      <Name>BLLbot</Name>
-    </ProjectReference>
+    <None Include="Resources\iconAdd.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\iconAdd.png" />
+    <ProjectReference Include="..\BLL\BLL.csproj">
+      <Project>{d2611e8b-3c1b-4feb-ba1e-6e3aea9c9f6e}</Project>
+      <Name>BLL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ENTITY\ENTITY.csproj">
+      <Project>{857bef1c-d3a7-4e38-8a8f-ee9fb7528379}</Project>
+      <Name>ENTITY</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

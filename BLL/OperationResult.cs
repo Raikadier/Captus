@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace BLL
 {
-    public class Class1
+    public class OperationResult
     {
+        public bool Success { get; set; }
+        public string Message { get; set; }
     }
 }
