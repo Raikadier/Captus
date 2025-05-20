@@ -94,10 +94,6 @@ namespace Presentation
         private void btnRegister_Click(object sender, EventArgs e)
         {
             Save();
-
-            MessageBox.Show("Guardado con éxito", "¡ Registrado !", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-            this.Close(); // Cierra el registro y regresa al login
         }
         private void Save()
         {
