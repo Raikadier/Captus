@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BLL;
+using ENTITY;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -6,6 +8,7 @@ using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -13,17 +16,13 @@ namespace Presentation
 {
     public partial class frmRegister : Form
     {
+        private readonly UserLogic userLogic;
         public frmRegister()
         {
             InitializeComponent();
-
-            // Sin bordes de sistema
+            userLogic = new UserLogic();
             this.FormBorderStyle = FormBorderStyle.None;
-
-            // Para que al maximizar no se pase ni deje espacio
             this.MaximizedBounds = Screen.FromHandle(this.Handle).WorkingArea;
-
-            // Evento para controlar el redimensionamiento
             this.Resize += new EventHandler(Form1_Resize);
         }
 
@@ -94,11 +93,80 @@ namespace Presentation
 
         private void btnRegister_Click(object sender, EventArgs e)
         {
-            // Aquí guardarías en base de datos o archivo (omito esa parte por ahora)
+            Save();
 
             MessageBox.Show("Guardado con éxito", "¡ Registrado !", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             this.Close(); // Cierra el registro y regresa al login
+        }
+        private void Save()
+        {
+            if (!verifyFields() || !varifyPassword() || !verifyEmail())
+                return;
+            User user = new User();
+            user.Name = txtName.Text;
+            user.UserName = txtUsername.Text.ToUpper();
+            user.Password = txtPassword.Text;
+            user.LastName = txtLastName.Text;
+            user.Email = txtEmail.Text;
+            user.Phone = txtPhNumber.Text;
+            var result = userLogic.Save(user);
+            if (result.Success)
+            {
+                MessageBox.Show("User saved successfully.", "¡ Gratulations !", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                this.Close();
+            }
+            else
+            {
+                MessageBox.Show($"Error: {result.Message}");
+            }
+        }
+        private bool varifyPassword()
+        {
+            string password = txtPassword.Text;
+            if (password.Length < 8)
+            {
+                MessageBox.Show("La contraseña debe tener al menos 8 caracteres.");
+                return false;
+            }
+            if (!Regex.IsMatch(password, @"[A-Z]") ||
+                !Regex.IsMatch(password, @"[a-z]") ||
+                !Regex.IsMatch(password, @"[0-9]"))
+            {
+                MessageBox.Show("La contraseña debe contener mayúsculas, minúsculas y números.");
+                return false;
+            }
+            if (txtPassword.Text != txtCnPassword.Text)
+            {
+                MessageBox.Show("Las contraseñas no coinciden.");
+                return false;
+            }
+            return true;
+        }
+        private bool verifyFields()
+        {
+            if (string.IsNullOrEmpty(txtName.Text) || string.IsNullOrEmpty(txtPassword.Text) || string.IsNullOrEmpty(txtEmail.Text) || string.IsNullOrEmpty(txtLastName.Text) || string.IsNullOrEmpty(txtPhNumber.Text) || string.IsNullOrEmpty(txtUsername.Text))
+            {
+                MessageBox.Show("Please fill in all fields.");
+                return false;
+            }
+            return true;
+        }
+        private bool verifyEmail()
+        {
+            string email = txtEmail.Text;
+            if (!Regex.IsMatch(email, @"^[^@\s]+@gmail\.com$"))
+            {
+                MessageBox.Show("Debe ingresar un correo electrónico válido de Gmail.");
+                return false;
+            }
+
+            //string codigo = new Random().Next(100000, 999999).ToString();
+            //if (!SendVerifyCode(email, codigo))
+            //{
+            //    return false;
+            //}
+            return true;
         }
     }
 }

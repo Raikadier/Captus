@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BLL;
+using ENTITY;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -13,9 +15,11 @@ namespace Presentation
 {
     public partial class frmLogin : Form
     {
+        private readonly UserLogic userLogic;
         public frmLogin()
         {
             InitializeComponent();
+            userLogic = new UserLogic();
         }
 
         [DllImport("user32.dll", EntryPoint = "ReleaseCapture")]
@@ -98,30 +102,33 @@ namespace Presentation
 
         private void label3_Click(object sender, EventArgs e)
         {
-            this.Hide(); // Oculta el login
+            this.Hide();
             frmRegister registerForm = new frmRegister();
-            registerForm.ShowDialog(); // Abre el registro
-            this.Show(); // Vuelve a mostrar login al cerrar registro
+            registerForm.ShowDialog();
+            this.Show();
 
         }
 
         private void btnLogin_Click(object sender, EventArgs e)
         {
-            //string user = textBox1.Text;
-            //string pass = textBox2.Text;
-
-            //// Simulamos validación (cambia esto con validación real)
-            //if (user == "admin" && pass == "1234")
-            //{
-            //    this.Hide();
-            //    frmPrin main = new frmPrin();
-            //    main.ShowDialog();
-            //    this.Show(); // Vuelve al login al cerrar principal
-            //}
-            //else
-            //{
-            //    MessageBox.Show("Usuario o contraseña incorrectos", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //}
+            if (string.IsNullOrEmpty(textBox1.Text) || string.IsNullOrEmpty(textBox2.Text))
+            {
+                MessageBox.Show("Please fill in all fields.");
+                return;
+            }
+            User user = userLogic.Login(textBox1.Text.ToUpper(), textBox2.Text);
+            if (user != null)
+            {
+                MessageBox.Show("Login successful.");
+                Session.Start(user);
+                this.Hide();
+                frmMain main = new frmMain();
+                main.ShowDialog();
+            }
+            else
+            {
+                MessageBox.Show("Invalid username or password.");
+            }
         }
 
         private void btnMinimizar_Click(object sender, EventArgs e)
