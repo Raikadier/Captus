@@ -201,5 +201,11 @@
       <Name>ENTITY</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\iconsRefresh.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\iconRefresh.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

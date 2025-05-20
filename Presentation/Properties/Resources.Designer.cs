@@ -183,6 +183,16 @@ namespace Presentation.Properties {
         /// <summary>
         ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap iconRefresh {
+            get {
+                object obj = ResourceManager.GetObject("iconRefresh", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap icons8_close_window_50__2_ {
             get {
                 object obj = ResourceManager.GetObject("icons8-close-window-50 (2)", resourceCulture);
@@ -196,6 +206,16 @@ namespace Presentation.Properties {
         internal static System.Drawing.Bitmap icons8_maximize_window_50__1_ {
             get {
                 object obj = ResourceManager.GetObject("icons8-maximize-window-50 (1)", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap iconsRefresh {
+            get {
+                object obj = ResourceManager.GetObject("iconsRefresh", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
