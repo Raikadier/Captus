@@ -52,6 +52,12 @@
     <Compile Include="frmAddTask.Designer.cs">
       <DependentUpon>frmAddTask.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmCalculo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmCalculo.Designer.cs">
+      <DependentUpon>frmCalculo.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmLogin.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -86,6 +92,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="frmAddTask.resx">
       <DependentUpon>frmAddTask.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmCalculo.resx">
+      <DependentUpon>frmCalculo.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmLogin.resx">
       <DependentUpon>frmLogin.cs</DependentUpon>

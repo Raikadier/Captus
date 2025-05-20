@@ -313,5 +313,10 @@ namespace Presentation
         {
 
         }
+
+        private void btnCalculo_Click(object sender, EventArgs e)
+        {
+            AbrirFormInPanel(new frmCalculo());
+        }
     }
 }
