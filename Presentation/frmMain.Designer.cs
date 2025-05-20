@@ -169,6 +169,8 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(790, 43);
             this.panel2.TabIndex = 1;
+            this.panel2.Paint += new System.Windows.Forms.PaintEventHandler(this.panel2_Paint);
+            this.panel2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Panel2_MouseDown);
             // 
             // btnMenu
             // 
