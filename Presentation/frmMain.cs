@@ -58,7 +58,6 @@ namespace Presentation
             picLogoCaptus.Width = panel1.Width;
 
 
-
             // Establecer el tamaño inicial del panel (expandido)
             panel1.Width = expandedWidth;
             // Actualizar UI del panel al estado expandido
