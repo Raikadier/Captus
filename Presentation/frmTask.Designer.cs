@@ -38,6 +38,7 @@
             this.btnAddTask = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.btnClose = new System.Windows.Forms.PictureBox();
+            this.flpTasks = new System.Windows.Forms.FlowLayoutPanel();
             this.panelTop.SuspendLayout();
             this.panelFull.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -144,6 +145,7 @@
             this.btnRefresh.TabIndex = 44;
             this.btnRefresh.Text = "Refresh";
             this.btnRefresh.UseVisualStyleBackColor = false;
+            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
             // 
             // btnAddTask
             // 
@@ -188,11 +190,22 @@
             this.btnClose.TabStop = false;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
+            // flpTasks
+            // 
+            this.flpTasks.AutoScroll = true;
+            this.flpTasks.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flpTasks.Location = new System.Drawing.Point(200, 38);
+            this.flpTasks.Name = "flpTasks";
+            this.flpTasks.Size = new System.Drawing.Size(889, 584);
+            this.flpTasks.TabIndex = 3;
+            this.flpTasks.Paint += new System.Windows.Forms.PaintEventHandler(this.flowLayoutPanel1_Paint);
+            // 
             // frmTask
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1089, 622);
+            this.Controls.Add(this.flpTasks);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.panelFull);
             this.Controls.Add(this.panelTop);
@@ -222,5 +235,6 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button btnRefresh;
+        private System.Windows.Forms.FlowLayoutPanel flpTasks;
     }
 }
