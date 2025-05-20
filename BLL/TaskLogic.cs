@@ -232,7 +232,7 @@ namespace BLL
                 task.State = state;
                 Update(task);
                 StatisticsLogic statisticsLogic=new StatisticsLogic();
-                statisticsLogic.UpdateRacha();
+                statisticsLogic.VerificarRacha();
             }
         }
     }

@@ -17,37 +17,44 @@ namespace BLL
             statisticsRepository = new StatisticsRepository(new UserRepository());
             taskLogic = new TaskLogic();
         }
-        public void UpdateRacha()
+        public void VerificarRacha()
         {
             var stat = GetByCurrentUser();
             if (stat == null) return;
 
             DateTime today = DateTime.Today;
+            DateTime yesterday = today.AddDays(-1);
 
-            int completadasHoy = taskLogic.GetCompletedTodayByUser().Count;
+            var tareasHoy = taskLogic.GetCompletedTodayByUser();
+            int completadasHoy = tareasHoy.Count;
 
-            if (completadasHoy >= stat.DailyGoal)
+            if (completadasHoy < stat.DailyGoal)
             {
-                if (stat.LastRachaDate.HasValue &&
-                    stat.LastRachaDate.Value.Date == today.AddDays(-1))
+                if (!stat.LastRachaDate.HasValue || stat.LastRachaDate.Value.Date < yesterday)
                 {
-                    stat.Racha += 1;
+                    stat.Racha = 0;
+                    stat.LastRachaDate = null;
+                    statisticsRepository.Update(stat);
                 }
-                else if (stat.LastRachaDate.HasValue &&
-                         stat.LastRachaDate.Value.Date == today)
+            }
+            else
+            {
+                if (!stat.LastRachaDate.HasValue || stat.LastRachaDate.Value.Date < today)
                 {
-                }
-                else
-                {
-                    stat.Racha = 1;
-                }
-                stat.LastRachaDate = today;
+                    if (stat.LastRachaDate.HasValue && stat.LastRachaDate.Value.Date == yesterday)
+                    {
+                        stat.Racha += 1;
+                    }
+                    else
+                    {
+                        stat.Racha = 1;
+                    }
 
-                // Guarda en base de datos
-                statisticsRepository.Update(stat);
+                    stat.LastRachaDate = today;
+                    statisticsRepository.Update(stat);
+                }
             }
         }
-
         public OperationResult Delete(int id)
         {
             try

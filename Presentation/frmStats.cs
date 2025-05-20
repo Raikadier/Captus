@@ -41,10 +41,33 @@ namespace Presentation
                 MessageBox.Show("No hay estadísticas registradas para este usuario.");
                 return;
             }
-            txtTaskCompleted.Text = stat.CompletedTasks.ToString();
+            int objetivo = stat.DailyGoal;
+            var tareasHoy = taskLogic.GetCompletedTodayByUser();
+            int completadasHoy = tareasHoy.Count;
+            lblTaskCompleted.Text = stat.CompletedTasks.ToString();
             txtObjetivoActual.Text = taskLogic.GetCompletedTodayByUser().Count.ToString();
-            txtObjetivoProp.Text = stat.DailyGoal.ToString();
-            txtRacha.Text = stat.Racha.ToString();
+            ObjetiveDaily.Text = $"{completadasHoy} / {objetivo} tareas";
+            UpdateLogoProgress(completadasHoy, objetivo);
+        }
+        private void UpdateLogoProgress(int completadas, int objetivo)
+        {
+            if (objetivo == 0) return;
+
+            float porcentaje = Math.Min(1f, (float)completadas / objetivo); // Máximo 100%
+
+            Bitmap imgGris = Properties.Resources.LogoCaptusGris_removebg_preview1;
+            Bitmap imgColor = Properties.Resources.LOGOCaptus_removebg_preview1;
+
+            Bitmap resultado = new Bitmap(imgGris.Width, imgGris.Height);
+            using (Graphics g = Graphics.FromImage(resultado))
+            {
+                g.DrawImage(imgGris, 0, 0);
+
+                Rectangle rectColor = new Rectangle(0, 0, (int)(imgColor.Width * porcentaje), imgColor.Height);
+                g.DrawImage(imgColor, rectColor, rectColor, GraphicsUnit.Pixel);
+            }
+
+            picLogoProgress.Image = resultado;
         }
     }
 }

@@ -30,6 +30,7 @@ namespace Presentation
             timer1.Interval = 10;
             InitializeLayout(); // Config inicial
             statisticsLogic = new StatisticsLogic();
+            statisticsLogic.VerificarRacha();
         }
 
         [DllImport("user32.dll", EntryPoint = "ReleaseCapture")]
