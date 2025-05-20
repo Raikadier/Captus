@@ -17,14 +17,12 @@ namespace Presentation
         private readonly TaskLogic taskLogic;
         public frmStats()
         {
-            this.FormBorderStyle = FormBorderStyle.None;
-            this.MaximizedBounds = Screen.FromHandle(this.Handle).WorkingArea;
-
             InitializeComponent();
             statisticsLogic = new StatisticsLogic();
             taskLogic = new TaskLogic();
             LoadStats();
             TableLoad();
+            txtEditObjetivo.Text = statisticsLogic.GetByCurrentUser().DailyGoal.ToString();
         }
         private void TableLoad()
         {
@@ -32,11 +30,7 @@ namespace Presentation
             dataGridView1.Rows.Clear();
             foreach (var tareas in lista)
             {
-                if (tareas.Description == null)
-                {
-                    dataGridView1.Rows.Add(tareas.Title, "", tareas.Category);
-                }
-                dataGridView1.Rows.Add(tareas.Title, tareas.Description, tareas.Category);
+                dataGridView1.Rows.Add(tareas.Title, tareas.Description ?? "", tareas.Category.Name);
             }
         }
         private void LoadStats()
@@ -47,15 +41,10 @@ namespace Presentation
                 MessageBox.Show("No hay estadísticas registradas para este usuario.");
                 return;
             }
-            int objetivo = stat.DailyGoal;
-
-            var tareasCompletadas = statisticsLogic.GetByCurrentUser().CompletedTasks;
-            var tareasHoy = taskLogic.GetCompletedTodayByUser();
-            int rachaActual = statisticsLogic.GetByCurrentUser().Racha;
-            txtTaskCompleted.Text = tareasCompletadas.ToString();
-            txtObjetivoActual.Text = tareasHoy.Count.ToString();
-            txtObjetivoProp.Text = objetivo.ToString();
-            txtRacha.Text = rachaActual.ToString();
+            txtTaskCompleted.Text = stat.CompletedTasks.ToString();
+            txtObjetivoActual.Text = taskLogic.GetCompletedTodayByUser().Count.ToString();
+            txtObjetivoProp.Text = stat.DailyGoal.ToString();
+            txtRacha.Text = stat.Racha.ToString();
         }
     }
 }

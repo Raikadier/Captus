@@ -18,35 +18,36 @@ namespace DAL
         }
         public Statistics GetByUser(int id)
         {
-            Statistics statistics = new Statistics();
             try
             {
                 if (id <= 0) return null;
+
                 bd.OpenConection();
-                Console.WriteLine("Id_Statistics: " + id);
-                SqlCommand cmd = new SqlCommand("SELECT * FROM [dbo].[Statistics] Where Id_User=@Id_User", bd.connection);
+                SqlCommand cmd = new SqlCommand("SELECT * FROM [dbo].[Statistics] WHERE Id_User=@Id_User", bd.connection);
                 cmd.Parameters.AddWithValue("@Id_User", id);
+
                 using (var reader = cmd.ExecuteReader())
                 {
                     if (reader.Read())
                     {
-                        statistics = MappingType(reader);
+                        return MappingType(reader);
                     }
                 }
+
+                return null; // <- Devuelve null si no hay resultado
             }
             catch (SqlException)
             {
                 throw new Exception("Error en la consulta SQL");
             }
-            catch (Exception a)
+            catch (Exception)
             {
-                throw new Exception("Error en la consulta"); ;
+                throw new Exception("Error en la consulta");
             }
             finally
             {
                 bd.CloseConection();
             }
-            return statistics;
         }
         public override Statistics GetById(int id)
         {

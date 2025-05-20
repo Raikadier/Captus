@@ -11,51 +11,41 @@ namespace BLL
     public class StatisticsLogic : ILogic<Statistics>
     {
         private readonly StatisticsRepository statisticsRepository;
+        private readonly TaskLogic taskLogic;
         public StatisticsLogic()
         {
             statisticsRepository = new StatisticsRepository(new UserRepository());
+            taskLogic = new TaskLogic();
         }
-        public void UpdateRacha(Statistics stats, List<ENTITY.Task> tareasDelUsuario)
+        public void UpdateRacha()
         {
-            DateTime hoy = DateTime.Today;
+            var stat = GetByCurrentUser();
+            if (stat == null) return;
 
-            if (stats.LastRachaDate == hoy)
-                return;
+            DateTime today = DateTime.Today;
 
-            int completadasHoy = tareasDelUsuario
-                .Where(t => t.State && t.CreationDate.Date == hoy)
-                .Count();
+            int completadasHoy = taskLogic.GetCompletedTodayByUser().Count;
 
-            if (completadasHoy >= stats.DailyGoal)
+            if (completadasHoy >= stat.DailyGoal)
             {
-                if (stats.LastRachaDate == hoy.AddDays(-1))
-                    stats.Racha++;
+                if (stat.LastRachaDate.HasValue &&
+                    stat.LastRachaDate.Value.Date == today.AddDays(-1))
+                {
+                    stat.Racha += 1;
+                }
+                else if (stat.LastRachaDate.HasValue &&
+                         stat.LastRachaDate.Value.Date == today)
+                {
+                }
                 else
-                    stats.Racha = 1;
+                {
+                    stat.Racha = 1;
+                }
+                stat.LastRachaDate = today;
 
-                stats.LastRachaDate = hoy;
+                // Guarda en base de datos
+                statisticsRepository.Update(stat);
             }
-            else
-            {
-                stats.Racha = 0;
-                stats.LastRachaDate = null;
-            }
-            Update(stats);
-        }
-        public void UpdateCompletedTask(Statistics stats, List<ENTITY.Task> tareasDelUsuario)
-        {
-            stats.CompletedTasks = tareasDelUsuario.Count(t => t.State);
-            Update(stats);
-        }
-        public void UpdateDailyGoal(Statistics stats, int dailyGoal)
-        {
-            stats.DailyGoal = dailyGoal;
-            Update(stats);
-        }
-        public void UpdateTotalTask(Statistics stats, List<ENTITY.Task> tareasDelUsuario)
-        {
-            stats.TotalTasks = tareasDelUsuario.Count;
-            Update(stats);
         }
 
         public OperationResult Delete(int id)
@@ -230,13 +220,6 @@ namespace BLL
                 return null;
 
             return statisticsRepository.GetByUser(Session.CurrentUser.id);
-        }
-        public void UpdateRacha(List<ENTITY.Task> tareasDelUsuario)
-        {
-            var stats = GetByCurrentUser();
-            if (stats == null) return;
-
-            UpdateRacha(stats, tareasDelUsuario);
         }
     }
 }

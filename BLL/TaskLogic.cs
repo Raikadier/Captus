@@ -97,7 +97,7 @@ namespace BLL
                 {
                     return null;
                 }
-                return taskRepository.GetAll().Where(t => t.User.id == Session.CurrentUser.id).ToList();
+                return taskRepository.GetAllByUserId(Session.CurrentUser.id);
             }
             catch (Exception ex)
             {
@@ -112,6 +112,7 @@ namespace BLL
                 {
                     return null;
                 }
+                
                 return GetAll().Where(t => t.State == true).ToList();
             }
             catch (Exception ex)
@@ -119,12 +120,20 @@ namespace BLL
                 throw new Exception($"An error occurred while retrieving tasks: {ex.Message}");
             }
         }
+        public List<ENTITY.Task> GetCompletedTasksByUser()
+        {
+            var allTasks = taskRepository.GetAllByUserId(Session.CurrentUser.id);
+            return allTasks
+                .Where(t => t.User.id == Session.CurrentUser.id && t.State)
+                .ToList();
+        }
         public List<ENTITY.Task> GetCompletedTodayByUser()
         {
             var today = DateTime.Today;
             return GetAllCompleted()
-                   .Where(t => t.User.id == Session.CurrentUser.id && t.State == true && t.CreationDate.Date == today)
-                   .ToList();
+                .Where(t =>
+                    t.CreationDate.Date == today)
+                .ToList();
         }
         public ENTITY.Task GetById(int id)
         {
@@ -214,6 +223,17 @@ namespace BLL
         public List<ENTITY.Task> GetOverdueTasks()
         {
             return GetAll()?.Where(t => !t.State && t.EndDate < DateTime.Now).ToList();
+        }
+        public void UpdateTaskState(int taskId, bool state)
+        {
+            var task = GetById(taskId);
+            if (task != null)
+            {
+                task.State = state;
+                Update(task);
+                StatisticsLogic statisticsLogic=new StatisticsLogic();
+                statisticsLogic.UpdateRacha();
+            }
         }
     }
 }

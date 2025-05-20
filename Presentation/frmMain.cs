@@ -19,7 +19,7 @@ namespace Presentation
         int expandedWidth = 200;
         int collapsedWidth = 45;
         int step = 7; // velocidad de animación
-        
+        private readonly StatisticsLogic statisticsLogic;
 
 
 
@@ -29,6 +29,7 @@ namespace Presentation
             InitializeComponent();
             timer1.Interval = 10;
             InitializeLayout(); // Config inicial
+            statisticsLogic = new StatisticsLogic();
         }
 
         [DllImport("user32.dll", EntryPoint = "ReleaseCapture")]
@@ -295,7 +296,9 @@ namespace Presentation
 
         private void btnLogout_Click(object sender, EventArgs e)
         {
-            Application.Exit();
+            this.Dispose();
+            frmLogin loginForm = new frmLogin();
+            loginForm.Show();
         }
 
         private void Panel2_MouseDown(object sender, MouseEventArgs e)
@@ -312,6 +315,12 @@ namespace Presentation
         private void panel2_Paint(object sender, PaintEventArgs e)
         {
 
+        }
+
+        private void btnProfile_Click(object sender, EventArgs e)
+        {
+            frmStats frmStats = new frmStats();
+            frmStats.ShowDialog();
         }
     }
 }
