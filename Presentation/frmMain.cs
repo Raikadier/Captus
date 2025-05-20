@@ -52,7 +52,7 @@ namespace Presentation
 
         
 
-        private async void frmMain_Load(object sender, EventArgs e)
+        private void frmMain_Load(object sender, EventArgs e)
         {
             picLogoCaptus.SizeMode = PictureBoxSizeMode.Zoom;
             picLogoCaptus.Width = panel1.Width;
