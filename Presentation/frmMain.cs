@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -19,7 +20,7 @@ namespace Presentation
         int collapsedWidth = 45;
         int step = 7; // velocidad de animación
         
-        private ChatBot bot;
+        
 
 
 
@@ -28,7 +29,20 @@ namespace Presentation
             InitializeComponent();
             timer1.Interval = 10;
             InitializeLayout(); // Config inicial
-            bot = new ChatBot();
+        }
+
+        [DllImport("user32.dll", EntryPoint = "ReleaseCapture")]
+        private extern static void ReleaseCapture();
+        [DllImport("user32.dll", EntryPoint = "SendMessage")]
+        private extern static void SendMessage(System.IntPtr hwnd, int wmsg, int wparam, int lparam);
+
+        private void Form1_Resize(object sender, EventArgs e)
+        {
+            if (this.WindowState == FormWindowState.Maximized)
+            {
+                this.MaximumSize = Screen.FromHandle(this.Handle).WorkingArea.Size;
+                this.Location = Screen.FromHandle(this.Handle).WorkingArea.Location;
+            }
         }
 
         private void InitializeLayout()
@@ -58,7 +72,7 @@ namespace Presentation
             picLogoCaptus.SizeMode = PictureBoxSizeMode.Zoom;
             picLogoCaptus.Width = panel1.Width;
 
-            await bot.StartReceiver(); // arranca el bot al iniciar el form
+            
 
             // Establecer el tamaño inicial del panel (expandido)
             panel1.Width = expandedWidth;
@@ -283,6 +297,22 @@ namespace Presentation
         private void btnLogout_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void Panel2_MouseDown(object sender, MouseEventArgs e)
+        {
+            ReleaseCapture();
+            SendMessage(this.Handle, 0x112, 0xf012, 0);
+        }
+
+        private void panelContenedor_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void panel2_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }

@@ -73,10 +73,10 @@
             // 
             this.btnAddTask.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnAddTask.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.btnAddTask.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.btnAddTask.FlatAppearance.MouseOverBackColor = System.Drawing.Color.ForestGreen;
             this.btnAddTask.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAddTask.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnAddTask.ForeColor = System.Drawing.Color.Green;
+            this.btnAddTask.ForeColor = System.Drawing.Color.ForestGreen;
             this.btnAddTask.Location = new System.Drawing.Point(570, 318);
             this.btnAddTask.Name = "btnAddTask";
             this.btnAddTask.Size = new System.Drawing.Size(92, 32);
@@ -89,10 +89,10 @@
             this.btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.btnCancel.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnCancel.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.btnCancel.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.btnCancel.FlatAppearance.MouseOverBackColor = System.Drawing.Color.ForestGreen;
             this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCancel.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnCancel.ForeColor = System.Drawing.Color.Green;
+            this.btnCancel.ForeColor = System.Drawing.Color.ForestGreen;
             this.btnCancel.Location = new System.Drawing.Point(483, 318);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(81, 32);
@@ -156,7 +156,7 @@
             this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnClose.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnClose.Image = global::Presentation.Properties.Resources.icons8_close_window_50__2_;
-            this.btnClose.Location = new System.Drawing.Point(647, 3);
+            this.btnClose.Location = new System.Drawing.Point(647, 14);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(30, 26);
             this.btnClose.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
