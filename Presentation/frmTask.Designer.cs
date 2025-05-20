@@ -29,16 +29,16 @@
         private void InitializeComponent()
         {
             this.panelTop = new System.Windows.Forms.Panel();
+            this.label1 = new System.Windows.Forms.Label();
             this.panelFull = new System.Windows.Forms.Panel();
             this.btnGuardarTaskList = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.btnClose = new System.Windows.Forms.PictureBox();
+            this.btnAddTask = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.monthCalendar1 = new System.Windows.Forms.MonthCalendar();
+            this.btnClose = new System.Windows.Forms.PictureBox();
             this.panelTop.SuspendLayout();
             this.panelFull.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.btnClose)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.btnClose)).BeginInit();
             this.SuspendLayout();
             // 
             // panelTop
@@ -53,15 +53,29 @@
             this.panelTop.Size = new System.Drawing.Size(1089, 38);
             this.panelTop.TabIndex = 0;
             // 
+            // label1
+            // 
+            this.label1.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.ForeColor = System.Drawing.Color.Honeydew;
+            this.label1.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.label1.Location = new System.Drawing.Point(50, 9);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(132, 19);
+            this.label1.TabIndex = 43;
+            this.label1.Text = "Captus - TaskList";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
+            // 
             // panelFull
             // 
             this.panelFull.BackColor = System.Drawing.Color.Honeydew;
-            this.panelFull.Controls.Add(this.monthCalendar1);
+            this.panelFull.Controls.Add(this.btnAddTask);
             this.panelFull.Controls.Add(this.btnGuardarTaskList);
             this.panelFull.Dock = System.Windows.Forms.DockStyle.Left;
             this.panelFull.Location = new System.Drawing.Point(0, 38);
             this.panelFull.Name = "panelFull";
-            this.panelFull.Size = new System.Drawing.Size(278, 584);
+            this.panelFull.Size = new System.Drawing.Size(190, 584);
             this.panelFull.TabIndex = 1;
             // 
             // btnGuardarTaskList
@@ -81,19 +95,35 @@
             this.btnGuardarTaskList.Text = "Guardar";
             this.btnGuardarTaskList.UseVisualStyleBackColor = false;
             // 
-            // label1
+            // btnAddTask
             // 
-            this.label1.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.Color.Honeydew;
-            this.label1.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.label1.Location = new System.Drawing.Point(50, 9);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(132, 19);
-            this.label1.TabIndex = 43;
-            this.label1.Text = "Captus - TaskList";
-            this.label1.Click += new System.EventHandler(this.label1_Click);
+            this.btnAddTask.BackColor = System.Drawing.Color.Green;
+            this.btnAddTask.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnAddTask.FlatAppearance.BorderSize = 0;
+            this.btnAddTask.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.btnAddTask.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Green;
+            this.btnAddTask.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAddTask.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnAddTask.ForeColor = System.Drawing.Color.Honeydew;
+            this.btnAddTask.Image = global::Presentation.Properties.Resources.iconAdd;
+            this.btnAddTask.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnAddTask.Location = new System.Drawing.Point(0, 42);
+            this.btnAddTask.Name = "btnAddTask";
+            this.btnAddTask.Size = new System.Drawing.Size(190, 42);
+            this.btnAddTask.TabIndex = 43;
+            this.btnAddTask.Text = "Add Task";
+            this.btnAddTask.UseVisualStyleBackColor = false;
+            this.btnAddTask.Click += new System.EventHandler(this.btnAddTask_Click);
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = global::Presentation.Properties.Resources.iconTask;
+            this.pictureBox1.Location = new System.Drawing.Point(3, 3);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(41, 31);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox1.TabIndex = 45;
+            this.pictureBox1.TabStop = false;
             // 
             // btnClose
             // 
@@ -108,24 +138,6 @@
             this.btnClose.TabStop = false;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Image = global::Presentation.Properties.Resources.iconTask;
-            this.pictureBox1.Location = new System.Drawing.Point(3, 3);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(41, 31);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox1.TabIndex = 45;
-            this.pictureBox1.TabStop = false;
-            // 
-            // monthCalendar1
-            // 
-            this.monthCalendar1.Location = new System.Drawing.Point(15, 12);
-            this.monthCalendar1.Name = "monthCalendar1";
-            this.monthCalendar1.TabIndex = 43;
-            this.monthCalendar1.TitleBackColor = System.Drawing.Color.Green;
-            this.monthCalendar1.TrailingForeColor = System.Drawing.Color.Honeydew;
-            // 
             // frmTask
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -133,14 +145,15 @@
             this.ClientSize = new System.Drawing.Size(1089, 622);
             this.Controls.Add(this.panelFull);
             this.Controls.Add(this.panelTop);
+            this.Cursor = System.Windows.Forms.Cursors.Hand;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "frmTask";
             this.Text = "frmTask";
             this.panelTop.ResumeLayout(false);
             this.panelTop.PerformLayout();
             this.panelFull.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.btnClose)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.btnClose)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -153,6 +166,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.PictureBox btnClose;
         private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.MonthCalendar monthCalendar1;
+        private System.Windows.Forms.Button btnAddTask;
     }
 }

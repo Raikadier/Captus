@@ -93,7 +93,7 @@ namespace BLL
             }
 
 
-            if (texto.Contains("estudiar") && texto.Contains("tengo"))
+            if (texto.Contains("necesito estudiar") && texto.Contains("tengo"))
             {
                 try
                 {
