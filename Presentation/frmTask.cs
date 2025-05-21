@@ -7,15 +7,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BLL;
 
 namespace Presentation
 {
     public partial class frmTask : Form
     {
+        private readonly TaskLogic taskLogic = new TaskLogic();
+
         public frmTask()
         {
             InitializeComponent();
         }
+
+        
 
         private void btnClose_Click(object sender, EventArgs e)
         {
@@ -27,10 +32,22 @@ namespace Presentation
 
         }
 
+
+
         private void btnAddTask_Click(object sender, EventArgs e)
         {
             frmAddTask addtaskForm = new frmAddTask();
             addtaskForm.ShowDialog(); // Abre el registro
+        }
+
+        private void flowLayoutPanel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void btnRefresh_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
