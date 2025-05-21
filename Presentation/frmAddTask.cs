@@ -293,7 +293,7 @@ namespace Presentation
                     State = false,
                     User = Session.CurrentUser
                 };
-
+                //Prueba de que si sirve esto
                 try
                 {
                     var result = taskLogic.Save(nuevaTarea);
