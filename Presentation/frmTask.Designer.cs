@@ -137,7 +137,7 @@
             this.btnRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnRefresh.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnRefresh.ForeColor = System.Drawing.Color.Honeydew;
-            this.btnRefresh.Image = global::Presentation.Properties.Resources.iconRefresh;
+            this.btnRefresh.Image = global::Presentation.Properties.Resources.LogoRefreshPNG;
             this.btnRefresh.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnRefresh.Location = new System.Drawing.Point(0, 122);
             this.btnRefresh.Name = "btnRefresh";
