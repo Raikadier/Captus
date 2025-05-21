@@ -31,6 +31,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.btbnSendMessage = new Presentation.ButtonPersonal();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -63,11 +64,34 @@
             this.richTextBox1.TabIndex = 1;
             this.richTextBox1.Text = "";
             // 
+            // btbnSendMessage
+            // 
+            this.btbnSendMessage.BackColor = System.Drawing.Color.Green;
+            this.btbnSendMessage.BackgroundColor = System.Drawing.Color.Green;
+            this.btbnSendMessage.BorderColor = System.Drawing.Color.Honeydew;
+            this.btbnSendMessage.BorderColor1 = System.Drawing.Color.Honeydew;
+            this.btbnSendMessage.BorderRadius = 40;
+            this.btbnSendMessage.BorderRadius1 = 40;
+            this.btbnSendMessage.BorderSize = 0;
+            this.btbnSendMessage.BorderSize1 = 0;
+            this.btbnSendMessage.FlatAppearance.BorderSize = 0;
+            this.btbnSendMessage.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btbnSendMessage.Font = new System.Drawing.Font("Century Gothic", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btbnSendMessage.ForeColor = System.Drawing.Color.White;
+            this.btbnSendMessage.Location = new System.Drawing.Point(634, 394);
+            this.btbnSendMessage.Name = "btbnSendMessage";
+            this.btbnSendMessage.Size = new System.Drawing.Size(150, 40);
+            this.btbnSendMessage.TabIndex = 2;
+            this.btbnSendMessage.Text = "Send Message";
+            this.btbnSendMessage.TextColor = System.Drawing.Color.White;
+            this.btbnSendMessage.UseVisualStyleBackColor = false;
+            // 
             // frmBot
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btbnSendMessage);
             this.Controls.Add(this.richTextBox1);
             this.Controls.Add(this.panel1);
             this.Name = "frmBot";
@@ -83,5 +107,6 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.RichTextBox richTextBox1;
+        private ButtonPersonal btbnSendMessage;
     }
 }
