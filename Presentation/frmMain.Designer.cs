@@ -30,6 +30,8 @@
         {
             this.components = new System.ComponentModel.Container();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.panel3 = new System.Windows.Forms.Panel();
+            this.lblCerrarSesion = new System.Windows.Forms.Label();
             this.btnLogout = new System.Windows.Forms.Button();
             this.btnProfile = new System.Windows.Forms.Button();
             this.btnCalculo = new System.Windows.Forms.Button();
@@ -44,9 +46,6 @@
             this.btnMinimizar = new System.Windows.Forms.PictureBox();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.panelContenedor = new System.Windows.Forms.Panel();
-            this.lblCerrarSesion = new System.Windows.Forms.Label();
-            this.panel3 = new System.Windows.Forms.Panel();
-            this.panel4 = new System.Windows.Forms.Panel();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picLogoCaptus)).BeginInit();
             this.panel2.SuspendLayout();
@@ -55,7 +54,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.btnRestaurar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnMaximizar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnMinimizar)).BeginInit();
-            this.panelContenedor.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -74,6 +72,24 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(200, 561);
             this.panel1.TabIndex = 0;
+            // 
+            // panel3
+            // 
+            this.panel3.Location = new System.Drawing.Point(0, 330);
+            this.panel3.Name = "panel3";
+            this.panel3.Size = new System.Drawing.Size(197, 40);
+            this.panel3.TabIndex = 46;
+            // 
+            // lblCerrarSesion
+            // 
+            this.lblCerrarSesion.AutoSize = true;
+            this.lblCerrarSesion.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Bold);
+            this.lblCerrarSesion.ForeColor = System.Drawing.Color.Red;
+            this.lblCerrarSesion.Location = new System.Drawing.Point(58, 434);
+            this.lblCerrarSesion.Name = "lblCerrarSesion";
+            this.lblCerrarSesion.Size = new System.Drawing.Size(104, 18);
+            this.lblCerrarSesion.TabIndex = 45;
+            this.lblCerrarSesion.Text = "Cerrar sesión";
             // 
             // btnLogout
             // 
@@ -250,38 +266,12 @@
             // 
             // panelContenedor
             // 
-            this.panelContenedor.Controls.Add(this.panel4);
             this.panelContenedor.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelContenedor.Location = new System.Drawing.Point(200, 43);
             this.panelContenedor.Name = "panelContenedor";
             this.panelContenedor.Size = new System.Drawing.Size(790, 518);
             this.panelContenedor.TabIndex = 2;
             this.panelContenedor.Paint += new System.Windows.Forms.PaintEventHandler(this.panelContenedor_Paint);
-            // 
-            // lblCerrarSesion
-            // 
-            this.lblCerrarSesion.AutoSize = true;
-            this.lblCerrarSesion.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Bold);
-            this.lblCerrarSesion.ForeColor = System.Drawing.Color.Red;
-            this.lblCerrarSesion.Location = new System.Drawing.Point(58, 434);
-            this.lblCerrarSesion.Name = "lblCerrarSesion";
-            this.lblCerrarSesion.Size = new System.Drawing.Size(104, 18);
-            this.lblCerrarSesion.TabIndex = 45;
-            this.lblCerrarSesion.Text = "Cerrar sesión";
-            // 
-            // panel3
-            // 
-            this.panel3.Location = new System.Drawing.Point(0, 330);
-            this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(197, 40);
-            this.panel3.TabIndex = 46;
-            // 
-            // panel4
-            // 
-            this.panel4.Location = new System.Drawing.Point(0, 287);
-            this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(154, 157);
-            this.panel4.TabIndex = 0;
             // 
             // frmMain
             // 
@@ -305,7 +295,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.btnRestaurar)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnMaximizar)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnMinimizar)).EndInit();
-            this.panelContenedor.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -329,6 +318,5 @@
         private System.Windows.Forms.Panel panelContenedor;
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.Label lblCerrarSesion;
-        private System.Windows.Forms.Panel panel4;
     }
 }
