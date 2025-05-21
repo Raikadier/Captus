@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Contexts;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BLL;
+using ENTITY;
 
 namespace Presentation
 {
@@ -20,7 +23,7 @@ namespace Presentation
         int collapsedWidth = 45;
         int step = 7; // velocidad de animación
         private readonly StatisticsLogic statisticsLogic;
-
+        private readonly TaskLogic taskLogic;
 
 
 
@@ -28,9 +31,11 @@ namespace Presentation
         {
             InitializeComponent();
             timer1.Interval = 10;
-            InitializeLayout(); // Config inicial
+            InitializeLayout();
+            taskLogic = new TaskLogic();
             statisticsLogic = new StatisticsLogic();
             statisticsLogic.VerificarRacha();
+            MostrarTareasAgrupadas();
         }
 
         [DllImport("user32.dll", EntryPoint = "ReleaseCapture")]
@@ -46,7 +51,158 @@ namespace Presentation
                 this.Location = Screen.FromHandle(this.Handle).WorkingArea.Location;
             }
         }
+        private void MostrarTareasAgrupadas()
+        {
+            panelTareas.Controls.Clear();
 
+            var tareasPendientes = taskLogic.GetTaskIncompletedByUser();
+
+            var tareasPorFecha = tareasPendientes
+                .GroupBy(t => t.EndDate.Date)
+                .OrderBy(g => g.Key);
+
+            foreach (var grupo in tareasPorFecha)
+            {
+                string tituloFecha = ObtenerTituloFecha(grupo.Key);
+
+                // Crear label para la fecha
+                Label lblFecha = new Label
+                {
+                    Text = tituloFecha,
+                    Font = new Font("Segoe UI", 12, FontStyle.Bold),
+                    ForeColor = Color.DarkGreen,
+                    Padding = new Padding(0, 10, 0, 5),
+                    AutoSize = true
+                };
+
+                panelTareas.Controls.Add(lblFecha);
+
+                // Mostrar tarjetas de tareas
+                foreach (var tarea in grupo)
+                {
+                    Panel tarjeta = CrearTarjetaTarea(tarea);
+                    tarjeta.Click += (s, e) =>
+                    {
+                        frmTaskDetails form = new frmTaskDetails(tarea);
+                        form.ShowDialog();
+                        MostrarTareasAgrupadas();
+                    };
+                    panelTareas.Controls.Add(tarjeta);
+                }
+            }
+        }
+        private Panel CrearTarjetaTarea(ENTITY.Task tarea)
+        {
+            Panel panel = new Panel
+            {
+                Width = panelTareas.Width - 40,
+                Height = 90,
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = Color.White,
+                Margin = new Padding(10),
+                Padding = new Padding(10)
+            };
+
+            Color colorPrioridad = ObtenerColorPrioridad(tarea.Priority.Name);
+            panel.Paint += (s, e) =>
+            {
+                ControlPaint.DrawBorder(e.Graphics, panel.ClientRectangle,
+                    colorPrioridad, 3, ButtonBorderStyle.Solid,
+                    colorPrioridad, 3, ButtonBorderStyle.Solid,
+                    colorPrioridad, 3, ButtonBorderStyle.Solid,
+                    colorPrioridad, 3, ButtonBorderStyle.Solid);
+            };
+
+            TextBox txtTitle = new TextBox
+            {
+                Text = tarea.Title,
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                AutoSize = true
+            };
+
+            TextBox txtDescription = new TextBox
+            {
+                Text = tarea.Description.Length > 60 ? tarea.Description.Substring(0, 57) + "..." : tarea.Description,
+                Font = new Font("Segoe UI", 9),
+                ForeColor = Color.Gray,
+                AutoSize = true,
+                Location = new Point(0, 25)
+            };
+
+            TextBox txtCategoria = new TextBox
+            {
+                Text = tarea.Category.Name,
+                Font = new Font("Segoe UI", 8, FontStyle.Italic),
+                ForeColor = Color.DarkSlateGray,
+                AutoSize = true,
+                Location = new Point(0, 50)
+            };
+
+            CheckBox chkCompletar = new CheckBox
+            {
+                Text = "✔",
+                Font = new Font("Segoe UI", 12),
+                AutoSize = true,
+                Location = new Point(panel.Width - 50, 10),
+                ForeColor = Color.Green
+            };
+            chkCompletar.CheckedChanged += (s, e) =>
+            {
+                if (chkCompletar.Checked)
+                {
+                    tarea.State = true;
+                    tarea.CreationDate = DateTime.Now;
+                    taskLogic.Update(tarea);
+                    MostrarTareasAgrupadas(); // refrescar vista
+                }
+            };
+
+            Button btnDetalle = new Button
+            {
+                Text = "⋯",
+                Width = 30,
+                Height = 25,
+                Location = new Point(panel.Width - 50, 45),
+                FlatStyle = FlatStyle.Flat
+            };
+            btnDetalle.Click += (s, e) =>
+            {
+                //new FormDetalleTarea(tarea).ShowDialog();
+                MostrarTareasAgrupadas();
+            };
+
+            panel.Controls.Add(txtTitle);
+            panel.Controls.Add(txtDescription);
+            panel.Controls.Add(txtCategoria);
+            panel.Controls.Add(chkCompletar);
+            panel.Controls.Add(btnDetalle);
+
+            return panel;
+        }
+        private string ObtenerTituloFecha(DateTime fecha)
+        {
+            DateTime hoy = DateTime.Today;
+            if (fecha == hoy)
+                return "Hoy";
+            else if (fecha == hoy.AddDays(1))
+                return "Mañana";
+            else
+                return fecha.ToString("dddd, dd MMMM", new CultureInfo("es-ES"));
+        }
+        private Color ObtenerColorPrioridad(string prioridad)
+        {
+            switch(prioridad.ToLower())
+            {
+                case "alta":
+                    return Color.Red;
+                case "media":
+                    return Color.Orange;
+                case "baja":
+                    return Color.Green;
+                default:
+                    return Color.Gray;
+            }
+        }
         private void InitializeLayout()
         {
             picLogoCaptus.SizeMode = PictureBoxSizeMode.Zoom;
@@ -56,11 +212,11 @@ namespace Presentation
             {
                 if (ctrl is Button btn)
                 {
-                    //btn.TextImageRelation = TextImageRelation.ImageAboveText; // imagen arriba del texto
+                    //btn.TextImageRelation = TextImageRelation.ImageAboveText;
                     ////btn.ImageAlign = ContentAlignment.MiddleCenter;
                     //btn.TextAlign = ContentAlignment.MiddleCenter;
 
-                    //btn.TextImageRelation = TextImageRelation.ImageAboveText; // imagen arriba del texto
+                    //btn.TextImageRelation = TextImageRelation.ImageAboveText;
                     //btn.ImageAlign = ContentAlignment.MiddleCenter;
                     btn.TextAlign = ContentAlignment.MiddleCenter;
                 }

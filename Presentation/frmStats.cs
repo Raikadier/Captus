@@ -82,7 +82,7 @@ namespace Presentation
             int objetivo = stat.DailyGoal;
             var tareasHoy = taskLogic.GetCompletedTodayByUser();
             int completadasHoy = tareasHoy.Count;
-            lblTaskCompleted.Text = stat.CompletedTasks.ToString();
+            lblTaskCompleted.Text = taskLogic.GetAllCompleted().Count().ToString();
             ObjetiveDaily.Text = $"{completadasHoy} / {objetivo} tareas";
             lblRacha.Text = stat.Racha.ToString();
             UpdateLogoProgress(completadasHoy, objetivo);

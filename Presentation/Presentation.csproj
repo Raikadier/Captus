@@ -82,6 +82,12 @@
     <Compile Include="frmTask.Designer.cs">
       <DependentUpon>frmTask.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmTaskDetails.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmTaskDetails.Designer.cs">
+      <DependentUpon>frmTaskDetails.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="frmAddTask.resx">
@@ -101,6 +107,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmTask.resx">
       <DependentUpon>frmTask.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmTaskDetails.resx">
+      <DependentUpon>frmTaskDetails.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

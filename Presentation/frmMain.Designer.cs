@@ -46,6 +46,7 @@
             this.btnMinimizar = new System.Windows.Forms.PictureBox();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.panelContenedor = new System.Windows.Forms.Panel();
+            this.panelTareas = new System.Windows.Forms.FlowLayoutPanel();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picLogoCaptus)).BeginInit();
             this.panel2.SuspendLayout();
@@ -54,6 +55,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.btnRestaurar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnMaximizar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnMinimizar)).BeginInit();
+            this.panelContenedor.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -75,7 +77,7 @@
             // 
             // panel3
             // 
-            this.panel3.Location = new System.Drawing.Point(0, 330);
+            this.panel3.Location = new System.Drawing.Point(0, 238);
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(197, 40);
             this.panel3.TabIndex = 46;
@@ -85,7 +87,7 @@
             this.lblCerrarSesion.AutoSize = true;
             this.lblCerrarSesion.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Bold);
             this.lblCerrarSesion.ForeColor = System.Drawing.Color.Red;
-            this.lblCerrarSesion.Location = new System.Drawing.Point(58, 434);
+            this.lblCerrarSesion.Location = new System.Drawing.Point(58, 483);
             this.lblCerrarSesion.Name = "lblCerrarSesion";
             this.lblCerrarSesion.Size = new System.Drawing.Size(104, 18);
             this.lblCerrarSesion.TabIndex = 45;
@@ -100,7 +102,7 @@
             this.btnLogout.ForeColor = System.Drawing.Color.Honeydew;
             this.btnLogout.Image = global::Presentation.Properties.Resources.iconLogout__1_;
             this.btnLogout.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnLogout.Location = new System.Drawing.Point(0, 416);
+            this.btnLogout.Location = new System.Drawing.Point(0, 465);
             this.btnLogout.Name = "btnLogout";
             this.btnLogout.Size = new System.Drawing.Size(197, 54);
             this.btnLogout.TabIndex = 44;
@@ -116,7 +118,7 @@
             this.btnProfile.ForeColor = System.Drawing.Color.Honeydew;
             this.btnProfile.Image = global::Presentation.Properties.Resources.iconUserWh;
             this.btnProfile.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnProfile.Location = new System.Drawing.Point(3, 284);
+            this.btnProfile.Location = new System.Drawing.Point(0, 419);
             this.btnProfile.Name = "btnProfile";
             this.btnProfile.Size = new System.Drawing.Size(197, 40);
             this.btnProfile.TabIndex = 43;
@@ -133,7 +135,7 @@
             this.btnCalculo.ForeColor = System.Drawing.Color.Honeydew;
             this.btnCalculo.Image = global::Presentation.Properties.Resources.iconCalculoWh__1_;
             this.btnCalculo.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnCalculo.Location = new System.Drawing.Point(3, 238);
+            this.btnCalculo.Location = new System.Drawing.Point(3, 286);
             this.btnCalculo.Name = "btnCalculo";
             this.btnCalculo.Size = new System.Drawing.Size(197, 40);
             this.btnCalculo.TabIndex = 42;
@@ -266,12 +268,23 @@
             // 
             // panelContenedor
             // 
+            this.panelContenedor.Controls.Add(this.panelTareas);
             this.panelContenedor.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelContenedor.Location = new System.Drawing.Point(200, 43);
             this.panelContenedor.Name = "panelContenedor";
             this.panelContenedor.Size = new System.Drawing.Size(790, 518);
             this.panelContenedor.TabIndex = 2;
             this.panelContenedor.Paint += new System.Windows.Forms.PaintEventHandler(this.panelContenedor_Paint);
+            // 
+            // panelTareas
+            // 
+            this.panelTareas.AutoScroll = true;
+            this.panelTareas.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this.panelTareas.Location = new System.Drawing.Point(49, 84);
+            this.panelTareas.Name = "panelTareas";
+            this.panelTareas.Size = new System.Drawing.Size(698, 392);
+            this.panelTareas.TabIndex = 0;
+            this.panelTareas.WrapContents = false;
             // 
             // frmMain
             // 
@@ -295,6 +308,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.btnRestaurar)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnMaximizar)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnMinimizar)).EndInit();
+            this.panelContenedor.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -318,5 +332,6 @@
         private System.Windows.Forms.Panel panelContenedor;
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.Label lblCerrarSesion;
+        private System.Windows.Forms.FlowLayoutPanel panelTareas;
     }
 }

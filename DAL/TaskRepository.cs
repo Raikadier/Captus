@@ -146,9 +146,9 @@ namespace DAL
                 Description = reader.IsDBNull(reader.GetOrdinal("Description")) ? null : reader.GetString(reader.GetOrdinal("Description")),
                 CreationDate = reader.GetDateTime(reader.GetOrdinal("CreationDate")),
                 EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
-                Priority = SearchEntity.SearchPriorityById(priorityRepository.GetAll(), Convert.ToInt32(reader.GetOrdinal("Id_Priority"))),
+                Priority = SearchEntity.SearchPriorityById(priorityRepository.GetAll(), Convert.ToInt32(reader["Id_Priority"])),
                 State = reader.GetBoolean(reader.GetOrdinal("State")),
-                User = SearchEntity.SearchUserById(userRepository.GetAll(), Convert.ToInt32(reader.GetOrdinal("Id_User")))
+                User = SearchEntity.SearchUserById(userRepository.GetAll(), Convert.ToInt32(reader["Id_User"]))
             };
             return task;
         }

@@ -104,6 +104,19 @@ namespace BLL
                 throw new Exception($"An error occurred while retrieving tasks: {ex.Message}");
             }
         }
+        public List<ENTITY.Task> GetTaskIncompletedByUser()
+        {
+            try
+            {
+                if (Session.CurrentUser ==null) return null;
+                var tasks = GetAll().Where<ENTITY.Task>(t => !t.State).ToList();
+                return tasks;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"An error occurred while retrieving tasks: {ex.Message}");
+            }
+        }
         public List<ENTITY.Task> GetAllCompleted()
         {
             try
