@@ -46,6 +46,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ButtonPersonal.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="frmAddTask.cs">
       <SubType>Form</SubType>
     </Compile>

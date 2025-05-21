@@ -222,7 +222,7 @@
             // 
             // pictureBox2
             // 
-            this.pictureBox2.Image = global::Presentation.Properties.Resources.picUser;
+            this.pictureBox2.Image = global::Presentation.Properties.Resources.iconUserWh;
             this.pictureBox2.Location = new System.Drawing.Point(347, 41);
             this.pictureBox2.Name = "pictureBox2";
             this.pictureBox2.Size = new System.Drawing.Size(59, 65);
