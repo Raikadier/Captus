@@ -213,5 +213,8 @@
   <ItemGroup>
     <None Include="Resources\LOGOCaptus-removebg-preview2.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Racha.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
