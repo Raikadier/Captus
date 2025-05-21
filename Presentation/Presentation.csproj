@@ -99,6 +99,9 @@
     <EmbeddedResource Include="frmAddTask.resx">
       <DependentUpon>frmAddTask.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="frmBot.resx">
+      <DependentUpon>frmBot.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmLogin.resx">
       <DependentUpon>frmLogin.cs</DependentUpon>
     </EmbeddedResource>
