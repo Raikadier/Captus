@@ -105,8 +105,6 @@ namespace Presentation
             this.Hide();
             frmRegister registerForm = new frmRegister();
             registerForm.ShowDialog();
-            this.Show();
-
         }
 
         private void btnLogin_Click(object sender, EventArgs e)

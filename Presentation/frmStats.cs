@@ -127,7 +127,9 @@ namespace Presentation
 
                 Label lblFecha = new Label
                 {
-                    Text = tarea.CreationDate.ToShortDateString(),
+                    Text = tarea.CreationDate.HasValue
+                    ? tarea.CreationDate.Value.ToShortDateString()
+                    : "Sin fecha",
                     Font = new Font("Segoe UI", 8, FontStyle.Italic),
                     ForeColor = Color.Gray,
                     Location = new Point(panelTarea.Width - 100, 5),

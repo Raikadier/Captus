@@ -11,13 +11,13 @@ namespace ENTITY
     {
         public bool IsDelay => !this.State && DateTime.Today > this.EndDate.Date;
         public Task() { }
-        public Task(int id, string title, Category category, string description, DateTime creationDate, DateTime endDate, Priority priority, bool state, User user)
+        public Task(int id, string title, Category category, string description, DateTime endDate, Priority priority, bool state, User user)
         {
             this.id = id;
             this.Title = title;
             this.Category = category;
             this.Description = description;
-            this.CreationDate = creationDate;
+            this.CreationDate = DateTime.Now;
             this.EndDate = endDate;
             this.Priority = priority;
             this.State = state;
@@ -35,7 +35,10 @@ namespace ENTITY
                 cmd.Parameters.AddWithValue("@Description", DBNull.Value);
             else
                 cmd.Parameters.AddWithValue("@Description", this.Description);
-            cmd.Parameters.AddWithValue("@CreationDate", this.CreationDate);
+            if (this.CreationDate == null)
+                cmd.Parameters.AddWithValue("@CreationDate", DBNull.Value);
+            else
+                cmd.Parameters.AddWithValue("@CreationDate", this.CreationDate);
             cmd.Parameters.AddWithValue("@EndDate", this.EndDate);
             cmd.Parameters.AddWithValue("@Id_Priority", this.Priority.Id_Priority);
             cmd.Parameters.AddWithValue("@State", this.State);

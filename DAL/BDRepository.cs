@@ -32,8 +32,9 @@ namespace DAL
                 Console.WriteLine("SQL Error: " + e.Message);
                 return false;
             }
-            catch (Exception)
+            catch (Exception a)
             {
+                Console.WriteLine("Error: " + a.Message);
                 bd.CloseConection();
                 return false;
             }

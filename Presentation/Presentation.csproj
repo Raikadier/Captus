@@ -216,5 +216,20 @@
   <ItemGroup>
     <None Include="Resources\Racha.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\LogoRefreshPNG.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Today.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Tomorrow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Weekend.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Nextweek.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
