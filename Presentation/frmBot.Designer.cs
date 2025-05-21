@@ -74,6 +74,7 @@
             this.btbnSendMessage.BorderRadius1 = 40;
             this.btbnSendMessage.BorderSize = 0;
             this.btbnSendMessage.BorderSize1 = 0;
+            this.btbnSendMessage.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btbnSendMessage.FlatAppearance.BorderSize = 0;
             this.btbnSendMessage.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btbnSendMessage.Font = new System.Drawing.Font("Century Gothic", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
