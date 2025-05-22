@@ -73,6 +73,16 @@ namespace Presentation.Properties {
         /// <summary>
         ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Bot {
+            get {
+                object obj = ResourceManager.GetObject("Bot", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap btnMinimizar {
             get {
                 object obj = ResourceManager.GetObject("btnMinimizar", resourceCulture);
@@ -336,6 +346,16 @@ namespace Presentation.Properties {
         internal static System.Drawing.Bitmap Nextweek {
             get {
                 object obj = ResourceManager.GetObject("Nextweek", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap picUser {
+            get {
+                object obj = ResourceManager.GetObject("picUser", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

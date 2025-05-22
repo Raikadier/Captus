@@ -30,6 +30,10 @@
         {
             this.components = new System.ComponentModel.Container();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.btnChatBot = new System.Windows.Forms.Panel();
+            this.label2 = new System.Windows.Forms.Label();
+            this.imgChatBot = new System.Windows.Forms.Panel();
+            this.btnAddTask = new System.Windows.Forms.Button();
             this.lblCerrarSesion = new System.Windows.Forms.Label();
             this.btnLogout = new System.Windows.Forms.Button();
             this.btnProfile = new System.Windows.Forms.Button();
@@ -46,8 +50,8 @@
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.panelContenedor = new System.Windows.Forms.Panel();
             this.panelTareas = new System.Windows.Forms.FlowLayoutPanel();
-            this.btnAddTask = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
+            this.btnChatBot.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picLogoCaptus)).BeginInit();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.btnMenu)).BeginInit();
@@ -61,6 +65,7 @@
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.Green;
+            this.panel1.Controls.Add(this.btnChatBot);
             this.panel1.Controls.Add(this.btnAddTask);
             this.panel1.Controls.Add(this.lblCerrarSesion);
             this.panel1.Controls.Add(this.btnLogout);
@@ -75,12 +80,63 @@
             this.panel1.Size = new System.Drawing.Size(200, 561);
             this.panel1.TabIndex = 0;
             // 
+            // btnChatBot
+            // 
+            this.btnChatBot.Controls.Add(this.label2);
+            this.btnChatBot.Controls.Add(this.imgChatBot);
+            this.btnChatBot.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnChatBot.Location = new System.Drawing.Point(2, 366);
+            this.btnChatBot.Name = "btnChatBot";
+            this.btnChatBot.Size = new System.Drawing.Size(198, 40);
+            this.btnChatBot.TabIndex = 47;
+            this.btnChatBot.Click += new System.EventHandler(this.btnChatBot_Click);
+            this.btnChatBot.Paint += new System.Windows.Forms.PaintEventHandler(this.btnChatBot_Paint);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Bold);
+            this.label2.ForeColor = System.Drawing.SystemColors.Window;
+            this.label2.Location = new System.Drawing.Point(56, 11);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(70, 18);
+            this.label2.TabIndex = 1;
+            this.label2.Text = "Chat Bot";
+            // 
+            // imgChatBot
+            // 
+            this.imgChatBot.BackgroundImage = global::Presentation.Properties.Resources.Bot;
+            this.imgChatBot.Location = new System.Drawing.Point(4, 5);
+            this.imgChatBot.Name = "imgChatBot";
+            this.imgChatBot.Size = new System.Drawing.Size(30, 30);
+            this.imgChatBot.TabIndex = 0;
+            // 
+            // btnAddTask
+            // 
+            this.btnAddTask.BackColor = System.Drawing.Color.Green;
+            this.btnAddTask.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnAddTask.FlatAppearance.BorderSize = 0;
+            this.btnAddTask.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.btnAddTask.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Green;
+            this.btnAddTask.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAddTask.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnAddTask.ForeColor = System.Drawing.Color.Honeydew;
+            this.btnAddTask.Image = global::Presentation.Properties.Resources.iconAdd;
+            this.btnAddTask.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnAddTask.Location = new System.Drawing.Point(21, 218);
+            this.btnAddTask.Name = "btnAddTask";
+            this.btnAddTask.Size = new System.Drawing.Size(162, 34);
+            this.btnAddTask.TabIndex = 46;
+            this.btnAddTask.Text = "Add Task";
+            this.btnAddTask.UseVisualStyleBackColor = false;
+            this.btnAddTask.Click += new System.EventHandler(this.btnAddTask_Click);
+            // 
             // lblCerrarSesion
             // 
             this.lblCerrarSesion.AutoSize = true;
             this.lblCerrarSesion.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Bold);
             this.lblCerrarSesion.ForeColor = System.Drawing.Color.Red;
-            this.lblCerrarSesion.Location = new System.Drawing.Point(58, 483);
+            this.lblCerrarSesion.Location = new System.Drawing.Point(58, 512);
             this.lblCerrarSesion.Name = "lblCerrarSesion";
             this.lblCerrarSesion.Size = new System.Drawing.Size(104, 18);
             this.lblCerrarSesion.TabIndex = 45;
@@ -95,7 +151,7 @@
             this.btnLogout.ForeColor = System.Drawing.Color.Honeydew;
             this.btnLogout.Image = global::Presentation.Properties.Resources.iconLogout__1_;
             this.btnLogout.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnLogout.Location = new System.Drawing.Point(0, 465);
+            this.btnLogout.Location = new System.Drawing.Point(0, 494);
             this.btnLogout.Name = "btnLogout";
             this.btnLogout.Size = new System.Drawing.Size(197, 54);
             this.btnLogout.TabIndex = 44;
@@ -111,7 +167,7 @@
             this.btnProfile.ForeColor = System.Drawing.Color.Honeydew;
             this.btnProfile.Image = global::Presentation.Properties.Resources.iconUserWh;
             this.btnProfile.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnProfile.Location = new System.Drawing.Point(0, 419);
+            this.btnProfile.Location = new System.Drawing.Point(0, 447);
             this.btnProfile.Name = "btnProfile";
             this.btnProfile.Size = new System.Drawing.Size(197, 40);
             this.btnProfile.TabIndex = 43;
@@ -279,26 +335,6 @@
             this.panelTareas.TabIndex = 0;
             this.panelTareas.WrapContents = false;
             // 
-            // btnAddTask
-            // 
-            this.btnAddTask.BackColor = System.Drawing.Color.Green;
-            this.btnAddTask.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnAddTask.FlatAppearance.BorderSize = 0;
-            this.btnAddTask.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.btnAddTask.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Green;
-            this.btnAddTask.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAddTask.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnAddTask.ForeColor = System.Drawing.Color.Honeydew;
-            this.btnAddTask.Image = global::Presentation.Properties.Resources.iconAdd;
-            this.btnAddTask.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnAddTask.Location = new System.Drawing.Point(21, 198);
-            this.btnAddTask.Name = "btnAddTask";
-            this.btnAddTask.Size = new System.Drawing.Size(162, 34);
-            this.btnAddTask.TabIndex = 46;
-            this.btnAddTask.Text = "Add Task";
-            this.btnAddTask.UseVisualStyleBackColor = false;
-            this.btnAddTask.Click += new System.EventHandler(this.btnAddTask_Click);
-            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -314,6 +350,8 @@
             this.Load += new System.EventHandler(this.frmMain_Load);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            this.btnChatBot.ResumeLayout(false);
+            this.btnChatBot.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picLogoCaptus)).EndInit();
             this.panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.btnMenu)).EndInit();
@@ -346,5 +384,8 @@
         private System.Windows.Forms.Label lblCerrarSesion;
         private System.Windows.Forms.FlowLayoutPanel panelTareas;
         private System.Windows.Forms.Button btnAddTask;
+        private System.Windows.Forms.Panel btnChatBot;
+        private System.Windows.Forms.Panel imgChatBot;
+        private System.Windows.Forms.Label label2;
     }
 }

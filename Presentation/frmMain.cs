@@ -91,6 +91,15 @@ namespace Presentation
                 }
             }
         }
+        private void CargarFormularioEnPanel(Form formulario)
+        {
+            panelContenedor.Controls.Clear();
+            formulario.TopLevel = false;
+            formulario.FormBorderStyle = FormBorderStyle.None;
+            formulario.Dock = DockStyle.Fill;
+            panelContenedor.Controls.Add(formulario);
+            formulario.Show();
+        }
         private Panel CrearTarjetaTarea(ENTITY.Task tarea)
         {
             Panel panel = new Panel
@@ -438,7 +447,9 @@ namespace Presentation
 
         private void btnTaskList_Click(object sender, EventArgs e)
         {
-            //AbrirFormInPanel(new frmTask ());
+            LimpiarPanelContenedor();
+            panelTareas.Visible = true;
+            panelContenedor.Controls.Add(panelTareas);
             MostrarTareasAgrupadas();
         }
 
@@ -473,8 +484,29 @@ namespace Presentation
 
         private void btnAddTask_Click(object sender, EventArgs e)
         {
+            LimpiarPanelContenedor();
             frmAddTask addtaskForm = new frmAddTask();
             addtaskForm.ShowDialog();
+        }
+
+        private void btnChatBot_Click(object sender, EventArgs e)
+        {
+            LimpiarPanelContenedor();
+            panelTareas.Visible = false;
+            FrmBot bot = new FrmBot();
+            CargarFormularioEnPanel(bot);
+        }
+
+        private void btnChatBot_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+        private void LimpiarPanelContenedor()
+        {
+            foreach (Control ctrl in panelContenedor.Controls)
+            {
+                ctrl.Visible = false;
+            }
         }
     }
 }
