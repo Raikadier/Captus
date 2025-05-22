@@ -37,7 +37,7 @@ namespace Presentation
         private void btnAddTask_Click(object sender, EventArgs e)
         {
             frmAddTask addtaskForm = new frmAddTask();
-            addtaskForm.ShowDialog(); // Abre el registro
+            addtaskForm.ShowDialog();
         }
 
         private void flowLayoutPanel1_Paint(object sender, PaintEventArgs e)

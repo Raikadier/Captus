@@ -30,7 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.panel3 = new System.Windows.Forms.Panel();
             this.lblCerrarSesion = new System.Windows.Forms.Label();
             this.btnLogout = new System.Windows.Forms.Button();
             this.btnProfile = new System.Windows.Forms.Button();
@@ -47,6 +46,7 @@
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.panelContenedor = new System.Windows.Forms.Panel();
             this.panelTareas = new System.Windows.Forms.FlowLayoutPanel();
+            this.btnAddTask = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picLogoCaptus)).BeginInit();
             this.panel2.SuspendLayout();
@@ -61,7 +61,7 @@
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.Green;
-            this.panel1.Controls.Add(this.panel3);
+            this.panel1.Controls.Add(this.btnAddTask);
             this.panel1.Controls.Add(this.lblCerrarSesion);
             this.panel1.Controls.Add(this.btnLogout);
             this.panel1.Controls.Add(this.btnProfile);
@@ -74,13 +74,6 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(200, 561);
             this.panel1.TabIndex = 0;
-            // 
-            // panel3
-            // 
-            this.panel3.Location = new System.Drawing.Point(0, 238);
-            this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(197, 40);
-            this.panel3.TabIndex = 46;
             // 
             // lblCerrarSesion
             // 
@@ -135,7 +128,7 @@
             this.btnCalculo.ForeColor = System.Drawing.Color.Honeydew;
             this.btnCalculo.Image = global::Presentation.Properties.Resources.iconCalculoWh__1_;
             this.btnCalculo.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnCalculo.Location = new System.Drawing.Point(3, 286);
+            this.btnCalculo.Location = new System.Drawing.Point(3, 320);
             this.btnCalculo.Name = "btnCalculo";
             this.btnCalculo.Size = new System.Drawing.Size(197, 40);
             this.btnCalculo.TabIndex = 42;
@@ -151,7 +144,7 @@
             this.btnTaskList.ForeColor = System.Drawing.Color.Honeydew;
             this.btnTaskList.Image = global::Presentation.Properties.Resources.iconTask;
             this.btnTaskList.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnTaskList.Location = new System.Drawing.Point(0, 192);
+            this.btnTaskList.Location = new System.Drawing.Point(0, 264);
             this.btnTaskList.Name = "btnTaskList";
             this.btnTaskList.Size = new System.Drawing.Size(200, 40);
             this.btnTaskList.TabIndex = 41;
@@ -282,9 +275,29 @@
             this.panelTareas.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.panelTareas.Location = new System.Drawing.Point(49, 84);
             this.panelTareas.Name = "panelTareas";
-            this.panelTareas.Size = new System.Drawing.Size(698, 392);
+            this.panelTareas.Size = new System.Drawing.Size(700, 400);
             this.panelTareas.TabIndex = 0;
             this.panelTareas.WrapContents = false;
+            // 
+            // btnAddTask
+            // 
+            this.btnAddTask.BackColor = System.Drawing.Color.Green;
+            this.btnAddTask.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnAddTask.FlatAppearance.BorderSize = 0;
+            this.btnAddTask.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.btnAddTask.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Green;
+            this.btnAddTask.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAddTask.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnAddTask.ForeColor = System.Drawing.Color.Honeydew;
+            this.btnAddTask.Image = global::Presentation.Properties.Resources.iconAdd;
+            this.btnAddTask.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnAddTask.Location = new System.Drawing.Point(21, 198);
+            this.btnAddTask.Name = "btnAddTask";
+            this.btnAddTask.Size = new System.Drawing.Size(162, 34);
+            this.btnAddTask.TabIndex = 46;
+            this.btnAddTask.Text = "Add Task";
+            this.btnAddTask.UseVisualStyleBackColor = false;
+            this.btnAddTask.Click += new System.EventHandler(this.btnAddTask_Click);
             // 
             // frmMain
             // 
@@ -330,8 +343,8 @@
         private System.Windows.Forms.Button btnProfile;
         private System.Windows.Forms.Button btnLogout;
         private System.Windows.Forms.Panel panelContenedor;
-        private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.Label lblCerrarSesion;
         private System.Windows.Forms.FlowLayoutPanel panelTareas;
+        private System.Windows.Forms.Button btnAddTask;
     }
 }

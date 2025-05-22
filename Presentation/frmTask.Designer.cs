@@ -29,21 +29,20 @@
         private void InitializeComponent()
         {
             this.panelTop = new System.Windows.Forms.Panel();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.btnClose = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
             this.panelFull = new System.Windows.Forms.Panel();
+            this.btnAddTask = new System.Windows.Forms.Button();
             this.btnGuardarTaskList = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.button2 = new System.Windows.Forms.Button();
-            this.btnRefresh = new System.Windows.Forms.Button();
-            this.btnAddTask = new System.Windows.Forms.Button();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.btnClose = new System.Windows.Forms.PictureBox();
             this.flpTasks = new System.Windows.Forms.FlowLayoutPanel();
             this.panelTop.SuspendLayout();
-            this.panelFull.SuspendLayout();
-            this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnClose)).BeginInit();
+            this.panelFull.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // panelTop
@@ -57,6 +56,29 @@
             this.panelTop.Name = "panelTop";
             this.panelTop.Size = new System.Drawing.Size(1089, 38);
             this.panelTop.TabIndex = 0;
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = global::Presentation.Properties.Resources.iconTask;
+            this.pictureBox1.Location = new System.Drawing.Point(3, 3);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(41, 31);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox1.TabIndex = 45;
+            this.pictureBox1.TabStop = false;
+            // 
+            // btnClose
+            // 
+            this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnClose.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnClose.Image = global::Presentation.Properties.Resources.icons8_close_window_50__2_;
+            this.btnClose.Location = new System.Drawing.Point(1056, 3);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(30, 26);
+            this.btnClose.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.btnClose.TabIndex = 44;
+            this.btnClose.TabStop = false;
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
             // label1
             // 
@@ -75,7 +97,6 @@
             // panelFull
             // 
             this.panelFull.BackColor = System.Drawing.Color.Honeydew;
-            this.panelFull.Controls.Add(this.btnRefresh);
             this.panelFull.Controls.Add(this.btnAddTask);
             this.panelFull.Controls.Add(this.btnGuardarTaskList);
             this.panelFull.Dock = System.Windows.Forms.DockStyle.Left;
@@ -83,6 +104,26 @@
             this.panelFull.Name = "panelFull";
             this.panelFull.Size = new System.Drawing.Size(190, 584);
             this.panelFull.TabIndex = 1;
+            // 
+            // btnAddTask
+            // 
+            this.btnAddTask.BackColor = System.Drawing.Color.Green;
+            this.btnAddTask.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnAddTask.FlatAppearance.BorderSize = 0;
+            this.btnAddTask.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.btnAddTask.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Green;
+            this.btnAddTask.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAddTask.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnAddTask.ForeColor = System.Drawing.Color.Honeydew;
+            this.btnAddTask.Image = global::Presentation.Properties.Resources.iconAdd;
+            this.btnAddTask.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnAddTask.Location = new System.Drawing.Point(0, 42);
+            this.btnAddTask.Name = "btnAddTask";
+            this.btnAddTask.Size = new System.Drawing.Size(190, 42);
+            this.btnAddTask.TabIndex = 43;
+            this.btnAddTask.Text = "Add Task";
+            this.btnAddTask.UseVisualStyleBackColor = false;
+            this.btnAddTask.Click += new System.EventHandler(this.btnAddTask_Click);
             // 
             // btnGuardarTaskList
             // 
@@ -128,68 +169,6 @@
             this.button2.Text = "Guardar";
             this.button2.UseVisualStyleBackColor = false;
             // 
-            // btnRefresh
-            // 
-            this.btnRefresh.BackColor = System.Drawing.Color.Green;
-            this.btnRefresh.FlatAppearance.BorderSize = 0;
-            this.btnRefresh.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.btnRefresh.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Green;
-            this.btnRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnRefresh.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnRefresh.ForeColor = System.Drawing.Color.Honeydew;
-            this.btnRefresh.Image = global::Presentation.Properties.Resources.iconRefresh;
-            this.btnRefresh.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnRefresh.Location = new System.Drawing.Point(0, 122);
-            this.btnRefresh.Name = "btnRefresh";
-            this.btnRefresh.Size = new System.Drawing.Size(190, 42);
-            this.btnRefresh.TabIndex = 44;
-            this.btnRefresh.Text = "Refresh";
-            this.btnRefresh.UseVisualStyleBackColor = false;
-            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
-            // 
-            // btnAddTask
-            // 
-            this.btnAddTask.BackColor = System.Drawing.Color.Green;
-            this.btnAddTask.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnAddTask.FlatAppearance.BorderSize = 0;
-            this.btnAddTask.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.btnAddTask.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Green;
-            this.btnAddTask.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAddTask.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnAddTask.ForeColor = System.Drawing.Color.Honeydew;
-            this.btnAddTask.Image = global::Presentation.Properties.Resources.iconAdd;
-            this.btnAddTask.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnAddTask.Location = new System.Drawing.Point(0, 42);
-            this.btnAddTask.Name = "btnAddTask";
-            this.btnAddTask.Size = new System.Drawing.Size(190, 42);
-            this.btnAddTask.TabIndex = 43;
-            this.btnAddTask.Text = "Add Task";
-            this.btnAddTask.UseVisualStyleBackColor = false;
-            this.btnAddTask.Click += new System.EventHandler(this.btnAddTask_Click);
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Image = global::Presentation.Properties.Resources.iconTask;
-            this.pictureBox1.Location = new System.Drawing.Point(3, 3);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(41, 31);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox1.TabIndex = 45;
-            this.pictureBox1.TabStop = false;
-            // 
-            // btnClose
-            // 
-            this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClose.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnClose.Image = global::Presentation.Properties.Resources.icons8_close_window_50__2_;
-            this.btnClose.Location = new System.Drawing.Point(1056, 3);
-            this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(30, 26);
-            this.btnClose.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.btnClose.TabIndex = 44;
-            this.btnClose.TabStop = false;
-            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
-            // 
             // flpTasks
             // 
             this.flpTasks.AutoScroll = true;
@@ -215,10 +194,10 @@
             this.Text = "frmTask";
             this.panelTop.ResumeLayout(false);
             this.panelTop.PerformLayout();
-            this.panelFull.ResumeLayout(false);
-            this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnClose)).EndInit();
+            this.panelFull.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -234,7 +213,6 @@
         private System.Windows.Forms.Button btnAddTask;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button btnRefresh;
         private System.Windows.Forms.FlowLayoutPanel flpTasks;
     }
 }
