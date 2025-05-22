@@ -144,8 +144,7 @@ namespace BLL
         {
             var today = DateTime.Today;
             return GetAllCompleted()
-                .Where(t =>
-                    t.CreationDate.HasValue && t.CreationDate.Value.Date == today)
+                .Where(t => t.CreationDate?.Date == today)
                 .ToList();
         }
         public ENTITY.Task GetById(int id)

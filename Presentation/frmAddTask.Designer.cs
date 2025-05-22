@@ -31,24 +31,24 @@
             this.components = new System.ComponentModel.Container();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.txtDescription = new System.Windows.Forms.RichTextBox();
             this.btnAddTask = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.cbCategories = new System.Windows.Forms.ComboBox();
             this.cbPriority = new System.Windows.Forms.ComboBox();
             this.dtmEndDate = new System.Windows.Forms.DateTimePicker();
             this.txtTitle = new System.Windows.Forms.RichTextBox();
-            this.txtDescription = new System.Windows.Forms.RichTextBox();
             this.toolRefresh = new System.Windows.Forms.ToolTip(this.components);
+            this.toolToday = new System.Windows.Forms.ToolTip(this.components);
+            this.toolTomorrow = new System.Windows.Forms.ToolTip(this.components);
+            this.toolWeekend = new System.Windows.Forms.ToolTip(this.components);
+            this.toolNextWeek = new System.Windows.Forms.ToolTip(this.components);
             this.btnNextWeek = new System.Windows.Forms.Panel();
             this.btnWeekend = new System.Windows.Forms.Panel();
             this.btnTomorrow = new System.Windows.Forms.Panel();
             this.btnToday = new System.Windows.Forms.Panel();
             this.pnlRefresh = new System.Windows.Forms.Panel();
             this.btnClose = new System.Windows.Forms.PictureBox();
-            this.toolToday = new System.Windows.Forms.ToolTip(this.components);
-            this.toolTomorrow = new System.Windows.Forms.ToolTip(this.components);
-            this.toolWeekend = new System.Windows.Forms.ToolTip(this.components);
-            this.toolNextWeek = new System.Windows.Forms.ToolTip(this.components);
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.btnClose)).BeginInit();
@@ -84,6 +84,20 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(659, 309);
             this.panel2.TabIndex = 1;
+            // 
+            // txtDescription
+            // 
+            this.txtDescription.BackColor = System.Drawing.Color.Honeydew;
+            this.txtDescription.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtDescription.EnableAutoDragDrop = true;
+            this.txtDescription.Font = new System.Drawing.Font("Segoe UI Semibold", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtDescription.Location = new System.Drawing.Point(12, 61);
+            this.txtDescription.Name = "txtDescription";
+            this.txtDescription.Size = new System.Drawing.Size(520, 107);
+            this.txtDescription.TabIndex = 8;
+            this.txtDescription.Text = "";
+            this.txtDescription.MouseClick += new System.Windows.Forms.MouseEventHandler(this.txtDescription_MouseClick);
+            this.txtDescription.Leave += new System.EventHandler(this.txtDescription_Leave);
             // 
             // btnAddTask
             // 
@@ -164,20 +178,6 @@
             this.txtTitle.Leave += new System.EventHandler(this.txtTitle_Leave);
             this.txtTitle.MouseEnter += new System.EventHandler(this.txtTitle_MouseEnter);
             // 
-            // txtDescription
-            // 
-            this.txtDescription.BackColor = System.Drawing.Color.Honeydew;
-            this.txtDescription.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtDescription.EnableAutoDragDrop = true;
-            this.txtDescription.Font = new System.Drawing.Font("Segoe UI Semibold", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtDescription.Location = new System.Drawing.Point(12, 61);
-            this.txtDescription.Name = "txtDescription";
-            this.txtDescription.Size = new System.Drawing.Size(520, 107);
-            this.txtDescription.TabIndex = 8;
-            this.txtDescription.Text = "";
-            this.txtDescription.MouseClick += new System.Windows.Forms.MouseEventHandler(this.txtDescription_MouseClick);
-            this.txtDescription.Leave += new System.EventHandler(this.txtDescription_Leave);
-            // 
             // btnNextWeek
             // 
             this.btnNextWeek.BackgroundImage = global::Presentation.Properties.Resources.Nextweek;
@@ -227,6 +227,7 @@
             this.pnlRefresh.Name = "pnlRefresh";
             this.pnlRefresh.Size = new System.Drawing.Size(40, 40);
             this.pnlRefresh.TabIndex = 7;
+            this.pnlRefresh.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlRefresh_Paint);
             this.pnlRefresh.MouseClick += new System.Windows.Forms.MouseEventHandler(this.panel3_MouseClick);
             // 
             // btnClose

@@ -323,5 +323,10 @@ namespace Presentation
             RandomDescription();
             RandomTitle();
         }
+
+        private void pnlRefresh_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 }
