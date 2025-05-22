@@ -42,6 +42,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CategoryLogic.cs" />
+    <Compile Include="ChatGPTService.cs" />
+    <Compile Include="ChatLogic.cs" />
     <Compile Include="ILogic.cs" />
     <Compile Include="OperationResult.cs" />
     <Compile Include="PriorityLogic.cs" />
@@ -60,6 +62,9 @@
       <Project>{857bef1c-d3a7-4e38-8a8f-ee9fb7528379}</Project>
       <Name>ENTITY</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="9.0.5" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
