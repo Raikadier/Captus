@@ -289,6 +289,7 @@ namespace Presentation
                     Title = titulo,
                     Category = categoryService.GetById(categoria),
                     Description = descripcion,
+                    CreationDate = DateTime.Now,
                     EndDate = fecha,
                     Priority = priorityService.GetById(prioridad),
                     State = false,

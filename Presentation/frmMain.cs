@@ -145,9 +145,9 @@ namespace Presentation
                 Font = new Font("Segoe UI", 10, FontStyle.Italic),
                 ForeColor = Color.DarkSlateGray,
                 AutoSize = true,
-                Location = new Point(550, 60)
+                Location = new Point(500, 60)
             };
-            if (tarea.EndDate >= DateTime.Now)
+            if (tarea.EndDate.Date >= DateTime.Now.Date)
             {
                 CheckBox chkCompletar = new CheckBox
                 {

@@ -84,7 +84,7 @@ namespace Presentation
             else if (task.EndDate ==DateTime.Today.AddDays(1))
             {
                     dtpFecha.Format = DateTimePickerFormat.Custom;
-                    dtpFecha.CustomFormat = "\'Mañana";
+                    dtpFecha.CustomFormat = "Mañana";
             }
             else
             {
@@ -97,7 +97,6 @@ namespace Presentation
             rtxtTitle.Text = editableTask.Title;
             rtxtDescription.Text = editableTask.Description;
             dtpFecha.MinDate = DateTime.Today;
-            dtpFecha.Value = editableTask.EndDate;
 
             cbCategory.SelectedItem = editableTask.Category;
             cbPriority.SelectedItem = editableTask.Priority;
@@ -152,7 +151,6 @@ namespace Presentation
             task.Description = descripcion;
             task.EndDate = fecha;
             task.Priority = priorityLogic.GetById(prioridad);
-            MessageBox.Show(task.Priority.Id_Priority.ToString());
             var result = taskLogic.Update(task);
             if (!result.Success)
             {
