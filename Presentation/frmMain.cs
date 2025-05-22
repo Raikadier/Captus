@@ -32,7 +32,7 @@ namespace Presentation
             InitializeComponent();
             timer1.Interval = 10;
             InitializeLayout();
-            taskLogic = new TaskLogic();
+            taskLogic = new TaskLogic(Configuration.ConnectionString);
             statisticsLogic = new StatisticsLogic();
             statisticsLogic.VerificarRacha();
             MostrarTareasAgrupadas();

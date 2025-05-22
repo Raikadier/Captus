@@ -121,7 +121,7 @@ namespace DAL
         }
         public override List<User> GetAll()
         {
-            List<User> users = new List<User>();
+            var users = new List<User>();
             try
             {
                 bd.OpenConection();

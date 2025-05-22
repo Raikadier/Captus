@@ -8,12 +8,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BLL;
+using ENTITY;
 
 namespace Presentation
 {
     public partial class frmTask : Form
     {
-        private readonly TaskLogic taskLogic = new TaskLogic();
+        private readonly TaskLogic taskLogic = new TaskLogic(Configuration.ConnectionString);
 
         public frmTask()
         {

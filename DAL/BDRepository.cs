@@ -26,10 +26,9 @@ namespace DAL
                 if (affectedRows > 0) return true;
                 return false;
             }
-            catch (SqlException e)
+            catch (SqlException)
             {
                 bd.CloseConection();
-                Console.WriteLine("SQL Error: " + e.Message);
                 return false;
             }
             catch (Exception a)

@@ -37,9 +37,9 @@ namespace DAL
                 Console.WriteLine("SQL Error: " + ex.Message);
                 return ConnectionState.Broken;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine("Error: " + e.Message);
+                Console.WriteLine("Error: " + ex.Message);
                 return ConnectionState.Broken;
             }
         }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ENTITY;
 using DAL;
+using TaskGeneric = ENTITY.TaskGeneric; // Alias para evitar conflictos si TaskGeneric también causa problemas
 
 namespace BLL
 {
@@ -12,11 +13,15 @@ namespace BLL
     {
         private readonly TaskRepository taskRepository;
         private readonly SubTaskLogic subTaskLogic;
-        public TaskLogic()
+        private readonly TaskDAL _taskDAL;
+
+        public TaskLogic(string connectionString = null)
         {
             taskRepository = new TaskRepository();
             subTaskLogic = new SubTaskLogic();
+            _taskDAL = new TaskDAL(connectionString ?? ENTITY.Configuration.ConnectionString);
         }
+
         public OperationResult Save(ENTITY.Task task)
         {
             try
@@ -55,6 +60,7 @@ namespace BLL
                 };
             }
         }
+
         public OperationResult DeleteByUser(int idUser)
         {
             try
@@ -72,6 +78,7 @@ namespace BLL
                 return new OperationResult { Success = false, Message = $"An error occurred: {ex.Message}" };
             }
         }
+
         public OperationResult DeleteByCategory(int idCategory)
         {
             try
@@ -89,6 +96,7 @@ namespace BLL
                 return new OperationResult { Success = false, Message = $"An error occurred: {ex.Message}" };
             }
         }
+
         public List<ENTITY.Task> GetAll()
         {
             try
@@ -104,6 +112,7 @@ namespace BLL
                 throw new Exception($"An error occurred while retrieving tasks: {ex.Message}");
             }
         }
+
         public List<ENTITY.Task> GetTaskIncompletedByUser()
         {
             try
@@ -117,6 +126,7 @@ namespace BLL
                 throw new Exception($"An error occurred while retrieving tasks: {ex.Message}");
             }
         }
+
         public List<ENTITY.Task> GetAllCompleted()
         {
             try
@@ -133,6 +143,7 @@ namespace BLL
                 throw new Exception($"An error occurred while retrieving tasks: {ex.Message}");
             }
         }
+
         public List<ENTITY.Task> GetCompletedTasksByUser()
         {
             var allTasks = taskRepository.GetAllByUserId(Session.CurrentUser.id);
@@ -140,13 +151,15 @@ namespace BLL
                 .Where(t => t.User.id == Session.CurrentUser.id && t.State)
                 .ToList();
         }
+
         public List<ENTITY.Task> GetCompletedTodayByUser()
         {
             var today = DateTime.Today;
             return GetAllCompleted()
-                .Where(t => t.CreationDate?.Date == today)
+                .Where(t => t.CreationDate.Date == today)
                 .ToList();
         }
+
         public ENTITY.Task GetById(int id)
         {
             try
@@ -188,6 +201,7 @@ namespace BLL
                 return new OperationResult { Success = false, Message = $"An error occurred: {ex.Message}" };
             }
         }
+
         public OperationResult Delete(int id)
         {
             try
@@ -232,10 +246,16 @@ namespace BLL
                 };
             }
         }
+
         public List<ENTITY.Task> GetOverdueTasks()
         {
-            return GetAll()?.Where(t => !t.State && t.EndDate < DateTime.Now).ToList();
+            var criteria = new TaskCriteria
+            {
+                IsOverdue = true
+            };
+            return _taskDAL.GetTasksByCriteria(Session.CurrentUser.id, criteria);
         }
+
         public void UpdateTaskState(int taskId, bool state)
         {
             var task = GetById(taskId);
@@ -246,6 +266,48 @@ namespace BLL
                 StatisticsLogic statisticsLogic=new StatisticsLogic();
                 statisticsLogic.VerificarRacha();
             }
+        }
+
+        public void SaveTask(ENTITY.Task task)
+        {
+            if (task == null)
+                throw new ArgumentNullException(nameof(task));
+
+            task.CreationDate = DateTime.Now;
+            _taskDAL.InsertTask(task);
+        }
+
+        public void UpdateTask(ENTITY.Task task)
+        {
+            if (task == null)
+                throw new ArgumentNullException(nameof(task));
+
+            _taskDAL.UpdateTask(task);
+        }
+
+        public void RescheduleTask(int taskId, DateTime newEndDate)
+        {
+            var task = _taskDAL.GetTaskById(taskId);
+            if (task == null)
+                throw new ArgumentException("Task not found", nameof(taskId));
+
+            task.EndDate = newEndDate;
+            _taskDAL.UpdateTask(task);
+        }
+
+        public ENTITY.Task GetTaskById(int taskId)
+        {
+            return _taskDAL.GetTaskById(taskId);
+        }
+
+        public List<ENTITY.Task> GetTasks(int userId, TaskCriteria criteria)
+        {
+            return _taskDAL.GetTasksByCriteria(userId, criteria);
+        }
+
+        public void DeleteTask(int taskId)
+        {
+            _taskDAL.DeleteTask(taskId);
         }
     }
 }

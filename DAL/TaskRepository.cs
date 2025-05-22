@@ -29,24 +29,21 @@ namespace DAL
             }
             catch (SqlException)
             {
-
                 return false;
             }
             catch (Exception)
             {
-
                 return false;
             }
             finally
             {
                 bd.CloseConection();
             }
-
         }
 
         public override List<ENTITY.Task> GetAll()
         {
-            List<ENTITY.Task> task = new List<ENTITY.Task>();
+            var task = new List<ENTITY.Task>();
             try
             {
                 bd.OpenConection();
@@ -76,7 +73,7 @@ namespace DAL
 
         public List<ENTITY.Task> GetAllByUserId(int id)
         {
-            List<ENTITY.Task> task = new List<ENTITY.Task>();
+            var task = new List<ENTITY.Task>();
             try
             {
                 bd.OpenConection();
@@ -133,7 +130,6 @@ namespace DAL
                 bd.CloseConection();
             }
             return task;
-
         }
 
         public override ENTITY.Task MappingType(SqlDataReader reader)
@@ -180,11 +176,11 @@ namespace DAL
                 if (affectedRows > 0) return true;
                 return false;
             }
-            catch (SqlException q)
+            catch (SqlException)
             {
                 return false;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }

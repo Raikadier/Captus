@@ -37,7 +37,7 @@ namespace DAL
         }
         public override List<SubTask> GetAll()
         {
-            List<SubTask> subTasks = new List<SubTask>();
+            var subTasks = new List<SubTask>();
             try
             {
                 bd.OpenConection();
@@ -97,7 +97,7 @@ namespace DAL
         }
         public List<SubTask> GetAllByTaskId(int taskId)
         {
-            List<SubTask> subtasks = new List<SubTask>();
+            var subtasks = new List<SubTask>();
             try
             {
                 bd.OpenConection();

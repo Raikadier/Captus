@@ -1,4 +1,5 @@
 ﻿using BLL;
+using ENTITY;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,7 +21,7 @@ namespace Presentation
         {
             InitializeComponent();
             statisticsLogic = new StatisticsLogic();
-            taskLogic = new TaskLogic();
+            taskLogic = new TaskLogic(Configuration.ConnectionString);
             LoadStats();
             CargarTareasCompletadasEnPanel();
             MostrarFraseMotivadora();
@@ -127,9 +128,7 @@ namespace Presentation
 
                 Label lblFecha = new Label
                 {
-                    Text = tarea.CreationDate.HasValue
-                    ? tarea.CreationDate.Value.ToShortDateString()
-                    : "Sin fecha",
+                    Text = tarea.CreationDate.ToShortDateString(),
                     Font = new Font("Segoe UI", 8, FontStyle.Italic),
                     ForeColor = Color.Gray,
                     Location = new Point(panelTarea.Width - 100, 5),

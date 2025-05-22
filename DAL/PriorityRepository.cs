@@ -15,7 +15,7 @@ namespace DAL
         public PriorityRepository() { bd = new BD(); }
         public List<Priority> GetAll()
         {
-            List<Priority> priorities = new List<Priority>();
+            var priorities = new List<Priority>();
             try
             {
                 bd.OpenConection();

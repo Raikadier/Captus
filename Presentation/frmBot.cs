@@ -18,10 +18,15 @@ namespace Presentation
         private readonly ChatLogic _chatLogic;
         private readonly User _currentUser;
 
+        // Constante para el texto del placeholder
+        private const string PlaceholderText = "Escribe tu mensaje aquí...";
+
         public FrmBot()
         {
             InitializeComponent();
-            _aiService = new AIService("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");
+            // Clave de API del servicio de IA. REEMPLAZAR con clave real o usar configuración segura.
+            _aiService = new AIService("YOUR_API_KEY_HERE");
+            // _aiService = new AIService("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"); // Línea original comentada
             _chatLogic = new ChatLogic(_aiService);
             _currentUser = new User { id = 1 };
             LoadMessages();
@@ -64,7 +69,9 @@ namespace Presentation
                 string sender = message.IsUserMessage ? "Tú" : "Bot";
                 string timestamp = message.SendDate.ToString("HH:mm");
                 
-                Color messageColor = message.IsUserMessage ? Color.FromArgb(0, 122, 0) : Color.FromArgb(64, 64, 64);
+                // Colores personalizados para cada tipo de mensaje
+                Color messageColor = message.IsUserMessage ? Color.FromArgb(0, 122, 204) : Color.FromArgb(64, 64, 64);
+                Color timestampColor = Color.FromArgb(128, 128, 128);
                 Font messageFont = new Font("Segoe UI", 10F, FontStyle.Regular);
                 Font timestampFont = new Font("Segoe UI", 8F, FontStyle.Italic);
                 
@@ -72,34 +79,12 @@ namespace Presentation
                 {
                     richTextBox1.Invoke(new MethodInvoker(delegate 
                     {
-                        richTextBox1.SelectionStart = richTextBox1.TextLength;
-                        richTextBox1.SelectionLength = 0;
-                        
-                        richTextBox1.SelectionColor = Color.Gray;
-                        richTextBox1.SelectionFont = timestampFont;
-                        richTextBox1.AppendText($"{timestamp} - {sender}\n");
-                        
-                        richTextBox1.SelectionColor = messageColor;
-                        richTextBox1.SelectionFont = messageFont;
-                        richTextBox1.AppendText($"{message.Message}\n\n");
-                        
-                        richTextBox1.ScrollToCaret();
+                        AppendMessageToRichTextBox(timestamp, sender, message.Message, messageColor, timestampColor, messageFont, timestampFont);
                     }));
                 }
                 else
                 {
-                    richTextBox1.SelectionStart = richTextBox1.TextLength;
-                    richTextBox1.SelectionLength = 0;
-                    
-                    richTextBox1.SelectionColor = Color.Gray;
-                    richTextBox1.SelectionFont = timestampFont;
-                    richTextBox1.AppendText($"{timestamp} - {sender}\n");
-                    
-                    richTextBox1.SelectionColor = messageColor;
-                    richTextBox1.SelectionFont = messageFont;
-                    richTextBox1.AppendText($"{message.Message}\n\n");
-                    
-                    richTextBox1.ScrollToCaret();
+                    AppendMessageToRichTextBox(timestamp, sender, message.Message, messageColor, timestampColor, messageFont, timestampFont);
                 }
             }
             catch (Exception ex)
@@ -108,16 +93,46 @@ namespace Presentation
             }
         }
 
+        private void AppendMessageToRichTextBox(string timestamp, string sender, string messageText, Color messageColor, Color timestampColor, Font messageFont, Font timestampFont)
+        {
+            richTextBox1.SelectionStart = richTextBox1.TextLength;
+            richTextBox1.SelectionLength = 0;
+            
+            // Añadir timestamp
+            richTextBox1.SelectionColor = timestampColor;
+            richTextBox1.SelectionFont = timestampFont;
+            richTextBox1.AppendText($"{timestamp} - {sender}\n");
+            
+            // Añadir mensaje
+            richTextBox1.SelectionColor = messageColor;
+            richTextBox1.SelectionFont = messageFont;
+            richTextBox1.AppendText($"{messageText}\n\n");
+            
+            richTextBox1.ScrollToCaret();
+        }
+
         private async void BtnSendMessage_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtMessage.Text)) return;
+            string userText = txtMessage.Text;
+
+            // Verificar si el texto es el placeholder antes de procesar
+            if (string.IsNullOrWhiteSpace(userText) || userText == PlaceholderText) return;
 
             try
             {
-                string userText = txtMessage.Text;
                 txtMessage.Clear();
                 txtMessage.Enabled = false;
                 btbnSendMessage.Enabled = false;
+
+                // Crear y mostrar el mensaje del usuario inmediatamente
+                var userMessage = new ChatMessage
+                {
+                    Message = userText,
+                    SendDate = DateTime.Now,
+                    IsUserMessage = true,
+                    User = _currentUser
+                };
+                DisplayMessage(userMessage);
 
                 var botMessage = await _chatLogic.ProcessUserMessageAsync(userText, _currentUser);
                 
@@ -166,7 +181,7 @@ namespace Presentation
             richTextBox1.BorderStyle = BorderStyle.None;
             richTextBox1.ReadOnly = true;
             
-            txtMessage.Text = "Escribe tu mensaje aquí...";
+            txtMessage.Text = PlaceholderText;
             txtMessage.ForeColor = Color.Gray;
             txtMessage.Enter += TxtMessage_Enter;
             txtMessage.Leave += TxtMessage_Leave;
@@ -177,7 +192,7 @@ namespace Presentation
 
         private void TxtMessage_Enter(object sender, EventArgs e)
         {
-            if (txtMessage.Text == "Escribe tu mensaje aquí...")
+            if (txtMessage.Text == PlaceholderText)
             {
                 txtMessage.Text = "";
                 txtMessage.ForeColor = Color.Black;
@@ -188,7 +203,7 @@ namespace Presentation
         {
             if (string.IsNullOrWhiteSpace(txtMessage.Text))
             {
-                txtMessage.Text = "Escribe tu mensaje aquí...";
+                txtMessage.Text = PlaceholderText;
                 txtMessage.ForeColor = Color.Gray;
             }
         }

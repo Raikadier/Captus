@@ -24,7 +24,7 @@ namespace Presentation
             InitializeComponent();
             categoryService = new CategoryLogic();
             priorityService = new PriorityLogic();
-            taskLogic = new TaskLogic();
+            taskLogic = new TaskLogic(Configuration.ConnectionString);
             LoadPriorities();
             LoadCategories();
             RandomTitle();

@@ -37,7 +37,7 @@ namespace DAL
 
         public override List<ChatMessage> GetAll()
         {
-            List<ChatMessage> messages = new List<ChatMessage>();
+            var messages = new List<ChatMessage>();
             try
             {
                 bd.OpenConection();

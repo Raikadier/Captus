@@ -24,7 +24,7 @@ namespace Presentation
         {
             InitializeComponent();
             this.task = task;
-            taskLogic = new TaskLogic();
+            taskLogic = new TaskLogic(Configuration.ConnectionString);
             categoryLogic = new CategoryLogic();
             priorityLogic = new PriorityLogic();
             EditCalendar();

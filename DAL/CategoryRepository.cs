@@ -29,7 +29,7 @@ namespace DAL
         }
         public override List<Category> GetAll()
         {
-            List<Category> categories = new List<Category>();
+            var categories = new List<Category>();
             try
             {
                 bd.OpenConection();
@@ -125,7 +125,7 @@ namespace DAL
         }
         public List<Category> GetByUser(int userId)
         {
-            List<Category> categories = new List<Category>();
+            var categories = new List<Category>();
             try
             {
                 bd.OpenConection();

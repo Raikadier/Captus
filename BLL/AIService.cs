@@ -26,10 +26,10 @@ namespace BLL
             {
                 var requestBody = new
                 {
-                    model = "anthropic/claude-3-haiku",
+                    model = "deepseek/deepseek-chat-v3-0324:free",
                     messages = new[]
                     {
-                        new { role = "system", content = "Eres un asistente útil." },
+                        new { role = "system", content = "Eres un asistente útil que responde preguntas generales y conversa amigablemente en español. Si la pregunta no es un comando específico de tareas, responde de forma natural." },
                         new { role = "user", content = prompt }
                     },
                     max_tokens = 500,

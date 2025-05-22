@@ -138,7 +138,7 @@ namespace DAL
         }
         public override List<Statistics> GetAll()
         {
-            List<Statistics> statistics = new List<Statistics>();
+            var statistics = new List<Statistics>();
             try
             {
                 bd.OpenConection();

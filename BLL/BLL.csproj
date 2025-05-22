@@ -39,11 +39,18 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Text.Json">
+      <HintPath>..\packages\System.Text.Json.9.0.5\lib\net462\System.Text.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory">
+      <HintPath>..\packages\System.Memory.4.6.3\lib\net462\System.Memory.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CategoryLogic.cs" />
     <Compile Include="AIService.cs" />
     <Compile Include="ChatLogic.cs" />
+    <Compile Include="IChatService.cs" />
     <Compile Include="ILogic.cs" />
     <Compile Include="OperationResult.cs" />
     <Compile Include="PriorityLogic.cs" />
@@ -62,9 +69,6 @@
       <Project>{857bef1c-d3a7-4e38-8a8f-ee9fb7528379}</Project>
       <Name>ENTITY</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="9.0.5" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

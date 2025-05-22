@@ -1,4 +1,6 @@
-﻿namespace Presentation
+﻿using System;
+
+namespace Presentation
 {
     partial class FrmBot
     {
@@ -55,7 +57,7 @@
             this.label1.ForeColor = System.Drawing.Color.White;
             this.label1.Location = new System.Drawing.Point(12, 25);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(138, 25);
+            this.label1.Size = new System.Drawing.Size(162, 25);
             this.label1.TabIndex = 0;
             this.label1.Text = "ChatBot - Captus";
             this.label1.Click += new System.EventHandler(this.Label1_Click);
@@ -92,9 +94,9 @@
             this.btbnSendMessage.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btbnSendMessage.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btbnSendMessage.ForeColor = System.Drawing.Color.White;
-            this.btbnSendMessage.Location = new System.Drawing.Point(634, 394);
+            this.btbnSendMessage.Location = new System.Drawing.Point(689, 394);
             this.btbnSendMessage.Name = "btbnSendMessage";
-            this.btbnSendMessage.Size = new System.Drawing.Size(150, 40);
+            this.btbnSendMessage.Size = new System.Drawing.Size(99, 40);
             this.btbnSendMessage.TabIndex = 2;
             this.btbnSendMessage.Text = "Enviar";
             this.btbnSendMessage.TextColor = System.Drawing.Color.White;
@@ -110,7 +112,7 @@
             this.txtMessage.Location = new System.Drawing.Point(12, 394);
             this.txtMessage.Multiline = true;
             this.txtMessage.Name = "txtMessage";
-            this.txtMessage.Size = new System.Drawing.Size(616, 40);
+            this.txtMessage.Size = new System.Drawing.Size(671, 40);
             this.txtMessage.TabIndex = 3;
             // 
             // FrmBot
@@ -131,6 +133,12 @@
             this.panel1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
+
+        }
+
+        private void buttonPersonal1_Click(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
