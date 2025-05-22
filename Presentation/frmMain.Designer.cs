@@ -37,7 +37,6 @@
             this.lblCerrarSesion = new System.Windows.Forms.Label();
             this.btnLogout = new System.Windows.Forms.Button();
             this.btnProfile = new System.Windows.Forms.Button();
-            this.btnCalculo = new System.Windows.Forms.Button();
             this.btnTaskList = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.picLogoCaptus = new System.Windows.Forms.PictureBox();
@@ -70,7 +69,6 @@
             this.panel1.Controls.Add(this.lblCerrarSesion);
             this.panel1.Controls.Add(this.btnLogout);
             this.panel1.Controls.Add(this.btnProfile);
-            this.panel1.Controls.Add(this.btnCalculo);
             this.panel1.Controls.Add(this.btnTaskList);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.picLogoCaptus);
@@ -85,7 +83,7 @@
             this.btnChatBot.Controls.Add(this.label2);
             this.btnChatBot.Controls.Add(this.imgChatBot);
             this.btnChatBot.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnChatBot.Location = new System.Drawing.Point(2, 366);
+            this.btnChatBot.Location = new System.Drawing.Point(0, 340);
             this.btnChatBot.Name = "btnChatBot";
             this.btnChatBot.Size = new System.Drawing.Size(198, 40);
             this.btnChatBot.TabIndex = 47;
@@ -123,7 +121,7 @@
             this.btnAddTask.ForeColor = System.Drawing.Color.Honeydew;
             this.btnAddTask.Image = global::Presentation.Properties.Resources.iconAdd;
             this.btnAddTask.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnAddTask.Location = new System.Drawing.Point(21, 218);
+            this.btnAddTask.Location = new System.Drawing.Point(4, 208);
             this.btnAddTask.Name = "btnAddTask";
             this.btnAddTask.Size = new System.Drawing.Size(162, 34);
             this.btnAddTask.TabIndex = 46;
@@ -175,22 +173,6 @@
             this.btnProfile.UseVisualStyleBackColor = true;
             this.btnProfile.Click += new System.EventHandler(this.btnProfile_Click);
             // 
-            // btnCalculo
-            // 
-            this.btnCalculo.FlatAppearance.BorderSize = 0;
-            this.btnCalculo.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.btnCalculo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCalculo.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnCalculo.ForeColor = System.Drawing.Color.Honeydew;
-            this.btnCalculo.Image = global::Presentation.Properties.Resources.iconCalculoWh__1_;
-            this.btnCalculo.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnCalculo.Location = new System.Drawing.Point(3, 320);
-            this.btnCalculo.Name = "btnCalculo";
-            this.btnCalculo.Size = new System.Drawing.Size(197, 40);
-            this.btnCalculo.TabIndex = 42;
-            this.btnCalculo.Text = "Calculation";
-            this.btnCalculo.UseVisualStyleBackColor = true;
-            // 
             // btnTaskList
             // 
             this.btnTaskList.FlatAppearance.BorderSize = 0;
@@ -200,7 +182,7 @@
             this.btnTaskList.ForeColor = System.Drawing.Color.Honeydew;
             this.btnTaskList.Image = global::Presentation.Properties.Resources.iconTask;
             this.btnTaskList.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnTaskList.Location = new System.Drawing.Point(0, 264);
+            this.btnTaskList.Location = new System.Drawing.Point(0, 273);
             this.btnTaskList.Name = "btnTaskList";
             this.btnTaskList.Size = new System.Drawing.Size(200, 40);
             this.btnTaskList.TabIndex = 41;
@@ -377,7 +359,6 @@
         private System.Windows.Forms.PictureBox picLogoCaptus;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Button btnTaskList;
-        private System.Windows.Forms.Button btnCalculo;
         private System.Windows.Forms.Button btnProfile;
         private System.Windows.Forms.Button btnLogout;
         private System.Windows.Forms.Panel panelContenedor;

@@ -24,9 +24,12 @@ namespace Presentation
         public FrmBot()
         {
             InitializeComponent();
+
             // Clave de API del servicio de IA. REEMPLAZAR con clave real o usar configuración segura.
-            _aiService = new AIService("YOUR_API_KEY_HERE");
-            // _aiService = new AIService("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"); // Línea original comentada
+
+             _aiService = new AIService("YOUR_API_KEY_HERE");
+             //_aiService = new AIService("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"); // Línea original comentada
+
             _chatLogic = new ChatLogic(_aiService);
             _currentUser = new User { id = 1 };
             LoadMessages();

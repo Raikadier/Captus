@@ -132,7 +132,7 @@ namespace Presentation
 
             Label txtDescription = new Label
             {
-                Text = tarea.Description.Length > 60 ? tarea.Description.Substring(0, 57) + "..." : tarea.Description,
+                Text = string.IsNullOrEmpty(tarea.Description) ? string.Empty : (tarea.Description.Length > 60 ? tarea.Description.Substring(0, 57) + "..." : tarea.Description),
                 Font = new Font("Segoe UI", 12),
                 ForeColor = Color.Gray,
                 AutoSize = true,
