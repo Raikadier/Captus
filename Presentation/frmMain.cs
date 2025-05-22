@@ -95,12 +95,12 @@ namespace Presentation
         {
             Panel panel = new Panel
             {
-                Width = panelTareas.Width - 40,
+                Width = panelTareas.Width-40,
                 Height = 90,
-                BorderStyle = BorderStyle.FixedSingle,
-                BackColor = Color.White,
+                BackColor = Color.Honeydew,
                 Margin = new Padding(10),
-                Padding = new Padding(10)
+                Padding = new Padding(10),
+                Cursor = Cursors.Hand
             };
 
             Color colorPrioridad = ObtenerColorPrioridad(tarea.Priority.Name);
@@ -113,76 +113,66 @@ namespace Presentation
                     colorPrioridad, 3, ButtonBorderStyle.Solid);
             };
 
-            TextBox txtTitle = new TextBox
+            Label txtTitle = new Label
             {
                 Text = tarea.Title,
-                Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                AutoSize = true
+                Font = new Font("Arial", 14, FontStyle.Bold),
+                AutoSize = true,
+                Location=new Point(75,8)
             };
 
-            TextBox txtDescription = new TextBox
+            Label txtDescription = new Label
             {
                 Text = tarea.Description.Length > 60 ? tarea.Description.Substring(0, 57) + "..." : tarea.Description,
-                Font = new Font("Segoe UI", 9),
+                Font = new Font("Segoe UI", 12),
                 ForeColor = Color.Gray,
                 AutoSize = true,
-                Location = new Point(0, 25)
+                Location = new Point(30, 40)
             };
 
-            TextBox txtCategoria = new TextBox
+            Label txtCategoria = new Label
             {
                 Text = tarea.Category.Name,
-                Font = new Font("Segoe UI", 8, FontStyle.Italic),
+                Font = new Font("Segoe UI", 10, FontStyle.Italic),
                 ForeColor = Color.DarkSlateGray,
                 AutoSize = true,
-                Location = new Point(0, 50)
+                Location = new Point(550, 60)
             };
-
-            CheckBox chkCompletar = new CheckBox
+            if (tarea.EndDate >= DateTime.Now)
             {
-                Text = "✔",
-                Font = new Font("Segoe UI", 12),
-                AutoSize = true,
-                Location = new Point(panel.Width - 50, 10),
-                ForeColor = Color.Green
-            };
-            chkCompletar.CheckedChanged += (s, e) =>
-            {
-                if (chkCompletar.Checked)
+                CheckBox chkCompletar = new CheckBox
                 {
-                    tarea.State = true;
-                    tarea.CreationDate = DateTime.Now;
-                    taskLogic.Update(tarea);
-                    MostrarTareasAgrupadas(); // refrescar vista
-                }
-            };
-
-            Button btnDetalle = new Button
-            {
-                Text = "⋯",
-                Width = 30,
-                Height = 25,
-                Location = new Point(panel.Width - 50, 45),
-                FlatStyle = FlatStyle.Flat
-            };
-            btnDetalle.Click += (s, e) =>
-            {
-                //new FormDetalleTarea(tarea).ShowDialog();
-                MostrarTareasAgrupadas();
-            };
+                    Text = "✔",
+                    Font = new Font("Segoe UI", 12),
+                    AutoSize = true,
+                    Location = new Point(10, 9),
+                    ForeColor = Color.Green
+                };
+                chkCompletar.CheckedChanged += (s, e) =>
+                {
+                    if (chkCompletar.Checked)
+                    {
+                        tarea.State = true;
+                        tarea.CreationDate = DateTime.Now;
+                        taskLogic.Update(tarea);
+                        MostrarTareasAgrupadas(); // refrescar vista
+                    }
+                };
+                panel.Controls.Add(chkCompletar);
+            }
 
             panel.Controls.Add(txtTitle);
             panel.Controls.Add(txtDescription);
             panel.Controls.Add(txtCategoria);
-            panel.Controls.Add(chkCompletar);
-            panel.Controls.Add(btnDetalle);
-
+            
             return panel;
         }
         private string ObtenerTituloFecha(DateTime fecha)
         {
             DateTime hoy = DateTime.Today;
-            if (fecha == hoy)
+            if(fecha < hoy)
+                return "Tareas Pasadas";
+            else if (fecha == hoy)
                 return "Hoy";
             else if (fecha == hoy.AddDays(1))
                 return "Mañana";
@@ -448,7 +438,8 @@ namespace Presentation
 
         private void btnTaskList_Click(object sender, EventArgs e)
         {
-            AbrirFormInPanel(new frmTask ());
+            //AbrirFormInPanel(new frmTask ());
+            MostrarTareasAgrupadas();
         }
 
         private void btnLogout_Click(object sender, EventArgs e)
@@ -478,6 +469,12 @@ namespace Presentation
         {
             frmStats frmStats = new frmStats();
             frmStats.ShowDialog();
+        }
+
+        private void btnAddTask_Click(object sender, EventArgs e)
+        {
+            frmAddTask addtaskForm = new frmAddTask();
+            addtaskForm.ShowDialog();
         }
     }
 }

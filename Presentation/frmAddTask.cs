@@ -79,6 +79,7 @@ namespace Presentation
             cbCategories.DataSource = categories;
             cbCategories.DisplayMember = "Name";
             cbCategories.ValueMember = "Id";
+            
         }
         private void Panel1_MouseDown(object sender, MouseEventArgs e)
         {
@@ -243,19 +244,20 @@ namespace Presentation
 
         private void cbPriority_SelectedIndexChanged(object sender, EventArgs e)
         {
-            switch (cbPriority.SelectedItem.ToString())
+            switch (cbPriority.SelectedItem)
             {
-                case "Baja":
-                    cbPriority.BackColor = Color.LightBlue;
-                    cbPriority.ForeColor = Color.Black;
+                case 0:
+                    cbPriority.BackColor = Color.LightCoral;
+                    cbPriority.ForeColor = Color.White;
+                    
                     break;
-                case "Media":
+                case 1:
                     cbPriority.BackColor = Color.SandyBrown;
                     cbPriority.ForeColor = Color.Black;
                     break;
-                case "Alta":
-                    cbPriority.BackColor = Color.LightCoral;
-                    cbPriority.ForeColor = Color.White;
+                case 2:
+                    cbPriority.BackColor = Color.LightBlue;
+                    cbPriority.ForeColor = Color.Black;
                     break;
                 default:
                     cbPriority.BackColor = SystemColors.Window;
@@ -287,13 +289,11 @@ namespace Presentation
                     Title = titulo,
                     Category = categoryService.GetById(categoria),
                     Description = descripcion,
-                    CreationDate = DateTime.Now,
                     EndDate = fecha,
                     Priority = priorityService.GetById(prioridad),
                     State = false,
                     User = Session.CurrentUser
                 };
-                //Prueba de que si sirve esto
                 try
                 {
                     var result = taskLogic.Save(nuevaTarea);
@@ -301,6 +301,7 @@ namespace Presentation
                     {
                         MessageBox.Show("✅ Tarea agregada exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         Clean();
+                        this.Dispose();
                     }
                     else
                     {

@@ -159,28 +159,32 @@ namespace DAL
             {
                 if (entity == null) return false;
                 bd.OpenConection();
-                SqlCommand cmd = entity.SQLCommandInsert(bd.connection);
-                cmd.CommandText = "UPDATE [dbo].[Task] SET Title=@Title, Id_Category=@Id_Category, Description=@Description, CreationDate=@CreationDate, EndDate=@EndDate, Id_Priority=@Id_Priority, State=@State WHERE Id_Task=@Id_Task";
+                SqlCommand cmd = new SqlCommand("UPDATE[dbo].[Task] SET[Title] = @Title, [Id_Category] = @Id_Category, [Description] = @Description, [CreationDate] = @CreationDate, [EndDate] = @EndDate, [Id_Priority] = @Id_Priority, [State] = @State, [Id_User] = @Id_User WHERE Id_Task = @Id_Task");
+                cmd.Connection = bd.connection;
                 cmd.Parameters.AddWithValue("@Id_Task", entity.id);
-                cmd.Parameters.AddWithValue("@Title", entity.Title);
-                cmd.Parameters.AddWithValue("@Id_Category", entity.Category.id);
+                cmd.Parameters.AddWithValue("@Title",entity.Title);
+                cmd.Parameters.AddWithValue("@Id_Category",entity.Category.id);
                 if (string.IsNullOrEmpty(entity.Description))
                     cmd.Parameters.AddWithValue("@Description", DBNull.Value);
                 else
-                    cmd.Parameters.AddWithValue("@Description", entity.Description);
-                cmd.Parameters.AddWithValue("@CreationDate", entity.CreationDate);
-                cmd.Parameters.AddWithValue("@EndDate", entity.EndDate);
-                cmd.Parameters.AddWithValue("@Id_Priority", entity.Priority.Id_Priority);
-                cmd.Parameters.AddWithValue("@State", entity.State);
+                    cmd.Parameters.AddWithValue("@Description",entity.Description);
+                if (entity.CreationDate== null)
+                    cmd.Parameters.AddWithValue("@CreationDate", DBNull.Value);
+                else
+                    cmd.Parameters.AddWithValue("@CreationDate",entity.CreationDate);
+                cmd.Parameters.AddWithValue("@EndDate",entity.EndDate);
+                cmd.Parameters.AddWithValue("@Id_Priority",entity.Priority.Id_Priority);
+                cmd.Parameters.AddWithValue("@State",entity.State);
+                cmd.Parameters.AddWithValue("@Id_User",entity.User.id);
                 int affectedRows = cmd.ExecuteNonQuery();
                 if (affectedRows > 0) return true;
                 return false;
             }
-            catch (SqlException)
+            catch (SqlException q)
             {
                 return false;
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return false;
             }
