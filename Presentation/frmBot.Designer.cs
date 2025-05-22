@@ -1,6 +1,6 @@
 ﻿namespace Presentation
 {
-    partial class frmBot
+    partial class FrmBot
     {
         /// <summary>
         /// Required designer variable.
@@ -45,7 +45,7 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(800, 76);
             this.panel1.TabIndex = 0;
-            this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
+            this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.Panel1_Paint);
             // 
             // label1
             // 
@@ -55,10 +55,10 @@
             this.label1.ForeColor = System.Drawing.Color.White;
             this.label1.Location = new System.Drawing.Point(12, 25);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(162, 25);
+            this.label1.Size = new System.Drawing.Size(138, 25);
             this.label1.TabIndex = 0;
             this.label1.Text = "ChatBot - Captus";
-            this.label1.Click += new System.EventHandler(this.label1_Click);
+            this.label1.Click += new System.EventHandler(this.Label1_Click);
             // 
             // richTextBox1
             // 
@@ -74,7 +74,7 @@
             this.richTextBox1.Size = new System.Drawing.Size(776, 280);
             this.richTextBox1.TabIndex = 1;
             this.richTextBox1.Text = "";
-            this.richTextBox1.TextChanged += new System.EventHandler(this.richTextBox1_TextChanged_1);
+            this.richTextBox1.TextChanged += new System.EventHandler(this.RichTextBox1_TextChanged);
             // 
             // btbnSendMessage
             // 
@@ -99,7 +99,7 @@
             this.btbnSendMessage.Text = "Enviar";
             this.btbnSendMessage.TextColor = System.Drawing.Color.White;
             this.btbnSendMessage.UseVisualStyleBackColor = false;
-            this.btbnSendMessage.Click += new System.EventHandler(this.btbnSendMessage_Click);
+            this.btbnSendMessage.Click += new System.EventHandler(this.BtnSendMessage_Click);
             // 
             // txtMessage
             // 
@@ -113,7 +113,7 @@
             this.txtMessage.Size = new System.Drawing.Size(616, 40);
             this.txtMessage.TabIndex = 3;
             // 
-            // frmBot
+            // FrmBot
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -124,14 +124,13 @@
             this.Controls.Add(this.richTextBox1);
             this.Controls.Add(this.panel1);
             this.MinimumSize = new System.Drawing.Size(600, 400);
-            this.Name = "frmBot";
+            this.Name = "FrmBot";
             this.Text = "ChatBot - Captus";
-            this.Load += new System.EventHandler(this.frmBot_Load);
+            this.Load += new System.EventHandler(this.FrmBot_Load);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         #endregion
