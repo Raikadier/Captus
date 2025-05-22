@@ -25,8 +25,8 @@ namespace Presentation
         {
             InitializeComponent();
 
-             //_aiService = new AIService("YOUR_API_KEY_HERE");
-             _aiService = new AIService("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"); 
+            //_aiService = new AIService("YOUR_API_KEY_HERE");
+            _aiService = new AIService("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"); 
 
             _chatLogic = new ChatLogic(_aiService);
             _currentUser = new User { id = 1 };

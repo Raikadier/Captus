@@ -3,21 +3,27 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Net.Http.Headers;
 
 namespace BLL
 {
     public class AIService
     {
         private readonly string _apiKey;
-        private static readonly HttpClient _httpClient = new HttpClient();
+        private static readonly HttpClient _httpClient;
         private const string API_URL = "https://openrouter.ai/api/v1/chat/completions";
+
+        static AIService()
+        {
+            _httpClient = new HttpClient();
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.DefaultRequestHeaders.Add("HTTP-Referer", "https://github.com/CaptusGUI");
+            _httpClient.DefaultRequestHeaders.Add("X-Title", "CaptusGUI");
+        }
 
         public AIService(string apiKey)
         {
             _apiKey = apiKey;
-            _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_apiKey}");
-            _httpClient.DefaultRequestHeaders.Add("HTTP-Referer", "https://github.com/CaptusGUI");
-            _httpClient.DefaultRequestHeaders.Add("X-Title", "CaptusGUI");
         }
 
         public async Task<string> GetResponseAsync(string prompt)
@@ -37,24 +43,35 @@ namespace BLL
                 };
 
                 var bodyJson = JsonSerializer.Serialize(requestBody);
-                var content = new StringContent(bodyJson, Encoding.UTF8, "application/json");
-
-                var response = await _httpClient.PostAsync(API_URL, content);
-                var responseString = await response.Content.ReadAsStringAsync();
-
-                if (!response.IsSuccessStatusCode)
+                
+                HttpRequestMessage request = null;
+                try
                 {
-                    var errorResponse = JsonSerializer.Deserialize<ErrorResponse>(responseString);
-                    return $"Error en la API: {errorResponse?.Error?.Message ?? responseString}";
+                    request = new HttpRequestMessage(HttpMethod.Post, API_URL);
+                    request.Content = new StringContent(bodyJson, Encoding.UTF8, "application/json");
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+
+                    var response = await _httpClient.SendAsync(request);
+                    var responseString = await response.Content.ReadAsStringAsync();
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        var errorResponse = JsonSerializer.Deserialize<ErrorResponse>(responseString);
+                        return $"Error en la API: {errorResponse?.Error?.Message ?? responseString}";
+                    }
+
+                    var responseJson = JsonSerializer.Deserialize<JsonElement>(responseString);
+                    string reply = responseJson.GetProperty("choices")[0]
+                                             .GetProperty("message")
+                                             .GetProperty("content")
+                                             .GetString();
+
+                    return reply ?? "No se pudo obtener una respuesta.";
                 }
-
-                var responseJson = JsonSerializer.Deserialize<JsonElement>(responseString);
-                string reply = responseJson.GetProperty("choices")[0]
-                                         .GetProperty("message")
-                                         .GetProperty("content")
-                                         .GetString();
-
-                return reply ?? "No se pudo obtener una respuesta.";
+                finally
+                {
+                    request?.Dispose();
+                }
             }
             catch (HttpRequestException ex)
             {
