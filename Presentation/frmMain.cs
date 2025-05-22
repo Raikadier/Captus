@@ -132,7 +132,9 @@ namespace Presentation
 
             Label txtDescription = new Label
             {
-                Text = tarea.Description.Length > 60 ? tarea.Description.Substring(0, 57) + "..." : tarea.Description,
+                Text = string.IsNullOrEmpty(tarea.Description)
+        ? "(Sin descripción)"
+        : (tarea.Description.Length > 60 ? tarea.Description.Substring(0, 50) + "..." : tarea.Description),
                 Font = new Font("Segoe UI", 12),
                 ForeColor = Color.Gray,
                 AutoSize = true,
@@ -145,9 +147,9 @@ namespace Presentation
                 Font = new Font("Segoe UI", 10, FontStyle.Italic),
                 ForeColor = Color.DarkSlateGray,
                 AutoSize = true,
-                Location = new Point(550, 60)
+                Location = new Point(500, 60)
             };
-            if (tarea.EndDate >= DateTime.Now)
+            if (tarea.EndDate.Date >= DateTime.Now.Date)
             {
                 CheckBox chkCompletar = new CheckBox
                 {

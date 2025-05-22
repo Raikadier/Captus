@@ -44,11 +44,13 @@ namespace BLL
                 }
                 else
                 {
+                    Console.WriteLine("Error saving task.");
                     return new OperationResult
                     {
                         Success = false,
                         Message = "Failed to save task."
                     };
+
                 }
             }
             catch (Exception ex)
