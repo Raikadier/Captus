@@ -8,12 +8,12 @@ namespace BLL
     public class ChatLogic
     {
         private readonly ChatRepository _chatRepository;
-        private readonly ChatGPTService _chatGPTService;
+        private readonly AIService _aiService;
 
-        public ChatLogic(ChatGPTService chatGPTService)
+        public ChatLogic(AIService aiService)
         {
             _chatRepository = new ChatRepository();
-            _chatGPTService = chatGPTService;
+            _aiService = aiService;
         }
 
         public List<ChatMessage> GetAllMessages()
@@ -33,8 +33,8 @@ namespace BLL
             };
             _chatRepository.Save(userMessage);
 
-            // Obtener respuesta de ChatGPT
-            string botResponseText = await _chatGPTService.GetResponseAsync(userMessageText);
+            // Obtener respuesta de la IA
+            string botResponseText = await _aiService.GetResponseAsync(userMessageText);
 
             // Guardar el mensaje del bot
             var botMessage = new ChatMessage

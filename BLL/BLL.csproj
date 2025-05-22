@@ -42,7 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CategoryLogic.cs" />
-    <Compile Include="ChatGPTService.cs" />
+    <Compile Include="AIService.cs" />
     <Compile Include="ChatLogic.cs" />
     <Compile Include="ILogic.cs" />
     <Compile Include="OperationResult.cs" />

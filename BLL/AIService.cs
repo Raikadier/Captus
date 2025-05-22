@@ -1,0 +1,85 @@
+using System;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+
+namespace BLL
+{
+    public class AIService
+    {
+        private readonly string _apiKey;
+        private static readonly HttpClient _httpClient = new HttpClient();
+        private const string API_URL = "https://openrouter.ai/api/v1/chat/completions";
+
+        public AIService(string apiKey)
+        {
+            _apiKey = apiKey;
+            _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_apiKey}");
+            _httpClient.DefaultRequestHeaders.Add("HTTP-Referer", "https://github.com/CaptusGUI");
+            _httpClient.DefaultRequestHeaders.Add("X-Title", "CaptusGUI");
+        }
+
+        public async Task<string> GetResponseAsync(string prompt)
+        {
+            try
+            {
+                var requestBody = new
+                {
+                    model = "anthropic/claude-3-haiku",
+                    messages = new[]
+                    {
+                        new { role = "system", content = "Eres un asistente útil." },
+                        new { role = "user", content = prompt }
+                    },
+                    max_tokens = 500,
+                    temperature = 0.2
+                };
+
+                var bodyJson = JsonSerializer.Serialize(requestBody);
+                var content = new StringContent(bodyJson, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(API_URL, content);
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorResponse = JsonSerializer.Deserialize<ErrorResponse>(responseString);
+                    return $"Error en la API: {errorResponse?.Error?.Message ?? responseString}";
+                }
+
+                var responseJson = JsonSerializer.Deserialize<JsonElement>(responseString);
+                string reply = responseJson.GetProperty("choices")[0]
+                                         .GetProperty("message")
+                                         .GetProperty("content")
+                                         .GetString();
+
+                return reply ?? "No se pudo obtener una respuesta.";
+            }
+            catch (HttpRequestException ex)
+            {
+                return $"Error de conexión: {ex.Message}";
+            }
+            catch (JsonException ex)
+            {
+                return $"Error al procesar la respuesta: {ex.Message}";
+            }
+            catch (Exception ex)
+            {
+                return $"Error inesperado: {ex.Message}";
+            }
+        }
+    }
+
+    public class ErrorResponse
+    {
+        public ErrorInfo Error { get; set; }
+    }
+
+    public class ErrorInfo
+    {
+        public string Message { get; set; }
+        public string Type { get; set; }
+        public string Code { get; set; }
+    }
+} 
