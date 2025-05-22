@@ -21,8 +21,8 @@ namespace Presentation
         public frmBot()
         {
             InitializeComponent();
-            //_aiService = new AIService("tu-api-key-de-openrouter-aquí");
-            _aiService = new AIService("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");
+            _aiService = new AIService("tu-api-key-de-openrouter-aquí");
+            //_aiService = new AIService("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");
             _chatLogic = new ChatLogic(_aiService);
             _currentUser = new User { id = 1 }; // Ejemplo: usa un usuario con ID 1 para pruebas si no tienes Session implementada
             LoadMessages();
@@ -218,6 +218,11 @@ namespace Presentation
             {
                 richTextBox1.Clear();
             }
+        }
+
+        private void richTextBox1_TextChanged_1(object sender, EventArgs e)
+        {
+
         }
     }
 }
