@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace ENTITY
 {
+    //Creacion de la clase
     public abstract class ClassId : IOperationEntity
     {
         public int id { get; set; }
