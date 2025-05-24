@@ -275,7 +275,7 @@ namespace Presentation
         {
             ProcessAddTask();
         }
-        private void ProcessAddTask()
+        private async void ProcessAddTask()
         {
             if (ValideTask())
             {
@@ -300,9 +300,13 @@ namespace Presentation
                     var result = taskLogic.Save(nuevaTarea);
                     if (result.Success)
                     {
+                        string mensaje = NotifyEmails.GetMessageInsert(nuevaTarea.Title, nuevaTarea.EndDate.ToShortDateString(), nuevaTarea.Category.Name);
+                        await NotifyEmails.SendNotifyAsync(Session.CurrentUser.Email, "Nueva tarea asignada", mensaje);
+
                         MessageBox.Show("✅ Tarea agregada exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         Clean();
                         this.Dispose();
+
                     }
                     else
                     {
@@ -326,6 +330,11 @@ namespace Presentation
         }
 
         private void pnlRefresh_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void toolRefresh_Popup(object sender, PopupEventArgs e)
         {
 
         }

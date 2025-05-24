@@ -333,6 +333,16 @@ namespace Presentation.Properties {
         /// <summary>
         ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap MasInfo {
+            get {
+                object obj = ResourceManager.GetObject("MasInfo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap menu_hamburguesa {
             get {
                 object obj = ResourceManager.GetObject("menu_hamburguesa", resourceCulture);

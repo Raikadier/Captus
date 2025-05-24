@@ -6,6 +6,8 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net.Mail;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -151,18 +153,62 @@ namespace Presentation
         private bool verifyEmail()
         {
             string email = txtEmail.Text;
-            if (!Regex.IsMatch(email, @"^[^@\s]+@gmail\.com$"))
+            if (!Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
             {
-                MessageBox.Show("Debe ingresar un correo electrónico válido de Gmail.");
+                MessageBox.Show("Debe ingresar un correo electrónico válido.");
                 return false;
             }
 
-            //string codigo = new Random().Next(100000, 999999).ToString();
-            //if (!SendVerifyCode(email, codigo))
-            //{
-            //    return false;
-            //}
+            string code = new Random().Next(100000, 999999).ToString();
+            if (!SendCode(email, code))
+            {
+                MessageBox.Show("Error al enviar el código de verificación.");
+                return false;
+            }
+            using (var formVerificationn = new ValideCode())
+            {
+                if (formVerificationn.ShowDialog() == DialogResult.OK)
+                {
+                    string codigoIngresado = formVerificationn.CodeInsert;
+                    if (codigoIngresado != code)
+                    {
+                        MessageBox.Show("El código ingresado es incorrecto.");
+                        return false;
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Verificación cancelada.");
+                    return false;
+                }
+            }
+
             return true;
+        }
+        public bool SendCode(string correoDestino, string codigo)
+        {
+            try
+            {
+                var mail = new MailMessage();
+                mail.From = new MailAddress("captusupc07@gmail.com");
+                mail.To.Add(correoDestino);
+                mail.Subject = "Código de verificación para tu cuenta en CAPTUS";
+                mail.Body = $"Hola,\n\nTu código de verificación es: {codigo}\n\nIngresa este código en la app para continuar con tu registro.\n\nGracias por usar CAPTUS.";
+                mail.ReplyToList.Add(new MailAddress("captusupc07@gmail.com"));
+                var smtp = new SmtpClient("smtp.gmail.com", 587)
+                {
+                    Credentials = new NetworkCredential("captusupc07@gmail.com", "qguo vidf kanr amvg"),
+                    EnableSsl = true
+                };
+
+                smtp.Send(mail);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al enviar correo: " + ex.Message);
+                return false;
+            }
         }
     }
 }

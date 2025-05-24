@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmAddTask));
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
             this.txtDescription = new System.Windows.Forms.RichTextBox();
@@ -178,6 +179,10 @@
             this.txtTitle.Leave += new System.EventHandler(this.txtTitle_Leave);
             this.txtTitle.MouseEnter += new System.EventHandler(this.txtTitle_MouseEnter);
             // 
+            // toolRefresh
+            // 
+            this.toolRefresh.Popup += new System.Windows.Forms.PopupEventHandler(this.toolRefresh_Popup);
+            // 
             // btnNextWeek
             // 
             this.btnNextWeek.BackgroundImage = global::Presentation.Properties.Resources.Nextweek;
@@ -251,6 +256,7 @@
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmAddTask";
             this.Text = "frmAddTask";
             this.panel1.ResumeLayout(false);

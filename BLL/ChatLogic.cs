@@ -134,6 +134,7 @@ namespace BLL
                     _taskLogic.SaveTask(task);
                     response = $"Tarea '{task.Title}' creada exitosamente" + 
                              (hasDate ? $" para el {endDate:dd/MM/yyyy HH:mm}" : ".");
+                    SendEmailTaskInsert(task);
                     return true;
                 }
 
@@ -207,6 +208,7 @@ namespace BLL
                     var task = tasks.First();
                     _taskLogic.DeleteTask(task.Id_Task);
                     response = $"Tarea '{task.Title}' eliminada exitosamente.";
+                    SendEmailTaskDelete(task);
                     return true;
                 }
 
@@ -240,6 +242,7 @@ namespace BLL
                     var task = tasks.First();
                     _taskLogic.RescheduleTask(task.Id_Task, newDate);
                     response = $"Tarea '{task.Title}' reprogramada para el {newDate:dd/MM/yyyy}.";
+                    SendEmailTaskUpdate(task);
                     return true;
                 }
 
@@ -254,7 +257,21 @@ namespace BLL
                 return true;
             }
         }
-
+        private async void SendEmailTaskInsert(ENTITY.Task task)
+        {
+            string mensaje = NotifyEmails.GetMessageInsert(task.Title, task.EndDate.ToShortDateString(), task.Category.Name);
+            await NotifyEmails.SendNotifyAsync(Session.CurrentUser.Email, "Tu asistente genero una nueva tarea", mensaje);
+        }
+        private async void SendEmailTaskUpdate(ENTITY.Task task)
+        {
+            string mensaje = NotifyEmails.GetMessageUpdate(task.Title, task.EndDate.ToShortDateString(), task.Category.Name);
+            await NotifyEmails.SendNotifyAsync(Session.CurrentUser.Email, "Tu asistente actualizo una tarea", mensaje);
+        }
+        private async void SendEmailTaskDelete(ENTITY.Task task)
+        {
+            string mensaje = NotifyEmails.GetMessageDelete(task.Title);
+            await NotifyEmails.SendNotifyAsync(Session.CurrentUser.Email, "Tu asistente elimino una tarea", mensaje);
+        }
         public bool DeleteMessage(int messageId, string username, string password)
         {
             // Validar credenciales antes de eliminar

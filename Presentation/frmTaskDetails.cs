@@ -109,7 +109,7 @@ namespace Presentation
         {
             DeleteTask();
         }
-        private void DeleteTask()
+        private async void DeleteTask()
         {
             var confirm = MessageBox.Show("¿Estás seguro de eliminar esta tarea?", "Confirmar eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
 
@@ -118,6 +118,8 @@ namespace Presentation
                 var result = taskLogic.Delete(task.id);
                 if (result.Success)
                 {
+                    string mensaje = NotifyEmails.GetMessageDelete(task.Title);
+                    await NotifyEmails.SendNotifyAsync(Session.CurrentUser.Email, "Tarea eliminada", mensaje);
                     MessageBox.Show("Tarea eliminada.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     this.Close();
                 }
@@ -134,7 +136,7 @@ namespace Presentation
             UpdateTask();
             this.Dispose();
         }
-        private void UpdateTask()
+        private async void UpdateTask()
         {
             if (string.IsNullOrWhiteSpace(rtxtTitle.Text))
             {
@@ -157,6 +159,8 @@ namespace Presentation
                 MessageBox.Show(result.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+            string mensaje = NotifyEmails.GetMessageUpdate(task.Title, task.EndDate.ToShortDateString(), task.Category.Name);
+            await NotifyEmails.SendNotifyAsync(Session.CurrentUser.Email, "Tarea actualizada", mensaje);
             MessageBox.Show("Tarea actualizada exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
             this.Close();
         }

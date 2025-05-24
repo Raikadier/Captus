@@ -28,10 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmCalculo));
             this.panel1 = new System.Windows.Forms.Panel();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.label1 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.panel2 = new System.Windows.Forms.Panel();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -47,14 +48,16 @@
             this.panel1.Size = new System.Drawing.Size(800, 51);
             this.panel1.TabIndex = 0;
             // 
-            // panel2
+            // pictureBox1
             // 
-            this.panel2.BackColor = System.Drawing.Color.Honeydew;
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(0, 51);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(800, 399);
-            this.panel2.TabIndex = 1;
+            this.pictureBox1.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.pictureBox1.Image = global::Presentation.Properties.Resources.iconCalculoWh;
+            this.pictureBox1.Location = new System.Drawing.Point(14, 10);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(41, 31);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox1.TabIndex = 46;
+            this.pictureBox1.TabStop = false;
             // 
             // label1
             // 
@@ -68,16 +71,14 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Calculation";
             // 
-            // pictureBox1
+            // panel2
             // 
-            this.pictureBox1.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.pictureBox1.Image = global::Presentation.Properties.Resources.iconCalculoWh;
-            this.pictureBox1.Location = new System.Drawing.Point(14, 10);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(41, 31);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox1.TabIndex = 46;
-            this.pictureBox1.TabStop = false;
+            this.panel2.BackColor = System.Drawing.Color.Honeydew;
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel2.Location = new System.Drawing.Point(0, 51);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(800, 399);
+            this.panel2.TabIndex = 1;
             // 
             // frmCalculo
             // 
@@ -87,6 +88,7 @@
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmCalculo";
             this.Text = "frmCalculo";
             this.panel1.ResumeLayout(false);

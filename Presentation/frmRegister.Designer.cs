@@ -28,7 +28,17 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmRegister));
             this.panel1 = new System.Windows.Forms.Panel();
+            this.txtCnPassword = new System.Windows.Forms.TextBox();
+            this.txtPassword = new System.Windows.Forms.TextBox();
+            this.txtUsername = new System.Windows.Forms.TextBox();
+            this.txtPhNumber = new System.Windows.Forms.TextBox();
+            this.txtEmail = new System.Windows.Forms.TextBox();
+            this.txtLastName = new System.Windows.Forms.TextBox();
+            this.txtName = new System.Windows.Forms.TextBox();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.label8 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
@@ -36,15 +46,6 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.label8 = new System.Windows.Forms.Label();
-            this.txtName = new System.Windows.Forms.TextBox();
-            this.txtLastName = new System.Windows.Forms.TextBox();
-            this.txtEmail = new System.Windows.Forms.TextBox();
-            this.txtPhNumber = new System.Windows.Forms.TextBox();
-            this.txtUsername = new System.Windows.Forms.TextBox();
-            this.txtPassword = new System.Windows.Forms.TextBox();
-            this.txtCnPassword = new System.Windows.Forms.TextBox();
             this.btnReply = new System.Windows.Forms.PictureBox();
             this.btnRegister = new System.Windows.Forms.PictureBox();
             this.btnClose = new System.Windows.Forms.PictureBox();
@@ -110,6 +111,104 @@
             this.panel1.Size = new System.Drawing.Size(1200, 650);
             this.panel1.TabIndex = 0;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
+            // 
+            // txtCnPassword
+            // 
+            this.txtCnPassword.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.txtCnPassword.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.txtCnPassword.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtCnPassword.Location = new System.Drawing.Point(592, 486);
+            this.txtCnPassword.Name = "txtCnPassword";
+            this.txtCnPassword.Size = new System.Drawing.Size(168, 13);
+            this.txtCnPassword.TabIndex = 28;
+            // 
+            // txtPassword
+            // 
+            this.txtPassword.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.txtPassword.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.txtPassword.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtPassword.Location = new System.Drawing.Point(591, 419);
+            this.txtPassword.Name = "txtPassword";
+            this.txtPassword.Size = new System.Drawing.Size(170, 13);
+            this.txtPassword.TabIndex = 27;
+            // 
+            // txtUsername
+            // 
+            this.txtUsername.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.txtUsername.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.txtUsername.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtUsername.Location = new System.Drawing.Point(588, 356);
+            this.txtUsername.Name = "txtUsername";
+            this.txtUsername.Size = new System.Drawing.Size(178, 13);
+            this.txtUsername.TabIndex = 26;
+            // 
+            // txtPhNumber
+            // 
+            this.txtPhNumber.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.txtPhNumber.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.txtPhNumber.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtPhNumber.Location = new System.Drawing.Point(593, 293);
+            this.txtPhNumber.Name = "txtPhNumber";
+            this.txtPhNumber.Size = new System.Drawing.Size(170, 13);
+            this.txtPhNumber.TabIndex = 25;
+            // 
+            // txtEmail
+            // 
+            this.txtEmail.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.txtEmail.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.txtEmail.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtEmail.Location = new System.Drawing.Point(591, 235);
+            this.txtEmail.Name = "txtEmail";
+            this.txtEmail.Size = new System.Drawing.Size(170, 13);
+            this.txtEmail.TabIndex = 24;
+            // 
+            // txtLastName
+            // 
+            this.txtLastName.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.txtLastName.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.txtLastName.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtLastName.Location = new System.Drawing.Point(592, 177);
+            this.txtLastName.Name = "txtLastName";
+            this.txtLastName.Size = new System.Drawing.Size(166, 13);
+            this.txtLastName.TabIndex = 23;
+            // 
+            // txtName
+            // 
+            this.txtName.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.txtName.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.txtName.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtName.Location = new System.Drawing.Point(592, 123);
+            this.txtName.Name = "txtName";
+            this.txtName.Size = new System.Drawing.Size(166, 13);
+            this.txtName.TabIndex = 22;
+            // 
+            // panel2
+            // 
+            this.panel2.BackColor = System.Drawing.Color.Honeydew;
+            this.panel2.Controls.Add(this.btnClose);
+            this.panel2.Controls.Add(this.btnRestaurar);
+            this.panel2.Controls.Add(this.btnMaximizar);
+            this.panel2.Controls.Add(this.btnMinimizar);
+            this.panel2.Controls.Add(this.label8);
+            this.panel2.Controls.Add(this.pictureBox1);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel2.Location = new System.Drawing.Point(0, 0);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(1200, 76);
+            this.panel2.TabIndex = 19;
+            this.panel2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Panel2_MouseDown);
+            // 
+            // label8
+            // 
+            this.label8.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.label8.AutoSize = true;
+            this.label8.Font = new System.Drawing.Font("Century Gothic", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label8.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.label8.Location = new System.Drawing.Point(556, 26);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(89, 24);
+            this.label8.TabIndex = 20;
+            this.label8.Text = "Register";
             // 
             // label7
             // 
@@ -195,104 +294,6 @@
             this.label1.TabIndex = 5;
             this.label1.Text = "First Name";
             this.label1.Click += new System.EventHandler(this.label1_Click);
-            // 
-            // panel2
-            // 
-            this.panel2.BackColor = System.Drawing.Color.Honeydew;
-            this.panel2.Controls.Add(this.btnClose);
-            this.panel2.Controls.Add(this.btnRestaurar);
-            this.panel2.Controls.Add(this.btnMaximizar);
-            this.panel2.Controls.Add(this.btnMinimizar);
-            this.panel2.Controls.Add(this.label8);
-            this.panel2.Controls.Add(this.pictureBox1);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel2.Location = new System.Drawing.Point(0, 0);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1200, 76);
-            this.panel2.TabIndex = 19;
-            this.panel2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Panel2_MouseDown);
-            // 
-            // label8
-            // 
-            this.label8.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label8.AutoSize = true;
-            this.label8.Font = new System.Drawing.Font("Century Gothic", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label8.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.label8.Location = new System.Drawing.Point(556, 26);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(89, 24);
-            this.label8.TabIndex = 20;
-            this.label8.Text = "Register";
-            // 
-            // txtName
-            // 
-            this.txtName.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.txtName.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.txtName.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtName.Location = new System.Drawing.Point(530, 121);
-            this.txtName.Name = "txtName";
-            this.txtName.Size = new System.Drawing.Size(166, 13);
-            this.txtName.TabIndex = 22;
-            // 
-            // txtLastName
-            // 
-            this.txtLastName.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.txtLastName.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.txtLastName.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtLastName.Location = new System.Drawing.Point(530, 177);
-            this.txtLastName.Name = "txtLastName";
-            this.txtLastName.Size = new System.Drawing.Size(166, 13);
-            this.txtLastName.TabIndex = 23;
-            // 
-            // txtEmail
-            // 
-            this.txtEmail.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.txtEmail.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.txtEmail.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtEmail.Location = new System.Drawing.Point(498, 235);
-            this.txtEmail.Name = "txtEmail";
-            this.txtEmail.Size = new System.Drawing.Size(170, 13);
-            this.txtEmail.TabIndex = 24;
-            // 
-            // txtPhNumber
-            // 
-            this.txtPhNumber.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.txtPhNumber.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.txtPhNumber.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtPhNumber.Location = new System.Drawing.Point(574, 293);
-            this.txtPhNumber.Name = "txtPhNumber";
-            this.txtPhNumber.Size = new System.Drawing.Size(170, 13);
-            this.txtPhNumber.TabIndex = 25;
-            // 
-            // txtUsername
-            // 
-            this.txtUsername.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.txtUsername.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.txtUsername.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtUsername.Location = new System.Drawing.Point(530, 355);
-            this.txtUsername.Name = "txtUsername";
-            this.txtUsername.Size = new System.Drawing.Size(178, 13);
-            this.txtUsername.TabIndex = 26;
-            // 
-            // txtPassword
-            // 
-            this.txtPassword.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.txtPassword.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.txtPassword.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtPassword.Location = new System.Drawing.Point(526, 420);
-            this.txtPassword.Name = "txtPassword";
-            this.txtPassword.Size = new System.Drawing.Size(170, 13);
-            this.txtPassword.TabIndex = 27;
-            // 
-            // txtCnPassword
-            // 
-            this.txtCnPassword.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.txtCnPassword.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.txtCnPassword.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtCnPassword.Location = new System.Drawing.Point(592, 486);
-            this.txtCnPassword.Name = "txtCnPassword";
-            this.txtCnPassword.Size = new System.Drawing.Size(168, 13);
-            this.txtCnPassword.TabIndex = 28;
             // 
             // btnReply
             // 
@@ -397,7 +398,7 @@
             // 
             this.brnPassword.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.brnPassword.Image = global::Presentation.Properties.Resources.banner;
-            this.brnPassword.Location = new System.Drawing.Point(498, 411);
+            this.brnPassword.Location = new System.Drawing.Point(563, 410);
             this.brnPassword.Name = "brnPassword";
             this.brnPassword.Size = new System.Drawing.Size(226, 43);
             this.brnPassword.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -408,7 +409,7 @@
             // 
             this.brnUserName.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.brnUserName.Image = global::Presentation.Properties.Resources.banner;
-            this.brnUserName.Location = new System.Drawing.Point(505, 345);
+            this.brnUserName.Location = new System.Drawing.Point(563, 346);
             this.brnUserName.Name = "brnUserName";
             this.brnUserName.Size = new System.Drawing.Size(226, 43);
             this.brnUserName.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -419,7 +420,7 @@
             // 
             this.brnPhNumber.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.brnPhNumber.Image = global::Presentation.Properties.Resources.banner;
-            this.brnPhNumber.Location = new System.Drawing.Point(544, 284);
+            this.brnPhNumber.Location = new System.Drawing.Point(563, 284);
             this.brnPhNumber.Name = "brnPhNumber";
             this.brnPhNumber.Size = new System.Drawing.Size(226, 43);
             this.brnPhNumber.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -430,7 +431,7 @@
             // 
             this.brnEmail.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.brnEmail.Image = global::Presentation.Properties.Resources.banner;
-            this.brnEmail.Location = new System.Drawing.Point(470, 226);
+            this.brnEmail.Location = new System.Drawing.Point(563, 226);
             this.brnEmail.Name = "brnEmail";
             this.brnEmail.Size = new System.Drawing.Size(226, 43);
             this.brnEmail.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -441,7 +442,7 @@
             // 
             this.brnLastName.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.brnLastName.Image = global::Presentation.Properties.Resources.banner;
-            this.brnLastName.Location = new System.Drawing.Point(501, 167);
+            this.brnLastName.Location = new System.Drawing.Point(563, 167);
             this.brnLastName.Name = "brnLastName";
             this.brnLastName.Size = new System.Drawing.Size(226, 43);
             this.brnLastName.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -452,7 +453,7 @@
             // 
             this.BnrName.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.BnrName.Image = global::Presentation.Properties.Resources.banner;
-            this.BnrName.Location = new System.Drawing.Point(501, 107);
+            this.BnrName.Location = new System.Drawing.Point(563, 109);
             this.BnrName.Name = "BnrName";
             this.BnrName.Size = new System.Drawing.Size(226, 43);
             this.BnrName.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -466,6 +467,7 @@
             this.ClientSize = new System.Drawing.Size(1200, 650);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmRegister";
             this.Text = "frmRegister";
             this.panel1.ResumeLayout(false);
