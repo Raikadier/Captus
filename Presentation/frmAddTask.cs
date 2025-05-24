@@ -354,5 +354,10 @@ namespace Presentation
         {
             ProcessAddTask();
         }
+
+        private void btnNextWeek_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 }
