@@ -338,5 +338,11 @@ namespace Presentation
         {
 
         }
+
+        private void btnClse_Click(object sender, EventArgs e)
+        {
+            this.Close();
+
+        }
     }
 }

@@ -31,8 +31,14 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmAddTask));
             this.panel1 = new System.Windows.Forms.Panel();
+            this.btnClose = new System.Windows.Forms.PictureBox();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.btnNextWeek = new System.Windows.Forms.Panel();
+            this.btnWeekend = new System.Windows.Forms.Panel();
+            this.btnTomorrow = new System.Windows.Forms.Panel();
+            this.btnToday = new System.Windows.Forms.Panel();
             this.txtDescription = new System.Windows.Forms.RichTextBox();
+            this.pnlRefresh = new System.Windows.Forms.Panel();
             this.btnAddTask = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.cbCategories = new System.Windows.Forms.ComboBox();
@@ -44,20 +50,16 @@
             this.toolTomorrow = new System.Windows.Forms.ToolTip(this.components);
             this.toolWeekend = new System.Windows.Forms.ToolTip(this.components);
             this.toolNextWeek = new System.Windows.Forms.ToolTip(this.components);
-            this.btnNextWeek = new System.Windows.Forms.Panel();
-            this.btnWeekend = new System.Windows.Forms.Panel();
-            this.btnTomorrow = new System.Windows.Forms.Panel();
-            this.btnToday = new System.Windows.Forms.Panel();
-            this.pnlRefresh = new System.Windows.Forms.Panel();
-            this.btnClose = new System.Windows.Forms.PictureBox();
+            this.btnClse = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
-            this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.btnClose)).BeginInit();
+            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.Honeydew;
+            this.panel1.Controls.Add(this.btnClse);
             this.panel1.Controls.Add(this.btnClose);
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
@@ -65,6 +67,19 @@
             this.panel1.TabIndex = 0;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             this.panel1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Panel1_MouseDown);
+            // 
+            // btnClose
+            // 
+            this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnClose.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnClose.Image = global::Presentation.Properties.Resources.icons8_close_window_50__2_;
+            this.btnClose.Location = new System.Drawing.Point(613, 14);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(30, 26);
+            this.btnClose.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.btnClose.TabIndex = 29;
+            this.btnClose.TabStop = false;
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
             // panel2
             // 
@@ -86,6 +101,47 @@
             this.panel2.Size = new System.Drawing.Size(659, 309);
             this.panel2.TabIndex = 1;
             // 
+            // btnNextWeek
+            // 
+            this.btnNextWeek.BackgroundImage = global::Presentation.Properties.Resources.Nextweek;
+            this.btnNextWeek.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnNextWeek.Location = new System.Drawing.Point(153, 221);
+            this.btnNextWeek.Name = "btnNextWeek";
+            this.btnNextWeek.Size = new System.Drawing.Size(40, 40);
+            this.btnNextWeek.TabIndex = 12;
+            this.btnNextWeek.MouseClick += new System.Windows.Forms.MouseEventHandler(this.btnNextWeek_MouseClick);
+            // 
+            // btnWeekend
+            // 
+            this.btnWeekend.BackgroundImage = global::Presentation.Properties.Resources.Weekend;
+            this.btnWeekend.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnWeekend.Location = new System.Drawing.Point(107, 221);
+            this.btnWeekend.Name = "btnWeekend";
+            this.btnWeekend.Size = new System.Drawing.Size(40, 40);
+            this.btnWeekend.TabIndex = 11;
+            this.btnWeekend.MouseClick += new System.Windows.Forms.MouseEventHandler(this.btnWeekend_MouseClick);
+            // 
+            // btnTomorrow
+            // 
+            this.btnTomorrow.BackgroundImage = global::Presentation.Properties.Resources.Tomorrow;
+            this.btnTomorrow.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnTomorrow.Location = new System.Drawing.Point(61, 221);
+            this.btnTomorrow.Name = "btnTomorrow";
+            this.btnTomorrow.Size = new System.Drawing.Size(40, 40);
+            this.btnTomorrow.TabIndex = 10;
+            this.btnTomorrow.MouseClick += new System.Windows.Forms.MouseEventHandler(this.btnTomorrow_MouseClick);
+            // 
+            // btnToday
+            // 
+            this.btnToday.BackgroundImage = global::Presentation.Properties.Resources.Today;
+            this.btnToday.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.btnToday.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnToday.Location = new System.Drawing.Point(15, 221);
+            this.btnToday.Name = "btnToday";
+            this.btnToday.Size = new System.Drawing.Size(40, 40);
+            this.btnToday.TabIndex = 9;
+            this.btnToday.MouseClick += new System.Windows.Forms.MouseEventHandler(this.btnToday_MouseClick);
+            // 
             // txtDescription
             // 
             this.txtDescription.BackColor = System.Drawing.Color.Honeydew;
@@ -99,6 +155,17 @@
             this.txtDescription.Text = "";
             this.txtDescription.MouseClick += new System.Windows.Forms.MouseEventHandler(this.txtDescription_MouseClick);
             this.txtDescription.Leave += new System.EventHandler(this.txtDescription_Leave);
+            // 
+            // pnlRefresh
+            // 
+            this.pnlRefresh.BackgroundImage = global::Presentation.Properties.Resources.LogoRefreshPNG;
+            this.pnlRefresh.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.pnlRefresh.Location = new System.Drawing.Point(590, 15);
+            this.pnlRefresh.Name = "pnlRefresh";
+            this.pnlRefresh.Size = new System.Drawing.Size(40, 40);
+            this.pnlRefresh.TabIndex = 7;
+            this.pnlRefresh.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlRefresh_Paint);
+            this.pnlRefresh.MouseClick += new System.Windows.Forms.MouseEventHandler(this.panel3_MouseClick);
             // 
             // btnAddTask
             // 
@@ -183,70 +250,20 @@
             // 
             this.toolRefresh.Popup += new System.Windows.Forms.PopupEventHandler(this.toolRefresh_Popup);
             // 
-            // btnNextWeek
+            // btnClse
             // 
-            this.btnNextWeek.BackgroundImage = global::Presentation.Properties.Resources.Nextweek;
-            this.btnNextWeek.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnNextWeek.Location = new System.Drawing.Point(153, 221);
-            this.btnNextWeek.Name = "btnNextWeek";
-            this.btnNextWeek.Size = new System.Drawing.Size(40, 40);
-            this.btnNextWeek.TabIndex = 12;
-            this.btnNextWeek.MouseClick += new System.Windows.Forms.MouseEventHandler(this.btnNextWeek_MouseClick);
-            // 
-            // btnWeekend
-            // 
-            this.btnWeekend.BackgroundImage = global::Presentation.Properties.Resources.Weekend;
-            this.btnWeekend.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnWeekend.Location = new System.Drawing.Point(107, 221);
-            this.btnWeekend.Name = "btnWeekend";
-            this.btnWeekend.Size = new System.Drawing.Size(40, 40);
-            this.btnWeekend.TabIndex = 11;
-            this.btnWeekend.MouseClick += new System.Windows.Forms.MouseEventHandler(this.btnWeekend_MouseClick);
-            // 
-            // btnTomorrow
-            // 
-            this.btnTomorrow.BackgroundImage = global::Presentation.Properties.Resources.Tomorrow;
-            this.btnTomorrow.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnTomorrow.Location = new System.Drawing.Point(61, 221);
-            this.btnTomorrow.Name = "btnTomorrow";
-            this.btnTomorrow.Size = new System.Drawing.Size(40, 40);
-            this.btnTomorrow.TabIndex = 10;
-            this.btnTomorrow.MouseClick += new System.Windows.Forms.MouseEventHandler(this.btnTomorrow_MouseClick);
-            // 
-            // btnToday
-            // 
-            this.btnToday.BackgroundImage = global::Presentation.Properties.Resources.Today;
-            this.btnToday.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.btnToday.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnToday.Location = new System.Drawing.Point(15, 221);
-            this.btnToday.Name = "btnToday";
-            this.btnToday.Size = new System.Drawing.Size(40, 40);
-            this.btnToday.TabIndex = 9;
-            this.btnToday.MouseClick += new System.Windows.Forms.MouseEventHandler(this.btnToday_MouseClick);
-            // 
-            // pnlRefresh
-            // 
-            this.pnlRefresh.BackgroundImage = global::Presentation.Properties.Resources.LogoRefreshPNG;
-            this.pnlRefresh.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.pnlRefresh.Location = new System.Drawing.Point(556, 15);
-            this.pnlRefresh.Name = "pnlRefresh";
-            this.pnlRefresh.Size = new System.Drawing.Size(40, 40);
-            this.pnlRefresh.TabIndex = 7;
-            this.pnlRefresh.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlRefresh_Paint);
-            this.pnlRefresh.MouseClick += new System.Windows.Forms.MouseEventHandler(this.panel3_MouseClick);
-            // 
-            // btnClose
-            // 
-            this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClose.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnClose.Image = global::Presentation.Properties.Resources.icons8_close_window_50__2_;
-            this.btnClose.Location = new System.Drawing.Point(613, 14);
-            this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(30, 26);
-            this.btnClose.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.btnClose.TabIndex = 29;
-            this.btnClose.TabStop = false;
-            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+            this.btnClse.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btnClse.FlatAppearance.BorderSize = 0;
+            this.btnClse.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
+            this.btnClse.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this.btnClse.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnClse.Image = global::Presentation.Properties.Resources.icons8_close_window_50__2_;
+            this.btnClse.Location = new System.Drawing.Point(577, 5);
+            this.btnClse.Name = "btnClse";
+            this.btnClse.Size = new System.Drawing.Size(30, 35);
+            this.btnClse.TabIndex = 30;
+            this.btnClse.UseVisualStyleBackColor = true;
+            this.btnClse.Click += new System.EventHandler(this.btnClse_Click);
             // 
             // frmAddTask
             // 
@@ -260,8 +277,8 @@
             this.Name = "frmAddTask";
             this.Text = "frmAddTask";
             this.panel1.ResumeLayout(false);
-            this.panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.btnClose)).EndInit();
+            this.panel2.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -288,5 +305,6 @@
         private System.Windows.Forms.ToolTip toolTomorrow;
         private System.Windows.Forms.ToolTip toolWeekend;
         private System.Windows.Forms.ToolTip toolNextWeek;
+        private System.Windows.Forms.Button btnClse;
     }
 }
