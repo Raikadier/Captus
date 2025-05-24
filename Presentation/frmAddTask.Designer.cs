@@ -67,6 +67,7 @@
             // 
             // panel2
             // 
+            this.panel2.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.panel2.BackColor = System.Drawing.Color.Honeydew;
             this.panel2.Controls.Add(this.btnAddTsk);
             this.panel2.Controls.Add(this.btnCancelar);
@@ -193,11 +194,12 @@
             // 
             // pnlRefresh
             // 
+            this.pnlRefresh.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.pnlRefresh.BackgroundImage = global::Presentation.Properties.Resources.LogoRefreshPNG;
             this.pnlRefresh.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.pnlRefresh.Location = new System.Drawing.Point(590, 15);
+            this.pnlRefresh.Location = new System.Drawing.Point(607, 15);
             this.pnlRefresh.Name = "pnlRefresh";
-            this.pnlRefresh.Size = new System.Drawing.Size(40, 40);
+            this.pnlRefresh.Size = new System.Drawing.Size(36, 37);
             this.pnlRefresh.TabIndex = 7;
             this.pnlRefresh.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlRefresh_Paint);
             this.pnlRefresh.MouseClick += new System.Windows.Forms.MouseEventHandler(this.panel3_MouseClick);

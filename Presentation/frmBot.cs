@@ -217,5 +217,23 @@ namespace Presentation
                 richTextBox1.Clear();
             }
         }
+
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            this.Close();
+
+        }
+
+        //private void btnMinimizar_Click(object sender, EventArgs e)
+        //{
+        //    this.WindowState = FormWindowState.Minimized;
+
+        //}
+
+        private void btnClse_Click(object sender, EventArgs e)
+        {
+            this.Close();
+
+        }
     }
 }

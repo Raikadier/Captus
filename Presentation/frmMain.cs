@@ -487,13 +487,13 @@ namespace Presentation
             addtaskForm.ShowDialog();
         }
 
-        private void btnChatBot_Click(object sender, EventArgs e)
-        {
-            LimpiarPanelContenedor();
-            panelTareas.Visible = false;
-            FrmBot bot = new FrmBot();
-            CargarFormularioEnPanel(bot);
-        }
+        //private void btnChatBot_Click(object sender, EventArgs e)
+        //{
+        //    LimpiarPanelContenedor();
+        //    panelTareas.Visible = false;
+        //    FrmBot bot = new FrmBot();
+        //    CargarFormularioEnPanel(bot);
+        //}
 
         private void btnChatBot_Paint(object sender, PaintEventArgs e)
         {
@@ -505,6 +505,19 @@ namespace Presentation
             {
                 ctrl.Visible = false;
             }
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnChatBot_Click_1(object sender, EventArgs e)
+        {
+            LimpiarPanelContenedor();
+            panelTareas.Visible = false;
+            FrmBot bot = new FrmBot();
+            CargarFormularioEnPanel(bot);
         }
     }
 }

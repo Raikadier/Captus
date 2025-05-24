@@ -134,12 +134,22 @@ namespace Presentation
             this.WindowState = FormWindowState.Minimized;
         }
 
-        private void btnClose_Click(object sender, EventArgs e)
+        //private void btnClose_Click(object sender, EventArgs e)
+        //{
+        //    Application.Exit();
+        //}
+
+        private void panel2_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void btnClse_Click(object sender, EventArgs e)
         {
             Application.Exit();
         }
 
-        private void panel2_Paint(object sender, PaintEventArgs e)
+        private void button1_Click(object sender, EventArgs e)
         {
 
         }

@@ -86,9 +86,9 @@ namespace Presentation
 
         private void btnReply_Click(object sender, EventArgs e)
         {
-            //this.Hide(); // Oculta el register
-            //frmLogin loginForm = new frmLogin();
-            //loginForm.ShowDialog(); // Abre el login
+            this.Hide(); // Oculta el register
+            frmLogin loginForm = new frmLogin();
+            loginForm.ShowDialog(); // Abre el login
 
             this.Close();
         }
