@@ -121,6 +121,9 @@
   <data name="picUser" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\picUser.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="menu_hamburguesa" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\menu_hamburguesa.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="banner" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\banner.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -133,14 +136,11 @@
   <data name="Eliminar" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Eliminar.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="btnReply" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\btnReply.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="iconCalculoWh (1)" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iconCalculoWh (1).png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Nextweek" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Nextweek.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Save" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Save.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Racha" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Racha.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -166,6 +166,9 @@
   <data name="iconTask" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\iconTask.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="iconLogout" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iconLogout.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="iconToDoList" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\iconToDoList.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -181,9 +184,6 @@
   <data name="lgCaptus" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\lgCaptus.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="btnRegister" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\btnRegister.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="btnRestaurar" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\btnRestaurar.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -196,11 +196,11 @@
   <data name="icons8-close-window-50 (2)" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\icons8-close-window-50 (2).png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="menu_hamburguesa" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\menu_hamburguesa.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="btnRegister" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\btnRegister.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="iconCalculoWh (1)" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\iconCalculoWh (1).png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="Save" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Save.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="icons8-maximize-window-50 (1)" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\icons8-maximize-window-50 (1).png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -214,8 +214,8 @@
   <data name="iconAdd" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\iconAdd.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="iconLogout" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\iconLogout.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="btnReply" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\btnReply.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="iconUserWh" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\iconUserWh.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -225,5 +225,8 @@
   </data>
   <data name="MasInfo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MasInfo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iconoCaptus&amp;Ds" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iconoCaptus&amp;Ds.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

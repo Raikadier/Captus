@@ -312,6 +312,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="LogoCaptus2.ico" />
+    <None Include="Resources\iconoCaptus&amp;Ds.png" />
     <None Include="Resources\MasInfo.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
