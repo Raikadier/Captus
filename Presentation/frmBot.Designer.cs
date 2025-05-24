@@ -57,7 +57,7 @@ namespace Presentation
             // 
             // btnClse
             // 
-            this.btnClse.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btnClse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnClse.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnClse.FlatAppearance.BorderSize = 0;
             this.btnClse.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));

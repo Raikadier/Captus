@@ -373,7 +373,7 @@ namespace Presentation
             label1.Visible = panel1.Width >= expandedWidth - 5;
             label1.Location = new Point(
                 (panel1.Width - label1.PreferredWidth) / 2,
-                picLogoCaptus.Bottom + 30 // justo debajo del logo
+                picLogoCaptus.Bottom + 10 // justo debajo del logo
             );
 
             //// Ajustar label de los botones

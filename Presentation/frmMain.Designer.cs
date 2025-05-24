@@ -81,7 +81,7 @@
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.ForeColor = System.Drawing.Color.Honeydew;
-            this.label1.Location = new System.Drawing.Point(57, 100);
+            this.label1.Location = new System.Drawing.Point(57, 91);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(87, 19);
             this.label1.TabIndex = 31;
@@ -201,7 +201,7 @@
             this.btnCalcular.ForeColor = System.Drawing.Color.Honeydew;
             this.btnCalcular.Image = global::Presentation.Properties.Resources.iconCalcular;
             this.btnCalcular.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnCalcular.Location = new System.Drawing.Point(0, 386);
+            this.btnCalcular.Location = new System.Drawing.Point(0, 385);
             this.btnCalcular.Name = "btnCalcular";
             this.btnCalcular.Size = new System.Drawing.Size(200, 40);
             this.btnCalcular.TabIndex = 49;
@@ -218,7 +218,7 @@
             this.btnChatBot.ForeColor = System.Drawing.Color.Honeydew;
             this.btnChatBot.Image = global::Presentation.Properties.Resources.iconBt;
             this.btnChatBot.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnChatBot.Location = new System.Drawing.Point(0, 340);
+            this.btnChatBot.Location = new System.Drawing.Point(0, 331);
             this.btnChatBot.Name = "btnChatBot";
             this.btnChatBot.Size = new System.Drawing.Size(200, 40);
             this.btnChatBot.TabIndex = 48;
