@@ -133,7 +133,7 @@
             this.btnLogout.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnLogout.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnLogout.ForeColor = System.Drawing.Color.Honeydew;
-            this.btnLogout.Image = global::Presentation.Properties.Resources.iconOut;
+            this.btnLogout.Image = global::Presentation.Properties.Resources.iconOut2;
             this.btnLogout.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnLogout.Location = new System.Drawing.Point(0, 494);
             this.btnLogout.Name = "btnLogout";
