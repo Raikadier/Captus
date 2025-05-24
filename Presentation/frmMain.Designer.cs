@@ -35,7 +35,6 @@
             this.label2 = new System.Windows.Forms.Label();
             this.imgChatBot = new System.Windows.Forms.Panel();
             this.btnAddTask = new System.Windows.Forms.Button();
-            this.lblCerrarSesion = new System.Windows.Forms.Label();
             this.btnLogout = new System.Windows.Forms.Button();
             this.btnProfile = new System.Windows.Forms.Button();
             this.btnTaskList = new System.Windows.Forms.Button();
@@ -67,7 +66,6 @@
             this.panel1.BackColor = System.Drawing.Color.Green;
             this.panel1.Controls.Add(this.btnChatBot);
             this.panel1.Controls.Add(this.btnAddTask);
-            this.panel1.Controls.Add(this.lblCerrarSesion);
             this.panel1.Controls.Add(this.btnLogout);
             this.panel1.Controls.Add(this.btnProfile);
             this.panel1.Controls.Add(this.btnTaskList);
@@ -115,8 +113,8 @@
             this.btnAddTask.BackColor = System.Drawing.Color.Green;
             this.btnAddTask.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnAddTask.FlatAppearance.BorderSize = 0;
-            this.btnAddTask.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.btnAddTask.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Green;
+            this.btnAddTask.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Green;
+            this.btnAddTask.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
             this.btnAddTask.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAddTask.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnAddTask.ForeColor = System.Drawing.Color.Honeydew;
@@ -129,17 +127,6 @@
             this.btnAddTask.Text = "Add Task";
             this.btnAddTask.UseVisualStyleBackColor = false;
             this.btnAddTask.Click += new System.EventHandler(this.btnAddTask_Click);
-            // 
-            // lblCerrarSesion
-            // 
-            this.lblCerrarSesion.AutoSize = true;
-            this.lblCerrarSesion.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Bold);
-            this.lblCerrarSesion.ForeColor = System.Drawing.Color.Red;
-            this.lblCerrarSesion.Location = new System.Drawing.Point(58, 512);
-            this.lblCerrarSesion.Name = "lblCerrarSesion";
-            this.lblCerrarSesion.Size = new System.Drawing.Size(104, 18);
-            this.lblCerrarSesion.TabIndex = 45;
-            this.lblCerrarSesion.Text = "Cerrar sesión";
             // 
             // btnLogout
             // 
@@ -364,7 +351,6 @@
         private System.Windows.Forms.Button btnProfile;
         private System.Windows.Forms.Button btnLogout;
         private System.Windows.Forms.Panel panelContenedor;
-        private System.Windows.Forms.Label lblCerrarSesion;
         private System.Windows.Forms.FlowLayoutPanel panelTareas;
         private System.Windows.Forms.Button btnAddTask;
         private System.Windows.Forms.Panel btnChatBot;

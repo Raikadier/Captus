@@ -344,5 +344,15 @@ namespace Presentation
             this.Close();
 
         }
+
+        private void btnCancelar_Click(object sender, EventArgs e)
+        {
+            this.Dispose();
+        }
+
+        private void btnAddTsk_Click(object sender, EventArgs e)
+        {
+            ProcessAddTask();
+        }
     }
 }

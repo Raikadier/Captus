@@ -31,7 +31,7 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmAddTask));
             this.panel1 = new System.Windows.Forms.Panel();
-            this.btnClose = new System.Windows.Forms.PictureBox();
+            this.btnClse = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
             this.btnNextWeek = new System.Windows.Forms.Panel();
             this.btnWeekend = new System.Windows.Forms.Panel();
@@ -39,8 +39,6 @@
             this.btnToday = new System.Windows.Forms.Panel();
             this.txtDescription = new System.Windows.Forms.RichTextBox();
             this.pnlRefresh = new System.Windows.Forms.Panel();
-            this.btnAddTask = new System.Windows.Forms.Button();
-            this.btnCancel = new System.Windows.Forms.Button();
             this.cbCategories = new System.Windows.Forms.ComboBox();
             this.cbPriority = new System.Windows.Forms.ComboBox();
             this.dtmEndDate = new System.Windows.Forms.DateTimePicker();
@@ -50,9 +48,9 @@
             this.toolTomorrow = new System.Windows.Forms.ToolTip(this.components);
             this.toolWeekend = new System.Windows.Forms.ToolTip(this.components);
             this.toolNextWeek = new System.Windows.Forms.ToolTip(this.components);
-            this.btnClse = new System.Windows.Forms.Button();
+            this.btnCancelar = new Presentation.ButtonPersonal();
+            this.btnAddTsk = new Presentation.ButtonPersonal();
             this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.btnClose)).BeginInit();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -60,7 +58,6 @@
             // 
             this.panel1.BackColor = System.Drawing.Color.Honeydew;
             this.panel1.Controls.Add(this.btnClse);
-            this.panel1.Controls.Add(this.btnClose);
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(659, 67);
@@ -68,30 +65,33 @@
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             this.panel1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Panel1_MouseDown);
             // 
-            // btnClose
+            // btnClse
             // 
-            this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClose.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnClose.Image = global::Presentation.Properties.Resources.icons8_close_window_50__2_;
-            this.btnClose.Location = new System.Drawing.Point(613, 14);
-            this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(30, 26);
-            this.btnClose.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.btnClose.TabIndex = 29;
-            this.btnClose.TabStop = false;
-            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+            this.btnClse.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btnClse.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnClse.FlatAppearance.BorderSize = 0;
+            this.btnClse.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
+            this.btnClse.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
+            this.btnClse.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnClse.Image = global::Presentation.Properties.Resources.icons8_close_window_50__2_;
+            this.btnClse.Location = new System.Drawing.Point(622, 3);
+            this.btnClse.Name = "btnClse";
+            this.btnClse.Size = new System.Drawing.Size(30, 35);
+            this.btnClse.TabIndex = 30;
+            this.btnClse.UseVisualStyleBackColor = true;
+            this.btnClse.Click += new System.EventHandler(this.btnClse_Click);
             // 
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.Color.Honeydew;
+            this.panel2.Controls.Add(this.btnAddTsk);
+            this.panel2.Controls.Add(this.btnCancelar);
             this.panel2.Controls.Add(this.btnNextWeek);
             this.panel2.Controls.Add(this.btnWeekend);
             this.panel2.Controls.Add(this.btnTomorrow);
             this.panel2.Controls.Add(this.btnToday);
             this.panel2.Controls.Add(this.txtDescription);
             this.panel2.Controls.Add(this.pnlRefresh);
-            this.panel2.Controls.Add(this.btnAddTask);
-            this.panel2.Controls.Add(this.btnCancel);
             this.panel2.Controls.Add(this.cbCategories);
             this.panel2.Controls.Add(this.cbPriority);
             this.panel2.Controls.Add(this.dtmEndDate);
@@ -167,39 +167,6 @@
             this.pnlRefresh.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlRefresh_Paint);
             this.pnlRefresh.MouseClick += new System.Windows.Forms.MouseEventHandler(this.panel3_MouseClick);
             // 
-            // btnAddTask
-            // 
-            this.btnAddTask.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnAddTask.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.btnAddTask.FlatAppearance.MouseOverBackColor = System.Drawing.Color.ForestGreen;
-            this.btnAddTask.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAddTask.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnAddTask.ForeColor = System.Drawing.Color.ForestGreen;
-            this.btnAddTask.Location = new System.Drawing.Point(538, 244);
-            this.btnAddTask.Name = "btnAddTask";
-            this.btnAddTask.Size = new System.Drawing.Size(92, 32);
-            this.btnAddTask.TabIndex = 6;
-            this.btnAddTask.Text = "Add Task";
-            this.btnAddTask.UseVisualStyleBackColor = true;
-            this.btnAddTask.Click += new System.EventHandler(this.btnAddTask_Click);
-            // 
-            // btnCancel
-            // 
-            this.btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.btnCancel.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnCancel.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.btnCancel.FlatAppearance.MouseOverBackColor = System.Drawing.Color.ForestGreen;
-            this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCancel.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnCancel.ForeColor = System.Drawing.Color.ForestGreen;
-            this.btnCancel.Location = new System.Drawing.Point(435, 244);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(81, 32);
-            this.btnCancel.TabIndex = 5;
-            this.btnCancel.Text = "Cancel";
-            this.btnCancel.UseVisualStyleBackColor = true;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
-            // 
             // cbCategories
             // 
             this.cbCategories.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -250,20 +217,57 @@
             // 
             this.toolRefresh.Popup += new System.Windows.Forms.PopupEventHandler(this.toolRefresh_Popup);
             // 
-            // btnClse
+            // btnCancelar
             // 
-            this.btnClse.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.btnClse.FlatAppearance.BorderSize = 0;
-            this.btnClse.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
-            this.btnClse.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.btnClse.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnClse.Image = global::Presentation.Properties.Resources.icons8_close_window_50__2_;
-            this.btnClse.Location = new System.Drawing.Point(577, 5);
-            this.btnClse.Name = "btnClse";
-            this.btnClse.Size = new System.Drawing.Size(30, 35);
-            this.btnClse.TabIndex = 30;
-            this.btnClse.UseVisualStyleBackColor = true;
-            this.btnClse.Click += new System.EventHandler(this.btnClse_Click);
+            this.btnCancelar.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btnCancelar.BackColor = System.Drawing.Color.Green;
+            this.btnCancelar.BackgroundColor = System.Drawing.Color.Green;
+            this.btnCancelar.BorderColor = System.Drawing.Color.Honeydew;
+            this.btnCancelar.BorderColor1 = System.Drawing.Color.Honeydew;
+            this.btnCancelar.BorderRadius = 40;
+            this.btnCancelar.BorderRadius1 = 40;
+            this.btnCancelar.BorderSize = 0;
+            this.btnCancelar.BorderSize1 = 0;
+            this.btnCancelar.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnCancelar.FlatAppearance.BorderSize = 0;
+            this.btnCancelar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.btnCancelar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCancelar.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnCancelar.ForeColor = System.Drawing.Color.White;
+            this.btnCancelar.Location = new System.Drawing.Point(389, 244);
+            this.btnCancelar.Name = "btnCancelar";
+            this.btnCancelar.Size = new System.Drawing.Size(121, 42);
+            this.btnCancelar.TabIndex = 13;
+            this.btnCancelar.Text = "Cancel";
+            this.btnCancelar.TextColor = System.Drawing.Color.White;
+            this.btnCancelar.UseVisualStyleBackColor = false;
+            this.btnCancelar.Click += new System.EventHandler(this.btnCancelar_Click);
+            // 
+            // btnAddTsk
+            // 
+            this.btnAddTsk.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btnAddTsk.BackColor = System.Drawing.Color.Green;
+            this.btnAddTsk.BackgroundColor = System.Drawing.Color.Green;
+            this.btnAddTsk.BorderColor = System.Drawing.Color.Honeydew;
+            this.btnAddTsk.BorderColor1 = System.Drawing.Color.Honeydew;
+            this.btnAddTsk.BorderRadius = 40;
+            this.btnAddTsk.BorderRadius1 = 40;
+            this.btnAddTsk.BorderSize = 0;
+            this.btnAddTsk.BorderSize1 = 0;
+            this.btnAddTsk.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnAddTsk.FlatAppearance.BorderSize = 0;
+            this.btnAddTsk.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.btnAddTsk.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAddTsk.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnAddTsk.ForeColor = System.Drawing.Color.White;
+            this.btnAddTsk.Location = new System.Drawing.Point(516, 244);
+            this.btnAddTsk.Name = "btnAddTsk";
+            this.btnAddTsk.Size = new System.Drawing.Size(127, 42);
+            this.btnAddTsk.TabIndex = 14;
+            this.btnAddTsk.Text = "Add Task";
+            this.btnAddTsk.TextColor = System.Drawing.Color.White;
+            this.btnAddTsk.UseVisualStyleBackColor = false;
+            this.btnAddTsk.Click += new System.EventHandler(this.btnAddTsk_Click);
             // 
             // frmAddTask
             // 
@@ -277,7 +281,6 @@
             this.Name = "frmAddTask";
             this.Text = "frmAddTask";
             this.panel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.btnClose)).EndInit();
             this.panel2.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -287,13 +290,10 @@
 
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.ComboBox cbCategories;
         private System.Windows.Forms.ComboBox cbPriority;
         private System.Windows.Forms.DateTimePicker dtmEndDate;
         private System.Windows.Forms.RichTextBox txtTitle;
-        private System.Windows.Forms.Button btnAddTask;
-        private System.Windows.Forms.PictureBox btnClose;
         private System.Windows.Forms.Panel pnlRefresh;
         private System.Windows.Forms.RichTextBox txtDescription;
         private System.Windows.Forms.ToolTip toolRefresh;
@@ -306,5 +306,7 @@
         private System.Windows.Forms.ToolTip toolWeekend;
         private System.Windows.Forms.ToolTip toolNextWeek;
         private System.Windows.Forms.Button btnClse;
+        private ButtonPersonal btnCancelar;
+        private ButtonPersonal btnAddTsk;
     }
 }
