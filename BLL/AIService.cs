@@ -9,6 +9,7 @@ namespace BLL
 {
     public class AIService
     {
+
         private readonly string _apiKey;
         private static readonly HttpClient _httpClient;
         private const string API_URL = "https://openrouter.ai/api/v1/chat/completions";

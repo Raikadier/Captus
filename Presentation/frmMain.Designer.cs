@@ -124,7 +124,7 @@
             this.btnAddTask.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnAddTask.Location = new System.Drawing.Point(4, 208);
             this.btnAddTask.Name = "btnAddTask";
-            this.btnAddTask.Size = new System.Drawing.Size(162, 34);
+            this.btnAddTask.Size = new System.Drawing.Size(196, 34);
             this.btnAddTask.TabIndex = 46;
             this.btnAddTask.Text = "Add Task";
             this.btnAddTask.UseVisualStyleBackColor = false;
