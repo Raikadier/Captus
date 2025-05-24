@@ -526,5 +526,32 @@ namespace Presentation
             frmCalculo calculoForm = new frmCalculo();
             calculoForm.ShowDialog();
         }
+
+        private void btnClse_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void btnMinimizar_Click_1(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Minimized;
+
+        }
+
+        private void btnMaximizar_Click_1(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Maximized;
+            btnMaximizar.Visible = false;
+            btnRestaurar.Visible = true;
+            btnRestaurar.BringToFront();  // Este botón va arriba
+        }
+
+        private void btnRestaurar_Click_1(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Normal;
+            btnRestaurar.Visible = false;
+            btnMaximizar.Visible = true;
+            btnMaximizar.BringToFront();  // Este botón va arriba
+        }
     }
 }
