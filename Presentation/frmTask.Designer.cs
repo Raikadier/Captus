@@ -113,7 +113,7 @@
             this.btnAddTask.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnAddTask.FlatAppearance.BorderSize = 0;
             this.btnAddTask.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.btnAddTask.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Green;
+            this.btnAddTask.FlatAppearance.MouseOverBackColor = System.Drawing.Color.PaleGreen;
             this.btnAddTask.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAddTask.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnAddTask.ForeColor = System.Drawing.Color.Honeydew;

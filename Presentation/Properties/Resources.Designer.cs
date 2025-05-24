@@ -253,6 +253,16 @@ namespace Presentation.Properties {
         /// <summary>
         ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap iconUserGrn {
+            get {
+                object obj = ResourceManager.GetObject("iconUserGrn", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap iconUserWh {
             get {
                 object obj = ResourceManager.GetObject("iconUserWh", resourceCulture);
