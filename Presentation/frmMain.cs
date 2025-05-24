@@ -54,9 +54,7 @@ namespace Presentation
         private void MostrarTareasAgrupadas()
         {
             panelTareas.Controls.Clear();
-
-            var tareasPendientes = taskLogic.GetTaskIncompletedByUser();
-
+            var tareasPendientes = taskLogic.GetTaskIncompletedByUser();                         
             var tareasPorFecha = tareasPendientes
                 .GroupBy(t => t.EndDate.Date)
                 .OrderBy(g => g.Key);
