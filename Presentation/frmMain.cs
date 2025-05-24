@@ -519,5 +519,12 @@ namespace Presentation
             FrmBot bot = new FrmBot();
             CargarFormularioEnPanel(bot);
         }
+
+        private void btnCalcular_Click(object sender, EventArgs e)
+        {
+            LimpiarPanelContenedor();
+            frmCalculo calculoForm = new frmCalculo();
+            calculoForm.ShowDialog();
+        }
     }
 }

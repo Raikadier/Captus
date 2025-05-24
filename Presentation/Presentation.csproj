@@ -312,6 +312,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="LogoCaptus2.ico" />
+    <None Include="Resources\iconCalcular.png" />
+    <None Include="Resources\iconOut.png" />
+    <None Include="Resources\iconProfile.png" />
+    <None Include="Resources\iconBt.png" />
+    <None Include="Resources\iconListTsk.png" />
+    <None Include="Resources\iconPlus.png" />
+    <None Include="Resources\icons8-plus-94.png" />
     <None Include="Resources\iconUserGrn.png" />
     <None Include="Resources\iconoCaptus&amp;Ds.png" />
     <None Include="Resources\MasInfo.png" />
