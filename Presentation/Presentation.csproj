@@ -312,6 +312,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="LogoCaptus2.ico" />
+    <None Include="Resources\iconOut2.png" />
     <None Include="Resources\iconCalcular.png" />
     <None Include="Resources\iconOut.png" />
     <None Include="Resources\iconProfile.png" />

@@ -476,8 +476,11 @@ namespace Presentation
 
         private void btnProfile_Click(object sender, EventArgs e)
         {
+
+            LimpiarPanelContenedor();
+            panelTareas.Visible = false;
             frmStats frmStats = new frmStats();
-            frmStats.ShowDialog();
+            CargarFormularioEnPanel(frmStats);
         }
 
         private void btnAddTask_Click(object sender, EventArgs e)
@@ -522,9 +525,11 @@ namespace Presentation
 
         private void btnCalcular_Click(object sender, EventArgs e)
         {
+           
             LimpiarPanelContenedor();
+            panelTareas.Visible = false;
             frmCalculo calculoForm = new frmCalculo();
-            calculoForm.ShowDialog();
+            CargarFormularioEnPanel(calculoForm);
         }
 
         private void btnClse_Click(object sender, EventArgs e)
@@ -552,6 +557,11 @@ namespace Presentation
             btnRestaurar.Visible = false;
             btnMaximizar.Visible = true;
             btnMaximizar.BringToFront();  // Este botón va arriba
+        }
+
+        private void panelTareas_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }
