@@ -19,7 +19,7 @@ namespace Presentation
     {
         bool isExpanding = false;
         bool isCollapsing = false;
-        int expandedWidth = 200;
+        int expandedWidth = 210;
         int collapsedWidth = 45;
         int step = 7; // velocidad de animación
         private readonly StatisticsLogic statisticsLogic;
@@ -562,6 +562,14 @@ namespace Presentation
         private void panelTareas_Paint(object sender, PaintEventArgs e)
         {
 
+        }
+
+        private void panel3_Paint(object sender, PaintEventArgs e)
+        {
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
         }
     }
 }
