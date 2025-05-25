@@ -32,7 +32,6 @@ namespace Presentation
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmBot));
             this.panel1 = new System.Windows.Forms.Panel();
-            this.btnClse = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
@@ -45,8 +44,12 @@ namespace Presentation
             // 
             // panel1
             // 
+
             this.panel1.BackColor = System.Drawing.Color.FromArgb(33, 150, 83);
             this.panel1.Controls.Add(this.btnClse);
+
+            this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(0)))));
+
             this.panel1.Controls.Add(this.pictureBox1);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
@@ -56,6 +59,7 @@ namespace Presentation
             this.panel1.TabIndex = 0;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.Panel1_Paint);
             // 
+
             // btnClse
             // 
             this.btnClse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -98,6 +102,7 @@ namespace Presentation
             // 
             // richTextBox1
             // 
+            this.richTextBox1.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.richTextBox1.BackColor = System.Drawing.Color.White;
             this.richTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.richTextBox1.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -194,6 +199,7 @@ namespace Presentation
         private ButtonPersonal btbnSendMessage;
         private System.Windows.Forms.TextBox txtMessage;
         private System.Windows.Forms.PictureBox pictureBox1;
+
         private System.Windows.Forms.Button btnClse;
         private System.Windows.Forms.Panel panelBottom;
     }
