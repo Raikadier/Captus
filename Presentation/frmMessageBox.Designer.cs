@@ -36,8 +36,8 @@
             this.btnClse = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            this.buttonPersonal1 = new Presentation.ButtonPersonal();
             this.labelTitle = new System.Windows.Forms.Label();
+            this.buttonPersonal1 = new Presentation.ButtonPersonal();
             this.panelTitleBar.SuspendLayout();
             this.panelButtons.SuspendLayout();
             this.panelBody.SuspendLayout();
@@ -140,12 +140,21 @@
             // pictureBox2
             // 
             this.pictureBox2.Image = global::Presentation.Properties.Resources.iconSpeech;
-            this.pictureBox2.Location = new System.Drawing.Point(7, 50);
+            this.pictureBox2.Location = new System.Drawing.Point(12, 59);
             this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(38, 40);
+            this.pictureBox2.Size = new System.Drawing.Size(27, 25);
             this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox2.TabIndex = 2;
             this.pictureBox2.TabStop = false;
+            // 
+            // labelTitle
+            // 
+            this.labelTitle.AutoSize = true;
+            this.labelTitle.Location = new System.Drawing.Point(51, 65);
+            this.labelTitle.Name = "labelTitle";
+            this.labelTitle.Size = new System.Drawing.Size(35, 13);
+            this.labelTitle.TabIndex = 3;
+            this.labelTitle.Text = "label1";
             // 
             // buttonPersonal1
             // 
@@ -162,7 +171,7 @@
             this.buttonPersonal1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonPersonal1.Font = new System.Drawing.Font("Century Gothic", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonPersonal1.ForeColor = System.Drawing.Color.White;
-            this.buttonPersonal1.Location = new System.Drawing.Point(126, 3);
+            this.buttonPersonal1.Location = new System.Drawing.Point(121, 3);
             this.buttonPersonal1.Name = "buttonPersonal1";
             this.buttonPersonal1.Size = new System.Drawing.Size(111, 40);
             this.buttonPersonal1.TabIndex = 2;
@@ -170,15 +179,6 @@
             this.buttonPersonal1.TextColor = System.Drawing.Color.White;
             this.buttonPersonal1.UseVisualStyleBackColor = false;
             this.buttonPersonal1.Click += new System.EventHandler(this.buttonPersonal1_Click);
-            // 
-            // labelTitle
-            // 
-            this.labelTitle.AutoSize = true;
-            this.labelTitle.Location = new System.Drawing.Point(51, 65);
-            this.labelTitle.Name = "labelTitle";
-            this.labelTitle.Size = new System.Drawing.Size(35, 13);
-            this.labelTitle.TabIndex = 3;
-            this.labelTitle.Text = "label1";
             // 
             // frmMessageBox
             // 
