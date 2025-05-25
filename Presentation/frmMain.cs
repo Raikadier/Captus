@@ -19,7 +19,7 @@ namespace Presentation
     {
         bool isExpanding = false;
         bool isCollapsing = false;
-        int expandedWidth = 210;
+        int expandedWidth = 200;
         int collapsedWidth = 45;
         int step = 7; // velocidad de animación
         private readonly StatisticsLogic statisticsLogic;
