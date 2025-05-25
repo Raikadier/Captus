@@ -58,7 +58,7 @@
             // 
             // panel1
             // 
-            this.panel1.BackColor = System.Drawing.Color.Green;
+            this.panel1.BackColor = System.Drawing.Color.FromArgb(33, 150, 83);
             this.panel1.Controls.Add(this.btnHome);
             this.panel1.Controls.Add(this.btnCalcular);
             this.panel1.Controls.Add(this.btnChatBot);
@@ -108,6 +108,7 @@
             // 
             // panelContenedor
             // 
+            this.panelContenedor.BackColor = System.Drawing.Color.White;
             this.panelContenedor.Controls.Add(this.panelTareas);
             this.panelContenedor.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelContenedor.Location = new System.Drawing.Point(210, 43);
@@ -206,11 +207,11 @@
             // 
             // btnHome
             // 
-            this.btnHome.BackColor = System.Drawing.Color.Green;
+            this.btnHome.BackColor = System.Drawing.Color.FromArgb(33, 150, 83);
             this.btnHome.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnHome.FlatAppearance.BorderSize = 0;
             this.btnHome.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Green;
-            this.btnHome.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.btnHome.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(111, 207, 151);
             this.btnHome.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnHome.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnHome.ForeColor = System.Drawing.Color.Honeydew;
@@ -260,11 +261,11 @@
             // 
             // btnAddTask
             // 
-            this.btnAddTask.BackColor = System.Drawing.Color.Green;
+            this.btnAddTask.BackColor = System.Drawing.Color.FromArgb(33, 150, 83);
             this.btnAddTask.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnAddTask.FlatAppearance.BorderSize = 0;
             this.btnAddTask.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Green;
-            this.btnAddTask.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.btnAddTask.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(111, 207, 151);
             this.btnAddTask.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAddTask.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnAddTask.ForeColor = System.Drawing.Color.Honeydew;
@@ -345,6 +346,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Honeydew;
             this.ClientSize = new System.Drawing.Size(990, 561);
+            this.Controls.Clear();
             this.Controls.Add(this.panelContenedor);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);

@@ -20,6 +20,8 @@ namespace Presentation
         {
             InitializeComponent();
             userLogic = new UserLogic();
+            textBox1.KeyDown += LoginTextBox_KeyDown;
+            textBox2.KeyDown += LoginTextBox_KeyDown;
         }
 
         [DllImport("user32.dll", EntryPoint = "ReleaseCapture")]
@@ -158,6 +160,14 @@ namespace Presentation
         {
             this.WindowState = FormWindowState.Minimized;
 
+        }
+
+        private void LoginTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                btnLogin_Click(sender, EventArgs.Empty);
+            }
         }
     }
 }

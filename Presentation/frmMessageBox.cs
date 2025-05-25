@@ -19,6 +19,16 @@ namespace Presentation
             this.StartPosition = FormStartPosition.CenterScreen;
             labelCaption.Text = mensaje;
             labelTitle.Text = titulo;
+            this.KeyPreview = true;
+            this.KeyDown += FrmMessageBox_KeyDown;
+        }
+
+        private void FrmMessageBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                buttonPersonal1.PerformClick();
+            }
         }
 
         // Versión simple como reemplazo directo de MessageBox.Show

@@ -259,12 +259,16 @@ namespace BLL
         }
         private async void SendEmailTaskInsert(ENTITY.Task task)
         {
-            string mensaje = NotifyEmails.GetMessageInsert(task.Title, task.EndDate.ToShortDateString(), task.Category.Name);
+            // Protección contra null en Category
+            string categoryName = task.Category?.Name ?? "General";
+            string mensaje = NotifyEmails.GetMessageInsert(task.Title, task.EndDate.ToShortDateString(), categoryName);
             await NotifyEmails.SendNotifyAsync(Session.CurrentUser.Email, "Tu asistente genero una nueva tarea", mensaje);
         }
         private async void SendEmailTaskUpdate(ENTITY.Task task)
         {
-            string mensaje = NotifyEmails.GetMessageUpdate(task.Title, task.EndDate.ToShortDateString(), task.Category.Name);
+            // Protección contra null en Category
+            string categoryName = task.Category?.Name ?? "General";
+            string mensaje = NotifyEmails.GetMessageUpdate(task.Title, task.EndDate.ToShortDateString(), categoryName);
             await NotifyEmails.SendNotifyAsync(Session.CurrentUser.Email, "Tu asistente actualizo una tarea", mensaje);
         }
         private async void SendEmailTaskDelete(ENTITY.Task task)

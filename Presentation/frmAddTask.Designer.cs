@@ -56,8 +56,9 @@
             // 
             // panel1
             // 
-            this.panel1.BackColor = System.Drawing.Color.PaleGreen;
+            this.panel1.BackColor = System.Drawing.Color.FromArgb(33, 150, 83);
             this.panel1.Controls.Add(this.btnClse);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(659, 67);
@@ -84,7 +85,7 @@
             // panel2
             // 
             this.panel2.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.panel2.BackColor = System.Drawing.Color.PaleGreen;
+            this.panel2.BackColor = System.Drawing.Color.FromArgb(245, 246, 250);
             this.panel2.Controls.Add(this.btnAddTsk);
             this.panel2.Controls.Add(this.btnCancelar);
             this.panel2.Controls.Add(this.btnNextWeek);
@@ -97,6 +98,7 @@
             this.panel2.Controls.Add(this.cbPriority);
             this.panel2.Controls.Add(this.dtmEndDate);
             this.panel2.Controls.Add(this.txtTitle);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel2.Location = new System.Drawing.Point(0, 67);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(659, 309);
@@ -146,7 +148,7 @@
             // 
             // txtDescription
             // 
-            this.txtDescription.BackColor = System.Drawing.Color.PaleGreen;
+            this.txtDescription.BackColor = System.Drawing.Color.White;
             this.txtDescription.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txtDescription.EnableAutoDragDrop = true;
             this.txtDescription.Font = new System.Drawing.Font("Segoe UI Semibold", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -203,7 +205,7 @@
             // 
             // txtTitle
             // 
-            this.txtTitle.BackColor = System.Drawing.Color.PaleGreen;
+            this.txtTitle.BackColor = System.Drawing.Color.White;
             this.txtTitle.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txtTitle.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtTitle.ForeColor = System.Drawing.SystemColors.WindowFrame;
@@ -224,8 +226,8 @@
             // btnAddTsk
             // 
             this.btnAddTsk.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.btnAddTsk.BackColor = System.Drawing.Color.Green;
-            this.btnAddTsk.BackgroundColor = System.Drawing.Color.Green;
+            this.btnAddTsk.BackColor = System.Drawing.Color.FromArgb(33, 150, 83);
+            this.btnAddTsk.BackgroundColor = System.Drawing.Color.FromArgb(33, 150, 83);
             this.btnAddTsk.BorderColor = System.Drawing.Color.Honeydew;
             this.btnAddTsk.BorderColor1 = System.Drawing.Color.Honeydew;
             this.btnAddTsk.BorderRadius = 40;
@@ -234,7 +236,7 @@
             this.btnAddTsk.BorderSize1 = 0;
             this.btnAddTsk.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnAddTsk.FlatAppearance.BorderSize = 0;
-            this.btnAddTsk.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.btnAddTsk.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(111, 207, 151);
             this.btnAddTsk.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAddTsk.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnAddTsk.ForeColor = System.Drawing.Color.White;
@@ -250,8 +252,8 @@
             // btnCancelar
             // 
             this.btnCancelar.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.btnCancelar.BackColor = System.Drawing.Color.Green;
-            this.btnCancelar.BackgroundColor = System.Drawing.Color.Green;
+            this.btnCancelar.BackColor = System.Drawing.Color.FromArgb(189, 189, 189);
+            this.btnCancelar.BackgroundColor = System.Drawing.Color.FromArgb(189, 189, 189);
             this.btnCancelar.BorderColor = System.Drawing.Color.Honeydew;
             this.btnCancelar.BorderColor1 = System.Drawing.Color.Honeydew;
             this.btnCancelar.BorderRadius = 40;
@@ -278,6 +280,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(660, 375);
+            this.Controls.Clear();
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;

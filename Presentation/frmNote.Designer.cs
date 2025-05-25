@@ -55,7 +55,7 @@
             // 
             // panel1
             // 
-            this.panel1.BackColor = System.Drawing.Color.Green;
+            this.panel1.BackColor = System.Drawing.Color.FromArgb(33, 150, 83);
             this.panel1.Controls.Add(this.btnClse);
             this.panel1.Controls.Add(this.pictureBox1);
             this.panel1.Controls.Add(this.label1);
@@ -107,7 +107,7 @@
             // 
             // panel2
             // 
-            this.panel2.BackColor = System.Drawing.Color.Honeydew;
+            this.panel2.BackColor = System.Drawing.Color.FromArgb(245, 246, 250);
             this.panel2.Controls.Add(this.richTextBox1);
             this.panel2.Controls.Add(this.menuStrip1);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -137,6 +137,7 @@
             this.richTextBox1.Size = new System.Drawing.Size(800, 374);
             this.richTextBox1.TabIndex = 1;
             this.richTextBox1.Text = "";
+            this.richTextBox1.BackColor = System.Drawing.Color.White;
             // 
             // archivoToolStripMenuItem
             // 
@@ -203,6 +204,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Clear();
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;

@@ -68,6 +68,8 @@
     <Compile Include="CategoryLogic.cs" />
     <Compile Include="AIService.cs" />
     <Compile Include="ChatLogic.cs" />
+    <Compile Include="CommandProcessor.cs" />
+    <Compile Include="GradeCalculator.cs" />
     <Compile Include="IChatService.cs" />
     <Compile Include="ILogic.cs" />
     <Compile Include="NotifyEmails.cs" />

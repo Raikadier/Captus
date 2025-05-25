@@ -32,12 +32,18 @@ namespace BLL
         {
             try
             {
+                // Detectar si es comando especial
+                bool isCaptusCommand = prompt.TrimStart().StartsWith("@Captus", StringComparison.OrdinalIgnoreCase);
+                string systemPrompt = isCaptusCommand
+                    ? "Eres un asistente para gestión de tareas y notas. Si el mensaje inicia con '@Captus', analiza el mensaje y, si detectas intención de crear, eliminar, actualizar o consultar una tarea, responde SOLO con un JSON con los campos: { \"accion\": \"crear_tarea|eliminar_tarea|actualizar_tarea|consultar_tareas\", \"titulo\": \"...\", \"fecha\": \"...\", \"prioridad\": \"...\", \"categoria\": \"...\" }. Si falta algún dato, ponlo como null. Si no es una acción válida, responde con { \"accion\": \"desconocida\" }. Responde solo con el JSON, sin explicaciones. Siempre responde en español."
+                    : "Eres un asistente amigable y profesional para estudiantes universitarios. Responde de forma clara, útil y conversacional a cualquier pregunta o mensaje que no sea un comando especial. Siempre responde en español.";
+
                 var requestBody = new
                 {
                     model = "deepseek/deepseek-chat-v3-0324:free",
                     messages = new[]
                     {
-                        new { role = "system", content = "Eres un asistente útil que responde preguntas generales y conversa amigablemente en español. Si la pregunta no es un comando específico de tareas, responde de forma natural." },
+                        new { role = "system", content = systemPrompt },
                         new { role = "user", content = prompt }
                     },
                     max_tokens = 500,
@@ -45,7 +51,6 @@ namespace BLL
                 };
 
                 var bodyJson = JsonSerializer.Serialize(requestBody);
-                
                 HttpRequestMessage request = null;
                 try
                 {
@@ -67,6 +72,24 @@ namespace BLL
                                              .GetProperty("message")
                                              .GetProperty("content")
                                              .GetString();
+
+                    // Optimización: Si es comando, intenta extraer JSON rápidamente
+                    if (isCaptusCommand && !string.IsNullOrWhiteSpace(reply))
+                    {
+                        int start = reply.IndexOf('{');
+                        int end = reply.LastIndexOf('}');
+                        if (start >= 0 && end > start)
+                        {
+                            string possibleJson = reply.Substring(start, end - start + 1);
+                            // Validar si es JSON válido
+                            try
+                            {
+                                JsonDocument.Parse(possibleJson);
+                                return possibleJson;
+                            }
+                            catch { /* Si falla, retorna el texto original */ }
+                        }
+                    }
 
                     return reply ?? "No se pudo obtener una respuesta.";
                 }

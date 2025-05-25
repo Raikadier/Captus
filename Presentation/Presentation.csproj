@@ -104,6 +104,9 @@
     <Compile Include="frmBot.Designer.cs">
       <DependentUpon>frmBot.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmCommandConfig.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmMessageBox.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -321,6 +324,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="LogoCaptus2.ico" />
+    <Content Include="Resources\Bot.png" />
+    <Content Include="Resources\IconChat.png" />
+    <Content Include="Resources\IconRefresh.png" />
+    <Content Include="Resources\IconsRefresh.png" />
+    <Content Include="Resources\LOGOCaptus-removebg-preview.png" />
+    <Content Include="Resources\LogoCaptus2.ico" />
+    <Content Include="Resources\LogoCaptusGris-removebg-preview.png" />
     <None Include="Resources\iconsHome.png" />
     <None Include="Resources\iconSpeech.png" />
     <None Include="Resources\iconNote.png" />
