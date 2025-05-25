@@ -39,18 +39,18 @@
             this.panel4 = new System.Windows.Forms.Panel();
             this.ObjetiveDaily = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.picLogoProgress = new System.Windows.Forms.PictureBox();
             this.panel3 = new System.Windows.Forms.Panel();
             this.label8 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.lblTaskCompleted = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.picLogoProgress = new System.Windows.Forms.PictureBox();
             this.panel1.SuspendLayout();
             this.panel5.SuspendLayout();
             this.panel4.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picLogoProgress)).BeginInit();
             this.panel3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picLogoProgress)).BeginInit();
             this.SuspendLayout();
             // 
             // panel1
@@ -116,6 +116,7 @@
             // 
             // panel6
             // 
+            this.panel6.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.panel6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
             this.panel6.Location = new System.Drawing.Point(152, 339);
             this.panel6.Name = "panel6";
@@ -164,15 +165,6 @@
             this.label2.Size = new System.Drawing.Size(113, 18);
             this.label2.TabIndex = 0;
             this.label2.Text = "Objetivo diario:";
-            // 
-            // picLogoProgress
-            // 
-            this.picLogoProgress.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.picLogoProgress.Location = new System.Drawing.Point(311, 52);
-            this.picLogoProgress.Name = "picLogoProgress";
-            this.picLogoProgress.Size = new System.Drawing.Size(120, 120);
-            this.picLogoProgress.TabIndex = 30;
-            this.picLogoProgress.TabStop = false;
             // 
             // panel3
             // 
@@ -239,6 +231,15 @@
             this.panel2.Size = new System.Drawing.Size(459, 48);
             this.panel2.TabIndex = 28;
             // 
+            // picLogoProgress
+            // 
+            this.picLogoProgress.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.picLogoProgress.Location = new System.Drawing.Point(311, 52);
+            this.picLogoProgress.Name = "picLogoProgress";
+            this.picLogoProgress.Size = new System.Drawing.Size(120, 120);
+            this.picLogoProgress.TabIndex = 30;
+            this.picLogoProgress.TabStop = false;
+            // 
             // frmStats
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -254,9 +255,9 @@
             this.panel5.PerformLayout();
             this.panel4.ResumeLayout(false);
             this.panel4.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picLogoProgress)).EndInit();
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picLogoProgress)).EndInit();
             this.ResumeLayout(false);
 
         }
