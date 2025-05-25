@@ -321,6 +321,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="LogoCaptus2.ico" />
+    <None Include="Resources\iconsHome.png" />
     <None Include="Resources\iconSpeech.png" />
     <None Include="Resources\iconNote.png" />
     <None Include="Resources\iconSend %281%29.png" />

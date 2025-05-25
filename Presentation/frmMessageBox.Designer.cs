@@ -29,19 +29,19 @@
         private void InitializeComponent()
         {
             this.panelTitleBar = new System.Windows.Forms.Panel();
-            this.labelCaption = new System.Windows.Forms.Label();
-            this.panelButtons = new System.Windows.Forms.Panel();
-            this.panelBody = new System.Windows.Forms.Panel();
-            this.labelMessage = new System.Windows.Forms.Label();
             this.btnClse = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            this.labelTitle = new System.Windows.Forms.Label();
+            this.labelCaption = new System.Windows.Forms.Label();
+            this.panelButtons = new System.Windows.Forms.Panel();
             this.buttonPersonal1 = new Presentation.ButtonPersonal();
+            this.panelBody = new System.Windows.Forms.Panel();
+            this.labelTitle = new System.Windows.Forms.Label();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.labelMessage = new System.Windows.Forms.Label();
             this.panelTitleBar.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.panelButtons.SuspendLayout();
             this.panelBody.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.SuspendLayout();
             // 
@@ -57,59 +57,6 @@
             this.panelTitleBar.Size = new System.Drawing.Size(352, 47);
             this.panelTitleBar.TabIndex = 3;
             this.panelTitleBar.Paint += new System.Windows.Forms.PaintEventHandler(this.panelTitleBar_Paint);
-            // 
-            // labelCaption
-            // 
-            this.labelCaption.AutoSize = true;
-            this.labelCaption.BackColor = System.Drawing.Color.Honeydew;
-            this.labelCaption.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelCaption.ForeColor = System.Drawing.Color.Green;
-            this.labelCaption.Location = new System.Drawing.Point(56, 16);
-            this.labelCaption.Name = "labelCaption";
-            this.labelCaption.Size = new System.Drawing.Size(86, 17);
-            this.labelCaption.TabIndex = 4;
-            this.labelCaption.Text = "labelCaption";
-            this.labelCaption.Click += new System.EventHandler(this.labelCaption_Click);
-            // 
-            // panelButtons
-            // 
-            this.panelButtons.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(235)))), ((int)(((byte)(235)))));
-            this.panelButtons.Controls.Add(this.buttonPersonal1);
-            this.panelButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelButtons.Location = new System.Drawing.Point(0, 96);
-            this.panelButtons.Name = "panelButtons";
-            this.panelButtons.Size = new System.Drawing.Size(352, 47);
-            this.panelButtons.TabIndex = 4;
-            this.panelButtons.Paint += new System.Windows.Forms.PaintEventHandler(this.panelButtons_Paint);
-            // 
-            // panelBody
-            // 
-            this.panelBody.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.panelBody.Controls.Add(this.labelTitle);
-            this.panelBody.Controls.Add(this.pictureBox2);
-            this.panelBody.Controls.Add(this.labelMessage);
-            this.panelBody.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelBody.Location = new System.Drawing.Point(0, 0);
-            this.panelBody.Name = "panelBody";
-            this.panelBody.Padding = new System.Windows.Forms.Padding(10, 10, 0, 0);
-            this.panelBody.Size = new System.Drawing.Size(352, 143);
-            this.panelBody.TabIndex = 5;
-            this.panelBody.Paint += new System.Windows.Forms.PaintEventHandler(this.panelBody_Paint);
-            // 
-            // labelMessage
-            // 
-            this.labelMessage.AutoSize = true;
-            this.labelMessage.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.labelMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelMessage.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(85)))), ((int)(((byte)(85)))), ((int)(((byte)(85)))));
-            this.labelMessage.Location = new System.Drawing.Point(10, 10);
-            this.labelMessage.MaximumSize = new System.Drawing.Size(600, 0);
-            this.labelMessage.Name = "labelMessage";
-            this.labelMessage.Padding = new System.Windows.Forms.Padding(5, 5, 10, 15);
-            this.labelMessage.Size = new System.Drawing.Size(110, 37);
-            this.labelMessage.TabIndex = 1;
-            this.labelMessage.Text = "labelMessage";
-            this.labelMessage.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // btnClse
             // 
@@ -137,24 +84,29 @@
             this.pictureBox1.TabIndex = 5;
             this.pictureBox1.TabStop = false;
             // 
-            // pictureBox2
+            // labelCaption
             // 
-            this.pictureBox2.Image = global::Presentation.Properties.Resources.iconSpeech;
-            this.pictureBox2.Location = new System.Drawing.Point(12, 59);
-            this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(27, 25);
-            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox2.TabIndex = 2;
-            this.pictureBox2.TabStop = false;
+            this.labelCaption.AutoSize = true;
+            this.labelCaption.BackColor = System.Drawing.Color.Honeydew;
+            this.labelCaption.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelCaption.ForeColor = System.Drawing.Color.Green;
+            this.labelCaption.Location = new System.Drawing.Point(56, 16);
+            this.labelCaption.Name = "labelCaption";
+            this.labelCaption.Size = new System.Drawing.Size(86, 17);
+            this.labelCaption.TabIndex = 4;
+            this.labelCaption.Text = "labelCaption";
+            this.labelCaption.Click += new System.EventHandler(this.labelCaption_Click);
             // 
-            // labelTitle
+            // panelButtons
             // 
-            this.labelTitle.AutoSize = true;
-            this.labelTitle.Location = new System.Drawing.Point(51, 65);
-            this.labelTitle.Name = "labelTitle";
-            this.labelTitle.Size = new System.Drawing.Size(35, 13);
-            this.labelTitle.TabIndex = 3;
-            this.labelTitle.Text = "label1";
+            this.panelButtons.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(235)))), ((int)(((byte)(235)))));
+            this.panelButtons.Controls.Add(this.buttonPersonal1);
+            this.panelButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panelButtons.Location = new System.Drawing.Point(0, 96);
+            this.panelButtons.Name = "panelButtons";
+            this.panelButtons.Size = new System.Drawing.Size(352, 47);
+            this.panelButtons.TabIndex = 4;
+            this.panelButtons.Paint += new System.Windows.Forms.PaintEventHandler(this.panelButtons_Paint);
             // 
             // buttonPersonal1
             // 
@@ -166,6 +118,7 @@
             this.buttonPersonal1.BorderRadius1 = 40;
             this.buttonPersonal1.BorderSize = 0;
             this.buttonPersonal1.BorderSize1 = 0;
+            this.buttonPersonal1.Cursor = System.Windows.Forms.Cursors.Hand;
             this.buttonPersonal1.FlatAppearance.BorderSize = 0;
             this.buttonPersonal1.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
             this.buttonPersonal1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -179,6 +132,54 @@
             this.buttonPersonal1.TextColor = System.Drawing.Color.White;
             this.buttonPersonal1.UseVisualStyleBackColor = false;
             this.buttonPersonal1.Click += new System.EventHandler(this.buttonPersonal1_Click);
+            // 
+            // panelBody
+            // 
+            this.panelBody.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.panelBody.Controls.Add(this.labelTitle);
+            this.panelBody.Controls.Add(this.pictureBox2);
+            this.panelBody.Controls.Add(this.labelMessage);
+            this.panelBody.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelBody.Location = new System.Drawing.Point(0, 0);
+            this.panelBody.Name = "panelBody";
+            this.panelBody.Padding = new System.Windows.Forms.Padding(10, 10, 0, 0);
+            this.panelBody.Size = new System.Drawing.Size(352, 143);
+            this.panelBody.TabIndex = 5;
+            this.panelBody.Paint += new System.Windows.Forms.PaintEventHandler(this.panelBody_Paint);
+            // 
+            // labelTitle
+            // 
+            this.labelTitle.AutoSize = true;
+            this.labelTitle.Location = new System.Drawing.Point(51, 65);
+            this.labelTitle.Name = "labelTitle";
+            this.labelTitle.Size = new System.Drawing.Size(35, 13);
+            this.labelTitle.TabIndex = 3;
+            this.labelTitle.Text = "label1";
+            // 
+            // pictureBox2
+            // 
+            this.pictureBox2.Image = global::Presentation.Properties.Resources.iconSpeech;
+            this.pictureBox2.Location = new System.Drawing.Point(12, 59);
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Size = new System.Drawing.Size(27, 25);
+            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox2.TabIndex = 2;
+            this.pictureBox2.TabStop = false;
+            // 
+            // labelMessage
+            // 
+            this.labelMessage.AutoSize = true;
+            this.labelMessage.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.labelMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelMessage.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(85)))), ((int)(((byte)(85)))), ((int)(((byte)(85)))));
+            this.labelMessage.Location = new System.Drawing.Point(10, 10);
+            this.labelMessage.MaximumSize = new System.Drawing.Size(600, 0);
+            this.labelMessage.Name = "labelMessage";
+            this.labelMessage.Padding = new System.Windows.Forms.Padding(5, 5, 10, 15);
+            this.labelMessage.Size = new System.Drawing.Size(110, 37);
+            this.labelMessage.TabIndex = 1;
+            this.labelMessage.Text = "labelMessage";
+            this.labelMessage.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // frmMessageBox
             // 
@@ -194,10 +195,10 @@
             this.Load += new System.EventHandler(this.frmMessageBox_Load);
             this.panelTitleBar.ResumeLayout(false);
             this.panelTitleBar.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.panelButtons.ResumeLayout(false);
             this.panelBody.ResumeLayout(false);
             this.panelBody.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             this.ResumeLayout(false);
 

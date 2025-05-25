@@ -22,6 +22,7 @@ namespace Presentation
         public frmAddTask()
         {
             InitializeComponent();
+            this.StartPosition = FormStartPosition.CenterScreen;
             categoryService = new CategoryLogic();
             priorityService = new PriorityLogic();
             taskLogic = new TaskLogic(Configuration.ConnectionString);
@@ -356,6 +357,11 @@ namespace Presentation
         }
 
         private void btnNextWeek_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void txtDescription_TextChanged(object sender, EventArgs e)
         {
 
         }

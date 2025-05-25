@@ -41,6 +41,7 @@
             this.btnMinimizar = new System.Windows.Forms.Button();
             this.btnClse = new System.Windows.Forms.Button();
             this.btnMenu = new System.Windows.Forms.PictureBox();
+            this.btnHome = new System.Windows.Forms.Button();
             this.btnCalcular = new System.Windows.Forms.Button();
             this.btnChatBot = new System.Windows.Forms.Button();
             this.btnAddTask = new System.Windows.Forms.Button();
@@ -58,6 +59,7 @@
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.Green;
+            this.panel1.Controls.Add(this.btnHome);
             this.panel1.Controls.Add(this.btnCalcular);
             this.panel1.Controls.Add(this.btnChatBot);
             this.panel1.Controls.Add(this.btnAddTask);
@@ -202,6 +204,26 @@
             this.btnMenu.TabStop = false;
             this.btnMenu.Click += new System.EventHandler(this.btnMenu_Click);
             // 
+            // btnHome
+            // 
+            this.btnHome.BackColor = System.Drawing.Color.Green;
+            this.btnHome.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnHome.FlatAppearance.BorderSize = 0;
+            this.btnHome.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Green;
+            this.btnHome.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.btnHome.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnHome.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnHome.ForeColor = System.Drawing.Color.Honeydew;
+            this.btnHome.Image = global::Presentation.Properties.Resources.iconsHome;
+            this.btnHome.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnHome.Location = new System.Drawing.Point(0, 168);
+            this.btnHome.Name = "btnHome";
+            this.btnHome.Size = new System.Drawing.Size(210, 34);
+            this.btnHome.TabIndex = 50;
+            this.btnHome.Text = "Home";
+            this.btnHome.UseVisualStyleBackColor = false;
+            this.btnHome.Click += new System.EventHandler(this.btnHome_Click);
+            // 
             // btnCalcular
             // 
             this.btnCalcular.FlatAppearance.BorderSize = 0;
@@ -248,9 +270,9 @@
             this.btnAddTask.ForeColor = System.Drawing.Color.Honeydew;
             this.btnAddTask.Image = global::Presentation.Properties.Resources.iconPlus;
             this.btnAddTask.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnAddTask.Location = new System.Drawing.Point(4, 208);
+            this.btnAddTask.Location = new System.Drawing.Point(0, 224);
             this.btnAddTask.Name = "btnAddTask";
-            this.btnAddTask.Size = new System.Drawing.Size(196, 34);
+            this.btnAddTask.Size = new System.Drawing.Size(210, 34);
             this.btnAddTask.TabIndex = 46;
             this.btnAddTask.Text = "Add Task";
             this.btnAddTask.UseVisualStyleBackColor = false;
@@ -361,5 +383,6 @@
         private System.Windows.Forms.Button btnMinimizar;
         private System.Windows.Forms.Button btnMaximizar;
         private System.Windows.Forms.Button btnRestaurar;
+        private System.Windows.Forms.Button btnHome;
     }
 }
