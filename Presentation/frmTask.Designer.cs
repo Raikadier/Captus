@@ -173,8 +173,8 @@
             // 
             // flpTasks
             // 
+            this.flpTasks.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.flpTasks.AutoScroll = true;
-            this.flpTasks.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flpTasks.Location = new System.Drawing.Point(200, 38);
             this.flpTasks.Name = "flpTasks";
             this.flpTasks.Size = new System.Drawing.Size(889, 584);
