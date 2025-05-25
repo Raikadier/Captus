@@ -104,6 +104,12 @@
     <Compile Include="frmBot.Designer.cs">
       <DependentUpon>frmBot.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmMessageBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmMessageBox.Designer.cs">
+      <DependentUpon>frmMessageBox.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmNote.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -159,6 +165,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmBot.resx">
       <DependentUpon>frmBot.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmMessageBox.resx">
+      <DependentUpon>frmMessageBox.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmNote.resx">
       <DependentUpon>frmNote.cs</DependentUpon>
@@ -312,6 +321,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="LogoCaptus2.ico" />
+    <None Include="Resources\iconSpeech.png" />
     <None Include="Resources\iconNote.png" />
     <None Include="Resources\iconSend %281%29.png" />
     <None Include="Resources\iconOut2.png" />

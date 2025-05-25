@@ -109,15 +109,20 @@ namespace Presentation
 
         private void btnLogin_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(textBox1.Text) || string.IsNullOrEmpty(textBox2.Text))
+            // Validar campos vacíos o valores por defecto
+            if (string.IsNullOrWhiteSpace(textBox1.Text) || textBox1.Text == "User Name" ||
+                string.IsNullOrWhiteSpace(textBox2.Text) || textBox2.Text == "Type Your Password")
             {
-                MessageBox.Show("Please fill in all fields.");
+                frmMessageBox.Show("Por favor, complete todos los campos.", "Campos vacíos");
                 return;
             }
+
+            // Intentar login
             User user = userLogic.Login(textBox1.Text.ToUpper(), textBox2.Text);
+
             if (user != null)
             {
-                MessageBox.Show("Login successful.");
+                frmMessageBox.Show("¡Inicio de sesión exitoso!", "Bienvenido");
                 Session.Start(user);
                 this.Hide();
                 frmMain main = new frmMain();
@@ -125,7 +130,7 @@ namespace Presentation
             }
             else
             {
-                MessageBox.Show("Invalid username or password.");
+                frmMessageBox.Show("Usuario o contraseña incorrectos.", "Error de autenticación");
             }
         }
 
