@@ -31,28 +31,28 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.panel1 = new System.Windows.Forms.Panel();
+            this.label1 = new System.Windows.Forms.Label();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.panelContenedor = new System.Windows.Forms.Panel();
+            this.panelTareas = new System.Windows.Forms.FlowLayoutPanel();
+            this.btnRestaurar = new System.Windows.Forms.Button();
+            this.btnMaximizar = new System.Windows.Forms.Button();
+            this.btnMinimizar = new System.Windows.Forms.Button();
+            this.btnClse = new System.Windows.Forms.Button();
+            this.btnMenu = new System.Windows.Forms.PictureBox();
             this.btnCalcular = new System.Windows.Forms.Button();
             this.btnChatBot = new System.Windows.Forms.Button();
             this.btnAddTask = new System.Windows.Forms.Button();
             this.btnLogout = new System.Windows.Forms.Button();
             this.btnProfile = new System.Windows.Forms.Button();
             this.btnTaskList = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
             this.picLogoCaptus = new System.Windows.Forms.PictureBox();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.btnRestaurar = new System.Windows.Forms.Button();
-            this.btnMaximizar = new System.Windows.Forms.Button();
-            this.btnMinimizar = new System.Windows.Forms.Button();
-            this.btnClse = new System.Windows.Forms.Button();
-            this.btnMenu = new System.Windows.Forms.PictureBox();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.panelContenedor = new System.Windows.Forms.Panel();
-            this.panelTareas = new System.Windows.Forms.FlowLayoutPanel();
             this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picLogoCaptus)).BeginInit();
             this.panel2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.btnMenu)).BeginInit();
             this.panelContenedor.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.btnMenu)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picLogoCaptus)).BeginInit();
             this.SuspendLayout();
             // 
             // panel1
@@ -73,6 +73,135 @@
             this.panel1.TabIndex = 0;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.ForeColor = System.Drawing.Color.Honeydew;
+            this.label1.Location = new System.Drawing.Point(57, 91);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(87, 19);
+            this.label1.TabIndex = 31;
+            this.label1.Text = "C A P T U S";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.btnRestaurar);
+            this.panel2.Controls.Add(this.btnMaximizar);
+            this.panel2.Controls.Add(this.btnMinimizar);
+            this.panel2.Controls.Add(this.btnClse);
+            this.panel2.Controls.Add(this.btnMenu);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel2.Location = new System.Drawing.Point(210, 0);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(780, 43);
+            this.panel2.TabIndex = 1;
+            this.panel2.Paint += new System.Windows.Forms.PaintEventHandler(this.panel2_Paint);
+            this.panel2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Panel2_MouseDown);
+            // 
+            // timer1
+            // 
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // panelContenedor
+            // 
+            this.panelContenedor.Controls.Add(this.panelTareas);
+            this.panelContenedor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelContenedor.Location = new System.Drawing.Point(210, 43);
+            this.panelContenedor.Name = "panelContenedor";
+            this.panelContenedor.Size = new System.Drawing.Size(780, 518);
+            this.panelContenedor.TabIndex = 2;
+            this.panelContenedor.Paint += new System.Windows.Forms.PaintEventHandler(this.panelContenedor_Paint);
+            // 
+            // panelTareas
+            // 
+            this.panelTareas.AutoScroll = true;
+            this.panelTareas.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this.panelTareas.Location = new System.Drawing.Point(49, 84);
+            this.panelTareas.Name = "panelTareas";
+            this.panelTareas.Size = new System.Drawing.Size(700, 400);
+            this.panelTareas.TabIndex = 0;
+            this.panelTareas.WrapContents = false;
+            this.panelTareas.Paint += new System.Windows.Forms.PaintEventHandler(this.panelTareas_Paint);
+            // 
+            // btnRestaurar
+            // 
+            this.btnRestaurar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnRestaurar.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnRestaurar.FlatAppearance.BorderSize = 0;
+            this.btnRestaurar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Silver;
+            this.btnRestaurar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.btnRestaurar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnRestaurar.Image = global::Presentation.Properties.Resources.btnRestaurar;
+            this.btnRestaurar.Location = new System.Drawing.Point(712, 6);
+            this.btnRestaurar.Name = "btnRestaurar";
+            this.btnRestaurar.Size = new System.Drawing.Size(30, 35);
+            this.btnRestaurar.TabIndex = 34;
+            this.btnRestaurar.UseVisualStyleBackColor = true;
+            this.btnRestaurar.Visible = false;
+            this.btnRestaurar.Click += new System.EventHandler(this.btnRestaurar_Click_1);
+            // 
+            // btnMaximizar
+            // 
+            this.btnMaximizar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnMaximizar.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnMaximizar.FlatAppearance.BorderSize = 0;
+            this.btnMaximizar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Silver;
+            this.btnMaximizar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.btnMaximizar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMaximizar.Image = global::Presentation.Properties.Resources.icons8_maximize_window_50__1_;
+            this.btnMaximizar.Location = new System.Drawing.Point(711, 3);
+            this.btnMaximizar.Name = "btnMaximizar";
+            this.btnMaximizar.Size = new System.Drawing.Size(30, 35);
+            this.btnMaximizar.TabIndex = 33;
+            this.btnMaximizar.UseVisualStyleBackColor = true;
+            this.btnMaximizar.Click += new System.EventHandler(this.btnMaximizar_Click_1);
+            // 
+            // btnMinimizar
+            // 
+            this.btnMinimizar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnMinimizar.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnMinimizar.FlatAppearance.BorderSize = 0;
+            this.btnMinimizar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Silver;
+            this.btnMinimizar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.btnMinimizar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMinimizar.Image = global::Presentation.Properties.Resources.btnMinimizar;
+            this.btnMinimizar.Location = new System.Drawing.Point(683, 9);
+            this.btnMinimizar.Name = "btnMinimizar";
+            this.btnMinimizar.Size = new System.Drawing.Size(23, 25);
+            this.btnMinimizar.TabIndex = 32;
+            this.btnMinimizar.UseVisualStyleBackColor = true;
+            this.btnMinimizar.Click += new System.EventHandler(this.btnMinimizar_Click_1);
+            // 
+            // btnClse
+            // 
+            this.btnClse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnClse.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnClse.FlatAppearance.BorderSize = 0;
+            this.btnClse.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
+            this.btnClse.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
+            this.btnClse.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnClse.Image = global::Presentation.Properties.Resources.icons8_close_window_50__2_;
+            this.btnClse.Location = new System.Drawing.Point(744, 8);
+            this.btnClse.Name = "btnClse";
+            this.btnClse.Size = new System.Drawing.Size(28, 28);
+            this.btnClse.TabIndex = 31;
+            this.btnClse.UseVisualStyleBackColor = true;
+            this.btnClse.Click += new System.EventHandler(this.btnClse_Click);
+            // 
+            // btnMenu
+            // 
+            this.btnMenu.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnMenu.Image = global::Presentation.Properties.Resources.menu_hamburguesa;
+            this.btnMenu.Location = new System.Drawing.Point(3, 3);
+            this.btnMenu.Name = "btnMenu";
+            this.btnMenu.Size = new System.Drawing.Size(50, 38);
+            this.btnMenu.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.btnMenu.TabIndex = 29;
+            this.btnMenu.TabStop = false;
+            this.btnMenu.Click += new System.EventHandler(this.btnMenu_Click);
+            // 
             // btnCalcular
             // 
             this.btnCalcular.FlatAppearance.BorderSize = 0;
@@ -80,13 +209,13 @@
             this.btnCalcular.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCalcular.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnCalcular.ForeColor = System.Drawing.Color.Honeydew;
-            this.btnCalcular.Image = global::Presentation.Properties.Resources.iconCalcular;
+            this.btnCalcular.Image = global::Presentation.Properties.Resources.iconNote;
             this.btnCalcular.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnCalcular.Location = new System.Drawing.Point(0, 385);
             this.btnCalcular.Name = "btnCalcular";
             this.btnCalcular.Size = new System.Drawing.Size(200, 40);
             this.btnCalcular.TabIndex = 49;
-            this.btnCalcular.Text = "Calculation";
+            this.btnCalcular.Text = "Note";
             this.btnCalcular.UseVisualStyleBackColor = true;
             this.btnCalcular.Click += new System.EventHandler(this.btnCalcular_Click);
             // 
@@ -177,18 +306,6 @@
             this.btnTaskList.UseVisualStyleBackColor = true;
             this.btnTaskList.Click += new System.EventHandler(this.btnTaskList_Click);
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.Color.Honeydew;
-            this.label1.Location = new System.Drawing.Point(57, 91);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(87, 19);
-            this.label1.TabIndex = 31;
-            this.label1.Text = "C A P T U S";
-            this.label1.Click += new System.EventHandler(this.label1_Click);
-            // 
             // picLogoCaptus
             // 
             this.picLogoCaptus.Image = global::Presentation.Properties.Resources.lgCaptus;
@@ -199,123 +316,6 @@
             this.picLogoCaptus.TabIndex = 30;
             this.picLogoCaptus.TabStop = false;
             this.picLogoCaptus.Click += new System.EventHandler(this.picLogoCaptus_Click);
-            // 
-            // panel2
-            // 
-            this.panel2.Controls.Add(this.btnRestaurar);
-            this.panel2.Controls.Add(this.btnMaximizar);
-            this.panel2.Controls.Add(this.btnMinimizar);
-            this.panel2.Controls.Add(this.btnClse);
-            this.panel2.Controls.Add(this.btnMenu);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel2.Location = new System.Drawing.Point(210, 0);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(780, 43);
-            this.panel2.TabIndex = 1;
-            this.panel2.Paint += new System.Windows.Forms.PaintEventHandler(this.panel2_Paint);
-            this.panel2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Panel2_MouseDown);
-            // 
-            // btnRestaurar
-            // 
-            this.btnRestaurar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRestaurar.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnRestaurar.FlatAppearance.BorderSize = 0;
-            this.btnRestaurar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Silver;
-            this.btnRestaurar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
-            this.btnRestaurar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnRestaurar.Image = global::Presentation.Properties.Resources.btnRestaurar;
-            this.btnRestaurar.Location = new System.Drawing.Point(712, 6);
-            this.btnRestaurar.Name = "btnRestaurar";
-            this.btnRestaurar.Size = new System.Drawing.Size(30, 35);
-            this.btnRestaurar.TabIndex = 34;
-            this.btnRestaurar.UseVisualStyleBackColor = true;
-            this.btnRestaurar.Visible = false;
-            this.btnRestaurar.Click += new System.EventHandler(this.btnRestaurar_Click_1);
-            // 
-            // btnMaximizar
-            // 
-            this.btnMaximizar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnMaximizar.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnMaximizar.FlatAppearance.BorderSize = 0;
-            this.btnMaximizar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Silver;
-            this.btnMaximizar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
-            this.btnMaximizar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnMaximizar.Image = global::Presentation.Properties.Resources.icons8_maximize_window_50__1_;
-            this.btnMaximizar.Location = new System.Drawing.Point(711, 3);
-            this.btnMaximizar.Name = "btnMaximizar";
-            this.btnMaximizar.Size = new System.Drawing.Size(30, 35);
-            this.btnMaximizar.TabIndex = 33;
-            this.btnMaximizar.UseVisualStyleBackColor = true;
-            this.btnMaximizar.Click += new System.EventHandler(this.btnMaximizar_Click_1);
-            // 
-            // btnMinimizar
-            // 
-            this.btnMinimizar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnMinimizar.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnMinimizar.FlatAppearance.BorderSize = 0;
-            this.btnMinimizar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Silver;
-            this.btnMinimizar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
-            this.btnMinimizar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnMinimizar.Image = global::Presentation.Properties.Resources.btnMinimizar;
-            this.btnMinimizar.Location = new System.Drawing.Point(683, 9);
-            this.btnMinimizar.Name = "btnMinimizar";
-            this.btnMinimizar.Size = new System.Drawing.Size(23, 25);
-            this.btnMinimizar.TabIndex = 32;
-            this.btnMinimizar.UseVisualStyleBackColor = true;
-            this.btnMinimizar.Click += new System.EventHandler(this.btnMinimizar_Click_1);
-            // 
-            // btnClse
-            // 
-            this.btnClse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClse.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnClse.FlatAppearance.BorderSize = 0;
-            this.btnClse.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
-            this.btnClse.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
-            this.btnClse.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnClse.Image = global::Presentation.Properties.Resources.icons8_close_window_50__2_;
-            this.btnClse.Location = new System.Drawing.Point(744, 8);
-            this.btnClse.Name = "btnClse";
-            this.btnClse.Size = new System.Drawing.Size(28, 28);
-            this.btnClse.TabIndex = 31;
-            this.btnClse.UseVisualStyleBackColor = true;
-            this.btnClse.Click += new System.EventHandler(this.btnClse_Click);
-            // 
-            // btnMenu
-            // 
-            this.btnMenu.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnMenu.Image = global::Presentation.Properties.Resources.menu_hamburguesa;
-            this.btnMenu.Location = new System.Drawing.Point(3, 3);
-            this.btnMenu.Name = "btnMenu";
-            this.btnMenu.Size = new System.Drawing.Size(50, 38);
-            this.btnMenu.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.btnMenu.TabIndex = 29;
-            this.btnMenu.TabStop = false;
-            this.btnMenu.Click += new System.EventHandler(this.btnMenu_Click);
-            // 
-            // timer1
-            // 
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-            // 
-            // panelContenedor
-            // 
-            this.panelContenedor.Controls.Add(this.panelTareas);
-            this.panelContenedor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelContenedor.Location = new System.Drawing.Point(210, 43);
-            this.panelContenedor.Name = "panelContenedor";
-            this.panelContenedor.Size = new System.Drawing.Size(780, 518);
-            this.panelContenedor.TabIndex = 2;
-            this.panelContenedor.Paint += new System.Windows.Forms.PaintEventHandler(this.panelContenedor_Paint);
-            // 
-            // panelTareas
-            // 
-            this.panelTareas.AutoScroll = true;
-            this.panelTareas.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.panelTareas.Location = new System.Drawing.Point(49, 84);
-            this.panelTareas.Name = "panelTareas";
-            this.panelTareas.Size = new System.Drawing.Size(700, 400);
-            this.panelTareas.TabIndex = 0;
-            this.panelTareas.WrapContents = false;
-            this.panelTareas.Paint += new System.Windows.Forms.PaintEventHandler(this.panelTareas_Paint);
             // 
             // frmMain
             // 
@@ -333,10 +333,10 @@
             this.Load += new System.EventHandler(this.frmMain_Load);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picLogoCaptus)).EndInit();
             this.panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.btnMenu)).EndInit();
             this.panelContenedor.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.btnMenu)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picLogoCaptus)).EndInit();
             this.ResumeLayout(false);
 
         }

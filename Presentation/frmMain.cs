@@ -528,7 +528,7 @@ namespace Presentation
            
             LimpiarPanelContenedor();
             panelTareas.Visible = false;
-            frmCalculo calculoForm = new frmCalculo();
+            frmNote calculoForm = new frmNote();
             CargarFormularioEnPanel(calculoForm);
         }
 
