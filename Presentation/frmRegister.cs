@@ -52,31 +52,13 @@ namespace Presentation
 
         }
 
-        private void btnMinimizar_Click(object sender, EventArgs e)
-        {
-            this.WindowState = FormWindowState.Minimized;
-        }
+        
 
-        private void btnClose_Click(object sender, EventArgs e)
-        {
-            Application.Exit();
-        }
+        
 
-        private void btnRestaurar_Click(object sender, EventArgs e)
-        {
-            this.WindowState = FormWindowState.Normal;
-            btnRestaurar.Visible = false;
-            btnMaximizar.Visible = true;
-            btnMaximizar.BringToFront();  // Este botón va arriba
-        }
+       
 
-        private void btnMaximizar_Click(object sender, EventArgs e)
-        {
-            this.WindowState = FormWindowState.Maximized;
-            btnMaximizar.Visible = false;
-            btnRestaurar.Visible = true;
-            btnRestaurar.BringToFront();  // Este botón va arriba
-        }
+        
 
         private void Panel2_MouseDown(object sender, MouseEventArgs e)
         {
@@ -209,6 +191,35 @@ namespace Presentation
                 MessageBox.Show("Error al enviar correo: " + ex.Message);
                 return false;
             }
+        }
+
+        private void btnClse_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void btnRestaurar_Click_1(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Normal;
+            btnRestaurar.Visible = false;
+            btnMaximizarbtnMaximizar.Visible = true;
+            btnMaximizarbtnMaximizar.BringToFront();  // Este botón va arriba
+        }
+
+      
+
+        private void btnMinimizar_Click_1(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Minimized;
+
+        }
+
+        private void btnMaximizarbtnMaximizar_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Maximized;
+            btnMaximizarbtnMaximizar.Visible = false;
+            btnRestaurar.Visible = true;
+            btnRestaurar.BringToFront();  // Este botón va arriba
         }
     }
 }

@@ -36,6 +36,7 @@ namespace Presentation
             statisticsLogic = new StatisticsLogic();
             statisticsLogic.VerificarRacha();
             MostrarTareasAgrupadas();
+
         }
 
         [DllImport("user32.dll", EntryPoint = "ReleaseCapture")]
