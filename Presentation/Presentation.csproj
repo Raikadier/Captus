@@ -104,11 +104,11 @@
     <Compile Include="frmBot.Designer.cs">
       <DependentUpon>frmBot.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmCalculo.cs">
+    <Compile Include="frmNote.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmCalculo.Designer.cs">
-      <DependentUpon>frmCalculo.cs</DependentUpon>
+    <Compile Include="frmNote.Designer.cs">
+      <DependentUpon>frmNote.cs</DependentUpon>
     </Compile>
     <Compile Include="frmLogin.cs">
       <SubType>Form</SubType>
@@ -160,8 +160,8 @@
     <EmbeddedResource Include="frmBot.resx">
       <DependentUpon>frmBot.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmCalculo.resx">
-      <DependentUpon>frmCalculo.cs</DependentUpon>
+    <EmbeddedResource Include="frmNote.resx">
+      <DependentUpon>frmNote.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmLogin.resx">
       <DependentUpon>frmLogin.cs</DependentUpon>
@@ -312,6 +312,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="LogoCaptus2.ico" />
+    <None Include="Resources\iconNote.png" />
     <None Include="Resources\iconSend %281%29.png" />
     <None Include="Resources\iconOut2.png" />
     <None Include="Resources\iconCalcular.png" />
