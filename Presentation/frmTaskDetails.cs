@@ -253,5 +253,15 @@ namespace Presentation
                     break;
             }
         }
+
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnClse_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
     }
 }
