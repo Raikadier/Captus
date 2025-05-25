@@ -31,15 +31,15 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmLogin));
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.btnMinimizar = new System.Windows.Forms.Button();
+            this.btnClse = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.lbRegister = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.btnLogin = new System.Windows.Forms.PictureBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.btnMinimizar = new System.Windows.Forms.Button();
-            this.btnClse = new System.Windows.Forms.Button();
-            this.btnLogin = new System.Windows.Forms.PictureBox();
             this.txtBanner2 = new System.Windows.Forms.PictureBox();
             this.txtBanner = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
@@ -85,6 +85,38 @@
             this.panel2.Paint += new System.Windows.Forms.PaintEventHandler(this.panel2_Paint);
             this.panel2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Panel2_MouseDown);
             // 
+            // btnMinimizar
+            // 
+            this.btnMinimizar.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btnMinimizar.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnMinimizar.FlatAppearance.BorderSize = 0;
+            this.btnMinimizar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Silver;
+            this.btnMinimizar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.btnMinimizar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMinimizar.Image = global::Presentation.Properties.Resources.btnMinimizar;
+            this.btnMinimizar.Location = new System.Drawing.Point(369, 0);
+            this.btnMinimizar.Name = "btnMinimizar";
+            this.btnMinimizar.Size = new System.Drawing.Size(35, 35);
+            this.btnMinimizar.TabIndex = 32;
+            this.btnMinimizar.UseVisualStyleBackColor = true;
+            this.btnMinimizar.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // btnClse
+            // 
+            this.btnClse.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btnClse.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnClse.FlatAppearance.BorderSize = 0;
+            this.btnClse.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
+            this.btnClse.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
+            this.btnClse.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnClse.Image = global::Presentation.Properties.Resources.icons8_close_window_50__2_;
+            this.btnClse.Location = new System.Drawing.Point(404, 0);
+            this.btnClse.Name = "btnClse";
+            this.btnClse.Size = new System.Drawing.Size(30, 34);
+            this.btnClse.TabIndex = 31;
+            this.btnClse.UseVisualStyleBackColor = true;
+            this.btnClse.Click += new System.EventHandler(this.btnClse_Click);
+            // 
             // label4
             // 
             this.label4.AutoSize = true;
@@ -119,6 +151,18 @@
             this.label2.Size = new System.Drawing.Size(88, 19);
             this.label2.TabIndex = 8;
             this.label2.Text = "New user?";
+            // 
+            // btnLogin
+            // 
+            this.btnLogin.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnLogin.Image = global::Presentation.Properties.Resources.login;
+            this.btnLogin.Location = new System.Drawing.Point(286, 283);
+            this.btnLogin.Name = "btnLogin";
+            this.btnLogin.Size = new System.Drawing.Size(180, 35);
+            this.btnLogin.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.btnLogin.TabIndex = 7;
+            this.btnLogin.TabStop = false;
+            this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
             // 
             // textBox2
             // 
@@ -162,50 +206,6 @@
             this.label1.Text = "Get Started";
             this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
-            // btnMinimizar
-            // 
-            this.btnMinimizar.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.btnMinimizar.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnMinimizar.FlatAppearance.BorderSize = 0;
-            this.btnMinimizar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Silver;
-            this.btnMinimizar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
-            this.btnMinimizar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnMinimizar.Image = global::Presentation.Properties.Resources.btnMinimizar;
-            this.btnMinimizar.Location = new System.Drawing.Point(369, 0);
-            this.btnMinimizar.Name = "btnMinimizar";
-            this.btnMinimizar.Size = new System.Drawing.Size(35, 35);
-            this.btnMinimizar.TabIndex = 32;
-            this.btnMinimizar.UseVisualStyleBackColor = true;
-            this.btnMinimizar.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // btnClse
-            // 
-            this.btnClse.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.btnClse.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnClse.FlatAppearance.BorderSize = 0;
-            this.btnClse.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
-            this.btnClse.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
-            this.btnClse.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnClse.Image = global::Presentation.Properties.Resources.icons8_close_window_50__2_;
-            this.btnClse.Location = new System.Drawing.Point(404, 0);
-            this.btnClse.Name = "btnClse";
-            this.btnClse.Size = new System.Drawing.Size(30, 34);
-            this.btnClse.TabIndex = 31;
-            this.btnClse.UseVisualStyleBackColor = true;
-            this.btnClse.Click += new System.EventHandler(this.btnClse_Click);
-            // 
-            // btnLogin
-            // 
-            this.btnLogin.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnLogin.Image = global::Presentation.Properties.Resources.login;
-            this.btnLogin.Location = new System.Drawing.Point(286, 283);
-            this.btnLogin.Name = "btnLogin";
-            this.btnLogin.Size = new System.Drawing.Size(180, 35);
-            this.btnLogin.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.btnLogin.TabIndex = 7;
-            this.btnLogin.TabStop = false;
-            this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
-            // 
             // txtBanner2
             // 
             this.txtBanner2.Image = global::Presentation.Properties.Resources.banner;
@@ -245,6 +245,7 @@
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
+            this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
             // 
             // frmLogin
             // 

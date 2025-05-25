@@ -19,6 +19,7 @@ namespace Presentation
         public frmLogin()
         {
             InitializeComponent();
+            this.StartPosition = FormStartPosition.CenterScreen;
             userLogic = new UserLogic();
         }
 
@@ -157,6 +158,11 @@ namespace Presentation
         private void button1_Click(object sender, EventArgs e)
         {
             this.WindowState = FormWindowState.Minimized;
+
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
 
         }
     }

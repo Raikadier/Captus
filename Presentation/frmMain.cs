@@ -570,13 +570,16 @@ namespace Presentation
 
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
+
         }
 
         private void btnHome_Click(object sender, EventArgs e)
         {
             LimpiarPanelContenedor();
             panelTareas.Visible = false;
-            frmMain calculoForm = new frmMain();
+            frmHome homeForm = new frmHome();
+            CargarFormularioEnPanel(homeForm);
+
         }
     }
 }
