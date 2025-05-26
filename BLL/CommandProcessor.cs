@@ -88,7 +88,7 @@ namespace BLL
                 "Consultar Tareas",
                 "Muestra las tareas",
                 @"(?:mostrar|consultar|ver)\s+tareas(?:\s+(.+))?$",
-                HandleListTasks
+                (input) => System.Threading.Tasks.Task.FromResult(HandleListTasks(input))
             ));
 
             // Comandos de notas
@@ -165,7 +165,7 @@ namespace BLL
                         case "eliminar_tarea":
                             return await HandleDeleteTaskFromJson(root.ToString());
                         case "consultar_tareas":
-                            return await HandleListTasks(input);
+                            return HandleListTasks(input);
                         default:
                             return "Acción no reconocida.";
                     }
@@ -302,7 +302,7 @@ namespace BLL
             }
         }
 
-        private async Task<string> HandleListTasks(string input)
+        private string HandleListTasks(string input)
         {
             try
             {
@@ -442,7 +442,7 @@ namespace BLL
         }
 
         private async System.Threading.Tasks.Task<string> HandleUpdateTask(string input)
-        {
+         {
             try
             {
                 if (Session.CurrentUser == null)
