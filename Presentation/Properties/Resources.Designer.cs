@@ -463,6 +463,26 @@ namespace Presentation.Properties {
         /// <summary>
         ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap LogoCaptus2Main {
+            get {
+                object obj = ResourceManager.GetObject("LogoCaptus2Main", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap LogoCaptusAddTask {
+            get {
+                object obj = ResourceManager.GetObject("LogoCaptusAddTask", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap LogoCaptusGris_removebg_preview {
             get {
                 object obj = ResourceManager.GetObject("LogoCaptusGris-removebg-preview", resourceCulture);

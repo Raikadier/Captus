@@ -193,7 +193,7 @@ namespace Presentation
 
             if (string.IsNullOrEmpty(titulo))
             {
-                MessageBox.Show("El título es obligatorio.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                frmMessageBox.Show("El título es obligatorio.", "Validación");
                 return false;
             }
             if (cbPriority.SelectedValue == null || cbCategories.SelectedValue == null)
@@ -303,20 +303,19 @@ namespace Presentation
                     {
                         string mensaje = NotifyEmails.GetMessageInsert(nuevaTarea.Title, nuevaTarea.EndDate.ToShortDateString(), nuevaTarea.Category.Name);
                         await NotifyEmails.SendNotifyAsync(Session.CurrentUser.Email, "Nueva tarea asignada", mensaje);
-
-                        MessageBox.Show("✅ Tarea agregada exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        frmMessageBox.Show("✅ Tarea agregada exitosamente", "Exito");
                         Clean();
                         this.Dispose();
 
                     }
                     else
                     {
-                        MessageBox.Show(result.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        frmMessageBox.Show(result.Message, "Error");
                     }
                 }
-                catch (Exception ex)
+                catch (Exception )
                 {
-                    MessageBox.Show($"❌ Ocurrió un error al guardar la tarea:\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    frmMessageBox.Show("❌ Ocurrió un error al guardar la tarea", "Error");
                 }
             }
         }

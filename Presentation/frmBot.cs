@@ -59,6 +59,7 @@ namespace Presentation
             }
             catch (Exception ex)
             {
+                
                 MessageBox.Show($"Error al cargar mensajes: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }

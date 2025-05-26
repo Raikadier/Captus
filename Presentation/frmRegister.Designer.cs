@@ -40,6 +40,10 @@
             this.txtName = new System.Windows.Forms.TextBox();
             this.btnRegister = new System.Windows.Forms.PictureBox();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.btnRestaurar = new System.Windows.Forms.Button();
+            this.btnMaximizarbtnMaximizar = new System.Windows.Forms.Button();
+            this.btnMinimizar = new System.Windows.Forms.Button();
+            this.btnClse = new System.Windows.Forms.Button();
             this.label8 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.brnCmPassword = new System.Windows.Forms.PictureBox();
@@ -56,10 +60,6 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.btnRestaurar = new System.Windows.Forms.Button();
-            this.btnMaximizarbtnMaximizar = new System.Windows.Forms.Button();
-            this.btnMinimizar = new System.Windows.Forms.Button();
-            this.btnClse = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.btnReply)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnRegister)).BeginInit();
@@ -219,6 +219,70 @@
             this.panel2.TabIndex = 19;
             this.panel2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Panel2_MouseDown);
             // 
+            // btnRestaurar
+            // 
+            this.btnRestaurar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnRestaurar.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnRestaurar.FlatAppearance.BorderSize = 0;
+            this.btnRestaurar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Silver;
+            this.btnRestaurar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.btnRestaurar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnRestaurar.Image = global::Presentation.Properties.Resources.btnRestaurar;
+            this.btnRestaurar.Location = new System.Drawing.Point(1132, 5);
+            this.btnRestaurar.Name = "btnRestaurar";
+            this.btnRestaurar.Size = new System.Drawing.Size(30, 35);
+            this.btnRestaurar.TabIndex = 38;
+            this.btnRestaurar.UseVisualStyleBackColor = true;
+            this.btnRestaurar.Visible = false;
+            this.btnRestaurar.Click += new System.EventHandler(this.btnRestaurar_Click_1);
+            // 
+            // btnMaximizarbtnMaximizar
+            // 
+            this.btnMaximizarbtnMaximizar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnMaximizarbtnMaximizar.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnMaximizarbtnMaximizar.FlatAppearance.BorderSize = 0;
+            this.btnMaximizarbtnMaximizar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Silver;
+            this.btnMaximizarbtnMaximizar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.btnMaximizarbtnMaximizar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMaximizarbtnMaximizar.Image = global::Presentation.Properties.Resources.icons8_maximize_window_50__1_;
+            this.btnMaximizarbtnMaximizar.Location = new System.Drawing.Point(1131, 3);
+            this.btnMaximizarbtnMaximizar.Name = "btnMaximizarbtnMaximizar";
+            this.btnMaximizarbtnMaximizar.Size = new System.Drawing.Size(30, 35);
+            this.btnMaximizarbtnMaximizar.TabIndex = 37;
+            this.btnMaximizarbtnMaximizar.UseVisualStyleBackColor = true;
+            this.btnMaximizarbtnMaximizar.Click += new System.EventHandler(this.btnMaximizarbtnMaximizar_Click);
+            // 
+            // btnMinimizar
+            // 
+            this.btnMinimizar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnMinimizar.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnMinimizar.FlatAppearance.BorderSize = 0;
+            this.btnMinimizar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Silver;
+            this.btnMinimizar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.btnMinimizar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMinimizar.Image = global::Presentation.Properties.Resources.btnMinimizar;
+            this.btnMinimizar.Location = new System.Drawing.Point(1103, 9);
+            this.btnMinimizar.Name = "btnMinimizar";
+            this.btnMinimizar.Size = new System.Drawing.Size(23, 25);
+            this.btnMinimizar.TabIndex = 36;
+            this.btnMinimizar.UseVisualStyleBackColor = true;
+            // 
+            // btnClse
+            // 
+            this.btnClse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnClse.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnClse.FlatAppearance.BorderSize = 0;
+            this.btnClse.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
+            this.btnClse.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
+            this.btnClse.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnClse.Image = global::Presentation.Properties.Resources.icons8_close_window_50__2_;
+            this.btnClse.Location = new System.Drawing.Point(1164, 8);
+            this.btnClse.Name = "btnClse";
+            this.btnClse.Size = new System.Drawing.Size(28, 28);
+            this.btnClse.TabIndex = 35;
+            this.btnClse.UseVisualStyleBackColor = true;
+            this.btnClse.Click += new System.EventHandler(this.btnClse_Click);
+            // 
             // label8
             // 
             this.label8.Anchor = System.Windows.Forms.AnchorStyles.Top;
@@ -233,7 +297,7 @@
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Image = global::Presentation.Properties.Resources.lgCaptus;
+            this.pictureBox1.Image = global::Presentation.Properties.Resources.LogoCaptus2Main;
             this.pictureBox1.Location = new System.Drawing.Point(3, 0);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(107, 74);
@@ -402,70 +466,6 @@
             this.label1.TabIndex = 5;
             this.label1.Text = "First Name";
             this.label1.Click += new System.EventHandler(this.label1_Click);
-            // 
-            // btnRestaurar
-            // 
-            this.btnRestaurar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRestaurar.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnRestaurar.FlatAppearance.BorderSize = 0;
-            this.btnRestaurar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Silver;
-            this.btnRestaurar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
-            this.btnRestaurar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnRestaurar.Image = global::Presentation.Properties.Resources.btnRestaurar;
-            this.btnRestaurar.Location = new System.Drawing.Point(1132, 5);
-            this.btnRestaurar.Name = "btnRestaurar";
-            this.btnRestaurar.Size = new System.Drawing.Size(30, 35);
-            this.btnRestaurar.TabIndex = 38;
-            this.btnRestaurar.UseVisualStyleBackColor = true;
-            this.btnRestaurar.Visible = false;
-            this.btnRestaurar.Click += new System.EventHandler(this.btnRestaurar_Click_1);
-            // 
-            // btnMaximizarbtnMaximizar
-            // 
-            this.btnMaximizarbtnMaximizar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnMaximizarbtnMaximizar.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnMaximizarbtnMaximizar.FlatAppearance.BorderSize = 0;
-            this.btnMaximizarbtnMaximizar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Silver;
-            this.btnMaximizarbtnMaximizar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
-            this.btnMaximizarbtnMaximizar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnMaximizarbtnMaximizar.Image = global::Presentation.Properties.Resources.icons8_maximize_window_50__1_;
-            this.btnMaximizarbtnMaximizar.Location = new System.Drawing.Point(1131, 3);
-            this.btnMaximizarbtnMaximizar.Name = "btnMaximizarbtnMaximizar";
-            this.btnMaximizarbtnMaximizar.Size = new System.Drawing.Size(30, 35);
-            this.btnMaximizarbtnMaximizar.TabIndex = 37;
-            this.btnMaximizarbtnMaximizar.UseVisualStyleBackColor = true;
-            this.btnMaximizarbtnMaximizar.Click += new System.EventHandler(this.btnMaximizarbtnMaximizar_Click);
-            // 
-            // btnMinimizar
-            // 
-            this.btnMinimizar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnMinimizar.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnMinimizar.FlatAppearance.BorderSize = 0;
-            this.btnMinimizar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Silver;
-            this.btnMinimizar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
-            this.btnMinimizar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnMinimizar.Image = global::Presentation.Properties.Resources.btnMinimizar;
-            this.btnMinimizar.Location = new System.Drawing.Point(1103, 9);
-            this.btnMinimizar.Name = "btnMinimizar";
-            this.btnMinimizar.Size = new System.Drawing.Size(23, 25);
-            this.btnMinimizar.TabIndex = 36;
-            this.btnMinimizar.UseVisualStyleBackColor = true;
-            // 
-            // btnClse
-            // 
-            this.btnClse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClse.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnClse.FlatAppearance.BorderSize = 0;
-            this.btnClse.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
-            this.btnClse.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
-            this.btnClse.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnClse.Image = global::Presentation.Properties.Resources.icons8_close_window_50__2_;
-            this.btnClse.Location = new System.Drawing.Point(1164, 8);
-            this.btnClse.Name = "btnClse";
-            this.btnClse.Size = new System.Drawing.Size(28, 28);
-            this.btnClse.TabIndex = 35;
-            this.btnClse.UseVisualStyleBackColor = true;
-            this.btnClse.Click += new System.EventHandler(this.btnClse_Click);
             // 
             // frmRegister
             // 

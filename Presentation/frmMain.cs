@@ -35,6 +35,7 @@ namespace Presentation
             taskLogic = new TaskLogic(Configuration.ConnectionString);
             statisticsLogic = new StatisticsLogic();
             statisticsLogic.VerificarRacha();
+            this.WindowState = FormWindowState.Maximized;
             MostrarTareasAgrupadas();
             cmbAnio.Visible = false;
             cmbMes.Visible = false;
@@ -46,7 +47,6 @@ namespace Presentation
             panelTareasCalendario.Visible = false;
             panelTareasCalendario.AutoScroll = true;
             panelTareasCalendario.AutoSize = true;
-            panelTareasCalendario.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             this.Controls.Add(panelTareasCalendario);
             this.MouseDown += OcultarPanelTareas;
             panelTareasCalendario.Padding = new Padding(10);
@@ -463,6 +463,7 @@ namespace Presentation
             LimpiarPanelContenedor();
             panelTareas.Visible = true;
             btnAlternarVista.Visible = true;
+            panelContenedor.Controls.Add(btnAlternarVista);
             panelContenedor.Controls.Add(panelTareas);
             MostrarTareasAgrupadas();
         }
@@ -609,6 +610,9 @@ namespace Presentation
                 tblCalendario.Visible = true;
                 lblAlternarVista.Text = "Ver lista";
                 Icono.BackgroundImage = Properties.Resources.Lista;
+                panelContenedor.Controls.Add(panelCalendario);
+                panelContenedor.Controls.Add(cmbAnio);
+                panelContenedor.Controls.Add(cmbMes);
                 cmbAnio.Visible = true;
                 cmbMes.Visible = true;
                 InicializarCombos();
@@ -699,7 +703,7 @@ namespace Presentation
                         Text = $"• {tareasDelDia.Count} tarea(s)",
                         AutoSize = true,
                         Location = new Point(5, 25),
-                        Font = new Font("Segoe UI", 8),
+                        Font = new Font("Segoe UI", 9),
                         ForeColor = Color.DarkBlue
                     };
                     fechasConTareas.Add(fechaActual);
@@ -732,24 +736,24 @@ namespace Presentation
                     titulo.Font = new Font("Segoe UI", 10, FontStyle.Bold);
                     titulo.Dock = DockStyle.Top;
                     panelTareasCalendario.Controls.Add(titulo);
-
+                    int y =35;
                     // Agregar tareas como Labels
                     foreach (var tarea in tareas)
                     {
                         Label lbl = new Label();
                         lbl.Text = "• " + tarea.Title;
                         lbl.AutoSize = true;
-                        lbl.Margin = new Padding(5);
-                        lbl.BackColor = Color.LightYellow;
+                        lbl.Location = new Point(5, y);
                         lbl.Font = new Font("Segoe UI", 11, FontStyle.Regular);
                         panelTareasCalendario.Controls.Add(lbl);
+                        y += lbl.Height + 5;
                     }
 
                     // Posicionar el panel cerca de la celda
                     Point pos = celda.PointToScreen(Point.Empty);
                     pos = this.PointToClient(pos);
-                    //panelTareasCalendario.Location = new Point(pos.X + celda.Width + 5, pos.Y);
-                    panelTareasCalendario.Location = new Point(pos.X + 80, pos.Y + 10);
+                    panelTareasCalendario.Location = new Point(pos.X + celda.Width + 5, pos.Y);
+                    //panelTareasCalendario.Location = new Point(pos.X + 80, pos.Y + 10);
                     panelTareasCalendario.BringToFront();
                     panelTareasCalendario.Visible = true;
                 };

@@ -330,6 +330,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="LogoCaptus2.ico" />
+    <None Include="Resources\LogoCaptus2Main.png" />
+    <None Include="Resources\LogoCaptusAddTask.png" />
     <None Include="Resources\Lista.png" />
     <None Include="Resources\Calendario.png" />
     <None Include="Resources\iconsHome.png" />

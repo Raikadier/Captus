@@ -52,14 +52,6 @@ namespace Presentation
 
         }
 
-        
-
-        
-
-       
-
-        
-
         private void Panel2_MouseDown(object sender, MouseEventArgs e)
         {
             ReleaseCapture();
@@ -93,12 +85,12 @@ namespace Presentation
             var result = userLogic.Save(user);
             if (result.Success)
             {
-                MessageBox.Show("User saved successfully.", "¡ Gratulations !", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                frmMessageBox.Show("User saved successfully.", "¡ Gratulations !");
                 this.Close();
             }
             else
             {
-                MessageBox.Show($"Error: {result.Message}");
+                frmMessageBox.Show(result.Message, "Error");
             }
         }
         private bool varifyPassword()
@@ -106,19 +98,19 @@ namespace Presentation
             string password = txtPassword.Text;
             if (password.Length < 8)
             {
-                MessageBox.Show("La contraseña debe tener al menos 8 caracteres.");
+                frmMessageBox.Show("La contraseña debe tener al menos 8 caracteres.", "Error");
                 return false;
             }
             if (!Regex.IsMatch(password, @"[A-Z]") ||
                 !Regex.IsMatch(password, @"[a-z]") ||
                 !Regex.IsMatch(password, @"[0-9]"))
             {
-                MessageBox.Show("La contraseña debe contener mayúsculas, minúsculas y números.");
+                frmMessageBox.Show("La contraseña debe contener mayúsculas, minúsculas y números.", "Error");
                 return false;
             }
             if (txtPassword.Text != txtCnPassword.Text)
             {
-                MessageBox.Show("Las contraseñas no coinciden.");
+                frmMessageBox.Show("Las contraseñas no coinciden.", "Error");
                 return false;
             }
             return true;
@@ -127,7 +119,7 @@ namespace Presentation
         {
             if (string.IsNullOrEmpty(txtName.Text) || string.IsNullOrEmpty(txtPassword.Text) || string.IsNullOrEmpty(txtEmail.Text) || string.IsNullOrEmpty(txtLastName.Text) || string.IsNullOrEmpty(txtPhNumber.Text) || string.IsNullOrEmpty(txtUsername.Text))
             {
-                MessageBox.Show("Please fill in all fields.");
+                frmMessageBox.Show("Por favor, complete todos los campos.", "Error");
                 return false;
             }
             return true;
@@ -137,14 +129,14 @@ namespace Presentation
             string email = txtEmail.Text;
             if (!Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
             {
-                MessageBox.Show("Debe ingresar un correo electrónico válido.");
+                frmMessageBox.Show("El correo electrónico no es válido.", "Error");
                 return false;
             }
 
             string code = new Random().Next(100000, 999999).ToString();
             if (!SendCode(email, code))
             {
-                MessageBox.Show("Error al enviar el código de verificación.");
+                frmMessageBox.Show("Error al enviar el código de verificación.", "Error");
                 return false;
             }
             using (var formVerificationn = new ValideCode())
@@ -154,13 +146,13 @@ namespace Presentation
                     string codigoIngresado = formVerificationn.CodeInsert;
                     if (codigoIngresado != code)
                     {
-                        MessageBox.Show("El código ingresado es incorrecto.");
+                        frmMessageBox.Show("El código ingresado es incorrecto.", "Error de verificación");
                         return false;
                     }
                 }
                 else
                 {
-                    MessageBox.Show("Verificación cancelada.");
+                    frmMessageBox.Show("Verificación cancelada.", "Error");
                     return false;
                 }
             }
@@ -186,9 +178,9 @@ namespace Presentation
                 smtp.Send(mail);
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                MessageBox.Show("Error al enviar correo: " + ex.Message);
+                frmMessageBox.Show("Error al enviar el correo", "Error");
                 return false;
             }
         }
