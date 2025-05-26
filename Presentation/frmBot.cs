@@ -51,7 +51,7 @@ namespace Presentation
                 var messages = _chatLogic.GetAllMessages();
                 if (messages != null)
                 {
-                    foreach (var message in messages)
+                    foreach (var message in messages.OrderBy(m => m.SendDate))
                     {
                         DisplayMessage(message);
                     }
@@ -59,8 +59,7 @@ namespace Presentation
             }
             catch (Exception ex)
             {
-                
-                MessageBox.Show($"Error al cargar mensajes: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                frmMessageBox.Show("Error al cargar mensajes", "Error");
             }
         }
 

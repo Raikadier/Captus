@@ -31,10 +31,29 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.panel1 = new System.Windows.Forms.Panel();
+            this.btnHome = new System.Windows.Forms.Button();
+            this.btnCalcular = new System.Windows.Forms.Button();
+            this.btnChatBot = new System.Windows.Forms.Button();
+            this.btnAddTask = new System.Windows.Forms.Button();
+            this.btnLogout = new System.Windows.Forms.Button();
+            this.btnProfile = new System.Windows.Forms.Button();
+            this.btnTaskList = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
+            this.picLogoCaptus = new System.Windows.Forms.PictureBox();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.btnRestaurar = new System.Windows.Forms.Button();
+            this.btnMaximizar = new System.Windows.Forms.Button();
+            this.btnMinimizar = new System.Windows.Forms.Button();
+            this.btnClse = new System.Windows.Forms.Button();
+            this.btnMenu = new System.Windows.Forms.PictureBox();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.panelContenedor = new System.Windows.Forms.Panel();
+            this.panel44 = new System.Windows.Forms.Panel();
+            this.cmbMes = new System.Windows.Forms.ComboBox();
+            this.btnAlternarVista = new System.Windows.Forms.Panel();
+            this.Icono = new System.Windows.Forms.Panel();
+            this.lblAlternarVista = new System.Windows.Forms.Label();
+            this.cmbAnio = new System.Windows.Forms.ComboBox();
             this.panelCalendario = new System.Windows.Forms.Panel();
             this.tblCalendario = new System.Windows.Forms.TableLayoutPanel();
             this.panel3 = new System.Windows.Forms.Panel();
@@ -86,29 +105,14 @@
             this.panel42 = new System.Windows.Forms.Panel();
             this.panel43 = new System.Windows.Forms.Panel();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-            this.cmbAnio = new System.Windows.Forms.ComboBox();
-            this.cmbMes = new System.Windows.Forms.ComboBox();
-            this.btnAlternarVista = new System.Windows.Forms.Panel();
-            this.lblAlternarVista = new System.Windows.Forms.Label();
             this.panelTareas = new System.Windows.Forms.FlowLayoutPanel();
-            this.Icono = new System.Windows.Forms.Panel();
-            this.btnRestaurar = new System.Windows.Forms.Button();
-            this.btnMaximizar = new System.Windows.Forms.Button();
-            this.btnMinimizar = new System.Windows.Forms.Button();
-            this.btnClse = new System.Windows.Forms.Button();
-            this.btnMenu = new System.Windows.Forms.PictureBox();
-            this.btnHome = new System.Windows.Forms.Button();
-            this.btnCalcular = new System.Windows.Forms.Button();
-            this.btnChatBot = new System.Windows.Forms.Button();
-            this.btnAddTask = new System.Windows.Forms.Button();
-            this.btnLogout = new System.Windows.Forms.Button();
-            this.btnProfile = new System.Windows.Forms.Button();
-            this.btnTaskList = new System.Windows.Forms.Button();
-            this.picLogoCaptus = new System.Windows.Forms.PictureBox();
-            this.panel44 = new System.Windows.Forms.Panel();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picLogoCaptus)).BeginInit();
             this.panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.btnMenu)).BeginInit();
             this.panelContenedor.SuspendLayout();
+            this.panel44.SuspendLayout();
+            this.btnAlternarVista.SuspendLayout();
             this.panelCalendario.SuspendLayout();
             this.tblCalendario.SuspendLayout();
             this.panel4.SuspendLayout();
@@ -118,10 +122,6 @@
             this.panel8.SuspendLayout();
             this.panel9.SuspendLayout();
             this.panel10.SuspendLayout();
-            this.btnAlternarVista.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.btnMenu)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.picLogoCaptus)).BeginInit();
-            this.panel44.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -143,6 +143,130 @@
             this.panel1.TabIndex = 0;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             // 
+            // btnHome
+            // 
+            this.btnHome.BackColor = System.Drawing.Color.Green;
+            this.btnHome.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnHome.FlatAppearance.BorderSize = 0;
+            this.btnHome.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Green;
+            this.btnHome.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.btnHome.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnHome.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnHome.ForeColor = System.Drawing.Color.Honeydew;
+            this.btnHome.Image = global::Presentation.Properties.Resources.iconsHome;
+            this.btnHome.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnHome.Location = new System.Drawing.Point(0, 191);
+            this.btnHome.Name = "btnHome";
+            this.btnHome.Size = new System.Drawing.Size(210, 34);
+            this.btnHome.TabIndex = 50;
+            this.btnHome.Text = "Home";
+            this.btnHome.UseVisualStyleBackColor = false;
+            this.btnHome.Click += new System.EventHandler(this.btnHome_Click);
+            // 
+            // btnCalcular
+            // 
+            this.btnCalcular.FlatAppearance.BorderSize = 0;
+            this.btnCalcular.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.btnCalcular.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCalcular.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnCalcular.ForeColor = System.Drawing.Color.Honeydew;
+            this.btnCalcular.Image = global::Presentation.Properties.Resources.iconNote;
+            this.btnCalcular.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnCalcular.Location = new System.Drawing.Point(0, 403);
+            this.btnCalcular.Name = "btnCalcular";
+            this.btnCalcular.Size = new System.Drawing.Size(200, 40);
+            this.btnCalcular.TabIndex = 49;
+            this.btnCalcular.Text = "Note";
+            this.btnCalcular.UseVisualStyleBackColor = true;
+            this.btnCalcular.Click += new System.EventHandler(this.btnCalcular_Click);
+            // 
+            // btnChatBot
+            // 
+            this.btnChatBot.FlatAppearance.BorderSize = 0;
+            this.btnChatBot.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.btnChatBot.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnChatBot.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnChatBot.ForeColor = System.Drawing.Color.Honeydew;
+            this.btnChatBot.Image = global::Presentation.Properties.Resources.iconBt;
+            this.btnChatBot.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnChatBot.Location = new System.Drawing.Point(0, 347);
+            this.btnChatBot.Name = "btnChatBot";
+            this.btnChatBot.Size = new System.Drawing.Size(200, 40);
+            this.btnChatBot.TabIndex = 48;
+            this.btnChatBot.Text = "ChatBot";
+            this.btnChatBot.UseVisualStyleBackColor = true;
+            this.btnChatBot.Click += new System.EventHandler(this.btnChatBot_Click_1);
+            // 
+            // btnAddTask
+            // 
+            this.btnAddTask.BackColor = System.Drawing.Color.Green;
+            this.btnAddTask.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnAddTask.FlatAppearance.BorderSize = 0;
+            this.btnAddTask.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Green;
+            this.btnAddTask.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.btnAddTask.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAddTask.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnAddTask.ForeColor = System.Drawing.Color.Honeydew;
+            this.btnAddTask.Image = global::Presentation.Properties.Resources.iconPlus;
+            this.btnAddTask.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnAddTask.Location = new System.Drawing.Point(0, 241);
+            this.btnAddTask.Name = "btnAddTask";
+            this.btnAddTask.Size = new System.Drawing.Size(210, 34);
+            this.btnAddTask.TabIndex = 46;
+            this.btnAddTask.Text = "Add Task";
+            this.btnAddTask.UseVisualStyleBackColor = false;
+            this.btnAddTask.Click += new System.EventHandler(this.btnAddTask_Click);
+            // 
+            // btnLogout
+            // 
+            this.btnLogout.FlatAppearance.BorderSize = 0;
+            this.btnLogout.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.btnLogout.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnLogout.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnLogout.ForeColor = System.Drawing.Color.Honeydew;
+            this.btnLogout.Image = global::Presentation.Properties.Resources.iconOut2;
+            this.btnLogout.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnLogout.Location = new System.Drawing.Point(0, 515);
+            this.btnLogout.Name = "btnLogout";
+            this.btnLogout.Size = new System.Drawing.Size(210, 39);
+            this.btnLogout.TabIndex = 44;
+            this.btnLogout.UseVisualStyleBackColor = true;
+            this.btnLogout.Click += new System.EventHandler(this.btnLogout_Click);
+            // 
+            // btnProfile
+            // 
+            this.btnProfile.FlatAppearance.BorderSize = 0;
+            this.btnProfile.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.btnProfile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnProfile.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnProfile.ForeColor = System.Drawing.Color.Honeydew;
+            this.btnProfile.Image = global::Presentation.Properties.Resources.iconProfile;
+            this.btnProfile.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnProfile.Location = new System.Drawing.Point(0, 459);
+            this.btnProfile.Name = "btnProfile";
+            this.btnProfile.Size = new System.Drawing.Size(197, 40);
+            this.btnProfile.TabIndex = 43;
+            this.btnProfile.Text = "Profile";
+            this.btnProfile.UseVisualStyleBackColor = true;
+            this.btnProfile.Click += new System.EventHandler(this.btnProfile_Click);
+            // 
+            // btnTaskList
+            // 
+            this.btnTaskList.FlatAppearance.BorderSize = 0;
+            this.btnTaskList.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.btnTaskList.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnTaskList.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnTaskList.ForeColor = System.Drawing.Color.Honeydew;
+            this.btnTaskList.Image = global::Presentation.Properties.Resources.iconListTsk;
+            this.btnTaskList.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnTaskList.Location = new System.Drawing.Point(0, 291);
+            this.btnTaskList.Name = "btnTaskList";
+            this.btnTaskList.Size = new System.Drawing.Size(200, 40);
+            this.btnTaskList.TabIndex = 41;
+            this.btnTaskList.Text = "TaskList";
+            this.btnTaskList.UseVisualStyleBackColor = true;
+            this.btnTaskList.Click += new System.EventHandler(this.btnTaskList_Click);
+            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -154,6 +278,17 @@
             this.label1.TabIndex = 31;
             this.label1.Text = "C A P T U S";
             this.label1.Click += new System.EventHandler(this.label1_Click);
+            // 
+            // picLogoCaptus
+            // 
+            this.picLogoCaptus.Image = global::Presentation.Properties.Resources.LogoCaptus2Main;
+            this.picLogoCaptus.Location = new System.Drawing.Point(34, 0);
+            this.picLogoCaptus.Name = "picLogoCaptus";
+            this.picLogoCaptus.Size = new System.Drawing.Size(132, 97);
+            this.picLogoCaptus.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.picLogoCaptus.TabIndex = 30;
+            this.picLogoCaptus.TabStop = false;
+            this.picLogoCaptus.Click += new System.EventHandler(this.picLogoCaptus_Click);
             // 
             // panel2
             // 
@@ -169,6 +304,83 @@
             this.panel2.TabIndex = 1;
             this.panel2.Paint += new System.Windows.Forms.PaintEventHandler(this.panel2_Paint);
             this.panel2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Panel2_MouseDown);
+            // 
+            // btnRestaurar
+            // 
+            this.btnRestaurar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnRestaurar.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnRestaurar.FlatAppearance.BorderSize = 0;
+            this.btnRestaurar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Silver;
+            this.btnRestaurar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.btnRestaurar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnRestaurar.Image = global::Presentation.Properties.Resources.btnRestaurar;
+            this.btnRestaurar.Location = new System.Drawing.Point(712, 2);
+            this.btnRestaurar.Name = "btnRestaurar";
+            this.btnRestaurar.Size = new System.Drawing.Size(30, 35);
+            this.btnRestaurar.TabIndex = 34;
+            this.btnRestaurar.UseVisualStyleBackColor = true;
+            this.btnRestaurar.Visible = false;
+            this.btnRestaurar.Click += new System.EventHandler(this.btnRestaurar_Click_1);
+            // 
+            // btnMaximizar
+            // 
+            this.btnMaximizar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnMaximizar.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnMaximizar.FlatAppearance.BorderSize = 0;
+            this.btnMaximizar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Silver;
+            this.btnMaximizar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.btnMaximizar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMaximizar.Image = global::Presentation.Properties.Resources.icons8_maximize_window_50__1_;
+            this.btnMaximizar.Location = new System.Drawing.Point(711, 2);
+            this.btnMaximizar.Name = "btnMaximizar";
+            this.btnMaximizar.Size = new System.Drawing.Size(30, 35);
+            this.btnMaximizar.TabIndex = 33;
+            this.btnMaximizar.UseVisualStyleBackColor = true;
+            this.btnMaximizar.Click += new System.EventHandler(this.btnMaximizar_Click_1);
+            // 
+            // btnMinimizar
+            // 
+            this.btnMinimizar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnMinimizar.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnMinimizar.FlatAppearance.BorderSize = 0;
+            this.btnMinimizar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Silver;
+            this.btnMinimizar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.btnMinimizar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMinimizar.Image = global::Presentation.Properties.Resources.btnMinimizar;
+            this.btnMinimizar.Location = new System.Drawing.Point(684, 8);
+            this.btnMinimizar.Name = "btnMinimizar";
+            this.btnMinimizar.Size = new System.Drawing.Size(23, 25);
+            this.btnMinimizar.TabIndex = 32;
+            this.btnMinimizar.UseVisualStyleBackColor = true;
+            this.btnMinimizar.Click += new System.EventHandler(this.btnMinimizar_Click_1);
+            // 
+            // btnClse
+            // 
+            this.btnClse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnClse.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnClse.FlatAppearance.BorderSize = 0;
+            this.btnClse.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
+            this.btnClse.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
+            this.btnClse.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnClse.Image = global::Presentation.Properties.Resources.icons8_close_window_50__2_;
+            this.btnClse.Location = new System.Drawing.Point(746, 5);
+            this.btnClse.Name = "btnClse";
+            this.btnClse.Size = new System.Drawing.Size(28, 28);
+            this.btnClse.TabIndex = 31;
+            this.btnClse.UseVisualStyleBackColor = true;
+            this.btnClse.Click += new System.EventHandler(this.btnClse_Click);
+            // 
+            // btnMenu
+            // 
+            this.btnMenu.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnMenu.Image = global::Presentation.Properties.Resources.menu_hamburguesa;
+            this.btnMenu.Location = new System.Drawing.Point(3, 3);
+            this.btnMenu.Name = "btnMenu";
+            this.btnMenu.Size = new System.Drawing.Size(50, 38);
+            this.btnMenu.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.btnMenu.TabIndex = 29;
+            this.btnMenu.TabStop = false;
+            this.btnMenu.Click += new System.EventHandler(this.btnMenu_Click);
             // 
             // timer1
             // 
@@ -186,8 +398,80 @@
             this.panelContenedor.TabIndex = 2;
             this.panelContenedor.Paint += new System.Windows.Forms.PaintEventHandler(this.panelContenedor_Paint);
             // 
+            // panel44
+            // 
+            this.panel44.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel44.Controls.Add(this.cmbMes);
+            this.panel44.Controls.Add(this.btnAlternarVista);
+            this.panel44.Controls.Add(this.cmbAnio);
+            this.panel44.Location = new System.Drawing.Point(0, 0);
+            this.panel44.Name = "panel44";
+            this.panel44.Size = new System.Drawing.Size(786, 52);
+            this.panel44.TabIndex = 4;
+            // 
+            // cmbMes
+            // 
+            this.cmbMes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.cmbMes.BackColor = System.Drawing.Color.Honeydew;
+            this.cmbMes.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.cmbMes.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cmbMes.FormattingEnabled = true;
+            this.cmbMes.Location = new System.Drawing.Point(657, 21);
+            this.cmbMes.Name = "cmbMes";
+            this.cmbMes.Size = new System.Drawing.Size(108, 21);
+            this.cmbMes.TabIndex = 2;
+            // 
+            // btnAlternarVista
+            // 
+            this.btnAlternarVista.Controls.Add(this.Icono);
+            this.btnAlternarVista.Controls.Add(this.lblAlternarVista);
+            this.btnAlternarVista.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnAlternarVista.Location = new System.Drawing.Point(46, 16);
+            this.btnAlternarVista.Name = "btnAlternarVista";
+            this.btnAlternarVista.Size = new System.Drawing.Size(233, 30);
+            this.btnAlternarVista.TabIndex = 1;
+            this.btnAlternarVista.MouseClick += new System.Windows.Forms.MouseEventHandler(this.btnAlternarVista_MouseClick);
+            // 
+            // Icono
+            // 
+            this.Icono.BackgroundImage = global::Presentation.Properties.Resources.Calendario;
+            this.Icono.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.Icono.Location = new System.Drawing.Point(59, 5);
+            this.Icono.Name = "Icono";
+            this.Icono.Size = new System.Drawing.Size(20, 20);
+            this.Icono.TabIndex = 1;
+            this.Icono.MouseClick += new System.Windows.Forms.MouseEventHandler(this.btnAlternarVista_MouseClick);
+            // 
+            // lblAlternarVista
+            // 
+            this.lblAlternarVista.AutoSize = true;
+            this.lblAlternarVista.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.lblAlternarVista.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblAlternarVista.Location = new System.Drawing.Point(87, 4);
+            this.lblAlternarVista.Name = "lblAlternarVista";
+            this.lblAlternarVista.Size = new System.Drawing.Size(114, 21);
+            this.lblAlternarVista.TabIndex = 0;
+            this.lblAlternarVista.Text = "Ver calendario";
+            this.lblAlternarVista.MouseClick += new System.Windows.Forms.MouseEventHandler(this.btnAlternarVista_MouseClick);
+            // 
+            // cmbAnio
+            // 
+            this.cmbAnio.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.cmbAnio.BackColor = System.Drawing.Color.Honeydew;
+            this.cmbAnio.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.cmbAnio.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.cmbAnio.FormattingEnabled = true;
+            this.cmbAnio.Location = new System.Drawing.Point(520, 21);
+            this.cmbAnio.Name = "cmbAnio";
+            this.cmbAnio.Size = new System.Drawing.Size(104, 21);
+            this.cmbAnio.TabIndex = 3;
+            // 
             // panelCalendario
             // 
+            this.panelCalendario.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.panelCalendario.Controls.Add(this.tblCalendario);
             this.panelCalendario.Location = new System.Drawing.Point(68, 54);
             this.panelCalendario.Name = "panelCalendario";
@@ -196,6 +480,9 @@
             // 
             // tblCalendario
             // 
+            this.tblCalendario.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tblCalendario.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
             this.tblCalendario.ColumnCount = 7;
             this.tblCalendario.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 14.28571F));
@@ -247,7 +534,6 @@
             this.tblCalendario.Controls.Add(this.panel42, 6, 4);
             this.tblCalendario.Controls.Add(this.panel43, 5, 5);
             this.tblCalendario.Controls.Add(this.flowLayoutPanel1, 6, 5);
-            this.tblCalendario.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tblCalendario.Location = new System.Drawing.Point(0, 0);
             this.tblCalendario.Name = "tblCalendario";
             this.tblCalendario.RowCount = 6;
@@ -681,55 +967,11 @@
             this.flowLayoutPanel1.Size = new System.Drawing.Size(90, 65);
             this.flowLayoutPanel1.TabIndex = 48;
             // 
-            // cmbAnio
-            // 
-            this.cmbAnio.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.cmbAnio.BackColor = System.Drawing.Color.Honeydew;
-            this.cmbAnio.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.cmbAnio.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.cmbAnio.FormattingEnabled = true;
-            this.cmbAnio.Location = new System.Drawing.Point(520, 21);
-            this.cmbAnio.Name = "cmbAnio";
-            this.cmbAnio.Size = new System.Drawing.Size(104, 21);
-            this.cmbAnio.TabIndex = 3;
-            // 
-            // cmbMes
-            // 
-            this.cmbMes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.cmbMes.BackColor = System.Drawing.Color.Honeydew;
-            this.cmbMes.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.cmbMes.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cmbMes.FormattingEnabled = true;
-            this.cmbMes.Location = new System.Drawing.Point(657, 21);
-            this.cmbMes.Name = "cmbMes";
-            this.cmbMes.Size = new System.Drawing.Size(108, 21);
-            this.cmbMes.TabIndex = 2;
-            // 
-            // btnAlternarVista
-            // 
-            this.btnAlternarVista.Controls.Add(this.Icono);
-            this.btnAlternarVista.Controls.Add(this.lblAlternarVista);
-            this.btnAlternarVista.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnAlternarVista.Location = new System.Drawing.Point(46, 16);
-            this.btnAlternarVista.Name = "btnAlternarVista";
-            this.btnAlternarVista.Size = new System.Drawing.Size(233, 30);
-            this.btnAlternarVista.TabIndex = 1;
-            this.btnAlternarVista.MouseClick += new System.Windows.Forms.MouseEventHandler(this.btnAlternarVista_MouseClick);
-            // 
-            // lblAlternarVista
-            // 
-            this.lblAlternarVista.AutoSize = true;
-            this.lblAlternarVista.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.lblAlternarVista.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblAlternarVista.Location = new System.Drawing.Point(87, 4);
-            this.lblAlternarVista.Name = "lblAlternarVista";
-            this.lblAlternarVista.Size = new System.Drawing.Size(114, 21);
-            this.lblAlternarVista.TabIndex = 0;
-            this.lblAlternarVista.Text = "Ver calendario";
-            this.lblAlternarVista.MouseClick += new System.Windows.Forms.MouseEventHandler(this.btnAlternarVista_MouseClick);
-            // 
             // panelTareas
             // 
+            this.panelTareas.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.panelTareas.AutoScroll = true;
             this.panelTareas.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.panelTareas.Location = new System.Drawing.Point(46, 61);
@@ -738,240 +980,6 @@
             this.panelTareas.TabIndex = 0;
             this.panelTareas.WrapContents = false;
             this.panelTareas.Paint += new System.Windows.Forms.PaintEventHandler(this.panelTareas_Paint);
-            // 
-            // Icono
-            // 
-            this.Icono.BackgroundImage = global::Presentation.Properties.Resources.Calendario;
-            this.Icono.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.Icono.Location = new System.Drawing.Point(59, 5);
-            this.Icono.Name = "Icono";
-            this.Icono.Size = new System.Drawing.Size(20, 20);
-            this.Icono.TabIndex = 1;
-            this.Icono.MouseClick += new System.Windows.Forms.MouseEventHandler(this.btnAlternarVista_MouseClick);
-            // 
-            // btnRestaurar
-            // 
-            this.btnRestaurar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRestaurar.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnRestaurar.FlatAppearance.BorderSize = 0;
-            this.btnRestaurar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Silver;
-            this.btnRestaurar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
-            this.btnRestaurar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnRestaurar.Image = global::Presentation.Properties.Resources.btnRestaurar;
-            this.btnRestaurar.Location = new System.Drawing.Point(712, 2);
-            this.btnRestaurar.Name = "btnRestaurar";
-            this.btnRestaurar.Size = new System.Drawing.Size(30, 35);
-            this.btnRestaurar.TabIndex = 34;
-            this.btnRestaurar.UseVisualStyleBackColor = true;
-            this.btnRestaurar.Visible = false;
-            this.btnRestaurar.Click += new System.EventHandler(this.btnRestaurar_Click_1);
-            // 
-            // btnMaximizar
-            // 
-            this.btnMaximizar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnMaximizar.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnMaximizar.FlatAppearance.BorderSize = 0;
-            this.btnMaximizar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Silver;
-            this.btnMaximizar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
-            this.btnMaximizar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnMaximizar.Image = global::Presentation.Properties.Resources.icons8_maximize_window_50__1_;
-            this.btnMaximizar.Location = new System.Drawing.Point(711, 2);
-            this.btnMaximizar.Name = "btnMaximizar";
-            this.btnMaximizar.Size = new System.Drawing.Size(30, 35);
-            this.btnMaximizar.TabIndex = 33;
-            this.btnMaximizar.UseVisualStyleBackColor = true;
-            this.btnMaximizar.Click += new System.EventHandler(this.btnMaximizar_Click_1);
-            // 
-            // btnMinimizar
-            // 
-            this.btnMinimizar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnMinimizar.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnMinimizar.FlatAppearance.BorderSize = 0;
-            this.btnMinimizar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Silver;
-            this.btnMinimizar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
-            this.btnMinimizar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnMinimizar.Image = global::Presentation.Properties.Resources.btnMinimizar;
-            this.btnMinimizar.Location = new System.Drawing.Point(684, 8);
-            this.btnMinimizar.Name = "btnMinimizar";
-            this.btnMinimizar.Size = new System.Drawing.Size(23, 25);
-            this.btnMinimizar.TabIndex = 32;
-            this.btnMinimizar.UseVisualStyleBackColor = true;
-            this.btnMinimizar.Click += new System.EventHandler(this.btnMinimizar_Click_1);
-            // 
-            // btnClse
-            // 
-            this.btnClse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClse.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnClse.FlatAppearance.BorderSize = 0;
-            this.btnClse.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
-            this.btnClse.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
-            this.btnClse.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnClse.Image = global::Presentation.Properties.Resources.icons8_close_window_50__2_;
-            this.btnClse.Location = new System.Drawing.Point(746, 5);
-            this.btnClse.Name = "btnClse";
-            this.btnClse.Size = new System.Drawing.Size(28, 28);
-            this.btnClse.TabIndex = 31;
-            this.btnClse.UseVisualStyleBackColor = true;
-            this.btnClse.Click += new System.EventHandler(this.btnClse_Click);
-            // 
-            // btnMenu
-            // 
-            this.btnMenu.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnMenu.Image = global::Presentation.Properties.Resources.menu_hamburguesa;
-            this.btnMenu.Location = new System.Drawing.Point(3, 3);
-            this.btnMenu.Name = "btnMenu";
-            this.btnMenu.Size = new System.Drawing.Size(50, 38);
-            this.btnMenu.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.btnMenu.TabIndex = 29;
-            this.btnMenu.TabStop = false;
-            this.btnMenu.Click += new System.EventHandler(this.btnMenu_Click);
-            // 
-            // btnHome
-            // 
-            this.btnHome.BackColor = System.Drawing.Color.Green;
-            this.btnHome.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnHome.FlatAppearance.BorderSize = 0;
-            this.btnHome.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Green;
-            this.btnHome.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.btnHome.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnHome.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnHome.ForeColor = System.Drawing.Color.Honeydew;
-            this.btnHome.Image = global::Presentation.Properties.Resources.iconsHome;
-            this.btnHome.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnHome.Location = new System.Drawing.Point(0, 191);
-            this.btnHome.Name = "btnHome";
-            this.btnHome.Size = new System.Drawing.Size(210, 34);
-            this.btnHome.TabIndex = 50;
-            this.btnHome.Text = "Home";
-            this.btnHome.UseVisualStyleBackColor = false;
-            this.btnHome.Click += new System.EventHandler(this.btnHome_Click);
-            // 
-            // btnCalcular
-            // 
-            this.btnCalcular.FlatAppearance.BorderSize = 0;
-            this.btnCalcular.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.btnCalcular.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCalcular.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnCalcular.ForeColor = System.Drawing.Color.Honeydew;
-            this.btnCalcular.Image = global::Presentation.Properties.Resources.iconNote;
-            this.btnCalcular.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnCalcular.Location = new System.Drawing.Point(0, 403);
-            this.btnCalcular.Name = "btnCalcular";
-            this.btnCalcular.Size = new System.Drawing.Size(200, 40);
-            this.btnCalcular.TabIndex = 49;
-            this.btnCalcular.Text = "Note";
-            this.btnCalcular.UseVisualStyleBackColor = true;
-            this.btnCalcular.Click += new System.EventHandler(this.btnCalcular_Click);
-            // 
-            // btnChatBot
-            // 
-            this.btnChatBot.FlatAppearance.BorderSize = 0;
-            this.btnChatBot.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.btnChatBot.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnChatBot.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnChatBot.ForeColor = System.Drawing.Color.Honeydew;
-            this.btnChatBot.Image = global::Presentation.Properties.Resources.iconBt;
-            this.btnChatBot.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnChatBot.Location = new System.Drawing.Point(0, 347);
-            this.btnChatBot.Name = "btnChatBot";
-            this.btnChatBot.Size = new System.Drawing.Size(200, 40);
-            this.btnChatBot.TabIndex = 48;
-            this.btnChatBot.Text = "ChatBot";
-            this.btnChatBot.UseVisualStyleBackColor = true;
-            this.btnChatBot.Click += new System.EventHandler(this.btnChatBot_Click_1);
-            // 
-            // btnAddTask
-            // 
-            this.btnAddTask.BackColor = System.Drawing.Color.Green;
-            this.btnAddTask.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnAddTask.FlatAppearance.BorderSize = 0;
-            this.btnAddTask.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Green;
-            this.btnAddTask.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.btnAddTask.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAddTask.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnAddTask.ForeColor = System.Drawing.Color.Honeydew;
-            this.btnAddTask.Image = global::Presentation.Properties.Resources.iconPlus;
-            this.btnAddTask.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnAddTask.Location = new System.Drawing.Point(0, 241);
-            this.btnAddTask.Name = "btnAddTask";
-            this.btnAddTask.Size = new System.Drawing.Size(210, 34);
-            this.btnAddTask.TabIndex = 46;
-            this.btnAddTask.Text = "Add Task";
-            this.btnAddTask.UseVisualStyleBackColor = false;
-            this.btnAddTask.Click += new System.EventHandler(this.btnAddTask_Click);
-            // 
-            // btnLogout
-            // 
-            this.btnLogout.FlatAppearance.BorderSize = 0;
-            this.btnLogout.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.btnLogout.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnLogout.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnLogout.ForeColor = System.Drawing.Color.Honeydew;
-            this.btnLogout.Image = global::Presentation.Properties.Resources.iconOut2;
-            this.btnLogout.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnLogout.Location = new System.Drawing.Point(0, 515);
-            this.btnLogout.Name = "btnLogout";
-            this.btnLogout.Size = new System.Drawing.Size(210, 39);
-            this.btnLogout.TabIndex = 44;
-            this.btnLogout.UseVisualStyleBackColor = true;
-            this.btnLogout.Click += new System.EventHandler(this.btnLogout_Click);
-            // 
-            // btnProfile
-            // 
-            this.btnProfile.FlatAppearance.BorderSize = 0;
-            this.btnProfile.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.btnProfile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnProfile.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnProfile.ForeColor = System.Drawing.Color.Honeydew;
-            this.btnProfile.Image = global::Presentation.Properties.Resources.iconProfile;
-            this.btnProfile.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnProfile.Location = new System.Drawing.Point(0, 459);
-            this.btnProfile.Name = "btnProfile";
-            this.btnProfile.Size = new System.Drawing.Size(197, 40);
-            this.btnProfile.TabIndex = 43;
-            this.btnProfile.Text = "Profile";
-            this.btnProfile.UseVisualStyleBackColor = true;
-            this.btnProfile.Click += new System.EventHandler(this.btnProfile_Click);
-            // 
-            // btnTaskList
-            // 
-            this.btnTaskList.FlatAppearance.BorderSize = 0;
-            this.btnTaskList.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.btnTaskList.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnTaskList.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnTaskList.ForeColor = System.Drawing.Color.Honeydew;
-            this.btnTaskList.Image = global::Presentation.Properties.Resources.iconListTsk;
-            this.btnTaskList.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnTaskList.Location = new System.Drawing.Point(0, 291);
-            this.btnTaskList.Name = "btnTaskList";
-            this.btnTaskList.Size = new System.Drawing.Size(200, 40);
-            this.btnTaskList.TabIndex = 41;
-            this.btnTaskList.Text = "TaskList";
-            this.btnTaskList.UseVisualStyleBackColor = true;
-            this.btnTaskList.Click += new System.EventHandler(this.btnTaskList_Click);
-            // 
-            // picLogoCaptus
-            // 
-            this.picLogoCaptus.Image = global::Presentation.Properties.Resources.LogoCaptus2Main;
-            this.picLogoCaptus.Location = new System.Drawing.Point(34, 0);
-            this.picLogoCaptus.Name = "picLogoCaptus";
-            this.picLogoCaptus.Size = new System.Drawing.Size(132, 97);
-            this.picLogoCaptus.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.picLogoCaptus.TabIndex = 30;
-            this.picLogoCaptus.TabStop = false;
-            this.picLogoCaptus.Click += new System.EventHandler(this.picLogoCaptus_Click);
-            // 
-            // panel44
-            // 
-            this.panel44.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel44.Controls.Add(this.cmbMes);
-            this.panel44.Controls.Add(this.btnAlternarVista);
-            this.panel44.Controls.Add(this.cmbAnio);
-            this.panel44.Location = new System.Drawing.Point(0, 0);
-            this.panel44.Name = "panel44";
-            this.panel44.Size = new System.Drawing.Size(786, 52);
-            this.panel44.TabIndex = 4;
             // 
             // frmMain
             // 
@@ -990,8 +998,13 @@
             this.Load += new System.EventHandler(this.frmMain_Load);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picLogoCaptus)).EndInit();
             this.panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.btnMenu)).EndInit();
             this.panelContenedor.ResumeLayout(false);
+            this.panel44.ResumeLayout(false);
+            this.btnAlternarVista.ResumeLayout(false);
+            this.btnAlternarVista.PerformLayout();
             this.panelCalendario.ResumeLayout(false);
             this.tblCalendario.ResumeLayout(false);
             this.panel4.ResumeLayout(false);
@@ -1008,11 +1021,6 @@
             this.panel9.PerformLayout();
             this.panel10.ResumeLayout(false);
             this.panel10.PerformLayout();
-            this.btnAlternarVista.ResumeLayout(false);
-            this.btnAlternarVista.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.btnMenu)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.picLogoCaptus)).EndInit();
-            this.panel44.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }

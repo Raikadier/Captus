@@ -170,7 +170,7 @@ namespace Presentation
                 Font = new Font("Segoe UI", 10, FontStyle.Italic),
                 ForeColor = Color.DarkSlateGray,
                 AutoSize = true,
-                Location = new Point(500, 60)
+                Location = new Point(panel.Width-100, 60)
             };
             if (tarea.EndDate.Date >= DateTime.Now.Date)
             {
@@ -494,10 +494,11 @@ namespace Presentation
         private void btnProfile_Click(object sender, EventArgs e)
         {
 
-            LimpiarPanelContenedor();
-            panelTareas.Visible = false;
+            //LimpiarPanelContenedor();
+            //panelTareas.Visible = false;
             frmStats frmStats = new frmStats();
-            CargarFormularioEnPanel(frmStats);
+            //CargarFormularioEnPanel(frmStats);
+            frmStats.ShowDialog();
         }
 
         private void btnAddTask_Click(object sender, EventArgs e)
