@@ -41,18 +41,28 @@ CaptusGUI es una aplicación de escritorio moderna que combina la gestión de ta
 - Respuestas contextuales y personalizadas
 - Soporte para múltiples idiomas
 - Integración con OpenRouter API
+- Sistema de procesamiento de comandos JSON estructurado
+- Manejo de errores y validación de respuestas IA
+- Formato de respuesta estandarizado para todas las acciones
 
 ### 📝 Gestión de Tareas
 - Creación, actualización y eliminación de tareas
 - Categorización y priorización
 - Fechas límite y recordatorios
 - Notificaciones por correo electrónico
+- Extracción inteligente de fechas relativas (ej: "el 11 de este mes")
+- Validación automática de campos requeridos
+- Sistema de prioridades predefinidas (alta, media, baja)
+- Categorías predefinidas (universidad, trabajo, personal)
 
 ### 📊 Gestión Académica
 - Cálculo de notas y promedios
 - Seguimiento de materias
 - Historial académico
 - Reportes y estadísticas
+- Cálculo de promedios semestrales y acumulados
+- Gestión de notas por materia
+- Sistema de consulta de notas históricas
 
 ## 🚀 Comenzando
 
@@ -125,16 +135,53 @@ await NotifyEmails.SendNotifyAsync(
    - Interfaz de usuario (Windows Forms)
    - Controladores de eventos
    - Validación de entrada
+   - Sistema de notificaciones visuales
+   - Manejo de errores en la interfaz
 
 2. **Business Logic Layer (BLL)**
    - Lógica de negocio
    - Procesamiento de comandos
    - Integración con IA
+   - Sistema de procesamiento de comandos JSON
+   - Validación de datos y respuestas
+   - Manejo de errores y excepciones
+   - Procesamiento de fechas relativas
 
 3. **Data Access Layer (DAL)**
    - Acceso a base de datos
    - Operaciones CRUD
    - Manejo de transacciones
+   - Validación de integridad de datos
+   - Sistema de respaldo y recuperación
+
+### Componentes Principales
+1. **AIService**
+   - Integración con OpenRouter API
+   - Procesamiento de prompts
+   - Manejo de respuestas JSON
+   - Sistema de errores y reintentos
+   - Configuración de parámetros de IA
+
+2. **CommandProcessor**
+   - Procesamiento de comandos en lenguaje natural
+   - Validación de estructura JSON
+   - Extracción de datos relevantes
+   - Manejo de errores de parseo
+   - Sistema de respuestas estandarizadas
+
+3. **TaskManager**
+   - Gestión completa de tareas
+   - Validación de datos
+   - Sistema de prioridades
+   - Categorización automática
+   - Procesamiento de fechas
+
+4. **NotificationService**
+   - Sistema de notificaciones
+   - Envío de correos electrónicos
+   - Alertas visuales
+   - Programación de recordatorios
+   - Manejo de preferencias de notificación
 
 ### Diagrama de Arquitectura
 ```mermaid
@@ -152,6 +199,21 @@ graph TD
 OPENROUTER_KEY=tu_api_key
 SMTP_SERVER=tu_servidor_smtp
 SMTP_PORT=587
+AI_MODEL=deepseek/deepseek-chat-v3-0324:free
+AI_TEMPERATURE=0.2
+AI_MAX_TOKENS=500
+```
+
+### Configuración de IA
+```json
+{
+  "AISettings": {
+    "Model": "deepseek/deepseek-chat-v3-0324:free",
+    "Temperature": 0.2,
+    "MaxTokens": 500,
+    "SystemPrompt": "Eres Captus, un asistente de gestión de tareas..."
+  }
+}
 ```
 
 ### Configuración de Base de Datos
