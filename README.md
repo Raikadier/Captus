@@ -183,15 +183,6 @@ await NotifyEmails.SendNotifyAsync(
    - Programación de recordatorios
    - Manejo de preferencias de notificación
 
-### Diagrama de Arquitectura
-```mermaid
-graph TD
-    A[Presentation Layer] --> B[BLL]
-    B --> C[DAL]
-    B --> D[AI Service]
-    D --> E[OpenRouter API]
-```
-
 ## 🔧 Configuración
 
 ### Variables de Entorno
