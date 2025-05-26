@@ -20,7 +20,6 @@ namespace Presentation
         private readonly User _currentUser;
         private Form _suggestionForm;
         private bool _isShowingSuggestions = false;
-        private bool commandSelected = false;
         private System.Windows.Forms.Label lblThinking;
         private System.Windows.Forms.Timer thinkingTimer;
         private int thinkingDotCount = 0;
@@ -154,8 +153,11 @@ namespace Presentation
             _commandListBox.Items.Clear();
             foreach (var c in commands)
             {
+                // Extraer solo el nombre del comando de la string "Nombre del Comando: Descripción"
+                string commandName = c.Contains(':') ? c.Substring(0, c.IndexOf(':')).Trim() : c.Trim();
+
                 // Si el comando tiene icono, úsalo; si no, asigna uno por defecto
-                var icon = commandIcons.ContainsKey(c) ? commandIcons[c] : "⚡";
+                var icon = commandIcons.ContainsKey(commandName) ? commandIcons[commandName] : "⚡";
                 _commandListBox.Items.Add($"{icon} {c}");
             }
             if (_commandListBox.Items.Count > 0)
@@ -192,8 +194,10 @@ namespace Presentation
             if (_commandListBox.SelectedItem != null)
             {
                 string selected = _commandListBox.SelectedItem.ToString();
-                // Extraer el nombre del comando quitando el icono y espacios
-                string nombreComando = selected.Substring(selected.IndexOf(' ') + 1).Trim();
+                // Extraer el nombre del comando de la string "⚡ Nombre del Comando: Descripción"
+                // Ignorar el icono y la descripción, solo obtener el nombre del comando
+                string commandTextWithoutIcon = selected.Substring(selected.IndexOf(' ') + 1).Trim();
+                string nombreComando = commandTextWithoutIcon.Contains(':') ? commandTextWithoutIcon.Substring(0, commandTextWithoutIcon.IndexOf(':')).Trim() : commandTextWithoutIcon.Trim();
 
                 string plantilla;
                 switch (nombreComando)
@@ -236,7 +240,6 @@ namespace Presentation
                 txtMessage.SelectionLength = 0; // Asegurar que no haya texto seleccionado
 
                 HideCommandSuggestions();
-                commandSelected = true; // Indicar que se seleccionó un comando de la UI
                 isCommandFromUI = true; // Flag para saber si el comando viene de la mini ventana
                 txtMessage.Focus();
             }
@@ -288,16 +291,16 @@ namespace Presentation
                 {
 
                     // Mostrar los mensajes más nuevos primero
-                    foreach (var message in messages.OrderByDescending(m => m.SendDate))
+                    //foreach (var chatMessage in messages.OrderByDescending(m => m.SendDate))
 
-                    foreach (var message in messages.OrderBy(m => m.SendDate))
+                    foreach (var chatMessage in messages.OrderBy(m => m.SendDate))
 
                     {
-                        DisplayMessage(message);
+                        DisplayMessage(chatMessage);
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 frmMessageBox.Show("Error al cargar mensajes", "Error");
             }

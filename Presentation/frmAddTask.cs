@@ -335,10 +335,6 @@ namespace Presentation
                 {
                     MessageBox.Show($"❌ Error inesperado al guardar la tarea:\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                catch (Exception )
-                {
-                    frmMessageBox.Show("❌ Ocurrió un error al guardar la tarea", "Error");
-
                 }
             }
         }

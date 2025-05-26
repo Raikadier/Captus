@@ -1,0 +1,167 @@
+CAPTUSGUI - ASISTENTE INTELIGENTE DE GESTIÓN DE TAREAS Y NOTAS ACADÉMICAS
+=====================================================================
+
+¿QUÉ ES?
+--------
+CaptusGUI es una aplicación de escritorio moderna desarrollada en .NET que combina la gestión de tareas con inteligencia artificial. Es un asistente virtual que ayuda a los estudiantes universitarios a organizar sus tareas académicas, gestionar sus notas y mejorar su productividad a través de una interfaz intuitiva y comandos en lenguaje natural.
+
+¿PARA QUÉ ES?
+------------
+El proyecto está diseñado para:
+1. Simplificar la gestión de tareas diarias y académicas
+2. Proporcionar asistencia inteligente en la organización del tiempo
+3. Mejorar la productividad académica mediante el seguimiento de notas
+4. Ofrecer una experiencia de usuario excepcional con IA integrada
+5. Facilitar el cálculo y seguimiento de promedios académicos
+6. Gestionar categorías de tareas (universidad, trabajo, personal)
+7. Proporcionar notificaciones y recordatorios inteligentes
+
+¿POR QUÉ ES?
+-----------
+El proyecto surge de la necesidad de:
+1. Centralizar la gestión de tareas académicas en una sola aplicación
+2. Aprovechar la IA para procesar comandos en lenguaje natural
+3. Automatizar el seguimiento de notas y promedios
+4. Reducir la carga mental de los estudiantes en la organización
+5. Proporcionar una herramienta moderna y eficiente para la gestión académica
+6. Facilitar la toma de decisiones basada en datos académicos
+
+¿DÓNDE ES?
+---------
+El proyecto está desarrollado para:
+1. Entorno Windows (10/11)
+2. Requiere .NET Framework 4.7.2 o superior
+3. Se integra con OpenRouter API para funcionalidades de IA
+4. Utiliza SQL Server para el almacenamiento de datos
+5. Puede ser ejecutado en cualquier computadora con los requisitos mínimos
+
+¿CÓMO ES?
+---------
+Arquitectura:
+1. Presentation Layer (Interfaz de Usuario)
+   - Desarrollada en Windows Forms
+   - Interfaz gráfica moderna y responsiva
+   - Sistema de notificaciones visuales
+   - Manejo de errores en la interfaz
+
+2. Business Logic Layer (BLL)
+   - Procesamiento de comandos en lenguaje natural
+   - Integración con IA a través de OpenRouter
+   - Validación de datos y respuestas
+   - Manejo de lógica de negocio
+
+3. Data Access Layer (DAL)
+   - Gestión de base de datos SQL Server
+   - Operaciones CRUD para tareas y notas
+   - Manejo de transacciones
+   - Sistema de respaldo
+
+Componentes Principales:
+1. AIService
+   - Integración con OpenRouter API
+   - Procesamiento de prompts
+   - Manejo de respuestas JSON
+   - Sistema de errores y reintentos
+
+2. CommandProcessor
+   - Procesamiento de comandos naturales
+   - Validación de estructura JSON
+   - Extracción de datos relevantes
+   - Manejo de errores de parseo
+
+3. TaskManager
+   - Gestión completa de tareas
+   - Validación de datos
+   - Sistema de prioridades
+   - Categorización automática
+
+4. NotificationService
+   - Sistema de notificaciones
+   - Envío de correos electrónicos
+   - Alertas visuales
+   - Programación de recordatorios
+
+Características Técnicas:
+1. Integración con IA
+   - Modelo: deepseek/deepseek-chat-v3-0324:free
+   - Temperatura: 0.2
+   - Máximo de tokens: 500
+   - Procesamiento de lenguaje natural
+
+2. Seguridad
+   - Encriptación AES-256
+   - Autenticación de dos factores
+   - Sesiones seguras con JWT
+   - Protección contra ataques comunes
+
+3. Base de Datos
+   - SQL Server 2019+
+   - Transacciones ACID
+   - Backups automáticos
+   - Validación de integridad
+
+4. Interfaz de Usuario
+   - Diseño moderno y minimalista
+   - Navegación intuitiva
+   - Feedback visual inmediato
+   - Modo oscuro/claro
+
+Comandos Principales:
+1. Gestión de Tareas
+   - @Captus crea una tarea [nombre]
+   - @Captus actualiza la tarea [nombre]
+   - @Captus elimina la tarea [nombre]
+   - @Captus muestra mis tareas pendientes
+
+2. Gestión Académica
+   - @Captus calcula mi promedio
+   - @Captus agrega nota [valor] en [materia]
+   - @Captus consulta mis notas
+   - @Captus muestra mi historial académico
+
+Requisitos del Sistema:
+1. Hardware
+   - Procesador: 1.6 GHz o superior
+   - RAM: 4 GB mínimo
+   - Espacio en disco: 500 MB
+
+2. Software
+   - Windows 10/11
+   - .NET Framework 4.7.2+
+   - SQL Server 2019+
+   - Conexión a Internet
+
+3. Dependencias
+   - OpenRouter API Key
+   - Servidor SMTP para notificaciones
+   - Permisos de administrador para instalación
+
+Instalación:
+1. Clonar repositorio
+2. Restaurar paquetes NuGet
+3. Configurar variables de entorno
+4. Compilar y ejecutar
+
+Mantenimiento:
+1. Actualizaciones automáticas
+2. Logs de sistema
+3. Backups diarios
+4. Monitoreo de rendimiento
+
+Contribución:
+1. Fork del proyecto
+2. Crear rama de características
+3. Commit de cambios
+4. Pull Request
+
+Licencia:
+- MIT License
+- Código abierto
+- Libre para uso y modificación
+- Atribución requerida
+
+Contacto:
+- Email: captus@example.com
+- GitHub: github.com/CaptusGUI
+- Discord: discord.gg/captusgui
+- LinkedIn: linkedin.com/company/captusgui 

@@ -92,5 +92,10 @@ namespace Presentation
             txtOutput.SelectionStart = txtOutput.Text.Length;
             txtOutput.ScrollToCaret();
         }
+
+        private void frmCommandWindow_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 } 

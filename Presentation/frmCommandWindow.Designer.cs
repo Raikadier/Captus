@@ -28,10 +28,18 @@ namespace Presentation
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            this.SuspendLayout();
+            // 
+            // frmCommandWindow
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(600, 400);
+            this.Name = "frmCommandWindow";
             this.Text = "Captus - Ventana de Comandos";
+            this.Load += new System.EventHandler(this.frmCommandWindow_Load);
+            this.ResumeLayout(false);
+
         }
 
         #endregion
