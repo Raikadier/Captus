@@ -286,8 +286,12 @@ namespace Presentation
                 var messages = _chatLogic.GetAllMessages();
                 if (messages != null)
                 {
+
                     // Mostrar los mensajes más nuevos primero
                     foreach (var message in messages.OrderByDescending(m => m.SendDate))
+
+                    foreach (var message in messages.OrderBy(m => m.SendDate))
+
                     {
                         DisplayMessage(message);
                     }
@@ -295,7 +299,7 @@ namespace Presentation
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al cargar mensajes: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                frmMessageBox.Show("Error al cargar mensajes", "Error");
             }
         }
 

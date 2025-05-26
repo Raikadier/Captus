@@ -38,7 +38,7 @@ namespace Presentation
         {
             if (string.IsNullOrWhiteSpace(txtValideCode.Text))
             {
-                MessageBox.Show("Ingrese el código enviado a su correo.");
+                frmMessageBox.Show("Ingrese el código enviado a su correo","Validar codigo");
                 return;
             }
 

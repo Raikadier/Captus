@@ -24,9 +24,9 @@ namespace Presentation
         int step = 7; // velocidad de animación
         private readonly StatisticsLogic statisticsLogic;
         private readonly TaskLogic taskLogic;
-
-
-
+        HashSet<DateTime> fechasConTareas = new HashSet<DateTime>();
+        Panel panelTareasCalendario = new Panel();
+        List<ENTITY.Task> listaTareas = new List<ENTITY.Task>();
         public frmMain()
         {
             InitializeComponent();
@@ -35,15 +35,41 @@ namespace Presentation
             taskLogic = new TaskLogic(Configuration.ConnectionString);
             statisticsLogic = new StatisticsLogic();
             statisticsLogic.VerificarRacha();
+            this.WindowState = FormWindowState.Maximized;
             MostrarTareasAgrupadas();
+            cmbAnio.Visible = false;
+            cmbMes.Visible = false;
+            panelCalendario.Visible = false;
+            panelTareas.Visible = true;
+            panelTareasCalendario.BackColor = Color.White;
+            panelTareasCalendario.BorderStyle = BorderStyle.FixedSingle;
+            panelTareasCalendario.Size = new Size(200, 150);
+            panelTareasCalendario.Visible = false;
+            panelTareasCalendario.AutoScroll = true;
+            panelTareasCalendario.AutoSize = true;
+            this.Controls.Add(panelTareasCalendario);
+            this.MouseDown += OcultarPanelTareas;
+            panelTareasCalendario.Padding = new Padding(10);
+            panelTareasCalendario.BringToFront();
+            // También lo puedes hacer para cada control contenedor (como el calendario)
+            foreach (Control ctrl in this.Controls)
+            {
+                ctrl.MouseDown += OcultarPanelTareas;
 
+                // Y si tienes paneles anidados:
+                foreach (Control child in ctrl.Controls)
+                    child.MouseDown += OcultarPanelTareas;
+            }
         }
-
+        private void OcultarPanelTareas(object sender, MouseEventArgs e)
+        {
+            if (!panelTareasCalendario.Bounds.Contains(PointToClient(MousePosition)))
+                panelTareasCalendario.Visible = false;
+        }
         [DllImport("user32.dll", EntryPoint = "ReleaseCapture")]
         private extern static void ReleaseCapture();
         [DllImport("user32.dll", EntryPoint = "SendMessage")]
         private extern static void SendMessage(System.IntPtr hwnd, int wmsg, int wparam, int lparam);
-
         private void Form1_Resize(object sender, EventArgs e)
         {
             if (this.WindowState == FormWindowState.Maximized)
@@ -144,7 +170,7 @@ namespace Presentation
                 Font = new Font("Segoe UI", 10, FontStyle.Italic),
                 ForeColor = Color.DarkSlateGray,
                 AutoSize = true,
-                Location = new Point(500, 60)
+                Location = new Point(panel.Width-100, 60)
             };
             if (tarea.EndDate.Date >= DateTime.Now.Date)
             {
@@ -376,18 +402,6 @@ namespace Presentation
                 (panel1.Width - label1.PreferredWidth) / 2,
                 picLogoCaptus.Bottom + 10 // justo debajo del logo
             );
-
-            //// Ajustar label de los botones
-            //txtTaskList.Font = new Font("Segoe UI", panel1.Width >= expandedWidth ? 12 : 8, FontStyle.Bold);
-            //txtTaskList.Visible = panel1.Width >= expandedWidth;
-            //txtTaskList.Location = new Point(
-            //    (panel1.Width - txtTaskList.PreferredWidth) / 2,
-            //    picLogoCaptus.Bottom + 5 // justo debajo del logo
-            //);
-
-            
-
-
         }
 
         //private void UpdatePanelContent(bool expanded)
@@ -448,6 +462,8 @@ namespace Presentation
         {
             LimpiarPanelContenedor();
             panelTareas.Visible = true;
+            btnAlternarVista.Visible = true;
+            panelContenedor.Controls.Add(btnAlternarVista);
             panelContenedor.Controls.Add(panelTareas);
             MostrarTareasAgrupadas();
         }
@@ -478,10 +494,11 @@ namespace Presentation
         private void btnProfile_Click(object sender, EventArgs e)
         {
 
-            LimpiarPanelContenedor();
-            panelTareas.Visible = false;
+            //LimpiarPanelContenedor();
+            //panelTareas.Visible = false;
             frmStats frmStats = new frmStats();
-            CargarFormularioEnPanel(frmStats);
+            //CargarFormularioEnPanel(frmStats);
+            frmStats.ShowDialog();
         }
 
         private void btnAddTask_Click(object sender, EventArgs e)
@@ -490,14 +507,6 @@ namespace Presentation
             frmAddTask addtaskForm = new frmAddTask();
             addtaskForm.ShowDialog();
         }
-
-        //private void btnChatBot_Click(object sender, EventArgs e)
-        //{
-        //    LimpiarPanelContenedor();
-        //    panelTareas.Visible = false;
-        //    FrmBot bot = new FrmBot();
-        //    CargarFormularioEnPanel(bot);
-        //}
 
         private void btnChatBot_Paint(object sender, PaintEventArgs e)
         {
@@ -581,6 +590,212 @@ namespace Presentation
             frmHome homeForm = new frmHome();
             CargarFormularioEnPanel(homeForm);
 
+        }
+
+        private void btnAlternarVista_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (panelCalendario.Visible)
+            {
+                panelCalendario.Visible = false;
+                panelTareas.Visible = true;
+                lblAlternarVista.Text = "Ver calendario";
+                Icono.BackgroundImage = Properties.Resources.Calendario;
+                cmbAnio.Visible = false;
+                cmbMes.Visible = false;
+                tblCalendario.Visible = false;
+            }
+            else
+            {
+                panelCalendario.Visible = true;
+                panelTareas.Visible = false;
+                tblCalendario.Visible = true;
+                lblAlternarVista.Text = "Ver lista";
+                Icono.BackgroundImage = Properties.Resources.Lista;
+                panelContenedor.Controls.Add(panelCalendario);
+                panelContenedor.Controls.Add(cmbAnio);
+                panelContenedor.Controls.Add(cmbMes);
+                cmbAnio.Visible = true;
+                cmbMes.Visible = true;
+                InicializarCombos();
+                GenerarCalendario();
+            }
+        }
+        private void GenerarCalendario()
+        {
+            if (cmbMes.SelectedIndex == -1 || cmbAnio.SelectedItem == null)
+                return;
+
+            tblCalendario.SuspendLayout(); // Mejora visual
+
+            int mes = cmbMes.SelectedIndex + 1;
+            int anio = (int)cmbAnio.SelectedItem;
+            DateTime primerDia = new DateTime(anio, mes, 1);
+            int diasEnMes = DateTime.DaysInMonth(anio, mes);
+            int diaInicio = (int)primerDia.DayOfWeek;
+
+            // Ajustar para que el lunes sea 0
+            diaInicio = (diaInicio == 0) ? 6 : diaInicio - 1;
+
+            int dia = 1;
+
+            // Limpiar contenido de las celdas (desde fila 1)
+            for (int fila = 1; fila < tblCalendario.RowCount; fila++)
+            {
+                for (int col = 0; col < tblCalendario.ColumnCount; col++)
+                {
+                    Control celda = tblCalendario.GetControlFromPosition(col, fila);
+                    if (celda is Panel panel)
+                    {
+                        panel.Controls.Clear();
+                        panel.BackColor = Color.Honeydew; 
+                    }
+                    else if (celda != null)
+                    {
+                        tblCalendario.Controls.Remove(celda);
+                        celda.BackColor = Color.Honeydew;
+                        celda.Dispose();
+                    }
+                }
+            }
+
+            // Llenar calendario con los días del mes
+            for (int i = diaInicio; dia <= diasEnMes; i++)
+            {
+                int fila = (i / 7) + 1;
+                int col = i % 7;
+
+                Panel celda = tblCalendario.GetControlFromPosition(col, fila) as Panel;
+
+                if (celda == null)
+                {
+                    celda = new Panel
+                    {
+                        BackColor = Color.Honeydew,
+                        BorderStyle = BorderStyle.FixedSingle,
+                        Dock = DockStyle.Fill,
+                        Margin = new Padding(1)
+                    };
+                    tblCalendario.Controls.Add(celda, col, fila);
+                }
+                else
+                {
+                    celda.Controls.Clear();
+                }
+
+                Label lblDia = new Label
+                {
+                    Text = dia.ToString(),
+                    AutoSize = true,
+                    Location = new Point(5, 5),
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold)
+                };
+
+                celda.Controls.Add(lblDia);
+                celda.Tag = new DateTime(anio, mes, dia);
+                DateTime fechaActual = new DateTime(anio, mes, dia);
+                var tareasPendientes = taskLogic.GetTaskIncompletedByUser();
+                var tareasDelDia = tareasPendientes.Where(t => t.EndDate.Date == fechaActual.Date).ToList();
+                if (tareasDelDia.Any())
+                {
+                    celda.BackColor = Color.LightBlue;
+
+                    Label lblTareas = new Label
+                    {
+                        Text = $"• {tareasDelDia.Count} tarea(s)",
+                        AutoSize = true,
+                        Location = new Point(5, 25),
+                        Font = new Font("Segoe UI", 9),
+                        ForeColor = Color.DarkBlue
+                    };
+                    fechasConTareas.Add(fechaActual);
+                    celda.Controls.Add(lblTareas);
+                    ToolTip toolTip = new ToolTip();
+                    string textoTareas = string.Join(Environment.NewLine, tareasDelDia.Select(t => "• " + t.Title));
+                    toolTip.SetToolTip(celda, textoTareas);
+                }
+                celda.MouseEnter += (s, e) => {
+                    celda.BackColor = Color.White;
+                };
+                celda.MouseLeave += (s, e) => {
+                    DateTime fechaCelda = (DateTime)celda.Tag;
+                    if (!fechasConTareas.Contains(fechaCelda))
+                        celda.BackColor = Color.Honeydew;
+                    else
+                        celda.BackColor = Color.LightBlue;
+                };
+                celda.Click += (s, e) =>
+                {
+                    DateTime fecha = (DateTime)celda.Tag;
+                    List<ENTITY.Task> tareas = ObtenerTareas(fecha);
+                    if (tareas.Count == 0)
+                        return;
+
+                    panelTareasCalendario.Controls.Clear();
+
+                    Label titulo = new Label();
+                    titulo.Text = $"Tareas del {fecha:dd/MM/yyyy}";
+                    titulo.Font = new Font("Segoe UI", 10, FontStyle.Bold);
+                    titulo.Dock = DockStyle.Top;
+                    panelTareasCalendario.Controls.Add(titulo);
+                    int y =35;
+                    // Agregar tareas como Labels
+                    foreach (var tarea in tareas)
+                    {
+                        Label lbl = new Label();
+                        lbl.Text = "• " + tarea.Title;
+                        lbl.AutoSize = true;
+                        lbl.Location = new Point(5, y);
+                        lbl.Font = new Font("Segoe UI", 11, FontStyle.Regular);
+                        panelTareasCalendario.Controls.Add(lbl);
+                        y += lbl.Height + 5;
+                    }
+
+                    // Posicionar el panel cerca de la celda
+                    Point pos = celda.PointToScreen(Point.Empty);
+                    pos = this.PointToClient(pos);
+                    panelTareasCalendario.Location = new Point(pos.X + celda.Width + 5, pos.Y);
+                    //panelTareasCalendario.Location = new Point(pos.X + 80, pos.Y + 10);
+                    panelTareasCalendario.BringToFront();
+                    panelTareasCalendario.Visible = true;
+                };
+                
+                celda.Cursor = Cursors.Hand;
+                dia++;
+            }
+            tblCalendario.ResumeLayout(); // Reanuda redibujo
+        }
+        public List<ENTITY.Task> ObtenerTareas(DateTime fecha)
+        {
+            return taskLogic.GetTaskIncompletedByUser()
+                .Where(t => t.EndDate.Date == fecha.Date)
+                .ToList();
+        }
+        private void InicializarCombos()
+        {
+            // Cargar meses
+            cmbMes.Items.Clear();
+            for (int i = 1; i <= 12; i++)
+            {
+                cmbMes.Items.Add(CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i));
+            }
+            cmbMes.SelectedIndex = DateTime.Now.Month - 1;
+
+            // Cargar años (5 hacia atrás y 5 adelante)
+            cmbAnio.Items.Clear();
+            int anioActual = DateTime.Now.Year;
+            for (int i = anioActual - 5; i <= anioActual + 5; i++)
+            {
+                cmbAnio.Items.Add(i);
+            }
+            cmbAnio.SelectedItem = anioActual;
+
+            cmbMes.SelectedIndexChanged += (sender, e) => GenerarCalendario();
+            cmbAnio.SelectedIndexChanged += (sender, e) => GenerarCalendario();
+        }
+
+        private void tblCalendario_Layout(object sender, LayoutEventArgs e)
+        {
+            //GenerarEncabezados();
         }
     }
 }

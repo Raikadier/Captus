@@ -345,6 +345,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="LogoCaptus2.ico" />
+
     <Content Include="Resources\Bot.png" />
     <Content Include="Resources\IconChat.png" />
     <Content Include="Resources\IconRefresh.png" />
@@ -352,6 +353,12 @@
     <Content Include="Resources\LOGOCaptus-removebg-preview.png" />
     <Content Include="Resources\LogoCaptus2.ico" />
     <Content Include="Resources\LogoCaptusGris-removebg-preview.png" />
+
+    <None Include="Resources\LogoCaptus2Main.png" />
+    <None Include="Resources\LogoCaptusAddTask.png" />
+    <None Include="Resources\Lista.png" />
+    <None Include="Resources\Calendario.png" />
+
     <None Include="Resources\iconsHome.png" />
     <None Include="Resources\iconSpeech.png" />
     <None Include="Resources\iconNote.png" />

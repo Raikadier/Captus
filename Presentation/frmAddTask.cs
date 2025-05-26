@@ -1,4 +1,4 @@
-﻿using BLL;
+using BLL;
 using ENTITY;
 using System;
 using System.Collections.Generic;
@@ -193,7 +193,7 @@ namespace Presentation
 
             if (string.IsNullOrEmpty(titulo))
             {
-                MessageBox.Show("El título es obligatorio.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                frmMessageBox.Show("El título es obligatorio.", "Validación");
                 return false;
             }
             if (cbPriority.SelectedValue == null || cbCategories.SelectedValue == null)
@@ -306,16 +306,23 @@ namespace Presentation
                     var result = taskLogic.Save(nuevaTarea);
                     if (result.Success)
                     {
+
                         await BLL.NotificationService.Instance.SendTaskNotificationAsync(nuevaTarea, "creada");
                         MessageBox.Show("✅ Tarea agregada exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                        string mensaje = NotifyEmails.GetMessageInsert(nuevaTarea.Title, nuevaTarea.EndDate.ToShortDateString(), nuevaTarea.Category.Name);
+                        await NotifyEmails.SendNotifyAsync(Session.CurrentUser.Email, "Nueva tarea asignada", mensaje);
+                        frmMessageBox.Show("✅ Tarea agregada exitosamente", "Exito");
+
                         Clean();
                         this.Dispose();
                     }
                     else
                     {
-                        MessageBox.Show(result.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        frmMessageBox.Show(result.Message, "Error");
                     }
                 }
+
                 catch (InvalidOperationException ex)
                 {
                     MessageBox.Show($"Error de sesión: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -327,6 +334,11 @@ namespace Presentation
                 catch (Exception ex)
                 {
                     MessageBox.Show($"❌ Error inesperado al guardar la tarea:\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                catch (Exception )
+                {
+                    frmMessageBox.Show("❌ Ocurrió un error al guardar la tarea", "Error");
+
                 }
             }
         }

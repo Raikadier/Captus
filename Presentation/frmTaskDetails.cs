@@ -79,12 +79,12 @@ namespace Presentation
             if (task.EndDate == DateTime.Today)
             {
                 dtpFecha.Format = DateTimePickerFormat.Custom;
-                dtpFecha.CustomFormat = "Hoy";
+                dtpFecha.CustomFormat = "\"Hoy\"";
             }
             else if (task.EndDate ==DateTime.Today.AddDays(1))
             {
                     dtpFecha.Format = DateTimePickerFormat.Custom;
-                    dtpFecha.CustomFormat = "Mañana";
+                    dtpFecha.CustomFormat = "\"Mañana\"";
             }
             else
             {
@@ -120,12 +120,12 @@ namespace Presentation
                 {
                     string mensaje = NotifyEmails.GetMessageDelete(task.Title);
                     await NotifyEmails.SendNotifyAsync(Session.CurrentUser.Email, "Tarea eliminada", mensaje);
-                    MessageBox.Show("Tarea eliminada.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    frmMessageBox.Show("Tarea eliminada.", "Éxito");
                     this.Close();
                 }
                 else
                 {
-                    MessageBox.Show(result.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    frmMessageBox.Show(result.Message, "Error");
                 }
                 
             }
@@ -140,7 +140,7 @@ namespace Presentation
         {
             if (string.IsNullOrWhiteSpace(rtxtTitle.Text))
             {
-                MessageBox.Show("El título no puede estar vacío.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                frmMessageBox.Show("El título no puede estar vacío.", "Advertencia");
                 return;
             }
             string titulo = rtxtTitle.Text.Trim();
@@ -156,12 +156,12 @@ namespace Presentation
             var result = taskLogic.Update(task);
             if (!result.Success)
             {
-                MessageBox.Show(result.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                frmMessageBox.Show(result.Message, "Error");
                 return;
             }
             string mensaje = NotifyEmails.GetMessageUpdate(task.Title, task.EndDate.ToShortDateString(), task.Category.Name);
             await NotifyEmails.SendNotifyAsync(Session.CurrentUser.Email, "Tarea actualizada", mensaje);
-            MessageBox.Show("Tarea actualizada exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            frmMessageBox.Show("Tarea actualizada.", "Éxito");
             this.Close();
         }
 
