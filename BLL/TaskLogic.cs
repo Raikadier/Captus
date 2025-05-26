@@ -311,5 +311,61 @@ namespace BLL
         {
             _taskDAL.DeleteTask(taskId);
         }
+
+        public OperationResult CreateAndSaveTask(string titulo, string descripcion, DateTime fecha, string prioridadTexto, string categoriaTexto, User usuario, out ENTITY.Task nuevaTarea)
+        {
+            try
+            {
+                // Valores por defecto como en el flujo antiguo
+                int prioridadId = 1; // Baja
+                int categoriaId = 1; // General
+
+                var priorityService = new PriorityLogic();
+                var categoryService = new CategoryLogic();
+
+                // Intentar convertir texto a IDs si se proporcionan
+                if (!string.IsNullOrEmpty(prioridadTexto))
+                {
+                    var priority = priorityService.GetAll().FirstOrDefault(p => p.Name.ToLower() == prioridadTexto.ToLower());
+                    if (priority != null)
+                        prioridadId = priority.Id_Priority;
+                }
+
+                if (!string.IsNullOrEmpty(categoriaTexto))
+                {
+                    var category = categoryService.GetAll().FirstOrDefault(c => c.Name.ToLower() == categoriaTexto.ToLower());
+                    if (category != null)
+                        categoriaId = category.id;
+                }
+
+                nuevaTarea = new ENTITY.Task
+                {
+                    Title = titulo,
+                    Description = descripcion,
+                    CreationDate = DateTime.Now,
+                    EndDate = fecha,
+                    Id_Priority = prioridadId,
+                    Id_Category = categoriaId,
+                    State = false,
+                    Id_User = usuario.id
+                };
+
+                // Usar _taskDAL.InsertTask como en el flujo antiguo
+                _taskDAL.InsertTask(nuevaTarea);
+
+                // Después de insertar, cargar los objetos Category y Priority para la notificación
+                // Es importante usar el ID que se guardó en la DB (que puede ser el por defecto o el convertido)
+                nuevaTarea.Category = categoryService.GetById(nuevaTarea.Id_Category);
+                nuevaTarea.Priority = priorityService.GetById(nuevaTarea.Id_Priority);
+                nuevaTarea.User = usuario; // También asignar el usuario
+
+                return new OperationResult { Success = true, Message = "Tarea creada exitosamente." };
+            }
+            catch (Exception ex)
+            {
+                nuevaTarea = null;
+                return new OperationResult { Success = false, Message = $"Error al crear la tarea: {ex.Message}" };
+            }
+        }
     }
 }

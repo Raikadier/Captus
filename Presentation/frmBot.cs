@@ -26,6 +26,7 @@ namespace Presentation
         private int thinkingDotCount = 0;
         private ListBox _commandListBox; // Guardar referencia para eventos de teclado
         private bool isSendingMessage = false; // Flag para evitar envíos simultáneos
+        private bool isCommandFromUI = false; // Flag para saber si el comando viene de la mini ventana
 
         // Diccionario de iconos por comando
         private readonly Dictionary<string, string> commandIcons = new Dictionary<string, string>
@@ -39,7 +40,7 @@ namespace Presentation
         };
 
         // Constante para el texto del placeholder
-        private const string PlaceholderText = "Usa @ para ver comandos rápidos";
+        private const string PlaceholderText = "Escribe / para abrir los comandos o usa @Captus para pedir a Captus";
         private const string CaptusPlaceholder = "Para usar comandos, llama a @Captus";
 
         // --- PERSONALIZACIÓN DE MENSAJES Y FIX DE CRASH ---
@@ -54,8 +55,7 @@ namespace Presentation
         {
             InitializeComponent();
 
-            //_aiService = new AIService("YOUR_API_KEY_HERE");
-            _aiService = new AIService("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"); 
+            _aiService = new AIService(ENTITY.Configuration.OpenRouterKey);
 
             _chatLogic = new ChatLogic(_aiService);
             _commandProcessor = new CommandProcessor();
@@ -109,14 +109,16 @@ namespace Presentation
         private void TxtMessage_TextChanged(object sender, EventArgs e)
         {
             string text = txtMessage.Text;
-            if (text.StartsWith("@") && !_isShowingSuggestions && !commandSelected && txtMessage.Focused)
+            // Trigger de comandos con '/'
+            if (text == "/" && !_isShowingSuggestions)
             {
                 ShowCommandSuggestions();
             }
-            else if (_isShowingSuggestions && (!text.StartsWith("@") || commandSelected || !txtMessage.Focused))
+            else if (_isShowingSuggestions && !text.StartsWith("/"))
             {
                 HideCommandSuggestions();
             }
+            // El color parcial para @Captus se omite porque TextBox no lo soporta
         }
 
         private void ShowCommandSuggestions()
@@ -152,8 +154,9 @@ namespace Presentation
             _commandListBox.Items.Clear();
             foreach (var c in commands)
             {
-                var icon = commandIcons.ContainsKey(c.Name) ? commandIcons[c.Name] : "⚡";
-                _commandListBox.Items.Add($"{icon} {c.Name}");
+                // Si el comando tiene icono, úsalo; si no, asigna uno por defecto
+                var icon = commandIcons.ContainsKey(c) ? commandIcons[c] : "⚡";
+                _commandListBox.Items.Add($"{icon} {c}");
             }
             if (_commandListBox.Items.Count > 0)
                 _commandListBox.SelectedIndex = 0;
@@ -189,18 +192,52 @@ namespace Presentation
             if (_commandListBox.SelectedItem != null)
             {
                 string selected = _commandListBox.SelectedItem.ToString();
-                // Plantillas con formato y ejemplos claros para el usuario
-                string plantilla = selected.Contains("Crear Tarea") ? "@Captus crear tarea [nombre de la tarea] para [fecha: yyyy-mm-dd] prioridad [alta|media|baja] categoría [universidad|trabajo|personal]" :
-                                  selected.Contains("Actualizar Tarea") ? "@Captus actualizar tarea [id: numérico o nombre] [nuevo nombre] para [nueva fecha: yyyy-mm-dd] prioridad [alta|media|baja] categoría [universidad|trabajo|personal]" :
-                                  selected.Contains("Eliminar Tarea") ? "@Captus eliminar tarea [id: numérico o nombre de la tarea]" :
-                                  selected.Contains("Consultar Tareas") ? "@Captus consultar tareas [filtro: hoy|esta semana|prioridad alta|categoría universidad]" :
-                                  selected.Contains("Calcular Nota") ? "@Captus calcular nota [materia] con [notas: 4.5,3.2,5.0]" :
-                                  selected.Contains("Calcular Promedio") ? "@Captus calcular promedio [semestral|acumulado]" :
-                                  "@Captus comando [parámetros]";
+                // Extraer el nombre del comando quitando el icono y espacios
+                string nombreComando = selected.Substring(selected.IndexOf(' ') + 1).Trim();
+
+                string plantilla;
+                switch (nombreComando)
+                {
+                    case "Crear Tarea":
+                        plantilla = "crear tarea [título] descripción [descripción] para [fecha YYYY-MM-DD] prioridad [alta|media|baja] categoría [universidad|trabajo|personal]";
+                        break;
+                    case "Actualizar Tarea":
+                        plantilla = "actualizar tarea [id] título [nuevo título] descripción [nueva descripción] para [nueva fecha YYYY-MM-DD] prioridad [nueva prioridad alta|media|baja] categoría [nueva categoría universidad|trabajo|personal]";
+                        break;
+                    case "Eliminar Tarea":
+                        plantilla = "eliminar tarea [id]";
+                        break;
+                    case "Consultar Tareas":
+                        plantilla = "consultar tareas [filtro opcional]";
+                        break;
+                    case "Calcular Nota":
+                         plantilla = "calcular nota [materia] con [notas separadas por coma]";
+                         break;
+                    case "Calcular Promedio":
+                         plantilla = "calcular promedio [semestral|acumulado]";
+                         break;
+                    default:
+                        plantilla = "Escribe un comando válido o selecciona una opción de la lista.";
+                        break;
+                }
+
                 txtMessage.Text = plantilla;
-                txtMessage.SelectionStart = plantilla.IndexOf('[') >= 0 ? plantilla.IndexOf('[') : plantilla.Length;
+                // Posicionar el cursor al inicio del primer parámetro esperado (el primer '[')
+                int primerCorchete = plantilla.IndexOf('[');
+                if (primerCorchete >= 0)
+                {
+                    txtMessage.SelectionStart = primerCorchete;
+                }
+                else
+                {
+                    // Si no hay corchetes, posicionar al final del texto.
+                    txtMessage.SelectionStart = plantilla.Length;
+                }
+                txtMessage.SelectionLength = 0; // Asegurar que no haya texto seleccionado
+
                 HideCommandSuggestions();
-                commandSelected = true;
+                commandSelected = true; // Indicar que se seleccionó un comando de la UI
+                isCommandFromUI = true; // Flag para saber si el comando viene de la mini ventana
                 txtMessage.Focus();
             }
         }
@@ -262,34 +299,18 @@ namespace Presentation
             }
         }
 
-        private void DisplayMessage(ChatMessage message)
+        private void DisplayMessage(ChatMessage message, bool isError = false, bool isQuestion = false)
         {
-            try
-            {
-                string sender = message.IsUserMessage ? "Tú" : "IA";
-                string timestamp = message.SendDate.ToString("HH:mm");
-                Color messageColor = message.IsUserMessage ? userMessageColor : botMessageColor;
-                Color textColor = message.IsUserMessage ? userTextColor : botTextColor;
-                Color timestampColor = Color.FromArgb(128, 128, 128);
-                Font messageFont = new Font("Segoe UI", 11F, FontStyle.Regular);
-                Font timestampFont = new Font("Segoe UI", 8F, FontStyle.Italic);
-
-                if (richTextBox1.InvokeRequired)
-                {
-                    richTextBox1.Invoke(new MethodInvoker(delegate
-                    {
-                        PrependBubbleToRichTextBox(timestamp, sender, message.Message, messageColor, borderColor, timestampColor, messageFont, timestampFont, message.IsUserMessage);
-                    }));
-                }
-                else
-                {
-                    PrependBubbleToRichTextBox(timestamp, sender, message.Message, messageColor, borderColor, timestampColor, messageFont, timestampFont, message.IsUserMessage);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error al mostrar mensaje: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            // Alineación: usuario a la derecha, IA a la izquierda
+            string sender = message.IsUserMessage ? "Tú" : "IA";
+            string timestamp = message.SendDate.ToString("HH:mm");
+            Color messageColor = message.IsUserMessage ? userMessageColor : botMessageColor;
+            Color textColor = message.IsUserMessage ? userTextColor : botTextColor;
+            Color timestampColor = Color.FromArgb(128, 128, 128);
+            Font messageFont = new Font("Segoe UI", 11F, FontStyle.Regular);
+            Font timestampFont = new Font("Segoe UI", 8F, FontStyle.Italic);
+            bool isUser = message.IsUserMessage;
+            PrependBubbleToRichTextBox(timestamp, sender, message.Message, messageColor, borderColor, timestampColor, messageFont, timestampFont, isUser);
         }
 
         private void PrependBubbleToRichTextBox(string timestamp, string sender, string messageText, Color messageColor, Color borderColor, Color timestampColor, Font messageFont, Font timestampFont, bool isUser)
@@ -319,9 +340,18 @@ namespace Presentation
             richTextBox1.ScrollToCaret();
         }
 
+        private void DisplayMessage(string message, bool isError = false, bool isQuestion = false)
+        {
+            Color color = isError ? Color.OrangeRed : isQuestion ? Color.Goldenrod : botTextColor;
+            string prefix = isError ? "⚠️ " : isQuestion ? "❓ " : "";
+            richTextBox1.SelectionColor = color;
+            richTextBox1.AppendText($"{prefix}{message}\n\n");
+            richTextBox1.SelectionColor = Color.Black;
+        }
+
         private async void BtnSendMessage_Click(object sender, EventArgs e)
         {
-            if (isSendingMessage) return; // Evita envíos múltiples
+            if (isSendingMessage) return;
             isSendingMessage = true;
             try
             {
@@ -336,6 +366,7 @@ namespace Presentation
                 txtMessage.Enabled = false;
                 btbnSendMessage.Enabled = false;
 
+                // Mostrar mensaje del usuario a la derecha y guardarlo
                 var userMessage = new ChatMessage
                 {
                     Message = userText,
@@ -343,7 +374,7 @@ namespace Presentation
                     IsUserMessage = true,
                     User = _currentUser
                 };
-                DisplayMessage(userMessage);
+                DisplayMessage(userMessage, false, false);
 
                 // Mostrar animación de "Pensando..."
                 thinkingDotCount = 0;
@@ -354,12 +385,19 @@ namespace Presentation
                 string response = null;
                 try
                 {
-                    if (userText.StartsWith("@"))
+                    if (isCommandFromUI)
                     {
-                        response = _commandProcessor.ProcessCommand(userText);
+                        // Solo ejecutar comandos si vienen de la mini ventana
+                        response = await _commandProcessor.ProcessCommandAsync(userText);
+                    }
+                    else if (userText.TrimStart().StartsWith("@Captus", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Trigger + lenguaje natural (NO comando)
+                        response = await _commandProcessor.ProcessCommandAsync(userText);
                     }
                     else
                     {
+                        // Flujo conversacional
                         var botMessage = await _chatLogic.ProcessUserMessageAsync(userText, _currentUser);
                         response = botMessage?.Message ?? "No se pudo obtener una respuesta.";
                     }
@@ -374,14 +412,21 @@ namespace Presentation
                     lblThinking.Visible = false;
                 }
 
-                var botResponse = new ChatMessage
+                // Detectar si es pregunta o error
+                bool isError = response.StartsWith("Error") || response.Contains("no se pudo") || response.Contains("no pude");
+                bool isQuestion = response.Contains("¿") && response.Contains("?") && !isError;
+
+                // Mostrar mensaje de la IA a la izquierda
+                DisplayMessage(response, isError, isQuestion);
+
+                if (isError)
                 {
-                    Message = response,
-                    SendDate = DateTime.Now,
-                    IsUserMessage = false,
-                    User = _currentUser
-                };
-                DisplayMessage(botResponse);
+                    MessageBox.Show(response, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                if (isQuestion)
+                {
+                    txtMessage.Focus();
+                }
             }
             catch (Exception ex)
             {
@@ -393,6 +438,7 @@ namespace Presentation
                 btbnSendMessage.Enabled = true;
                 txtMessage.Focus();
                 isSendingMessage = false;
+                isCommandFromUI = false; // Resetear flag después de cada envío
             }
         }
 
@@ -442,7 +488,7 @@ namespace Presentation
         }
 
 
-        }
+        
 
         //private void btnMinimizar_Click(object sender, EventArgs e)
         //{

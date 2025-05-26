@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using BLL;
 using ENTITY;
+using System.Linq;
 
 namespace Presentation
 {
@@ -19,21 +20,6 @@ namespace Presentation
             _parameterControls = new Dictionary<string, Control>();
             
             InitializeUI();
-        }
-
-        private void InitializeComponent()
-        {
-            this.SuspendLayout();
-            // 
-            // FrmCommandConfig
-            // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(400, 300);
-            this.Name = "FrmCommandConfig";
-            this.Text = "Configurar Comando";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.ResumeLayout(false);
         }
 
         private void InitializeUI()
@@ -131,7 +117,7 @@ namespace Presentation
             return parameters;
         }
 
-        private void OkButton_Click(object sender, EventArgs e)
+        private async void OkButton_Click(object sender, EventArgs e)
         {
             var parameters = new List<string>();
             foreach (var control in _parameterControls.Values)
@@ -144,13 +130,109 @@ namespace Presentation
 
             try
             {
-                _command.Handler(string.Join(" ", parameters));
+                if (Session.CurrentUser == null)
+                    throw new InvalidOperationException("No hay una sesión de usuario activa.");
+
+                var taskLogic = new TaskLogic();
+                switch (_command.Name)
+                {
+                    case "Crear Tarea":
+                        if (parameters.Count < 1)
+                            throw new ArgumentException("Se requiere al menos el título de la tarea.");
+
+                        var categoryService = new CategoryLogic();
+                        var priorityService = new PriorityLogic();
+                        string titulo = parameters[0];
+                        string descripcion = parameters.Count > 1 ? parameters[1] : null;
+                        DateTime fecha = parameters.Count > 2 ? DateTime.Parse(parameters[2]) : DateTime.Now.AddDays(7);
+                        string prioridadTexto = parameters.Count > 3 ? parameters[3].ToLower() : "media";
+                        string categoriaTexto = parameters.Count > 4 ? parameters[4].ToLower() : "personal";
+
+                        // Buscar ID de prioridad
+                        int prioridad = priorityService.GetAll().FirstOrDefault(p => p.Name.ToLower() == prioridadTexto)?.Id_Priority ?? 2;
+                        // Buscar ID de categoría
+                        int categoria = categoryService.GetAll().FirstOrDefault(c => c.Name.ToLower() == categoriaTexto)?.id ?? 4;
+
+                        ENTITY.Task nuevaTarea;
+                        var resultSave = taskLogic.CreateAndSaveTask(
+                            titulo,
+                            descripcion,
+                            fecha,
+                            prioridadTexto,
+                            categoriaTexto,
+                            Session.CurrentUser,
+                            out nuevaTarea
+                        );
+                        if (!resultSave.Success)
+                            throw new Exception(resultSave.Message);
+                        await BLL.NotificationService.Instance.SendTaskNotificationAsync(nuevaTarea, "creada");
+                        break;
+
+                    case "Actualizar Tarea":
+                        if (parameters.Count < 2)
+                            throw new ArgumentException("Se requiere el ID y el nuevo título de la tarea.");
+
+                        if (!int.TryParse(parameters[0], out int taskId))
+                            throw new FormatException("El ID de la tarea debe ser un número válido.");
+
+                        var tareaActualizar = new ENTITY.Task
+                        {
+                            Id_Task = taskId,
+                            Title = parameters[1],
+                            Description = parameters.Count > 2 ? parameters[2] : null,
+                            EndDate = parameters.Count > 3 ? DateTime.Parse(parameters[3]) : DateTime.Now.AddDays(7)
+                        };
+
+                        var resultUpdate = taskLogic.Update(tareaActualizar);
+                        if (!resultUpdate.Success)
+                            throw new Exception(resultUpdate.Message);
+                        await BLL.NotificationService.Instance.SendTaskUpdateNotificationAsync(tareaActualizar);
+                        break;
+
+                    case "Eliminar Tarea":
+                        if (parameters.Count < 1)
+                            throw new ArgumentException("Se requiere el ID de la tarea a eliminar.");
+
+                        if (!int.TryParse(parameters[0], out int idToDelete))
+                            throw new FormatException("El ID de la tarea debe ser un número válido.");
+
+                        var tareaEliminada = taskLogic.GetById(idToDelete);
+                        var resultDelete = taskLogic.Delete(idToDelete);
+                        if (!resultDelete.Success)
+                            throw new Exception(resultDelete.Message);
+                        await BLL.NotificationService.Instance.SendTaskDeleteNotificationAsync(tareaEliminada);
+                        break;
+
+                    default:
+                        _command.Handler(string.Join(" ", parameters));
+                        break;
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                MessageBox.Show($"Error de validación: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                this.DialogResult = DialogResult.None;
+            }
+            catch (FormatException ex)
+            {
+                MessageBox.Show($"Error de formato: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                this.DialogResult = DialogResult.None;
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show($"Error de operación: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                this.DialogResult = DialogResult.None;
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al ejecutar el comando: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Error inesperado: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.DialogResult = DialogResult.None;
             }
+        }
+
+        private void FrmCommandConfig_Load(object sender, EventArgs e)
+        {
+
         }
     }
 } 

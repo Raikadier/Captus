@@ -1,6 +1,6 @@
 namespace Presentation
 {
-    partial class frmCommandConfig
+    partial class FrmCommandConfig
     {
         /// <summary>
         /// Required designer variable.
@@ -26,14 +26,21 @@ namespace Presentation
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent()
+        public void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            this.SuspendLayout();
+            // 
+            // FrmCommandConfig
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(400, 300);
-            this.Text = "Configurar Comando";
-            this.Name = "frmCommandConfig";
+            this.Name = "FrmCommandConfig";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Configurar Comando";
+            this.Load += new System.EventHandler(this.FrmCommandConfig_Load);
+            this.ResumeLayout(false);
+
         }
 
         #endregion

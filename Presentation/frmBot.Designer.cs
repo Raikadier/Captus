@@ -46,10 +46,6 @@ namespace Presentation
             // 
 
             this.panel1.BackColor = System.Drawing.Color.FromArgb(33, 150, 83);
-            this.panel1.Controls.Add(this.btnClse);
-
-            this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(0)))));
-
             this.panel1.Controls.Add(this.pictureBox1);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
@@ -60,22 +56,6 @@ namespace Presentation
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.Panel1_Paint);
             // 
 
-            // btnClse
-            // 
-            this.btnClse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClse.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnClse.FlatAppearance.BorderSize = 0;
-            this.btnClse.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
-            this.btnClse.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
-            this.btnClse.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnClse.Image = global::Presentation.Properties.Resources.icons8_close_window_50__2_;
-            this.btnClse.Location = new System.Drawing.Point(759, 12);
-            this.btnClse.Name = "btnClse";
-            this.btnClse.Size = new System.Drawing.Size(29, 30);
-            this.btnClse.TabIndex = 33;
-            this.btnClse.UseVisualStyleBackColor = true;
-            this.btnClse.Click += new System.EventHandler(this.BtnClose_Click);
-            // 
             // pictureBox1
             // 
             this.pictureBox1.Anchor = System.Windows.Forms.AnchorStyles.Left;
@@ -200,7 +180,6 @@ namespace Presentation
         private System.Windows.Forms.TextBox txtMessage;
         private System.Windows.Forms.PictureBox pictureBox1;
 
-        private System.Windows.Forms.Button btnClse;
         private System.Windows.Forms.Panel panelBottom;
     }
 }

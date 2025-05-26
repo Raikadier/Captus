@@ -72,6 +72,7 @@
     <Compile Include="GradeCalculator.cs" />
     <Compile Include="IChatService.cs" />
     <Compile Include="ILogic.cs" />
+    <Compile Include="NotificationService.cs" />
     <Compile Include="NotifyEmails.cs" />
     <Compile Include="OperationResult.cs" />
     <Compile Include="PriorityLogic.cs" />

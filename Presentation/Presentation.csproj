@@ -104,11 +104,18 @@
     <Compile Include="frmBot.Designer.cs">
       <DependentUpon>frmBot.cs</DependentUpon>
     </Compile>
-
     <Compile Include="frmCommandConfig.cs">
       <SubType>Form</SubType>
     </Compile>
-
+    <Compile Include="frmCommandConfig.Designer.cs">
+      <DependentUpon>frmCommandConfig.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmCommandWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmCommandWindow.Designer.cs">
+      <DependentUpon>frmCommandWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmHome.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -176,6 +183,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmBot.resx">
       <DependentUpon>frmBot.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmCommandConfig.resx">
+      <DependentUpon>frmCommandConfig.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmHome.resx">
       <DependentUpon>frmHome.cs</DependentUpon>

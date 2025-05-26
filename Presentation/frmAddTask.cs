@@ -280,43 +280,53 @@ namespace Presentation
         {
             if (ValideTask())
             {
-                string titulo = txtTitle.Text.Trim();
-                string descripcion = string.IsNullOrWhiteSpace(txtDescription.Text) ? null : txtDescription.Text.Trim();
-                DateTime fecha = dtmEndDate.Value.Date;
-                int prioridad = Convert.ToInt32(cbPriority.SelectedValue);
-                int categoria = Convert.ToInt32(cbCategories.SelectedValue);
-                ENTITY.Task nuevaTarea = new ENTITY.Task
-                {
-                    Title = titulo,
-                    Category = categoryService.GetById(categoria),
-                    Description = descripcion,
-                    CreationDate = DateTime.Now,
-                    EndDate = fecha,
-                    Priority = priorityService.GetById(prioridad),
-                    State = false,
-                    User = Session.CurrentUser
-                };
                 try
                 {
+                    if (Session.CurrentUser == null)
+                        throw new InvalidOperationException("No hay una sesión de usuario activa.");
+
+                    string titulo = txtTitle.Text.Trim();
+                    string descripcion = string.IsNullOrWhiteSpace(txtDescription.Text) ? null : txtDescription.Text.Trim();
+                    DateTime fecha = dtmEndDate.Value.Date;
+                    int prioridad = Convert.ToInt32(cbPriority.SelectedValue);
+                    int categoria = Convert.ToInt32(cbCategories.SelectedValue);
+
+                    ENTITY.Task nuevaTarea = new ENTITY.Task
+                    {
+                        Title = titulo,
+                        Category = categoryService.GetById(categoria),
+                        Description = descripcion,
+                        CreationDate = DateTime.Now,
+                        EndDate = fecha,
+                        Priority = priorityService.GetById(prioridad),
+                        State = false,
+                        User = Session.CurrentUser
+                    };
+
                     var result = taskLogic.Save(nuevaTarea);
                     if (result.Success)
                     {
-                        string mensaje = NotifyEmails.GetMessageInsert(nuevaTarea.Title, nuevaTarea.EndDate.ToShortDateString(), nuevaTarea.Category.Name);
-                        await NotifyEmails.SendNotifyAsync(Session.CurrentUser.Email, "Nueva tarea asignada", mensaje);
-
+                        await BLL.NotificationService.Instance.SendTaskNotificationAsync(nuevaTarea, "creada");
                         MessageBox.Show("✅ Tarea agregada exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         Clean();
                         this.Dispose();
-
                     }
                     else
                     {
                         MessageBox.Show(result.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
+                catch (InvalidOperationException ex)
+                {
+                    MessageBox.Show($"Error de sesión: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                catch (FormatException ex)
+                {
+                    MessageBox.Show($"Error de formato: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"❌ Ocurrió un error al guardar la tarea:\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"❌ Error inesperado al guardar la tarea:\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
