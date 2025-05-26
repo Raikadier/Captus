@@ -80,6 +80,7 @@
     <Compile Include="ClassId.cs" />
     <Compile Include="ClassName.cs" />
     <Compile Include="ClassTitle.cs" />
+    <Compile Include="Command.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="IOperationEntity.cs" />
     <Compile Include="Note.cs" />

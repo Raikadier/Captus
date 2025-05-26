@@ -58,9 +58,14 @@
             // 
             // panel1
             // 
+
+            this.panel1.BackColor = System.Drawing.Color.FromArgb(33, 150, 83);
+
             this.panel1.BackColor = System.Drawing.Color.PaleGreen;
             this.panel1.Controls.Add(this.picbLogo);
+
             this.panel1.Controls.Add(this.btnClse);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(659, 67);
@@ -71,7 +76,7 @@
             // panel2
             // 
             this.panel2.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.panel2.BackColor = System.Drawing.Color.PaleGreen;
+            this.panel2.BackColor = System.Drawing.Color.FromArgb(245, 246, 250);
             this.panel2.Controls.Add(this.btnAddTsk);
             this.panel2.Controls.Add(this.btnCancelar);
             this.panel2.Controls.Add(this.btnNextWeek);
@@ -84,6 +89,7 @@
             this.panel2.Controls.Add(this.cbPriority);
             this.panel2.Controls.Add(this.dtmEndDate);
             this.panel2.Controls.Add(this.txtTitle);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel2.Location = new System.Drawing.Point(0, 67);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(659, 309);
@@ -143,7 +149,7 @@
             // 
             // txtDescription
             // 
-            this.txtDescription.BackColor = System.Drawing.Color.PaleGreen;
+            this.txtDescription.BackColor = System.Drawing.Color.White;
             this.txtDescription.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txtDescription.EnableAutoDragDrop = true;
             this.txtDescription.Font = new System.Drawing.Font("Segoe UI Semibold", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -188,7 +194,7 @@
             // 
             // txtTitle
             // 
-            this.txtTitle.BackColor = System.Drawing.Color.PaleGreen;
+            this.txtTitle.BackColor = System.Drawing.Color.White;
             this.txtTitle.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txtTitle.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtTitle.ForeColor = System.Drawing.SystemColors.WindowFrame;
@@ -208,6 +214,31 @@
             // 
             // btnNextWeek
             // 
+
+            this.btnAddTsk.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btnAddTsk.BackColor = System.Drawing.Color.FromArgb(33, 150, 83);
+            this.btnAddTsk.BackgroundColor = System.Drawing.Color.FromArgb(33, 150, 83);
+            this.btnAddTsk.BorderColor = System.Drawing.Color.Honeydew;
+            this.btnAddTsk.BorderColor1 = System.Drawing.Color.Honeydew;
+            this.btnAddTsk.BorderRadius = 40;
+            this.btnAddTsk.BorderRadius1 = 40;
+            this.btnAddTsk.BorderSize = 0;
+            this.btnAddTsk.BorderSize1 = 0;
+            this.btnAddTsk.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnAddTsk.FlatAppearance.BorderSize = 0;
+            this.btnAddTsk.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(111, 207, 151);
+            this.btnAddTsk.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAddTsk.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnAddTsk.ForeColor = System.Drawing.Color.White;
+            this.btnAddTsk.Location = new System.Drawing.Point(516, 244);
+            this.btnAddTsk.Name = "btnAddTsk";
+            this.btnAddTsk.Size = new System.Drawing.Size(127, 42);
+            this.btnAddTsk.TabIndex = 14;
+            this.btnAddTsk.Text = "Add Task";
+            this.btnAddTsk.TextColor = System.Drawing.Color.White;
+            this.btnAddTsk.UseVisualStyleBackColor = false;
+            this.btnAddTsk.Click += new System.EventHandler(this.btnAddTsk_Click);
+
             this.btnNextWeek.BackgroundImage = global::Presentation.Properties.Resources.Nextweek;
             this.btnNextWeek.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnNextWeek.Location = new System.Drawing.Point(153, 221);
@@ -216,9 +247,35 @@
             this.btnNextWeek.TabIndex = 12;
             this.btnNextWeek.Paint += new System.Windows.Forms.PaintEventHandler(this.btnNextWeek_Paint);
             this.btnNextWeek.MouseClick += new System.Windows.Forms.MouseEventHandler(this.btnNextWeek_MouseClick);
+
             // 
             // btnWeekend
             // 
+
+            this.btnCancelar.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btnCancelar.BackColor = System.Drawing.Color.FromArgb(189, 189, 189);
+            this.btnCancelar.BackgroundColor = System.Drawing.Color.FromArgb(189, 189, 189);
+            this.btnCancelar.BorderColor = System.Drawing.Color.Honeydew;
+            this.btnCancelar.BorderColor1 = System.Drawing.Color.Honeydew;
+            this.btnCancelar.BorderRadius = 40;
+            this.btnCancelar.BorderRadius1 = 40;
+            this.btnCancelar.BorderSize = 0;
+            this.btnCancelar.BorderSize1 = 0;
+            this.btnCancelar.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnCancelar.FlatAppearance.BorderSize = 0;
+            this.btnCancelar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.btnCancelar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCancelar.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnCancelar.ForeColor = System.Drawing.Color.White;
+            this.btnCancelar.Location = new System.Drawing.Point(389, 244);
+            this.btnCancelar.Name = "btnCancelar";
+            this.btnCancelar.Size = new System.Drawing.Size(121, 42);
+            this.btnCancelar.TabIndex = 13;
+            this.btnCancelar.Text = "Cancel";
+            this.btnCancelar.TextColor = System.Drawing.Color.White;
+            this.btnCancelar.UseVisualStyleBackColor = false;
+            this.btnCancelar.Click += new System.EventHandler(this.btnCancelar_Click);
+
             this.btnWeekend.BackgroundImage = global::Presentation.Properties.Resources.Weekend;
             this.btnWeekend.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnWeekend.Location = new System.Drawing.Point(107, 221);
@@ -284,12 +341,14 @@
             this.btnClse.TabIndex = 30;
             this.btnClse.UseVisualStyleBackColor = true;
             this.btnClse.Click += new System.EventHandler(this.btnClse_Click);
+
             // 
             // frmAddTask
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(660, 375);
+            this.Controls.Clear();
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;

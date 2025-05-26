@@ -37,13 +37,15 @@ namespace Presentation
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.txtMessage = new System.Windows.Forms.TextBox();
             this.btbnSendMessage = new Presentation.ButtonPersonal();
+            this.panelBottom = new System.Windows.Forms.Panel();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // panel1
             // 
-            this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(0)))));
+
+            this.panel1.BackColor = System.Drawing.Color.FromArgb(33, 150, 83);
             this.panel1.Controls.Add(this.pictureBox1);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
@@ -53,6 +55,7 @@ namespace Presentation
             this.panel1.TabIndex = 0;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.Panel1_Paint);
             // 
+
             // pictureBox1
             // 
             this.pictureBox1.Anchor = System.Windows.Forms.AnchorStyles.Left;
@@ -83,33 +86,33 @@ namespace Presentation
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.richTextBox1.BackColor = System.Drawing.Color.White;
-            this.richTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.richTextBox1.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.richTextBox1.Location = new System.Drawing.Point(12, 82);
+            this.richTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.richTextBox1.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.richTextBox1.Location = new System.Drawing.Point(0, 76);
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.ReadOnly = true;
-            this.richTextBox1.Size = new System.Drawing.Size(776, 280);
+            this.richTextBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.richTextBox1.TabIndex = 1;
             this.richTextBox1.Text = "";
             this.richTextBox1.TextChanged += new System.EventHandler(this.RichTextBox1_TextChanged);
+            this.richTextBox1.Padding = new System.Windows.Forms.Padding(32, 24, 24, 24);
             // 
             // txtMessage
             // 
-            this.txtMessage.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtMessage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtMessage.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtMessage.Location = new System.Drawing.Point(12, 394);
+            this.txtMessage.Dock = System.Windows.Forms.DockStyle.Fill;
             this.txtMessage.Multiline = true;
             this.txtMessage.Name = "txtMessage";
-            this.txtMessage.Size = new System.Drawing.Size(683, 40);
+            this.txtMessage.Size = new System.Drawing.Size(735, 40);
             this.txtMessage.TabIndex = 3;
+            this.txtMessage.Margin = new System.Windows.Forms.Padding(0, 0, 12, 0);
             // 
             // btbnSendMessage
             // 
             this.btbnSendMessage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btbnSendMessage.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(0)))));
-            this.btbnSendMessage.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(0)))));
+            this.btbnSendMessage.BackColor = System.Drawing.Color.FromArgb(33, 150, 83);
+            this.btbnSendMessage.BackgroundColor = System.Drawing.Color.FromArgb(33, 150, 83);
             this.btbnSendMessage.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(0)))));
             this.btbnSendMessage.BorderColor1 = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(0)))));
             this.btbnSendMessage.BorderRadius = 20;
@@ -118,7 +121,7 @@ namespace Presentation
             this.btbnSendMessage.BorderSize1 = 0;
             this.btbnSendMessage.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btbnSendMessage.FlatAppearance.BorderSize = 0;
-            this.btbnSendMessage.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.btbnSendMessage.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(111, 207, 151);
             this.btbnSendMessage.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btbnSendMessage.Font = new System.Drawing.Font("Century Gothic", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btbnSendMessage.ForeColor = System.Drawing.Color.White;
@@ -130,6 +133,16 @@ namespace Presentation
             this.btbnSendMessage.TextColor = System.Drawing.Color.White;
             this.btbnSendMessage.UseVisualStyleBackColor = false;
             this.btbnSendMessage.Click += new System.EventHandler(this.BtnSendMessage_Click);
+            this.btbnSendMessage.Dock = System.Windows.Forms.DockStyle.Right;
+            // 
+            // panelBottom
+            // 
+            this.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panelBottom.Height = 50;
+            this.panelBottom.BackColor = System.Drawing.Color.White;
+            this.panelBottom.Controls.Add(this.txtMessage);
+            this.panelBottom.Controls.Add(this.btbnSendMessage);
+            this.panelBottom.Padding = new System.Windows.Forms.Padding(16, 8, 16, 8);
             // 
             // FrmBot
             // 
@@ -137,11 +150,11 @@ namespace Presentation
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.txtMessage);
-            this.Controls.Add(this.btbnSendMessage);
+            this.Controls.Clear();
             this.Controls.Add(this.richTextBox1);
+            this.Controls.Add(this.panelBottom);
             this.Controls.Add(this.panel1);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(600, 400);
             this.Name = "FrmBot";
@@ -168,5 +181,7 @@ namespace Presentation
         private ButtonPersonal btbnSendMessage;
         private System.Windows.Forms.TextBox txtMessage;
         private System.Windows.Forms.PictureBox pictureBox1;
+
+        private System.Windows.Forms.Panel panelBottom;
     }
 }

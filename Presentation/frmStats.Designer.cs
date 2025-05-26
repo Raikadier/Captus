@@ -60,7 +60,7 @@
             // 
             // panel1
             // 
-            this.panel1.BackColor = System.Drawing.Color.Honeydew;
+            this.panel1.BackColor = System.Drawing.Color.FromArgb(245, 246, 250);
             this.panel1.Controls.Add(this.panel5);
             this.panel1.Controls.Add(this.lblRacha);
             this.panel1.Controls.Add(this.label3);
@@ -79,6 +79,7 @@
             // panel5
             // 
             this.panel5.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.panel5.BackColor = System.Drawing.Color.White;
             this.panel5.Controls.Add(this.lblMotivation);
             this.panel5.Font = new System.Drawing.Font("Ink Free", 9F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.panel5.Location = new System.Drawing.Point(82, 270);
@@ -142,6 +143,7 @@
             // panel4
             // 
             this.panel4.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.panel4.BackColor = System.Drawing.Color.White;
             this.panel4.Controls.Add(this.ObjetiveDaily);
             this.panel4.Controls.Add(this.label2);
             this.panel4.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -182,14 +184,19 @@
             // 
             // panel3
             // 
-            this.panel3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.panel3.BackColor = System.Drawing.Color.FromArgb(33, 150, 83);
             this.panel3.Controls.Add(this.label8);
             this.panel3.Controls.Add(this.label7);
             this.panel3.Controls.Add(this.lblTaskCompleted);
             this.panel3.Controls.Add(this.label1);
             this.panel3.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+
+            this.panel3.ForeColor = System.Drawing.Color.White;
+            this.panel3.Location = new System.Drawing.Point(0, 0);
+
             this.panel3.ForeColor = System.Drawing.Color.Gray;
             this.panel3.Location = new System.Drawing.Point(0, 59);
+
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(625, 25);
             this.panel3.TabIndex = 29;
@@ -289,10 +296,17 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+
+            this.ClientSize = new System.Drawing.Size(764, 479);
+            this.Controls.Clear();
+            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.panel3);
+
             this.ClientSize = new System.Drawing.Size(625, 590);
             this.ControlBox = false;
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;

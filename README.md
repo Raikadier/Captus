@@ -1,170 +1,389 @@
-# CaptusGUI - Sistema de Gestión de Tareas con IA
+# CaptusGUI - Asistente Inteligente de Gestión de Tareas
 
-## Descripción
-CaptusGUI es una aplicación de escritorio desarrollada en C# que combina la gestión de tareas con un asistente virtual inteligente. El sistema permite a los usuarios organizar sus tareas, establecer metas diarias y recibir asistencia a través de un chatbot integrado.
+[![.NET](https://img.shields.io/badge/.NET-4.7.2-blue)](https://dotnet.microsoft.com/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.md)
+[![OpenRouter](https://img.shields.io/badge/OpenRouter-API-orange)](https://openrouter.ai/)
+[![Windows](https://img.shields.io/badge/Windows-10%2F11-blue)](https://www.microsoft.com/windows)
 
-## Características Principales
-- 🎯 Gestión completa de tareas
-- 🤖 Asistente virtual con IA integrada
-- 📊 Estadísticas y seguimiento de progreso
-- 🎨 Interfaz de usuario moderna e intuitiva
-- 🔐 Sistema de autenticación seguro
-- 📱 Diseño responsivo
+![CaptusGUI Logo](assets/logo.png)
 
-## Estructura del Proyecto
-El proyecto está organizado en capas siguiendo el patrón de arquitectura en capas:
+## 📑 Tabla de Contenidos
+- [Descripción](#-descripción)
+- [Características](#-características-principales)
+- [Comenzando](#-comenzando)
+- [Uso](#-uso)
+- [Arquitectura](#️-arquitectura)
+- [Configuración](#-configuración)
+- [Pruebas](#-pruebas)
+- [Solución de Problemas](#-solución-de-problemas)
+- [Seguridad](#-seguridad)
+- [Versiones](#-versiones)
+- [Desarrollo](#-desarrollo)
+- [Roadmap](#-roadmap)
+- [Contribución](#-contribución)
+- [Equipo](#-equipo)
+- [Agradecimientos](#-agradecimientos)
 
-- **Presentation**: Interfaz de usuario y formularios
-- **BLL**: Lógica de negocio
-- **DAL**: Acceso a datos
-- **ENTITY**: Modelos y entidades
+## 📋 Descripción
 
-## Principios SOLID Implementados
+CaptusGUI es una aplicación de escritorio moderna que combina la gestión de tareas con inteligencia artificial para ofrecer una experiencia de usuario intuitiva y eficiente. Permite a los usuarios gestionar sus tareas, notas y actividades académicas a través de una interfaz gráfica amigable y comandos en lenguaje natural.
 
-### 1. Principio de Responsabilidad Única (SRP)
-- **TaskLogic**: Encargada exclusivamente de la lógica de negocio de tareas
-- **ChatLogic**: Maneja únicamente la lógica de procesamiento de mensajes
-- **StatisticsLogic**: Gestiona solo las estadísticas y métricas
-- **UserRepository**: Responsable solo del acceso a datos de usuarios
+### 🎯 Objetivos
+- Simplificar la gestión de tareas diarias
+- Proporcionar asistencia inteligente
+- Mejorar la productividad académica
+- Ofrecer una experiencia de usuario excepcional
 
-### 2. Principio de Abierto/Cerrado (OCP)
-- **ILogic<T>**: Interfaz base que permite extender funcionalidad sin modificar código existente
-- **BDRepository<T>**: Clase base que permite añadir nuevos repositorios sin modificar la implementación existente
-- **TaskCriteria**: Permite extender los criterios de búsqueda sin modificar la lógica base
+## ✨ Características Principales
 
-### 3. Principio de Sustitución de Liskov (LSP)
-- **IRepository<T>**: Implementada por diferentes repositorios manteniendo el contrato base
-- **IOperationEntity**: Interfaz base para entidades que permite sustitución segura
-- **BaseRepository**: Clase base que puede ser sustituida por implementaciones específicas
+### 🤖 Asistente IA Integrado
+- Procesamiento de lenguaje natural para comandos
+- Respuestas contextuales y personalizadas
+- Soporte para múltiples idiomas
+- Integración con OpenRouter API
 
-### 4. Principio de Segregación de Interfaces (ISP)
-- **IChatService**: Interfaz específica para servicios de chat
-- **ITaskService**: Interfaz dedicada a operaciones de tareas
-- **IUserService**: Interfaz específica para operaciones de usuario
+### 📝 Gestión de Tareas
+- Creación, actualización y eliminación de tareas
+- Categorización y priorización
+- Fechas límite y recordatorios
+- Notificaciones por correo electrónico
 
-### 5. Principio de Inversión de Dependencias (DIP)
-- Inyección de dependencias en constructores:
-```csharp
-public class ChatLogic : IChatService
-{
-    private readonly AIService _aiService;
-    private readonly ChatRepository _chatRepository;
-    
-    public ChatLogic(AIService aiService, ChatRepository chatRepository)
-    {
-        _aiService = aiService;
-        _chatRepository = chatRepository;
-    }
-}
-```
-- Uso de interfaces para desacoplar capas:
-```csharp
-public class TaskLogic : ILogic<Task>
-{
-    private readonly ITaskRepository _taskRepository;
-    private readonly ISubTaskLogic _subTaskLogic;
-}
-```
+### 📊 Gestión Académica
+- Cálculo de notas y promedios
+- Seguimiento de materias
+- Historial académico
+- Reportes y estadísticas
 
-### Beneficios de la Implementación SOLID
-- **Mantenibilidad**: Código más fácil de mantener y modificar
-- **Testabilidad**: Componentes aislados facilitan las pruebas unitarias
-- **Escalabilidad**: Fácil adición de nuevas funcionalidades
-- **Reutilización**: Componentes modulares y reutilizables
-- **Flexibilidad**: Cambios en implementaciones sin afectar el sistema
+## 🚀 Comenzando
 
-## Requisitos del Sistema
-- Windows 10 o superior
+### Requisitos Previos
 - .NET Framework 4.7.2 o superior
-- SQL Server Express
-- Conexión a Internet (para funcionalidades de IA)
+- Visual Studio 2019 o superior
+- Cuenta en OpenRouter (para funcionalidades de IA)
 
-## Instalación
-1. Clonar el repositorio:
+### Instalación
+1. Clona el repositorio:
 ```bash
-git clone https://github.com/tu-usuario/CaptusGUI.git
+git clone https://github.com/yourusername/CaptusGUI.git
 ```
 
-2. Abrir la solución en Visual Studio
-3. Restaurar los paquetes NuGet
-4. Configurar la cadena de conexión en el archivo de configuración
-5. Compilar y ejecutar el proyecto
+2. Abre la solución en Visual Studio:
+```bash
+cd CaptusGUI
+CaptusGUI.sln
+```
 
-## Configuración de la IA
-Para utilizar el asistente virtual, es necesario configurar la clave de API en el archivo `frmBot.cs`:
+3. Restaura los paquetes NuGet:
+```bash
+dotnet restore
+```
 
+4. Compila y ejecuta:
+```bash
+dotnet build
+dotnet run
+```
+
+## 💻 Uso
+
+### Comandos en Lenguaje Natural
+CaptusGUI entiende comandos en lenguaje natural. Ejemplos:
+
+```plaintext
+@Captus crea una tarea que tenga por nombre Cocinar el viernes
+@Captus actualiza la tarea Cocinar para el sábado
+@Captus elimina la tarea Cocinar
+@Captus muestra mis tareas pendientes
+```
+
+### Gestión de Tareas
 ```csharp
-_aiService = new AIService("TU_CLAVE_API_AQUI");
+// Ejemplo de creación de tarea
+var task = new Task {
+    Title = "Estudiar Matemáticas",
+    EndDate = DateTime.Now.AddDays(7),
+    Priority = Priority.High,
+    Category = Category.Academic
+};
+taskLogic.Save(task);
 ```
 
-## Implementación de la IA
-La integración de la IA en CaptusGUI se realizó siguiendo un enfoque modular y extensible:
+### Notificaciones
+```csharp
+// Ejemplo de envío de notificación
+await NotifyEmails.SendNotifyAsync(
+    user.Email,
+    "Nueva Tarea Creada",
+    $"Se ha creado la tarea: {task.Title}"
+);
+```
 
-### Arquitectura
-- **AIService**: Clase principal que maneja la comunicación con el servicio de IA
-- **ChatLogic**: Implementa la lógica de procesamiento de mensajes y comandos
-- **ChatRepository**: Gestiona el almacenamiento y recuperación de mensajes
+## 🏗️ Arquitectura
 
-### Flujo de Procesamiento
-1. **Recepción de Mensajes**:
-   - El usuario envía un mensaje a través de la interfaz
-   - El mensaje se guarda en la base de datos
-   - Se procesa a través de ChatLogic
+### Capas de la Aplicación
+1. **Presentation Layer**
+   - Interfaz de usuario (Windows Forms)
+   - Controladores de eventos
+   - Validación de entrada
 
-2. **Procesamiento de Comandos**:
-   - Verificación de comandos específicos de tareas
-   - Si es un comando válido, se ejecuta la acción correspondiente
-   - Si no es un comando, se envía al servicio de IA
+2. **Business Logic Layer (BLL)**
+   - Lógica de negocio
+   - Procesamiento de comandos
+   - Integración con IA
 
-3. **Integración con IA**:
-   - Uso de API REST para comunicación con el servicio de IA
-   - Procesamiento asíncrono de respuestas
-   - Manejo de errores y timeouts
+3. **Data Access Layer (DAL)**
+   - Acceso a base de datos
+   - Operaciones CRUD
+   - Manejo de transacciones
 
-4. **Gestión de Respuestas**:
-   - Almacenamiento de respuestas en la base de datos
-   - Formateo y presentación en la interfaz
-   - Manejo de estados de carga y errores
+### Diagrama de Arquitectura
+```mermaid
+graph TD
+    A[Presentation Layer] --> B[BLL]
+    B --> C[DAL]
+    B --> D[AI Service]
+    D --> E[OpenRouter API]
+```
 
-### Características Técnicas
-- Implementación asíncrona para mejor rendimiento
-- Sistema de caché para respuestas frecuentes
-- Manejo de contexto de conversación
-- Validación y sanitización de entradas
-- Sistema de logging para depuración
+## 🔧 Configuración
 
-### Seguridad
-- Validación de claves API
-- Sanitización de entradas y salidas
-- Protección contra ataques de inyección
-- Manejo seguro de sesiones
+### Variables de Entorno
+```plaintext
+OPENROUTER_KEY=tu_api_key
+SMTP_SERVER=tu_servidor_smtp
+SMTP_PORT=587
+```
 
-## Uso del Asistente Virtual
-El asistente virtual entiende los siguientes comandos:
+### Configuración de Base de Datos
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost;Database=CaptusDB;Trusted_Connection=True;"
+  }
+}
+```
 
-- Crear tarea: `crear tarea [título] (para [fecha YYYY-MM-DD])`
-- Mostrar tareas: `mostrar mis tareas` o `listar tareas`
-- Completar tarea: `completar tarea [título]`
-- Eliminar tarea: `eliminar tarea [título]`
-- Reprogramar tarea: `reprogramar tarea [título] [fecha YYYY-MM-DD]`
+## 🧪 Pruebas
 
-## Características de Seguridad
-- Contraseñas encriptadas
-- Validación de datos de entrada
-- Protección contra inyección SQL
-- Sesiones de usuario seguras
+### Pruebas Unitarias
+```csharp
+[Test]
+public void CreateTask_ValidData_ReturnsSuccess()
+{
+    // Arrange
+    var task = new Task { Title = "Test Task" };
+    
+    // Act
+    var result = taskLogic.Save(task);
+    
+    // Assert
+    Assert.IsTrue(result.Success);
+}
+```
 
-## Contribución
+### Pruebas de Integración
+```csharp
+[Test]
+public async Task ProcessCommand_ValidInput_ReturnsExpectedResponse()
+{
+    // Arrange
+    var command = "@Captus crea una tarea";
+    
+    // Act
+    var response = await commandProcessor.ProcessCommand(command);
+    
+    // Assert
+    Assert.Contains("tarea creada", response.ToLower());
+}
+```
+
+## 📈 Roadmap
+
+- [ ] Integración con calendario
+- [ ] Sincronización con servicios en la nube
+- [ ] Aplicación móvil
+- [ ] Análisis predictivo de tareas
+- [ ] Integración con más servicios de IA
+
+## 🤝 Contribución
+
 1. Fork el proyecto
-2. Crear una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+2. Crea tu rama de características (`git checkout -b feature/AmazingFeature`)
 3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
 4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abrir un Pull Request
+5. Abre un Pull Request
 
-## Licencia
+## 📝 Licencia
+
 Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE.md](LICENSE.md) para más detalles.
 
-## Contacto
-Tu Nombre - [@tutwitter](https://twitter.com/tutwitter) - email@ejemplo.com
+## 👥 Equipo
 
-Link del proyecto: [https://github.com/tu-usuario/CaptusGUI](https://github.com/tu-usuario/CaptusGUI)
+### Desarrolladores
+- **David Barceló** - *Desarrollador Principal*
+  - Experto en .NET y arquitectura de software
+  - [GitHub](https://github.com/davidbarcelo)
+  - [LinkedIn](https://linkedin.com/in/davidbarcelo)
+
+- **Harold Florez** - *Arquitecto de Software*
+  - Especialista en patrones de diseño y SOLID
+  - [GitHub](https://github.com/haroldflorez)
+  - [LinkedIn](https://linkedin.com/in/haroldflorez)
+
+- **Valentina Molina** - *Diseñadora UI/UX*
+  - Experta en diseño de interfaces y experiencia de usuario
+  - [GitHub](https://github.com/valentinamolina)
+  - [LinkedIn](https://linkedin.com/in/valentinamolina)
+
+### Contacto
+- Email: captus@example.com
+- Twitter: [@CaptusGUI](https://twitter.com/CaptusGUI)
+- LinkedIn: [CaptusGUI](https://linkedin.com/company/captusgui)
+- Discord: [CaptusGUI Community](https://discord.gg/captusgui)
+
+## 🙏 Agradecimientos
+
+- OpenRouter por proporcionar la API de IA
+- La comunidad de .NET
+- Todos los contribuidores que han ayudado al proyecto
+- Nuestros usuarios por su valioso feedback
+
+## 🔍 Solución de Problemas
+
+### Problemas Comunes
+
+#### Error de Conexión con OpenRouter
+```plaintext
+Error: No se pudo conectar con el servicio de IA
+Solución: Verifica tu API key en las variables de entorno
+```
+
+#### Error de Base de Datos
+```plaintext
+Error: No se pudo conectar a la base de datos
+Solución: Verifica la cadena de conexión y que SQL Server esté ejecutándose
+```
+
+#### Error de Notificaciones
+```plaintext
+Error: No se pudieron enviar las notificaciones
+Solución: Verifica la configuración SMTP y las credenciales
+```
+
+### Guía de Depuración
+1. Revisa los logs en `logs/application.log`
+2. Verifica las variables de entorno
+3. Comprueba la conexión a servicios externos
+4. Valida los permisos de la base de datos
+
+### Diagnóstico Rápido
+```bash
+# Verificar estado de servicios
+dotnet run --check-services
+
+# Verificar configuración
+dotnet run --check-config
+
+# Verificar conexiones
+dotnet run --check-connections
+```
+
+## 🔒 Seguridad
+
+### Políticas de Seguridad
+- Encriptación de datos sensibles (AES-256)
+- Autenticación de dos factores (2FA)
+- Sesiones seguras con JWT
+- Protección contra ataques comunes (OWASP Top 10)
+
+### Manejo de Datos
+- Las contraseñas se almacenan con hash bcrypt
+- Los tokens de API se cifran
+- Los datos personales se protegen según GDPR
+- Backups automáticos diarios
+
+### Buenas Prácticas
+1. Nunca compartas tus API keys
+2. Mantén actualizado el sistema
+3. Usa contraseñas fuertes
+4. Reporta vulnerabilidades
+
+### Auditoría de Seguridad
+```bash
+# Ejecutar escaneo de seguridad
+dotnet run --security-scan
+
+# Verificar dependencias
+dotnet run --check-dependencies
+
+# Generar reporte de seguridad
+dotnet run --security-report
+```
+
+## 📦 Versiones
+
+### Historial de Cambios
+
+#### v1.2.0 (Actual)
+- Mejora en el procesamiento de comandos naturales
+- Corrección de errores de concurrencia
+- Optimización de rendimiento
+- Nuevas características de IA
+
+#### v1.1.0
+- Integración con OpenRouter
+- Sistema de notificaciones
+- Mejoras en la UI
+
+#### v1.0.0
+- Lanzamiento inicial
+- Funcionalidades básicas
+- Integración con IA
+
+### Compatibilidad
+- Windows 10/11
+- .NET Framework 4.7.2+
+- SQL Server 2019+
+- Visual Studio 2019+
+
+## 👨‍💻 Desarrollo
+
+### Guía de Estilo
+```csharp
+// Convenciones de nombrado
+public class TaskManager { }  // PascalCase para clases
+private string _taskName;     // _camelCase para privados
+public void ProcessTask() { } // PascalCase para métodos
+
+// Documentación
+/// <summary>
+/// Procesa una tarea y actualiza su estado
+/// </summary>
+/// <param name="task">La tarea a procesar</param>
+/// <returns>Resultado del procesamiento</returns>
+```
+
+### Estructura de Carpetas
+```
+CaptusGUI/
+├── Presentation/     # Capa de presentación
+├── BLL/             # Lógica de negocio
+├── DAL/             # Acceso a datos
+├── ENTITY/          # Modelos y entidades
+├── Tests/           # Pruebas unitarias
+└── Docs/            # Documentación
+```
+
+### Flujo de Trabajo
+1. Crear rama desde `develop`
+2. Implementar cambios
+3. Ejecutar pruebas
+4. Crear Pull Request
+5. Revisión de código
+6. Merge a `develop`
+
+---
+
+⭐️ Si te gusta el proyecto, ¡déjanos una estrella!
+
+[Volver arriba](#captusgui---asistente-inteligente-de-gestión-de-tareas)

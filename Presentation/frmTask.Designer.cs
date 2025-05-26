@@ -49,7 +49,7 @@
             // 
             // panelTop
             // 
-            this.panelTop.BackColor = System.Drawing.Color.Green;
+            this.panelTop.BackColor = System.Drawing.Color.FromArgb(33, 150, 83);
             this.panelTop.Controls.Add(this.pictureBox1);
             this.panelTop.Controls.Add(this.btnClose);
             this.panelTop.Controls.Add(this.label1);
@@ -98,7 +98,7 @@
             // 
             // panelFull
             // 
-            this.panelFull.BackColor = System.Drawing.Color.Honeydew;
+            this.panelFull.BackColor = System.Drawing.Color.FromArgb(245, 246, 250);
             this.panelFull.Controls.Add(this.btnAddTask);
             this.panelFull.Controls.Add(this.btnGuardarTaskList);
             this.panelFull.Dock = System.Windows.Forms.DockStyle.Left;
@@ -109,11 +109,11 @@
             // 
             // btnAddTask
             // 
-            this.btnAddTask.BackColor = System.Drawing.Color.Green;
+            this.btnAddTask.BackColor = System.Drawing.Color.FromArgb(33, 150, 83);
             this.btnAddTask.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnAddTask.FlatAppearance.BorderSize = 0;
             this.btnAddTask.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.btnAddTask.FlatAppearance.MouseOverBackColor = System.Drawing.Color.PaleGreen;
+            this.btnAddTask.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(111, 207, 151);
             this.btnAddTask.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAddTask.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnAddTask.ForeColor = System.Drawing.Color.Honeydew;
@@ -146,7 +146,7 @@
             // 
             // panel1
             // 
-            this.panel1.BackColor = System.Drawing.Color.PaleGreen;
+            this.panel1.BackColor = System.Drawing.Color.FromArgb(245, 246, 250);
             this.panel1.Controls.Add(this.button2);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Left;
             this.panel1.Location = new System.Drawing.Point(190, 38);
@@ -175,18 +175,21 @@
             // 
             this.flpTasks.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.flpTasks.AutoScroll = true;
+            this.flpTasks.BackColor = System.Drawing.Color.White;
+            this.flpTasks.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flpTasks.Location = new System.Drawing.Point(200, 38);
             this.flpTasks.Name = "flpTasks";
+            this.flpTasks.Padding = new System.Windows.Forms.Padding(32, 24, 32, 24);
             this.flpTasks.Size = new System.Drawing.Size(889, 584);
             this.flpTasks.TabIndex = 3;
             this.flpTasks.Paint += new System.Windows.Forms.PaintEventHandler(this.flowLayoutPanel1_Paint);
             // 
             // btnRefresh
             // 
-            this.btnRefresh.BackColor = System.Drawing.Color.Green;
+            this.btnRefresh.BackColor = System.Drawing.Color.FromArgb(33, 150, 83);
             this.btnRefresh.FlatAppearance.BorderSize = 0;
             this.btnRefresh.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.btnRefresh.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Green;
+            this.btnRefresh.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(111, 207, 151);
             this.btnRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnRefresh.Font = new System.Drawing.Font("Century Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnRefresh.ForeColor = System.Drawing.Color.Honeydew;
@@ -205,6 +208,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1089, 622);
+            this.Controls.Clear();
             this.Controls.Add(this.flpTasks);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.panelFull);
