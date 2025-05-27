@@ -129,6 +129,13 @@ namespace BLL
                 if (string.IsNullOrWhiteSpace(aiResponse))
                     return "No se pudo procesar la solicitud.";
 
+                // Verificar si la respuesta parece ser JSON antes de intentar parsear
+                if (!aiResponse.TrimStart().StartsWith("{"))
+                {
+                    // Si no parece JSON, devolver la respuesta directamente
+                    return aiResponse;
+                }
+
                 // Intentar parsear la respuesta como JSON
                 try
                 {

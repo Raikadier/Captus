@@ -11,7 +11,7 @@ namespace BLL
 {
     public class ChatLogic : IChatService
     {
-        private readonly ChatRepository _chatRepository;
+        private readonly DAL.ChatRepository _chatRepository;
         private readonly AIService _aiService;
         private readonly TaskLogic _taskLogic;
         private readonly CommandProcessor _commandProcessor;
@@ -112,6 +112,27 @@ namespace BLL
                 return _chatRepository.Delete(messageId);
             }
             return false;
+        }
+
+        // Nuevo método para eliminar todos los mensajes del chat
+        public bool ClearChatMessages()
+        {
+            try
+            {
+                var result = _chatRepository.DeleteAll();
+                if (!result)
+                {
+                    // Aquí podrías agregar logging si lo necesitas
+                    Console.WriteLine("Error al eliminar los mensajes del chat");
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                // Aquí podrías agregar logging si lo necesitas
+                Console.WriteLine($"Error inesperado al eliminar mensajes: {ex.Message}");
+                return false;
+            }
         }
 
         // Implementación del método de la interfaz

@@ -24,6 +24,7 @@ namespace Presentation
         int step = 7; // velocidad de animación
         private readonly StatisticsLogic statisticsLogic;
         private readonly TaskLogic taskLogic;
+        private readonly BLL.ChatLogic chatLogic;
         HashSet<DateTime> fechasConTareas = new HashSet<DateTime>();
         Panel panelTareasCalendario = new Panel();
         List<ENTITY.Task> listaTareas = new List<ENTITY.Task>();
@@ -60,6 +61,12 @@ namespace Presentation
                 foreach (Control child in ctrl.Controls)
                     child.MouseDown += OcultarPanelTareas;
             }
+
+            // Inicializar ChatLogic
+            chatLogic = new BLL.ChatLogic(new BLL.AIService(ENTITY.Configuration.OpenRouterKey ?? ""));
+
+            // Suscribirse al evento FormClosing
+            this.FormClosing += FrmMain_FormClosing;
         }
         private void OcultarPanelTareas(object sender, MouseEventArgs e)
         {
@@ -796,6 +803,12 @@ namespace Presentation
         private void tblCalendario_Layout(object sender, LayoutEventArgs e)
         {
             //GenerarEncabezados();
+        }
+
+        private void FrmMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Eliminar todos los mensajes del chat al cerrar la aplicación a través de la BLL
+            chatLogic.ClearChatMessages();
         }
     }
 }
