@@ -282,8 +282,10 @@ namespace Presentation
             {
                 try
                 {
-                    if (Session.CurrentUser == null)
-                        throw new InvalidOperationException("No hay una sesión de usuario activa.");
+                    if (Session.CurrentUser == null) { 
+                        frmMessageBox.Show("No hay una sesión de usuario activa.", "Error de sesión");
+                        return;
+                    }
 
                     string titulo = txtTitle.Text.Trim();
                     string descripcion = string.IsNullOrWhiteSpace(txtDescription.Text) ? null : txtDescription.Text.Trim();
@@ -306,12 +308,10 @@ namespace Presentation
                     var result = taskLogic.Save(nuevaTarea);
                     if (result.Success)
                     {
+                        Notification noti = new EmailNotification();
 
-                        await BLL.NotificationService.Instance.SendTaskNotificationAsync(nuevaTarea, "creada");
-                        MessageBox.Show("✅ Tarea agregada exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                        string mensaje = NotifyEmails.GetMessageInsert(nuevaTarea.Title, nuevaTarea.EndDate.ToShortDateString(), nuevaTarea.Category.Name);
-                        await NotifyEmails.SendNotifyAsync(Session.CurrentUser.Email, "Nueva tarea asignada", mensaje);
+                        string mensaje = MessageTemplates.GetMessageInsert(nuevaTarea.Title, nuevaTarea.EndDate.ToShortDateString(), nuevaTarea.Category.Name);
+                        await noti.EnviarAsync(Session.CurrentUser.Email, "Nueva tarea asignada", mensaje);
                         frmMessageBox.Show("✅ Tarea agregada exitosamente", "Exito");
 
                         Clean();
@@ -325,15 +325,15 @@ namespace Presentation
 
                 catch (InvalidOperationException ex)
                 {
-                    MessageBox.Show($"Error de sesión: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    frmMessageBox.Show($"Error de sesión: {ex.Message}", "Error");
                 }
                 catch (FormatException ex)
                 {
-                    MessageBox.Show($"Error de formato: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    frmMessageBox.Show($"Error de formato: {ex.Message}", "Error");
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"❌ Error inesperado al guardar la tarea:\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    frmMessageBox.Show($"❌ Error inesperado al guardar la tarea:\n{ex.Message}", "Error");
 
                 }
             }

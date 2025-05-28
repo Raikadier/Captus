@@ -9,15 +9,7 @@ using System.Text;
 
 namespace BLL
 {
-    public interface ICommand
-    {
-        string Name { get; }
-        string Description { get; }
-        string Pattern { get; }
-        bool Matches(string input);
-        Task<string> Execute(string input);
-    }
-
+   
     public class Command : ICommand
     {
         public string Name { get; }

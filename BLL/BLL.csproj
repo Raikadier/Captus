@@ -69,9 +69,13 @@
     <Compile Include="AIService.cs" />
     <Compile Include="ChatLogic.cs" />
     <Compile Include="CommandProcessor.cs" />
+    <Compile Include="EmailNotification.cs" />
     <Compile Include="GradeCalculator.cs" />
     <Compile Include="IChatService.cs" />
+    <Compile Include="ICommand.cs" />
     <Compile Include="ILogic.cs" />
+    <Compile Include="MessageTemplates.cs" />
+    <Compile Include="Notification.cs" />
     <Compile Include="NotificationService.cs" />
     <Compile Include="NotifyEmails.cs" />
     <Compile Include="OperationResult.cs" />
