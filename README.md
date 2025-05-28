@@ -38,12 +38,18 @@ CaptusGUI es una aplicación de escritorio moderna que combina la gestión de ta
 
 ### 🤖 Asistente IA Integrado
 - Procesamiento de lenguaje natural para comandos
+  - Soporte para comandos estructurados y conversacionales
+  - Extracción inteligente de fechas relativas (ej: "el 28 de este mes")
+  - Interpretación de prioridades en lenguaje natural (ej: "es importante", "no es urgente")
+  - Reconocimiento de categorías en contexto conversacional
 - Respuestas contextuales y personalizadas
 - Soporte para múltiples idiomas
 - Integración con OpenRouter API
 - Sistema de procesamiento de comandos JSON estructurado
 - Manejo de errores y validación de respuestas IA
 - Formato de respuesta estandarizado para todas las acciones
+- Prompt engineering optimizado para comandos de tareas
+- Few-shot learning con ejemplos de comandos exitosos
 
 ### 📝 Gestión de Tareas
 - Creación, actualización y eliminación de tareas
@@ -97,14 +103,38 @@ dotnet run
 ## 💻 Uso
 
 ### Comandos en Lenguaje Natural
-CaptusGUI entiende comandos en lenguaje natural. Ejemplos:
+CaptusGUI entiende comandos en lenguaje natural. Puedes usar tanto comandos estructurados como lenguaje conversacional:
 
+#### Comandos Estructurados
 ```plaintext
-@Captus crea una tarea que tenga por nombre Cocinar el viernes
-@Captus actualiza la tarea Cocinar para el sábado
-@Captus elimina la tarea Cocinar
-@Captus muestra mis tareas pendientes
+@Captus crear tarea Reunión de equipo descripción Discutir progreso del proyecto X para 2024-07-25 prioridad alta categoría trabajo
+@Captus crear tarea Comprar víveres para 2024-07-26 categoría personal
+@Captus crear tarea Terminar informe mensual prioridad media categoría trabajo
 ```
+
+#### Comandos Conversacionales
+```plaintext
+@Captus, por favor crea una tarea que se llame "Organizar archivos", que trata de clasificar los documentos digitales de mi proyecto final, para el 28 de este mes, es importante y es de la categoría universidad.
+@Captus, necesito que crees una tarea para preparar la presentación final de mi proyecto. Es para el 29 de julio, es muy importante y es de la universidad.
+@Captus, quiero que me recuerdes hacer ejercicio el 28 de julio. Es una tarea personal.
+```
+
+### Ejemplos de Prompts
+Aquí tienes más ejemplos de prompts que puedes probar:
+
+#### Prompts Estructurados
+1. `@Captus crear tarea Preparar presentación final descripción Ensayar exposición del proyecto para 2024-07-29 prioridad alta categoría universidad`
+2. `@Captus crear tarea Revisar código fuente descripción Depurar errores en módulo principal para 2024-07-27 prioridad alta categoría trabajo`
+3. `@Captus crear tarea Hacer ejercicio para 2024-07-28 categoría personal`
+4. `@Captus crear tarea Actualizar documentación prioridad media categoría trabajo`
+5. `@Captus crear tarea Investigar nuevas tecnologías descripción Analizar frameworks para el proyecto para 2024-07-30 prioridad alta categoría universidad`
+
+#### Prompts Conversacionales
+1. `@Captus, necesito que crees una tarea para revisar el código del módulo principal. Necesito encontrar y corregir los errores antes del 27 de julio. Es de alta prioridad y es para el trabajo.`
+2. `@Captus, quiero que me recuerdes hacer ejercicio el 28 de julio. Es una tarea personal.`
+3. `@Captus, necesito actualizar la documentación del proyecto. No es urgente, pero es importante para el trabajo.`
+4. `@Captus, por favor crea una tarea para investigar nuevos frameworks. Necesito analizar las opciones para el proyecto antes del 30 de julio. Es de alta prioridad y es para la universidad.`
+5. `@Captus, quiero que me recuerdes limpiar la casa el 27 de julio. Es una tarea personal.`
 
 ### Gestión de Tareas
 ```csharp
@@ -211,7 +241,7 @@ AI_MAX_TOKENS=500
     "Model": "deepseek/deepseek-chat-v3-0324:free",
     "Temperature": 0.2,
     "MaxTokens": 500,
-    "SystemPrompt": "Eres Captus, un asistente de gestión de tareas..."
+    "SystemPrompt": "Eres Captus, un asistente de gestión de tareas especializado en procesar comandos de creación de tareas. Tu objetivo es generar respuestas en formato JSON para las siguientes acciones: crear_tarea, actualizar_tarea, eliminar_tarea, consultar_tareas, calcular_nota, calcular_promedio. Para crear_tarea, el JSON debe incluir: título (obligatorio), descripción (opcional), fecha (obligatorio), prioridad (obligatorio: alta, media, baja), categoría (obligatorio: universidad, trabajo, personal). Si falta un campo obligatorio, responde con un error específico. Si falta un campo opcional, asigna null. NO respondas de forma conversacional. SIEMPRE genera el JSON correspondiente a la acción solicitada."
   }
 }
 ```
