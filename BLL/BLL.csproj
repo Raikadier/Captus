@@ -80,6 +80,7 @@
     <Compile Include="StatisticsLogic.cs" />
     <Compile Include="SubTaskLogic.cs" />
     <Compile Include="TaskLogic.cs" />
+    <Compile Include="TaskService.cs" />
     <Compile Include="UserLogic.cs" />
   </ItemGroup>
   <ItemGroup>

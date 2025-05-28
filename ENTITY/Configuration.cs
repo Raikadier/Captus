@@ -6,6 +6,6 @@ namespace ENTITY
     {
         public static string ConnectionString { get; } = "Server=.\\SQLEXPRESS;Database=Captus;Trusted_Connection=True;";
         // Clave de API para OpenRouter (debe ser configurada por el usuario)
-        public static string OpenRouterKey { get; set; } = "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";
+        public static string OpenRouterKey { get; set; } = "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";
     }
 } 

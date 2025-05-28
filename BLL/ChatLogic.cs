@@ -4,16 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Task = ENTITY.Task; // Alias para evitar ambigüedad
-using BLL; // Añadir esta directiva si es necesario
+using Task = ENTITY.Task;
 
 namespace BLL
 {
     public class ChatLogic : IChatService
     {
-        private readonly ChatRepository _chatRepository;
+        private readonly DAL.ChatRepository _chatRepository;
         private readonly AIService _aiService;
-        private readonly TaskLogic _taskLogic;
+        private readonly TaskService _taskService;
         private readonly CommandProcessor _commandProcessor;
 
         // Constante para los comandos de ayuda
@@ -29,7 +28,7 @@ namespace BLL
         {
             _chatRepository = new ChatRepository();
             _aiService = aiService;
-            _taskLogic = new TaskLogic("Server=.\\SQLEXPRESS;Database=Captus;Trusted_Connection=True;");
+            _taskService = new TaskService();
             _commandProcessor = new CommandProcessor();
         }
 
@@ -57,7 +56,7 @@ namespace BLL
 
             if (!string.IsNullOrEmpty(commandResponse) && !commandResponse.StartsWith("Acción no reconocida."))
             {
-                 botResponseText = commandResponse;
+                botResponseText = commandResponse;
             }
             else
             {
@@ -112,6 +111,21 @@ namespace BLL
                 return _chatRepository.Delete(messageId);
             }
             return false;
+        }
+
+        // Nuevo método para eliminar todos los mensajes del chat
+        public bool ClearChatMessages()
+        {
+            try
+            {
+                return _chatRepository.DeleteAll();
+            }
+            catch (Exception ex)
+            {
+                // Aquí podrías agregar logging si lo necesitas
+                Console.WriteLine($"Error inesperado al eliminar mensajes: {ex.Message}");
+                return false;
+            }
         }
 
         // Implementación del método de la interfaz

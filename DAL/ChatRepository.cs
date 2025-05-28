@@ -135,5 +135,48 @@ namespace DAL
                 return false;
             }
         }
+
+        public bool DeleteAll()
+        {
+            try
+            {
+                bd.OpenConection();
+                
+                // Verificar si hay mensajes antes de eliminar
+                SqlCommand checkCmd = new SqlCommand("SELECT COUNT(*) FROM [dbo].[ChatMessage]", bd.connection);
+                int messageCount = (int)checkCmd.ExecuteScalar();
+                
+                if (messageCount == 0)
+                {
+                    return true; // No hay mensajes para eliminar
+                }
+
+                // Iniciar transacción
+                SqlTransaction transaction = bd.connection.BeginTransaction();
+                try
+                {
+                    SqlCommand cmd = new SqlCommand("DELETE FROM [dbo].[ChatMessage]", bd.connection, transaction);
+                    cmd.ExecuteNonQuery();
+                    
+                    // Confirmar transacción
+                    transaction.Commit();
+                    return true;
+                }
+                catch (Exception)
+                {
+                    // Revertir transacción en caso de error
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally
+            {
+                bd.CloseConection();
+            }
+        }
     }
 } 
