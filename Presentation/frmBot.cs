@@ -469,7 +469,7 @@ namespace Presentation
 
         private void FrmBot_Load(object sender, EventArgs e)
         {
-            richTextBox1.Clear(); // Borra historial automáticamente
+            // richTextBox1.Clear(); // Borra historial automáticamente - MOVIDO A FormClosing
             richTextBox1.BackColor = Color.White;
             richTextBox1.BorderStyle = BorderStyle.None;
             richTextBox1.ReadOnly = true;
@@ -485,7 +485,7 @@ namespace Presentation
 
         private void FrmBot_FormClosing(object sender, FormClosingEventArgs e)
             {
-                richTextBox1.Clear();
+                richTextBox1.Clear(); // Limpiar historial al cerrar el formulario
             }
 
         private void BtnClose_Click(object sender, EventArgs e)
