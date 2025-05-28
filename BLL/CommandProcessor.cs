@@ -49,15 +49,13 @@ namespace BLL
         private readonly List<ICommand> _commands;
         private const string CAPTUS_PATTERN = @"@[Cc]aptus\s+";
         private readonly AIService _aiService;
-        private readonly TaskLogic _taskLogic;
-        private readonly NotificationService _notificationService;
+        private readonly TaskService _taskService;
 
         public CommandProcessor()
         {
             _commands = new List<ICommand>();
             _aiService = new AIService(ENTITY.Configuration.OpenRouterKey ?? "");
-            _taskLogic = new TaskLogic();
-            _notificationService = NotificationService.Instance;
+            _taskService = new TaskService();
             InitializeCommands();
         }
 
@@ -112,81 +110,102 @@ namespace BLL
             if (string.IsNullOrWhiteSpace(input))
                 return "Por favor, ingrese un comando válido.";
 
-            // Si no es un comando @Captus, intentar procesar como comando normal
-            if (!input.StartsWith("@", StringComparison.OrdinalIgnoreCase))
+            // Remover el prefijo @Captus si existe
+            input = Regex.Replace(input, CAPTUS_PATTERN, "", RegexOptions.IgnoreCase).Trim();
+
+            // Intentar procesar como comando directo primero
+            var command = _commands.FirstOrDefault(c => c.Matches(input));
+            if (command != null)
             {
-                var command = _commands.FirstOrDefault(c => c.Matches(input));
-                if (command != null)
-                {
-                    return await command.Execute(input);
-                }
+                return await command.Execute(input);
             }
 
-            // Procesar con IA
+            // Si no es un comando directo, procesar con IA
             try
             {
                 var aiResponse = await _aiService.GetResponseAsync(input);
                 if (string.IsNullOrWhiteSpace(aiResponse))
                     return "No se pudo procesar la solicitud.";
 
-                // Verificar si la respuesta parece ser JSON antes de intentar parsear
-                if (!aiResponse.TrimStart().StartsWith("{"))
-                {
-                    // Si no parece JSON, devolver la respuesta directamente
-                    return aiResponse;
-                }
-
-                // Intentar parsear la respuesta como JSON
-                try
-                {
-                    var doc = JsonDocument.Parse(aiResponse);
-                    var root = doc.RootElement;
-
-                    // Si la IA responde con 'pregunta', mostrarla directamente al usuario
-                    if (root.TryGetProperty("pregunta", out var preguntaProp))
-                    {
-                        var pregunta = preguntaProp.GetString();
-                        if (!string.IsNullOrWhiteSpace(pregunta))
-                            return pregunta;
-                    }
-
-                    // Si la IA responde con 'error', mostrarlo directamente al usuario
-                    if (root.TryGetProperty("error", out var errorProp))
-                    {
-                        var error = errorProp.GetString();
-                        if (!string.IsNullOrWhiteSpace(error))
-                            return error;
-                    }
-
-                    string accion = root.TryGetProperty("accion", out var acc) ? acc.GetString() : null;
-
-                    if (string.IsNullOrEmpty(accion))
-                        return "No pude entender qué acción deseas realizar. Por favor, intenta ser más específico.";
-
-                    switch (accion)
-                    {
-                        case "crear_tarea":
-                            return await HandleCreateTaskFromJson(root.ToString());
-                        case "actualizar_tarea":
-                            return await HandleUpdateTaskFromJson(root.ToString());
-                        case "eliminar_tarea":
-                            return await HandleDeleteTaskFromJson(root.ToString());
-                        case "consultar_tareas":
-                            return HandleListTasks(input);
-                        default:
-                            return "Acción no reconocida.";
-                    }
-                }
-                catch (JsonException)
-                {
-                    // Si no es JSON válido, devolvemos un mensaje que incluye el contenido crudo recibido.
-                    return $"Error: La IA no devolvió un JSON válido para procesar el comando. Contenido recibido: \n{aiResponse}";
-                }
+                return await ProcessAIResponse(aiResponse);
             }
             catch (Exception ex)
             {
                 return $"Error al procesar la solicitud: {ex.Message}";
             }
+        }
+
+        private async Task<string> ProcessAIResponse(string aiResponse)
+        {
+            // Extraer el bloque JSON si está envuelto en markdown
+            string jsonContent = ExtractJsonFromMarkdown(aiResponse);
+
+            // Si no se encontró un bloque JSON y la respuesta original no parece JSON, devolver la respuesta directamente
+            if (string.IsNullOrEmpty(jsonContent) && !aiResponse.TrimStart().StartsWith("{"))
+                return aiResponse;
+
+            // Usar el contenido JSON extraído o la respuesta original si no había markdown
+            string responseToParse = string.IsNullOrEmpty(jsonContent) ? aiResponse : jsonContent;
+
+            try
+            {
+                var doc = JsonDocument.Parse(responseToParse);
+                var root = doc.RootElement;
+
+                // Manejar respuestas directas (pregunta, error)
+                if (root.TryGetProperty("mensaje_error", out var errorProp) && !string.IsNullOrWhiteSpace(errorProp.GetString()))
+                    return $"❌ {errorProp.GetString()}"; // Mostrar errores con un prefijo
+
+                if (root.TryGetProperty("pregunta", out var preguntaProp) && !string.IsNullOrWhiteSpace(preguntaProp.GetString()))
+                     return $"❓ {preguntaProp.GetString()}"; // Mostrar preguntas con un prefijo
+
+                // Procesar acciones
+                string accion = root.TryGetProperty("accion", out var acc) ? acc.GetString() : null;
+                if (string.IsNullOrEmpty(accion))
+                    return "❓ No pude entender qué acción deseas realizar. Por favor, intenta ser más específico.";
+
+                string resultMessage = "⚠️ Acción no reconocida.";
+                switch (accion)
+                {
+                    case "crear_tarea":
+                        resultMessage = await HandleCreateTaskFromJson(responseToParse);
+                        break;
+                    case "actualizar_tarea":
+                        resultMessage = await HandleUpdateTaskFromJson(responseToParse);
+                        break;
+                    case "eliminar_tarea":
+                        resultMessage = await HandleDeleteTaskFromJson(responseToParse);
+                        break;
+                    case "consultar_tareas":
+                        resultMessage = HandleListTasks(responseToParse);
+                        break;
+                    default:
+                        resultMessage = $"⚠️ Acción '{accion}' no implementada aún.";
+                        break;
+                }
+
+                return resultMessage;
+            }
+            catch (JsonException)
+            {
+                return $"❌ Error: La IA no devolvió un JSON válido. Contenido recibido: \n{responseToParse}";
+            }
+            catch (Exception ex)
+            {
+                // Capturar cualquier otra excepción durante el procesamiento del JSON
+                return $"❌ Error interno al procesar la respuesta de la IA: {ex.Message}";
+            }
+        }
+
+        // Nuevo método para extraer JSON de bloques markdown
+        private string ExtractJsonFromMarkdown(string text)
+        {
+            var match = Regex.Match(text, @"```json\n([\s\S]*?)\n```");
+            if (match.Success)
+            {
+                return match.Groups[1].Value.Trim();
+            }
+            return null;
         }
 
         private async Task<string> HandleCreateTaskFromJson(string json)
@@ -199,32 +218,20 @@ namespace BLL
                 var doc = JsonDocument.Parse(json);
                 var root = doc.RootElement;
                 
-                string titulo = root.TryGetProperty("titulo", out var t) ? t.GetString() : null;
-                string descripcion = root.TryGetProperty("descripcion", out var d) ? d.GetString() : null;
-                string prioridadTexto = root.TryGetProperty("prioridad", out var p) ? p.GetString() : "Normal";
-                string categoriaTexto = root.TryGetProperty("categoria", out var c) ? c.GetString() : "General";
-                DateTime fecha = root.TryGetProperty("fecha", out var f) ? f.GetDateTime() : DateTime.Now.AddDays(7);
-
-                ENTITY.Task nuevaTarea;
-                var resultado = _taskLogic.CreateAndSaveTask(
-                    titulo, descripcion, fecha, prioridadTexto, categoriaTexto, 
-                    Session.CurrentUser, out nuevaTarea);
-
-                if (resultado.Success)
+                var taskData = new TaskData
                 {
-                    await _notificationService.SendTaskNotificationAsync(nuevaTarea, "create");
-                    Console.WriteLine($"Tarea creada exitosamente: {titulo}");
-                    return $"✅ Tarea creada exitosamente: {titulo}";
-                }
-                else
-                {
-                    Console.WriteLine($"Error al crear tarea: {resultado.Message}");
-                    return $"❌ Error al crear tarea: {resultado.Message}";
-                }
+                    Titulo = root.TryGetProperty("titulo", out var t) ? t.GetString() : null,
+                    Descripcion = root.TryGetProperty("descripcion", out var d) ? d.GetString() : null,
+                    PrioridadTexto = root.TryGetProperty("prioridad", out var p) ? p.GetString() : "Normal",
+                    CategoriaTexto = root.TryGetProperty("categoria", out var c) ? c.GetString() : "General",
+                    Fecha = root.TryGetProperty("fecha", out var f) ? f.GetDateTime() : DateTime.Now.AddDays(7)
+                };
+
+                var resultado = await _taskService.CreateTaskAsync(taskData, Session.CurrentUser);
+                return resultado.Message;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error al procesar comando JSON: {ex.Message}");
                 return $"❌ Error al procesar el comando: {ex.Message}";
             }
         }
@@ -242,32 +249,20 @@ namespace BLL
                 if (!root.TryGetProperty("id", out var idProp) || !int.TryParse(idProp.GetString(), out int taskId))
                     return "Error: ID de tarea no válido.";
 
-                var tarea = _taskLogic.GetById(taskId);
-                if (tarea == null)
-                    return "Error: Tarea no encontrada.";
-
-                if (root.TryGetProperty("titulo", out var t)) tarea.Title = t.GetString();
-                if (root.TryGetProperty("descripcion", out var d)) tarea.Description = d.GetString();
-                if (root.TryGetProperty("fecha", out var f)) tarea.EndDate = f.GetDateTime();
-                if (root.TryGetProperty("prioridad", out var p)) tarea.Priority = new Priority { Name = p.GetString() };
-                if (root.TryGetProperty("categoria", out var c)) tarea.Category = new Category { Name = c.GetString() };
-
-                var resultado = _taskLogic.Update(tarea);
-                if (resultado.Success)
+                var taskData = new TaskData
                 {
-                    await _notificationService.SendTaskNotificationAsync(tarea, "update");
-                    Console.WriteLine($"Tarea actualizada exitosamente: {tarea.Title}");
-                    return $"✅ Tarea actualizada exitosamente: {tarea.Title}";
-                }
-                else
-                {
-                    Console.WriteLine($"Error al actualizar tarea: {resultado.Message}");
-                    return $"❌ Error al actualizar tarea: {resultado.Message}";
-                }
+                    Titulo = root.TryGetProperty("titulo", out var t) ? t.GetString() : null,
+                    Descripcion = root.TryGetProperty("descripcion", out var d) ? d.GetString() : null,
+                    PrioridadTexto = root.TryGetProperty("prioridad", out var p) ? p.GetString() : null,
+                    CategoriaTexto = root.TryGetProperty("categoria", out var c) ? c.GetString() : null,
+                    Fecha = root.TryGetProperty("fecha", out var f) ? f.GetDateTime() : default
+                };
+
+                var resultado = await _taskService.UpdateTaskAsync(taskId, taskData);
+                return resultado.Message;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error al procesar comando JSON: {ex.Message}");
                 return $"❌ Error al procesar el comando: {ex.Message}";
             }
         }
@@ -285,26 +280,11 @@ namespace BLL
                 if (!root.TryGetProperty("id", out var idProp) || !int.TryParse(idProp.GetString(), out int taskId))
                     return "Error: ID de tarea no válido.";
 
-                var tarea = _taskLogic.GetById(taskId);
-                if (tarea == null)
-                    return "Error: Tarea no encontrada.";
-
-                var resultado = _taskLogic.Delete(taskId);
-                if (resultado.Success)
-                {
-                    await _notificationService.SendTaskNotificationAsync(tarea, "delete");
-                    Console.WriteLine($"Tarea eliminada exitosamente: {tarea.Title}");
-                    return $"✅ Tarea eliminada exitosamente: {tarea.Title}";
-                }
-                else
-                {
-                    Console.WriteLine($"Error al eliminar tarea: {resultado.Message}");
-                    return $"❌ Error al eliminar tarea: {resultado.Message}";
-                }
+                var resultado = await _taskService.DeleteTaskAsync(taskId);
+                return resultado.Message;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error al procesar comando JSON: {ex.Message}");
                 return $"❌ Error al procesar el comando: {ex.Message}";
             }
         }
@@ -316,25 +296,22 @@ namespace BLL
                 if (Session.CurrentUser == null)
                     return "Error: No hay una sesión de usuario activa.";
 
-                // Se mantiene el filtro básico si se proporciona texto adicional, 
-                // aunque la implementación detallada dependerá de TaskLogic.GetTasks
                 var match = Regex.Match(input, @"(?:mostrar|consultar|ver)\s+tareas(?:\s+(.+))?$", RegexOptions.IgnoreCase);
-                string filtro = match.Groups[1].Success ? match.Groups[1].Value.Trim() : null; // Usar null si no hay filtro
+                string filtro = match.Groups[1].Success ? match.Groups[1].Value.Trim() : null;
 
-                // Si hay filtro, pasarlo a GetTasks; de lo contrario, obtener todas
-                var tasks = string.IsNullOrEmpty(filtro)
-                    ? _taskLogic.GetTasks(Session.CurrentUser.id, new ENTITY.TaskCriteria())
-                    : _taskLogic.GetTasks(Session.CurrentUser.id, new ENTITY.TaskCriteria { SearchText = filtro });
+                var criteria = new TaskCriteria { SearchText = filtro };
+                var resultado = _taskService.GetTasks(criteria);
 
+                if (!resultado.Success)
+                    return resultado.Message;
 
+                var tasks = (List<ENTITY.Task>)resultado.Data;
                 if (tasks == null || !tasks.Any())
-                {
                     return "No tienes tareas pendientes o no se encontraron tareas con ese filtro.";
-                }
 
                 var sb = new StringBuilder();
                 sb.AppendLine("📋 Tus tareas:");
-                sb.AppendLine(); // Línea en blanco para mejor formato
+                sb.AppendLine();
 
                 foreach (var task in tasks)
                 {
@@ -342,21 +319,16 @@ namespace BLL
                     sb.AppendLine($"  Título: {task.Title ?? "Sin título"}");
                     sb.AppendLine($"  Descripción: {task.Description ?? "Sin descripción"}");
                     sb.AppendLine($"  Fecha Límite: {task.EndDate:dd/MM/yyyy}");
-                    // Asegurarse de cargar Priority y Category si no están ya cargados
-                    // Aunque TaskLogic.GetTasks debería cargarlos, es bueno tener precaución
-                    string prioridad = task.Priority?.Name ?? GetPriorityName(task.Id_Priority);
-                    string categoria = task.Category?.Name ?? GetCategoryName(task.Id_Category);
-                    sb.AppendLine($"  Prioridad: {prioridad}");
-                    sb.AppendLine($"  Categoría: {categoria}");
+                    sb.AppendLine($"  Prioridad: {task.Priority?.Name ?? GetPriorityName(task.Id_Priority)}");
+                    sb.AppendLine($"  Categoría: {task.Category?.Name ?? GetCategoryName(task.Id_Category)}");
                     sb.AppendLine($"  Estado: {(task.State ? "Completada ✅" : "Pendiente ⏳")}");
-                    sb.AppendLine(); // Línea en blanco entre tareas
+                    sb.AppendLine();
                 }
 
                 return sb.ToString();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error al consultar las tareas: {ex.Message}");
                 return $"❌ Error al consultar las tareas: {ex.Message}";
             }
         }
