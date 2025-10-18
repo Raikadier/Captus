@@ -1,163 +1,201 @@
-# Captus Web
+# Captus Web - Task Management Application
 
-Versión web de la aplicación Captus Desktop, migrada de C# a React + Node.js + Supabase.
+A modern web version of the Captus desktop application, migrated from C# to a React + Node.js stack with Supabase.
 
-## Tecnologías
+## 🚀 Features (MVP)
 
-- **Frontend**: React 19 con Vite
-- **Backend**: Node.js con Express.js
-- **Base de datos**: Supabase (PostgreSQL)
-- **Autenticación**: JWT con Supabase Auth
-- **UI**: Tailwind CSS
+- ✅ User authentication (register/login) with Supabase Auth
+- ✅ Task management (CRUD operations)
+- ✅ Subtask support
+- ✅ Categories and priorities
+- ✅ Streak tracking system
+- ✅ Responsive UI with Tailwind CSS
+- ✅ REST API with JWT authentication
+- ✅ Swagger API documentation
 
-## Características MVP
+## 🏗️ Architecture
 
-### Fase 1 - Esenciales
-- ✅ Gestión de tareas (crear, editar, eliminar, completar)
-- ✅ Subtareas anidadas
-- ✅ Gestión de usuarios (registro, login)
-- ✅ Categorías y prioridades
-- ✅ Sistema de rachas (streaks)
+### Backend
+- **Framework**: Node.js + Express
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth + JWT
+- **Documentation**: Swagger/OpenAPI
+- **Structure**: Modular (controllers, services, models, routes)
 
-### Fase 2 - Complementarias (preparado)
-- ✅ Notificaciones básicas
-- 🔄 Grupos de trabajo (pendiente)
-- 🔄 Gestor de documentos (pendiente)
+### Frontend
+- **Framework**: React + Vite
+- **State Management**: Context API + Custom Hooks
+- **Styling**: Tailwind CSS
+- **Architecture**: Bulletproof React (features, shared, components)
+- **Routing**: React Router
 
-### Fase 3 - Avanzadas (futuro)
-- 🔄 Asistente IA
-- 🔄 Generador UML
-- 🔄 Integraciones n8n/MCP
+## 📁 Project Structure
 
-## Instalación y Configuración
+```
+Captus/
+├── backend/src/
+│   ├── controllers/     # HTTP request handlers
+│   ├── services/        # Business logic layer
+│   ├── models/          # Data models
+│   ├── routes/          # API route definitions
+│   └── middleware/      # Express middleware
+├── src/
+│   ├── features/        # Feature-specific code
+│   │   └── tasks/       # Task management feature
+│   ├── shared/          # Shared utilities and components
+│   └── context/         # React context providers
+├── __tests__/           # Unit and integration tests
+├── server.js            # Main server file
+├── supabase-schema.sql  # Database schema
+└── MIGRATION_PLAN.md    # Migration documentation
+```
 
-### Prerrequisitos
+## 🔧 Setup and Installation
+
+### Prerequisites
 - Node.js 18+
-- Cuenta de Supabase
+- npm or yarn
+- Supabase account and project
 
-### Configuración
+### Environment Variables
+Create a `.env` file in the root directory:
 
-1. **Clona el repositorio**:
+```env
+# Supabase Configuration
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# JWT Secret
+JWT_SECRET=your_jwt_secret_key
+
+# Server Configuration
+PORT=5432
+FRONTEND_URL=http://localhost:5173
+```
+
+### Installation
+
+1. **Clone and setup**:
    ```bash
-   git clone <repository-url>
-   cd CaptusGUI
-   ```
-
-2. **Instala dependencias**:
-   ```bash
+   git checkout feature/web-migration
    npm install
    ```
 
-3. **Configura Supabase**:
-   - Crea un proyecto en [Supabase](https://supabase.com)
-   - Ejecuta el esquema SQL en `supabase-schema.sql` en el SQL Editor de Supabase
-   - Copia las credenciales del proyecto
+2. **Database setup**:
+   - Create a Supabase project
+   - Run the SQL schema from `supabase-schema.sql` in your Supabase SQL editor
+   - Update your `.env` file with Supabase credentials
 
-4. **Configura variables de entorno**:
-   Edita el archivo `.env`:
-   ```env
-   SUPABASE_URL=tu_supabase_project_url
-   SUPABASE_ANON_KEY=tu_supabase_anon_key
-   JWT_SECRET=tu_jwt_secret_key
-   PORT=5000
-   ```
-
-5. **Ejecuta la aplicación**:
+3. **Start the application**:
    ```bash
-   # Terminal 1: Backend
+   # Start backend server
    npm run server:dev
 
-   # Terminal 2: Frontend
+   # In another terminal, start frontend
    npm run dev
    ```
 
-6. **Accede a la aplicación**:
+4. **Access the application**:
    - Frontend: http://localhost:5173
-   - Backend API: http://localhost:5000
+   - Backend API: http://localhost:5432
+   - API Documentation: http://localhost:5432/api-docs
 
-## Estructura del Proyecto
+## 🧪 Testing
 
-```
-CaptusGUI/
-├── server.js                 # Backend Express
-├── supabase-schema.sql       # Esquema de base de datos
-├── vite.config.js           # Configuración Vite
-├── package.json             # Dependencias
-├── .env                     # Variables de entorno
-├── src/
-│   ├── App.jsx              # Componente principal con routing
-│   ├── main.jsx             # Punto de entrada React
-│   ├── context/
-│   │   └── AuthContext.jsx  # Contexto de autenticación
-│   └── components/
-│       ├── Login.jsx        # Componente de login/registro
-│       └── Dashboard.jsx    # Dashboard principal
-└── public/                  # Archivos estáticos
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run with coverage
+npm test -- --coverage
 ```
 
-## API Endpoints
+## 📚 API Documentation
 
-### Autenticación
-- `POST /api/auth/login` - Iniciar sesión
-- `POST /api/auth/register` - Registrarse
-- `POST /api/auth/logout` - Cerrar sesión
+The API is fully documented with Swagger. Visit `/api-docs` when the server is running.
 
-### Tareas
-- `GET /api/tasks` - Obtener tareas del usuario
-- `POST /api/tasks` - Crear nueva tarea
-- `PUT /api/tasks/:id` - Actualizar tarea
-- `DELETE /api/tasks/:id` - Eliminar tarea
+### Key Endpoints
 
-### Subtareas
-- `GET /api/subtasks` - Obtener subtareas
-- `POST /api/subtasks` - Crear subtarea
+#### Authentication
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - Login user
+- `POST /api/auth/logout` - Logout user
 
-### Datos maestros
-- `GET /api/categories` - Obtener categorías
-- `GET /api/priorities` - Obtener prioridades
-- `GET /api/streaks` - Obtener rachas del usuario
+#### Tasks
+- `GET /api/tasks` - Get user tasks (with filters)
+- `POST /api/tasks` - Create new task
+- `PUT /api/tasks/:id` - Update task
+- `DELETE /api/tasks/:id` - Delete task
+- `GET /api/tasks/overdue` - Get overdue tasks
+- `GET /api/tasks/completed-today` - Get today's completed tasks
+- `POST /api/tasks/:id/subtasks` - Create subtask
+- `GET /api/tasks/:id/subtasks` - Get task subtasks
 
-### Notificaciones
-- `GET /api/notifications` - Obtener notificaciones
-- `PUT /api/notifications/:id/read` - Marcar como leída
+#### Streaks
+- `GET /api/streaks` - Get user streak
+- `PUT /api/streaks` - Update streak
+- `DELETE /api/streaks` - Reset streak
+- `GET /api/streaks/stats` - Get streak statistics
 
-## Desarrollo
+#### Reference Data
+- `GET /api/categories` - Get all categories
+- `GET /api/priorities` - Get all priorities
 
-### Scripts disponibles
-- `npm run dev` - Inicia el servidor de desarrollo frontend
-- `npm run build` - Construye la aplicación para producción
-- `npm run server` - Inicia el servidor backend
-- `npm run server:dev` - Inicia el servidor backend con nodemon
-- `npm run lint` - Ejecuta ESLint
+## 🔄 Migration from Desktop Version
 
-### Arquitectura
+This web version maintains feature parity with the C# desktop application:
 
-La aplicación sigue una arquitectura en 3 capas:
-1. **Presentación** (React): Componentes UI y manejo de estado
-2. **Servicios** (Express): APIs RESTful y lógica de negocio
-3. **Acceso a datos** (Supabase): Consultas a base de datos con RLS
+### Entity Mapping
+- `Task` (C#) → `tasks` table
+- `SubTask` (C#) → `tasks` table with `parent_task_id`
+- `User` (C#) → Supabase Auth + `users` table
+- `Category` (C#) → `categories` table
+- `Priority` (C#) → `priorities` table
+- `Statistics` (C#) → `streaks` table
 
-### Seguridad
-- Autenticación JWT con tokens en HttpOnly cookies
-- Row Level Security (RLS) en Supabase
-- Validación de entrada en APIs
-- CORS configurado
+### Business Logic Migration
+- Task validation and business rules preserved
+- Streak calculation logic migrated
+- User session management adapted for web
+- CRUD operations maintain desktop behavior
 
-## Próximos pasos
+See `MIGRATION_PLAN.md` for detailed migration notes.
 
-1. **Fase 2**: Implementar grupos de trabajo y gestor de documentos
-2. **Fase 3**: Integrar IA con Ollama/n8n/MCP
-3. **Testing**: Añadir tests unitarios e integración
-4. **CI/CD**: Configurar pipelines de despliegue
-5. **PWA**: Convertir en Progressive Web App
+## 🚀 Deployment
 
-## Contribución
+### Backend Deployment
+```bash
+npm run build
+npm run server  # Production server
+```
 
-1. Crea una rama para tu feature: `git checkout -b feature/nueva-funcionalidad`
-2. Realiza tus cambios y commits: `git commit -m "feat: descripción"`
-3. Push a la rama: `git push origin feature/nueva-funcionalidad`
-4. Crea un Pull Request
+### Frontend Deployment
+```bash
+npm run build
+# Deploy the dist/ folder to your hosting service
+```
 
-## Licencia
+## 🤝 Contributing
 
-Este proyecto está bajo la Licencia MIT.
+1. Create a feature branch from `feature/web-migration`
+2. Make your changes
+3. Add tests for new functionality
+4. Ensure all tests pass
+5. Submit a pull request
+
+## 📝 License
+
+This project is part of the Captus application migration. See the original desktop project for licensing information.
+
+## 🐛 Known Issues & TODO
+
+- [ ] Email notifications (Phase 2)
+- [ ] Document management (Phase 2)
+- [ ] Work groups (Phase 2)
+- [ ] AI integration (Phase 3)
+- [ ] UML editor (Phase 3)
+
+See `MIGRATION_PLAN.md` for the complete roadmap.
