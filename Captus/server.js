@@ -4,6 +4,13 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
 import jwt from 'jsonwebtoken';
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+
+// Import our modular routes and controllers
+import taskRoutes, { setTaskController } from './backend/src/routes/taskRoutes.js';
+import userRoutes, { setUserController } from './backend/src/routes/userRoutes.js';
+import streakRoutes, { setStreakService } from './backend/src/routes/streakRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -13,7 +20,10 @@ const PORT = process.env.PORT || 5432;
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  credentials: true
+}));
 app.use(express.json());
 
 // Supabase client
@@ -23,6 +33,11 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 // JWT Secret
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
+
+// Initialize controllers and services with supabase
+setTaskController(supabase);
+setUserController(supabase);
+setStreakService(supabase);
 
 // Auth middleware
 const authenticateToken = (req, res, next) => {
@@ -101,92 +116,55 @@ app.post('/api/auth/logout', authenticateToken, async (req, res) => {
   }
 });
 
+// Swagger configuration
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Captus Web API',
+      version: '1.0.0',
+      description: 'API for the Captus task management web application',
+    },
+    servers: [
+      {
+        url: `http://localhost:${PORT}`,
+        description: 'Development server',
+      },
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
+  },
+  apis: ['./backend/src/routes/*.js', './backend/src/controllers/*.js'],
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+
 // Routes
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Captus Web API is running' });
 });
 
-// Protected routes for MVP
-app.get('/api/users', authenticateToken, async (req, res) => {
-  try {
-    const { data, error } = await supabase.from('users').select('*');
-    if (error) throw error;
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+// Swagger documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.get('/api/tasks', authenticateToken, async (req, res) => {
-  try {
-    const { data, error } = await supabase.from('tasks').select('*').eq('user_id', req.user.id);
-    if (error) throw error;
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+// API routes using modular structure
+app.use('/api/tasks', authenticateToken, taskRoutes);
+app.use('/api/users', authenticateToken, userRoutes);
+app.use('/api/streaks', authenticateToken, streakRoutes);
 
-app.post('/api/tasks', authenticateToken, async (req, res) => {
-  try {
-    const taskData = { ...req.body, user_id: req.user.id };
-    const { data, error } = await supabase.from('tasks').insert(taskData);
-    if (error) throw error;
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.put('/api/tasks/:id', authenticateToken, async (req, res) => {
-  try {
-    const { data, error } = await supabase.from('tasks').update(req.body).eq('id', req.params.id).eq('user_id', req.user.id);
-    if (error) throw error;
-
-    // Update streak if task completion status changed
-    if (req.body.completed !== undefined) {
-      await updateUserStreak(req.user.id);
-    }
-
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.delete('/api/tasks/:id', authenticateToken, async (req, res) => {
-  try {
-    const { data, error } = await supabase.from('tasks').delete().eq('id', req.params.id).eq('user_id', req.user.id);
-    if (error) throw error;
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Subtasks routes
-app.get('/api/subtasks', authenticateToken, async (req, res) => {
-  try {
-    const { data, error } = await supabase.from('subtasks').select('*').eq('user_id', req.user.id);
-    if (error) throw error;
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.post('/api/subtasks', authenticateToken, async (req, res) => {
-  try {
-    const subtaskData = { ...req.body, user_id: req.user.id };
-    const { data, error } = await supabase.from('subtasks').insert(subtaskData);
-    if (error) throw error;
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Categories routes
+// Additional routes for categories and priorities (simple direct routes)
 app.get('/api/categories', authenticateToken, async (req, res) => {
   try {
     const { data, error } = await supabase.from('categories').select('*');
@@ -197,7 +175,6 @@ app.get('/api/categories', authenticateToken, async (req, res) => {
   }
 });
 
-// Priorities routes
 app.get('/api/priorities', authenticateToken, async (req, res) => {
   try {
     const { data, error } = await supabase.from('priorities').select('*');
@@ -208,124 +185,80 @@ app.get('/api/priorities', authenticateToken, async (req, res) => {
   }
 });
 
-// Streaks routes
-app.get('/api/streaks', authenticateToken, async (req, res) => {
-  try {
-    const { data, error } = await supabase.from('streaks').select('*').eq('user_id', req.user.id);
-    if (error) throw error;
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+// Swagger annotations for API documentation
+/**
+ * @swagger
+ * /api/health:
+ *   get:
+ *     summary: Health check endpoint
+ *     responses:
+ *       200:
+ *         description: API is running
+ */
 
-// Notifications routes
-app.get('/api/notifications', authenticateToken, async (req, res) => {
-  try {
-    const { data, error } = await supabase.from('notifications').select('*').eq('user_id', req.user.id).order('created_at', { ascending: false });
-    if (error) throw error;
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+/**
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *                 minLength: 6
+ *               name:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User registered successfully
+ */
 
-app.put('/api/notifications/:id/read', authenticateToken, async (req, res) => {
-  try {
-    const { data, error } = await supabase.from('notifications').update({ read: true }).eq('id', req.params.id).eq('user_id', req.user.id);
-    if (error) throw error;
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Streak calculation function
-async function updateUserStreak(userId) {
-  try {
-    const today = new Date().toISOString().split('T')[0];
-
-    // Get user's streak record
-    let { data: streak, error: streakError } = await supabase
-      .from('streaks')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
-
-    if (streakError && streakError.code !== 'PGRST116') throw streakError;
-
-    // Get completed tasks today
-    const { data: completedTasks, error: tasksError } = await supabase
-      .from('tasks')
-      .select('id')
-      .eq('user_id', userId)
-      .eq('completed', true)
-      .gte('updated_at', today + ' 00:00:00')
-      .lt('updated_at', today + ' 23:59:59');
-
-    if (tasksError) throw tasksError;
-
-    const hasCompletedToday = completedTasks.length > 0;
-
-    if (!streak) {
-      // Create new streak record
-      const { data, error } = await supabase
-        .from('streaks')
-        .insert({
-          user_id: userId,
-          current_streak: hasCompletedToday ? 1 : 0,
-          longest_streak: hasCompletedToday ? 1 : 0,
-          last_completed_date: hasCompletedToday ? today : null,
-        });
-      if (error) throw error;
-    } else {
-      // Update existing streak
-      let newCurrentStreak = streak.current_streak;
-      let newLongestStreak = streak.longest_streak;
-
-      if (hasCompletedToday && streak.last_completed_date !== today) {
-        // Check if it's consecutive day
-        const lastDate = new Date(streak.last_completed_date);
-        const currentDate = new Date(today);
-        const diffTime = Math.abs(currentDate - lastDate);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-        if (diffDays === 1) {
-          newCurrentStreak += 1;
-        } else {
-          newCurrentStreak = 1;
-        }
-
-        if (newCurrentStreak > newLongestStreak) {
-          newLongestStreak = newCurrentStreak;
-        }
-      } else if (!hasCompletedToday) {
-        // Reset streak if no completion today and it's a new day
-        const lastDate = new Date(streak.last_completed_date);
-        const currentDate = new Date(today);
-        const diffTime = Math.abs(currentDate - lastDate);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-        if (diffDays > 1) {
-          newCurrentStreak = 0;
-        }
-      }
-
-      const { error } = await supabase
-        .from('streaks')
-        .update({
-          current_streak: newCurrentStreak,
-          longest_streak: newLongestStreak,
-          last_completed_date: hasCompletedToday ? today : streak.last_completed_date,
-        })
-        .eq('user_id', userId);
-
-      if (error) throw error;
-    }
-  } catch (error) {
-    console.error('Error updating streak:', error);
-  }
-}
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Login user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *                 token:
+ *                   type: string
+ *                 session:
+ *                   type: object
+ */
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
