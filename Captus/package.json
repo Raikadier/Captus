@@ -9,7 +9,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "server": "node server.js",
-    "server:dev": "nodemon server.js"
+    "server:dev": "nodemon server.js",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.75.1",
@@ -18,11 +20,16 @@
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "helmet": "^8.1.0",
+    "jest": "^30.2.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.546.0",
+    "pg": "^8.16.3",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "react-router-dom": "^7.9.4"
+    "react-router-dom": "^7.9.4",
+    "supertest": "^7.1.4",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
