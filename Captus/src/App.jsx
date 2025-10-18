@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './components/Login';
-import Dashboard from './components/Dashboard';
+import TaskPage from './features/tasks/TaskPage';
 import './App.css';
 
 // Protected Route component
@@ -28,14 +28,14 @@ function App() {
           <Routes>
             <Route path="/" element={<Login />} />
             <Route
-              path="/dashboard"
+              path="/tasks"
               element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <TaskPage />
                 </ProtectedRoute>
               }
             />
-            <Route path="*" element={<Navigate to="/" />} />
+            <Route path="*" element={<Navigate to="/tasks" />} />
           </Routes>
         </div>
       </Router>

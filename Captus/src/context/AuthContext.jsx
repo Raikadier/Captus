@@ -61,6 +61,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const redirectToTasks = () => {
+    window.location.href = '/tasks';
+  };
+
   const register = async (email, password, name) => {
     try {
       const response = await axios.post('/api/auth/register', { email, password, name });
@@ -93,6 +97,7 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    redirectToTasks,
     isAuthenticated: !!user,
   };
 
