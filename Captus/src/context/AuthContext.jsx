@@ -31,13 +31,16 @@ export const AuthProvider = ({ children }) => {
       const storedToken = localStorage.getItem('token');
       if (storedToken) {
         try {
-          // You could add a /api/auth/verify endpoint to verify token
+          // Verify token with backend
+          const response = await axios.get('/api/auth/verify', {
+            headers: { Authorization: `Bearer ${storedToken}` }
+          });
           setToken(storedToken);
-          // For now, we'll assume the token is valid
-          setUser({ email: 'user@example.com' }); // This should come from token decode
+          setUser(response.data.user);
         } catch (error) {
           localStorage.removeItem('token');
           setToken(null);
+          setUser(null);
         }
       }
       setLoading(false);
@@ -68,11 +71,22 @@ export const AuthProvider = ({ children }) => {
   const register = async (email, password, name) => {
     try {
       const response = await axios.post('/api/auth/register', { email, password, name });
-      const { user } = response.data;
+      const { user, session } = response.data;
 
-      setUser(user);
+      if (session) {
+        // User is auto-logged in after registration
+        const token = jwt.sign(
+          { id: user.id, email: user.email },
+          'your_jwt_secret_key', // This should match backend secret
+          { expiresIn: '24h' }
+        );
 
-      return { success: true };
+        setUser(user);
+        setToken(token);
+        localStorage.setItem('token', token);
+      }
+
+      return { success: true, requiresEmailConfirmation: !session };
     } catch (error) {
       return { success: false, error: error.response?.data?.error || 'Registration failed' };
     }

@@ -9,30 +9,40 @@ const Login = () => {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
-  const { login, register } = useAuth();
+  const { login, register, redirectToTasks } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccessMessage('');
     setLoading(true);
 
     try {
       let result;
       if (isRegistering) {
         result = await register(email, password, name);
+        if (result.success) {
+          if (result.requiresEmailConfirmation) {
+            setSuccessMessage('Registro exitoso. Revisa tu email para confirmar tu cuenta.');
+          } else {
+            navigate('/tasks');
+          }
+        } else {
+          setError(result.error);
+        }
       } else {
         result = await login(email, password);
-      }
-
-      if (result.success) {
-        navigate('/tasks');
-      } else {
-        setError(result.error);
+        if (result.success) {
+          navigate('/tasks');
+        } else {
+          setError(result.error);
+        }
       }
     } catch (err) {
-      setError('An unexpected error occurred');
+      setError('Ocurrió un error inesperado');
     } finally {
       setLoading(false);
     }
@@ -105,6 +115,12 @@ const Login = () => {
           {error && (
             <div className="text-red-600 text-sm text-center">
               {error}
+            </div>
+          )}
+
+          {successMessage && (
+            <div className="text-green-600 text-sm text-center">
+              {successMessage}
             </div>
           )}
 
