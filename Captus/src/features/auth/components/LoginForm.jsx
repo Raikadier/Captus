@@ -56,7 +56,7 @@ const LoginForm = () => {
     try {
       const result = await login(email, password);
       if (result.success) {
-        navigate('/tasks');
+        navigate('/home');
       } else {
         setError(result.error);
       }
@@ -64,6 +64,12 @@ const LoginForm = () => {
       setError('An unexpected error occurred');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSubmit(e);
     }
   };
 
@@ -100,6 +106,7 @@ const LoginForm = () => {
             onChange={(e) => setEmail(e.target.value)}
             onFocus={handleEmailFocus}
             onBlur={handleEmailBlur}
+            onKeyPress={handleKeyPress}
             className="w-full px-4 py-3 bg-gray-100 border-none rounded text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
             placeholder={emailPlaceholder}
           />
@@ -113,6 +120,7 @@ const LoginForm = () => {
             onChange={(e) => setPassword(e.target.value)}
             onFocus={handlePasswordFocus}
             onBlur={handlePasswordBlur}
+            onKeyPress={handleKeyPress}
             className="w-full px-4 py-3 bg-gray-100 border-none rounded text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
             placeholder={passwordPlaceholder}
           />

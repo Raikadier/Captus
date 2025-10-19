@@ -9,6 +9,8 @@ import {
   Bot,
   FileText,
   User,
+  Calendar,
+  Users,
   LogOut,
   Menu,
   X
@@ -19,10 +21,11 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
 
   const menuItems = [
     { path: '/home', icon: Home, label: 'Home', color: 'text-green-600' },
-    { path: '/add-task', icon: Plus, label: 'Add Task', color: 'text-green-600' },
     { path: '/tasks', icon: List, label: 'TaskList', color: 'text-gray-600' },
-    { path: '/chat', icon: Bot, label: 'ChatBot', color: 'text-gray-600' },
+    { path: '/chatbot', icon: Bot, label: 'ChatBot', color: 'text-gray-600' },
     { path: '/notes', icon: FileText, label: 'Note', color: 'text-gray-600' },
+    { path: '/calendar', icon: Calendar, label: 'Calendario', color: 'text-gray-600' },
+    { path: '/groups', icon: Users, label: 'Grupos', color: 'text-gray-600' },
     { path: '/profile', icon: User, label: 'Profile', color: 'text-gray-600' },
   ];
 

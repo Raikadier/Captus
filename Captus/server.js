@@ -116,6 +116,19 @@ app.post('/api/auth/logout', authenticateToken, async (req, res) => {
   }
 });
 
+// Verify token endpoint
+app.get('/api/auth/verify', authenticateToken, async (req, res) => {
+  try {
+    // Get user data from Supabase
+    const { data: user, error } = await supabase.auth.getUser(req.user.id);
+    if (error) throw error;
+
+    res.json({ user: req.user });
+  } catch (error) {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+});
+
 // Swagger configuration
 const swaggerOptions = {
   definition: {
@@ -150,6 +163,17 @@ const swaggerOptions = {
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
+
+// Root route
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Captus Web API',
+    version: '1.0.0',
+    status: 'Running',
+    docs: '/api-docs',
+    health: '/api/health'
+  });
+});
 
 // Routes
 app.get('/api/health', (req, res) => {

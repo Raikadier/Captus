@@ -1,4 +1,4 @@
-// Task card component
+// TaskCard - Equivalent to individual task display in frmTask.cs
 import React from 'react';
 import { CheckCircle, Circle, Calendar, Tag, AlertTriangle } from 'lucide-react';
 
@@ -23,7 +23,7 @@ const TaskCard = ({
       <div className="flex items-start justify-between">
         <div className="flex items-start space-x-3 flex-1">
           <button
-            onClick={() => onToggleComplete(task.id, task.completed)}
+            onClick={() => onToggleComplete(task.id)}
             className="mt-1 flex-shrink-0"
             disabled={!showActions}
           >

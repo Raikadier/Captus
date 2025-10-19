@@ -74,12 +74,9 @@ export const AuthProvider = ({ children }) => {
       const { user, session } = response.data;
 
       if (session) {
-        // User is auto-logged in after registration
-        const token = jwt.sign(
-          { id: user.id, email: user.email },
-          'your_jwt_secret_key', // This should match backend secret
-          { expiresIn: '24h' }
-        );
+        // User is auto-logged in after registration - get token from login
+        const loginResponse = await axios.post('/api/auth/login', { email, password });
+        const { token } = loginResponse.data;
 
         setUser(user);
         setToken(token);

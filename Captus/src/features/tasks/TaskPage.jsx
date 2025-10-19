@@ -1,6 +1,7 @@
-// Main task management page
+// TaskPage - Equivalent to frmTask.cs
+// Main task management interface with sidebar and task list
 import React, { useState, useEffect } from 'react';
-import { Plus, Filter, Search } from 'lucide-react';
+import { Plus, Filter, Search, RefreshCw } from 'lucide-react';
 import { useTasks } from './hooks/useTasks';
 import TaskCard from './components/TaskCard';
 import TaskForm from './components/TaskForm';
@@ -280,7 +281,7 @@ const TaskPage = () => {
                 task={task}
                 categories={categories}
                 priorities={priorities}
-                onToggleComplete={toggleTaskCompletion}
+                onToggleComplete={(taskId) => toggleTaskCompletion(taskId)}
                 onEdit={handleEditTask}
                 onDelete={handleDeleteTask}
               />

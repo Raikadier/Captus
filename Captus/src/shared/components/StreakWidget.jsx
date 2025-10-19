@@ -1,17 +1,10 @@
-// Streak widget component
+// StreakWidget - Shows user streak information
 import React, { useState, useEffect } from 'react';
-import { Flame, TrendingUp, Target } from 'lucide-react';
+import { Flame, Target, Calendar } from 'lucide-react';
 import apiClient from '../api/client';
 
 const StreakWidget = () => {
-  const [streakData, setStreakData] = useState({
-    current_streak: 0,
-    last_completed_date: null,
-    daily_goal: 5
-  });
-  const [stats, setStats] = useState({
-    completionRate: 0
-  });
+  const [streakData, setStreakData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -20,84 +13,92 @@ const StreakWidget = () => {
 
   const fetchStreakData = async () => {
     try {
-      setLoading(true);
-      const [streakResponse, statsResponse] = await Promise.all([
-        apiClient.get('/streaks'),
-        apiClient.get('/streaks/stats')
-      ]);
-
-      setStreakData(streakResponse.data);
-      setStats(statsResponse.data);
+      const response = await apiClient.get('/streaks');
+      if (response.data && response.data.length > 0) {
+        setStreakData(response.data[0]);
+      } else {
+        // Default streak data if none exists
+        setStreakData({
+          current_streak: 0,
+          last_completed_date: null,
+          daily_goal: 5
+        });
+      }
     } catch (error) {
       console.error('Error fetching streak data:', error);
+      setStreakData({
+        current_streak: 0,
+        last_completed_date: null,
+        daily_goal: 5
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  const getStreakColor = (streak) => {
-    if (streak === 0) return 'text-gray-500';
-    if (streak < 7) return 'text-orange-500';
-    if (streak < 30) return 'text-blue-500';
-    return 'text-purple-600';
-  };
-
-  const getStreakMessage = (streak) => {
-    if (streak === 0) return '¡Empieza tu racha hoy!';
-    if (streak === 1) return '¡Primer día completado!';
-    if (streak < 7) return '¡Vas por buen camino!';
-    if (streak < 30) return '¡Eres increíble!';
-    return '¡Campeón de la productividad!';
-  };
-
   if (loading) {
     return (
-      <div className="bg-gradient-to-r from-orange-400 to-red-500 rounded-lg p-6 text-white">
-        <div className="animate-pulse">
-          <div className="h-8 bg-white/20 rounded w-3/4 mb-4"></div>
-          <div className="h-6 bg-white/20 rounded w-1/2"></div>
-        </div>
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="text-center text-gray-500">Cargando racha...</div>
       </div>
     );
   }
 
+  if (!streakData) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="text-center text-gray-500">No se pudo cargar la información de racha</div>
+      </div>
+    );
+  }
+
+  const isStreakActive = streakData.last_completed_date &&
+    new Date(streakData.last_completed_date).toDateString() === new Date().toDateString();
+
   return (
-    <div className="bg-gradient-to-r from-orange-400 to-red-500 rounded-lg p-6 text-white shadow-lg">
+    <div className="bg-white rounded-lg shadow-sm p-6">
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-2">
-          <Flame className={`h-8 w-8 ${getStreakColor(streakData.current_streak)}`} />
-          <div>
-            <h3 className="text-xl font-bold">Racha Actual</h3>
-            <p className="text-orange-100 text-sm">{getStreakMessage(streakData.current_streak)}</p>
-          </div>
-        </div>
-        <div className="text-right">
-          <div className="text-3xl font-bold">{streakData.current_streak}</div>
-          <div className="text-sm text-orange-100">días</div>
+        <h3 className="text-lg font-bold text-gray-800 flex items-center">
+          <Flame className="mr-2 text-orange-500" size={20} />
+          Mi Racha
+        </h3>
+        <div className="flex items-center text-sm text-gray-600">
+          <Target size={16} className="mr-1" />
+          Meta: {streakData.daily_goal} tareas/día
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mt-4">
-        <div className="bg-white/10 rounded-lg p-3">
-          <div className="flex items-center space-x-2">
-            <Target className="h-4 w-4" />
-            <span className="text-sm">Meta diaria</span>
-          </div>
-          <div className="text-lg font-semibold">{streakData.daily_goal}</div>
+      {/* Streak counter */}
+      <div className="text-center mb-4">
+        <div className={`text-6xl font-bold mb-2 ${
+          streakData.current_streak > 0 ? 'text-orange-500' : 'text-gray-400'
+        }`}>
+          {streakData.current_streak}
         </div>
-
-        <div className="bg-white/10 rounded-lg p-3">
-          <div className="flex items-center space-x-2">
-            <TrendingUp className="h-4 w-4" />
-            <span className="text-sm">Tasa de éxito</span>
-          </div>
-          <div className="text-lg font-semibold">{Math.round(stats.completionRate * 100)}%</div>
+        <div className="text-sm text-gray-600">
+          {streakData.current_streak === 1 ? 'día consecutivo' : 'días consecutivos'}
         </div>
       </div>
 
+      {/* Streak status */}
+      <div className="text-center">
+        {isStreakActive ? (
+          <div className="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm">
+            <Flame size={14} className="mr-1" />
+            ¡Racha activa!
+          </div>
+        ) : (
+          <div className="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-sm">
+            <Calendar size={14} className="mr-1" />
+            Completa tareas hoy para mantener la racha
+          </div>
+        )}
+      </div>
+
+      {/* Last completed date */}
       {streakData.last_completed_date && (
-        <div className="mt-4 text-sm text-orange-100">
-          Última tarea completada: {new Date(streakData.last_completed_date).toLocaleDateString()}
+        <div className="mt-4 text-center text-xs text-gray-500">
+          Última tarea completada: {new Date(streakData.last_completed_date).toLocaleDateString('es-ES')}
         </div>
       )}
     </div>
