@@ -87,7 +87,7 @@ const TaskListView = () => {
   }
 
   return (
-    <div className="min-h-screen bg-honeydew p-6">
+    <div className="min-h-screen bg-green-50 p-6">
       {/* Header with view toggle */}
       <div className="max-w-4xl mx-auto mb-6">
         <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm">

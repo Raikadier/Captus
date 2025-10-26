@@ -30,7 +30,7 @@ const HomePage = () => {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-honeydew">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-green-50">
       {/* Time display - equivalent to lblHora */}
       <div className="text-center mb-8">
         <div className="text-8xl font-normal text-green-600 mb-4">

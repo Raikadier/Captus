@@ -143,7 +143,7 @@ const TaskPage = () => {
           <div className="flex items-center space-x-4">
             <button
               onClick={() => setShowTaskForm(true)}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
             >
               <Plus className="h-5 w-5 mr-2" />
               Nueva Tarea
@@ -151,7 +151,7 @@ const TaskPage = () => {
 
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
             >
               <Filter className="h-5 w-5 mr-2" />
               Filtros
@@ -176,7 +176,7 @@ const TaskPage = () => {
                   value={filters.searchText}
                   onChange={(e) => handleFilterChange('searchText', e.target.value)}
                   placeholder="Buscar en título o descripción"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
                 />
               </div>
 
@@ -187,7 +187,7 @@ const TaskPage = () => {
                 <select
                   value={filters.categoryId}
                   onChange={(e) => handleFilterChange('categoryId', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
                 >
                   <option value="">Todas las categorías</option>
                   {categories.map((category) => (
@@ -205,7 +205,7 @@ const TaskPage = () => {
                 <select
                   value={filters.priorityId}
                   onChange={(e) => handleFilterChange('priorityId', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
                 >
                   <option value="">Todas las prioridades</option>
                   {priorities.map((priority) => (
@@ -223,7 +223,7 @@ const TaskPage = () => {
                 <select
                   value={filters.completed}
                   onChange={(e) => handleFilterChange('completed', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
                 >
                   <option value="">Todos</option>
                   <option value="false">Pendientes</option>

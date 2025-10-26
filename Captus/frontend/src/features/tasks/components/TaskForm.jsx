@@ -83,7 +83,7 @@ const TaskForm = ({ task, categories, priorities, onSubmit, onCancel }) => {
             type="text"
             value={formData.title}
             onChange={(e) => handleInputChange('title', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
             placeholder="Ingresa el título de la tarea"
             required
           />
@@ -98,7 +98,7 @@ const TaskForm = ({ task, categories, priorities, onSubmit, onCancel }) => {
             value={formData.description}
             onChange={(e) => handleInputChange('description', e.target.value)}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
             placeholder="Describe la tarea (opcional)"
           />
         </div>
@@ -112,7 +112,7 @@ const TaskForm = ({ task, categories, priorities, onSubmit, onCancel }) => {
             type="date"
             value={formData.due_date}
             onChange={(e) => handleInputChange('due_date', e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
           />
         </div>
 
@@ -125,7 +125,7 @@ const TaskForm = ({ task, categories, priorities, onSubmit, onCancel }) => {
             <select
               value={formData.priority_id}
               onChange={(e) => handleInputChange('priority_id', parseInt(e.target.value))}
-              className={`w-full px-3 py-2 border-2 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 ${getPriorityColor(formData.priority_id)}`}
+              className={`w-full px-3 py-2 border-2 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 ${getPriorityColor(formData.priority_id)}`}
             >
               {priorities.map((priority) => (
                 <option key={priority.id} value={priority.id}>
@@ -142,7 +142,7 @@ const TaskForm = ({ task, categories, priorities, onSubmit, onCancel }) => {
             <select
               value={formData.category_id}
               onChange={(e) => handleInputChange('category_id', parseInt(e.target.value))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
             >
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
@@ -158,13 +158,13 @@ const TaskForm = ({ task, categories, priorities, onSubmit, onCancel }) => {
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
           >
             Cancelar
           </button>
           <button
             type="submit"
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
           >
             {task ? 'Actualizar' : 'Crear'} Tarea
           </button>

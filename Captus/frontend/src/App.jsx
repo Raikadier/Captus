@@ -10,7 +10,6 @@ import NotesPage from './features/notes/NotesPage';
 import ProfilePage from './features/profile/ProfilePage';
 import CalendarPage from './features/calendar/CalendarPage';
 import GroupsPage from './features/groups/GroupsPage';
-import './App.css';
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -31,7 +30,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="App">
+        <div className="App p-4 md:p-6 text-primary">
           <Routes>
             <Route path="/" element={<LoginForm />} />
             <Route
@@ -58,7 +57,9 @@ function App() {
               path="/chatbot"
               element={
                 <ProtectedRoute>
-                  <ChatBotPage />
+                  <MainLayout>
+                    <ChatBotPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -66,7 +67,9 @@ function App() {
               path="/notes"
               element={
                 <ProtectedRoute>
-                  <NotesPage />
+                  <MainLayout>
+                    <NotesPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -74,7 +77,9 @@ function App() {
               path="/profile"
               element={
                 <ProtectedRoute>
-                  <ProfilePage />
+                  <MainLayout>
+                    <ProfilePage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -82,7 +87,9 @@ function App() {
               path="/calendar"
               element={
                 <ProtectedRoute>
-                  <CalendarPage />
+                  <MainLayout>
+                    <CalendarPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -90,7 +97,9 @@ function App() {
               path="/groups"
               element={
                 <ProtectedRoute>
-                  <GroupsPage />
+                  <MainLayout>
+                    <GroupsPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />

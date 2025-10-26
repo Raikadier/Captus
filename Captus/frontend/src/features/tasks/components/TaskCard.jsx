@@ -90,7 +90,7 @@ const TaskCard = ({
           <div className="flex items-center space-x-2 ml-4">
             <button
               onClick={() => onEdit(task)}
-              className="text-indigo-600 hover:text-indigo-900 text-sm font-medium"
+              className="text-green-600 hover:text-green-900 text-sm font-medium"
             >
               Editar
             </button>
