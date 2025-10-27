@@ -11,8 +11,8 @@ Captus es una plataforma web diseñada para ayudar a estudiantes universitarios 
 - ✅ **Navegación completa** entre todas las vistas
 - ✅ **Modo demo** sin necesidad de backend
 - ✅ **Diseño responsivo** (desktop y mobile)
-- ✅ **UI/UX moderno** con Tailwind CSS
-- ✅ **Rutas protegidas** (simuladas)
+- ✅ **UI/UX moderno responsive**
+- ✅ **Rutas protegidas simuladas** (liberadas en esta rama)
 - ✅ **Autenticación en modo demo**
 
 ## 🚀 Instalación y Uso
@@ -22,7 +22,7 @@ Captus es una plataforma web diseñada para ayudar a estudiantes universitarios 
 - Node.js (v16 o superior)
 - npm o yarn
 
-### Pasos de Instalación
+### Pasos de Instalación (Rama frontend-only)
 
 1. Clona el repositorio:
 ```bash
@@ -48,6 +48,12 @@ npm run dev
 
 5. Abre tu navegador en: `http://localhost:5173`
 
+## 🧭 Nota para el profesor
+
+- Esta rama (`frontend-only`) contiene únicamente el frontend, listo para evaluar la **navegabilidad** y la **UI/UX**.
+- Las rutas protegidas están abiertas para navegación y la autenticación está simulada en **modo demo**.
+- Algunas vistas usan datos de ejemplo; no hay persistencia ni consumo real de API.
+
 ## 📱 Vistas Disponibles
 
 - **Login** (`/`) - Página de inicio de sesión (modo demo activado)
@@ -58,16 +64,13 @@ npm run dev
 - **ChatBot** (`/chatbot`) - Asistente virtual de IA
 - **Grupos** (`/groups`) - Gestión de grupos de trabajo
 - **Perfil** (`/profile`) - Información del usuario
-- **Estadísticas** (`/estadisticas`) - Análisis de rendimiento
-- **Configuración** (`/configuracion`) - Ajustes de la aplicación
 
 ## 🎨 Tecnologías Utilizadas
 
 - **React** 19.1.1
 - **React Router** 7.9.4
-- **Tailwind CSS** 4.1.16
 - **Lucide React** (iconos)
-- **Vite** (build tool)
+- **Vite** 7.1.7 (build tool)
 
 ## 📝 Modo Demo
 
@@ -78,27 +81,25 @@ Este prototipo funciona completamente sin backend. Todas las funcionalidades est
 - **CRUD**: Las operaciones se simulan localmente (sin persistencia)
 - **Navegación**: Totalmente funcional entre todas las vistas
 
-## 🏗️ Arquitectura
+## 🏗️ Arquitectura (simplificada)
 
 ```
 frontend/
 ├── src/
-│   ├── App.jsx                # Componente principal y rutas
+│   ├── App.jsx                # Rutas y composición
 │   ├── context/
 │   │   └── AuthContext.jsx    # Autenticación en modo demo
 │   ├── features/
-│   │   ├── auth/              # Login y registro
-│   │   ├── dashboard/         # Home y layouts
-│   │   ├── tasks/             # Gestión de tareas
-│   │   ├── calendar/          # Vista calendario
-│   │   ├── notes/             # Sistema de notas
-│   │   ├── chatbot/           # Chat con IA
-│   │   ├── groups/            # Grupos de trabajo
-│   │   ├── profile/           # Perfil de usuario
-│   │   └── stats/             # Estadísticas
-│   ├── shared/
-│   │   └── components/        # Componentes compartidos
-│   └── ui/                    # Componentes UI base
+│   │   ├── auth/
+│   │   ├── dashboard/
+│   │   ├── tasks/
+│   │   ├── calendar/
+│   │   ├── notes/
+│   │   ├── chatbot/
+│   │   ├── groups/
+│   │   └── profile/
+│   └── shared/
+│       └── components/
 ├── public/                    # Assets estáticos
 └── package.json
 ```
@@ -116,9 +117,9 @@ frontend/
 - ✅ UI intuitiva y navegable
 
 ### Código y Organización (30%)
-- ✅ HTML semántico y estructurado
+- ✅ HTML/JSX semántico y estructurado
 - ✅ Organización clara de carpetas
-- ✅ Código limpio y bien estructurado
+- ✅ Código limpio y legible
 
 ## 👥 Integrantes del Grupo
 
