@@ -12,9 +12,9 @@ import CalendarPage from './features/calendar/CalendarPage';
 import GroupsPage from './features/groups/GroupsPage';
 import './App.css';
 
-// Protected Route component
+// Componente de Ruta Protegida (habilitada para navegación en frontend-only)
 const ProtectedRoute = ({ children }) => {
-  // Frontend-only: allow navigation without authentication
+  // Frontend-only: permite navegación sin autenticación
   return children;
 };
 

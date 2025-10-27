@@ -1,5 +1,5 @@
-// MainLayout - Equivalent to frmMain.cs layout
-// Main application layout with sidebar and content area
+// MainLayout - Equivalente al diseño de frmMain.cs
+// Diseño principal de la aplicación con barra lateral y área de contenido
 import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
@@ -15,15 +15,15 @@ const MainLayout = () => {
 
   return (
     <div className="flex h-screen bg-honeydew">
-      {/* Sidebar */}
+      {/* Barra lateral */}
       <Sidebar
         isCollapsed={sidebarCollapsed}
         onToggle={toggleSidebar}
       />
 
-      {/* Main content area */}
+      {/* Área principal de contenido */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top bar with menu toggle (for mobile) */}
+        {/* Barra superior con botón de menú (para móvil) */}
         <div className="bg-white shadow-sm border-b p-4 md:hidden">
           <button
             onClick={toggleSidebar}
@@ -33,7 +33,7 @@ const MainLayout = () => {
           </button>
         </div>
 
-        {/* Content area */}
+        {/* Área de contenido */}
         <div className="flex-1 overflow-auto">
           <Outlet />
           <AcademicFooter />
