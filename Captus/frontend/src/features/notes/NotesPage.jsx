@@ -1,253 +1,233 @@
-// NotesPage - Equivalent to frmNote.cs
-// Rich text editor for notes with file operations
-import React, { useState, useRef } from 'react';
-import { FileText, Save, FolderOpen, X, Palette, Type } from 'lucide-react';
+import React, { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { Bell, MessageSquare, Pin, Edit, Trash2, Search as SearchIcon } from 'lucide-react'
+import { Button } from '../../ui/button'
+import { Card } from '../../ui/card'
+import { Input } from '../../ui/input'
+import { Badge } from '../../ui/badge'
 
-const NotesPage = () => {
-  const [content, setContent] = useState('');
-  const [fileName, setFileName] = useState('Sin título');
-  const [isSaved, setIsSaved] = useState(true);
-  const [showColorPicker, setShowColorPicker] = useState(false);
-  const [showFontPicker, setShowFontPicker] = useState(false);
-  const textAreaRef = useRef(null);
+function getCurrentDate() {
+  const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+  const months = [
+    'enero',
+    'febrero',
+    'marzo',
+    'abril',
+    'mayo',
+    'junio',
+    'julio',
+    'agosto',
+    'septiembre',
+    'octubre',
+    'noviembre',
+    'diciembre',
+  ]
+  const now = new Date()
+  return `${days[now.getDay()]}, ${now.getDate()} de ${months[now.getMonth()]} de ${now.getFullYear()}`
+}
 
-  const colors = [
-    '#000000', '#FF0000', '#00FF00', '#0000FF', '#FFFF00',
-    '#FF00FF', '#00FFFF', '#FFA500', '#800080', '#008000'
-  ];
+const initialNotes = [
+  {
+    id: 1,
+    title: 'Apuntes de Cálculo - Derivadas',
+    content:
+      'Definición de derivada: límite del cociente incremental. Reglas básicas: potencia, producto, cociente, cadena...',
+    subject: 'Matemáticas III',
+    color: 'blue',
+    pinned: true,
+    lastEdited: '2025-10-24',
+  },
+  {
+    id: 2,
+    title: 'Resumen: Romanticismo Español',
+    content:
+      'Características principales del Romanticismo: libertad creativa, sentimientos, naturaleza, rebeldía...',
+    subject: 'Literatura Española',
+    color: 'purple',
+    pinned: true,
+    lastEdited: '2025-10-23',
+  },
+  {
+    id: 3,
+    title: 'Ideas para proyecto final',
+    content:
+      'Posibles temas: Sistema de gestión académica, App de salud mental para estudiantes, Plataforma de tutorías...',
+    subject: 'Programación Web',
+    color: 'green',
+    pinned: false,
+    lastEdited: '2025-10-22',
+  },
+  {
+    id: 4,
+    title: 'Fórmulas de Química Orgánica',
+    content:
+      'Grupos funcionales: alcoholes (-OH), aldehídos (-CHO), cetonas (C=O), ácidos carboxílicos (-COOH)...',
+    subject: 'Química Orgánica',
+    color: 'orange',
+    pinned: false,
+    lastEdited: '2025-10-21',
+  },
+  {
+    id: 5,
+    title: 'Cronología Segunda Guerra Mundial',
+    content:
+      '1939: Invasión de Polonia. 1941: Ataque a Pearl Harbor. 1944: Desembarco de Normandía...',
+    subject: 'Historia Mundial',
+    color: 'red',
+    pinned: false,
+    lastEdited: '2025-10-20',
+  },
+  {
+    id: 6,
+    title: 'Conceptos de Filosofía Moderna',
+    content:
+      'Kant: Imperativo categórico, fenómeno vs. noúmeno. Descartes: Cogito ergo sum, dualismo mente-cuerpo...',
+    subject: 'Filosofía Moderna',
+    color: 'yellow',
+    pinned: false,
+    lastEdited: '2025-10-19',
+  },
+]
 
-  const fonts = [
-    'Arial', 'Times New Roman', 'Courier New', 'Georgia',
-    'Verdana', 'Comic Sans MS', 'Impact', 'Century Gothic'
-  ];
-
-  const handleContentChange = (e) => {
-    setContent(e.target.value);
-    setIsSaved(false);
-  };
-
-  const handleSave = () => {
-    // TODO: Implement save to backend
-    console.log('Saving note:', { fileName, content });
-    setIsSaved(true);
-    alert('Nota guardada exitosamente');
-  };
-
-  const handleOpen = () => {
-    // TODO: Implement file open dialog
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.txt,.rtf,.doc,.docx';
-    input.onchange = (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          setContent(e.target.result);
-          setFileName(file.name);
-          setIsSaved(false);
-        };
-        reader.readAsText(file);
-      }
-    };
-    input.click();
-  };
-
-  const handleNew = () => {
-    if (!isSaved && content.trim()) {
-      if (!confirm('¿Deseas guardar los cambios antes de crear una nueva nota?')) {
-        return;
-      }
-      handleSave();
+function NoteCard({ note }) {
+  const colorClass = useMemo(() => {
+    const map = {
+      blue: 'bg-blue-50 border-blue-200',
+      purple: 'bg-purple-50 border-purple-200',
+      green: 'bg-green-50 border-green-200',
+      orange: 'bg-orange-50 border-orange-200',
+      red: 'bg-red-50 border-red-200',
+      yellow: 'bg-yellow-50 border-yellow-200',
     }
-    setContent('');
-    setFileName('Sin título');
-    setIsSaved(true);
-  };
-
-  const applyColor = (color) => {
-    document.execCommand('foreColor', false, color);
-    setShowColorPicker(false);
-  };
-
-  const applyFont = (fontFamily) => {
-    document.execCommand('fontName', false, fontFamily);
-    setShowFontPicker(false);
-  };
-
-  const formatText = (command) => {
-    document.execCommand(command, false, null);
-  };
+    return map[note.color] || 'bg-white border-gray-200'
+  }, [note.color])
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header - equivalent to panel1 in frmNote.cs */}
-      <div className="bg-green-600 text-white p-4 shadow-lg">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <img src="/iconNote.png" alt="Notes" className="w-8 h-8" />
+    <Card className={`p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow border ${colorClass}`}>
+      <div className="flex justify-between items-start mb-3">
+        <h3 className="font-semibold text-gray-900 text-base flex-1">{note.title}</h3>
+        {note.pinned && <Pin size={16} className="text-green-600 flex-shrink-0" />}
+      </div>
+      <p className="text-gray-600 text-sm mb-3 line-clamp-3">{note.content}</p>
+      <div className="flex justify-between items-center">
+        <Badge variant="outline" className="bg-white">
+          {note.subject}
+        </Badge>
+        <div className="flex gap-2">
+          <Button variant="ghost" size="icon" className="h-8 w-8" title="Editar">
+            <Edit size={14} />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-red-600 hover:text-red-700"
+            title="Eliminar"
+          >
+            <Trash2 size={14} />
+          </Button>
+        </div>
+      </div>
+      <p className="text-xs text-gray-400 mt-2">
+        Editado:{' '}
+        {new Date(note.lastEdited).toLocaleDateString('es-ES', {
+          day: 'numeric',
+          month: 'short',
+        })}
+      </p>
+    </Card>
+  )
+}
+
+export default function NotesPage() {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [notes] = useState(initialNotes)
+
+  const pinnedNotes = useMemo(() => notes.filter((n) => n.pinned), [notes])
+  const regularNotes = useMemo(
+    () =>
+      notes
+        .filter((n) => !n.pinned)
+        .filter((n) => {
+          if (!searchQuery.trim()) return true
+          const q = searchQuery.toLowerCase()
+          return (
+            n.title.toLowerCase().includes(q) ||
+            n.content.toLowerCase().includes(q) ||
+            n.subject.toLowerCase().includes(q)
+          )
+        }),
+    [notes, searchQuery],
+  )
+
+  return (
+    <div className="min-h-screen bg-[#F6F7FB]">
+      <div className="max-w-7xl mx-auto p-8">
+        {/* Header */}
+        <header className="sticky top-0 bg-white rounded-xl shadow-sm p-6 mb-6 z-10">
+          <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-xl font-bold">Notes</h1>
-              <p className="text-green-100 text-sm">{fileName} {!isSaved && '*'}</p>
+              <h1 className="text-2xl font-bold text-gray-900">📝 Mis Notas</h1>
+              <p className="text-gray-600 mt-1">{getCurrentDate()}</p>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Button className="bg-green-600 hover:bg-green-700">
+                + Nueva Nota
+              </Button>
+              <Button variant="outline" className="border-gray-300 relative bg-transparent">
+                <Bell size={18} className="text-gray-500" />
+              </Button>
             </div>
           </div>
-          <button className="text-white hover:text-gray-200">
-            <X size={24} />
-          </button>
-        </div>
-      </div>
+        </header>
 
-      {/* Menu Bar - equivalent to menuStrip1 */}
-      <div className="bg-green-50 border-b border-gray-200 px-4 py-2">
-        <div className="max-w-7xl mx-auto flex items-center space-x-6">
-          {/* Archivo Menu */}
+        {/* Search */}
+        <div className="mb-6">
           <div className="relative">
-            <button className="text-gray-700 hover:text-green-600 font-medium">
-              Archivo
-            </button>
-            <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded shadow-lg py-1 min-w-32 hidden group-hover:block">
-              <button
-                onClick={handleNew}
-                className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
-              >
-                Nuevo
-              </button>
-              <button
-                onClick={handleOpen}
-                className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm flex items-center space-x-2"
-              >
-                <FolderOpen size={14} />
-                <span>Abrir</span>
-              </button>
-              <button
-                onClick={handleSave}
-                className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm flex items-center space-x-2"
-              >
-                <Save size={14} />
-                <span>Guardar</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Formato de Texto Menu */}
-          <div className="relative">
-            <button className="text-gray-700 hover:text-green-600 font-medium">
-              Formato de texto
-            </button>
-            <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded shadow-lg py-1 min-w-40 hidden group-hover:block">
-              <div className="px-4 py-2 border-b border-gray-100">
-                <div className="flex items-center space-x-2 mb-2">
-                  <button
-                    onClick={() => setShowColorPicker(!showColorPicker)}
-                    className="flex items-center space-x-1 text-sm hover:bg-gray-100 px-2 py-1 rounded"
-                  >
-                    <Palette size={14} />
-                    <span>Color</span>
-                  </button>
-                  <button
-                    onClick={() => setShowFontPicker(!showFontPicker)}
-                    className="flex items-center space-x-1 text-sm hover:bg-gray-100 px-2 py-1 rounded"
-                  >
-                    <Type size={14} />
-                    <span>Fuente</span>
-                  </button>
-                </div>
-
-                {/* Color Picker */}
-                {showColorPicker && (
-                  <div className="grid grid-cols-5 gap-1 mb-2">
-                    {colors.map((color) => (
-                      <button
-                        key={color}
-                        onClick={() => applyColor(color)}
-                        className="w-6 h-6 rounded border border-gray-300"
-                        style={{ backgroundColor: color }}
-                        title={color}
-                      />
-                    ))}
-                  </div>
-                )}
-
-                {/* Font Picker */}
-                {showFontPicker && (
-                  <div className="space-y-1">
-                    {fonts.map((font) => (
-                      <button
-                        key={font}
-                        onClick={() => applyFont(font)}
-                        className="w-full text-left text-sm hover:bg-gray-100 px-2 py-1 rounded"
-                        style={{ fontFamily: font }}
-                      >
-                        {font}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Text Formatting Buttons */}
-              <div className="px-4 py-2">
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => formatText('bold')}
-                    className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded"
-                  >
-                    <strong>B</strong>
-                  </button>
-                  <button
-                    onClick={() => formatText('italic')}
-                    className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded"
-                  >
-                    <em>I</em>
-                  </button>
-                  <button
-                    onClick={() => formatText('underline')}
-                    className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded"
-                  >
-                    <u>U</u>
-                  </button>
-                  <button
-                    onClick={() => formatText('strikeThrough')}
-                    className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded"
-                  >
-                    <s>S</s>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Editor Area - equivalent to richTextBox1 */}
-      <div className="flex-1 p-4">
-        <div className="max-w-5xl mx-auto">
-          <div className="bg-white rounded-lg shadow-lg border border-gray-200">
-            <textarea
-              ref={textAreaRef}
-              value={content}
-              onChange={handleContentChange}
-              placeholder="Empieza a escribir tu nota..."
-              className="w-full h-96 p-6 text-gray-800 resize-none focus:outline-none"
-              style={{
-                fontFamily: 'Arial',
-                fontSize: '14px',
-                lineHeight: '1.6'
-              }}
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <Input
+              placeholder="Buscar notas..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 bg-white"
             />
           </div>
         </div>
-      </div>
 
-      {/* Status Bar */}
-      <div className="bg-white border-t border-gray-200 px-4 py-2">
-        <div className="max-w-7xl mx-auto flex justify-between items-center text-sm text-gray-600">
-          <span>{content.length} caracteres</span>
-          <span>{isSaved ? 'Guardado' : 'No guardado'}</span>
+        {/* Pinned Notes */}
+        {pinnedNotes.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <Pin size={18} className="mr-2 text-green-600" />
+              Notas Fijadas
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {pinnedNotes.map((note) => (
+                <NoteCard key={note.id} note={note} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Regular Notes */}
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Todas las Notas</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {regularNotes.map((note) => (
+              <NoteCard key={note.id} note={note} />
+            ))}
+          </div>
         </div>
       </div>
-    </div>
-  );
-};
 
-export default NotesPage;
+      {/* Floating AI Chat Button */}
+      <Link to="/chatbot" title="Hablar con Captus">
+        <Button
+          className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-xl transition-all"
+          size="icon"
+        >
+          <MessageSquare size={24} />
+        </Button>
+      </Link>
+    </div>
+  )
+}

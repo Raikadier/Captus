@@ -13,7 +13,9 @@ import {
   Users,
   LogOut,
   Menu,
-  X
+  X,
+  BarChart3,
+  Settings
 } from 'lucide-react';
 
 const Sidebar = ({ isCollapsed, onToggle }) => {
@@ -25,6 +27,8 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
     { path: '/chatbot', icon: Bot, label: 'ChatBot', color: 'text-gray-600' },
     { path: '/notes', icon: FileText, label: 'Note', color: 'text-gray-600' },
     { path: '/calendar', icon: Calendar, label: 'Calendario', color: 'text-gray-600' },
+    { path: '/estadisticas', icon: BarChart3, label: 'Estadísticas', color: 'text-gray-600' },
+    { path: '/configuracion', icon: Settings, label: 'Configuración', color: 'text-gray-600' },
     { path: '/groups', icon: Users, label: 'Grupos', color: 'text-gray-600' },
     { path: '/profile', icon: User, label: 'Profile', color: 'text-gray-600' },
   ];

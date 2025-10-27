@@ -10,6 +10,9 @@ import NotesPage from './features/notes/NotesPage';
 import ProfilePage from './features/profile/ProfilePage';
 import CalendarPage from './features/calendar/CalendarPage';
 import GroupsPage from './features/groups/GroupsPage';
+import SettingsPage from './features/settings/SettingsPage';
+import StatsPage from './features/stats/StatsPage';
+import { Toaster } from 'sonner';
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -31,6 +34,7 @@ function App() {
     <AuthProvider>
       <Router>
         <div className="App p-4 md:p-6 text-primary">
+          <Toaster richColors position="top-right" />
           <Routes>
             <Route path="/" element={<LoginForm />} />
             <Route
@@ -99,6 +103,26 @@ function App() {
                 <ProtectedRoute>
                   <MainLayout>
                     <GroupsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/estadisticas"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <StatsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/configuracion"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <SettingsPage />
                   </MainLayout>
                 </ProtectedRoute>
               }

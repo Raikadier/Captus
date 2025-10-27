@@ -1,12 +1,17 @@
 // TaskPage - Equivalent to frmTask.cs
 // Main task management interface with sidebar and task list
-import React, { useState, useEffect } from 'react';
-import { Plus, Filter, Search, RefreshCw } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Plus, Filter, Search as SearchIcon, Bell, Calendar as CalendarIcon } from 'lucide-react';
 import { useTasks } from './hooks/useTasks';
 import TaskCard from './components/TaskCard';
 import TaskForm from './components/TaskForm';
 import StreakWidget from '../../shared/components/StreakWidget';
 import apiClient from '../../shared/api/client';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../ui/tabs';
+import { Input } from '../../ui/input';
+import { Badge } from '../../ui/badge';
+import { Button } from '../../ui/button';
+import { Card } from '../../ui/card';
 
 const TaskPage = () => {
   const {
@@ -139,47 +144,47 @@ const TaskPage = () => {
         </div>
 
         {/* Actions Bar */}
-        <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setShowTaskForm(true)}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-            >
-              <Plus className="h-5 w-5 mr-2" />
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-4">
+            <Button onClick={() => setShowTaskForm(true)} className="bg-green-600 hover:bg-green-700">
+              <Plus size={18} className="mr-2" />
               Nueva Tarea
-            </button>
-
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            </Button>
+            <Button variant="outline" className="border-gray-300 bg-white">
+              <Bell size={18} className="text-gray-500" />
+            </Button>
+            <Button
+              variant="outline"
+              className="border-gray-300 bg-white"
+              onClick={() => setShowFilters((v) => !v)}
+              title="Filtros"
             >
-              <Filter className="h-5 w-5 mr-2" />
+              <Filter size={18} className="mr-2 text-gray-500" />
               Filtros
-            </button>
+            </Button>
           </div>
-
           <div className="text-sm text-gray-500">
             {filteredTasks.length} de {tasks.length} tareas
           </div>
         </div>
 
-        {/* Filters */}
+        {/* Search */}
+        <div className="mb-6">
+          <div className="relative">
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <Input
+              placeholder="Buscar tareas..."
+              value={filters.searchText}
+              onChange={(e) => handleFilterChange('searchText', e.target.value)}
+              className="pl-10 bg-white"
+            />
+          </div>
+        </div>
+
+        {/* Advanced Filters */}
         {showFilters && (
           <div className="bg-white p-4 rounded-lg shadow mb-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Buscar
-                </label>
-                <input
-                  type="text"
-                  value={filters.searchText}
-                  onChange={(e) => handleFilterChange('searchText', e.target.value)}
-                  placeholder="Buscar en título o descripción"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
-                />
-              </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Categoría
@@ -187,7 +192,7 @@ const TaskPage = () => {
                 <select
                   value={filters.categoryId}
                   onChange={(e) => handleFilterChange('categoryId', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 bg-white"
                 >
                   <option value="">Todas las categorías</option>
                   {categories.map((category) => (
@@ -205,7 +210,7 @@ const TaskPage = () => {
                 <select
                   value={filters.priorityId}
                   onChange={(e) => handleFilterChange('priorityId', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 bg-white"
                 >
                   <option value="">Todas las prioridades</option>
                   {priorities.map((priority) => (
@@ -223,22 +228,19 @@ const TaskPage = () => {
                 <select
                   value={filters.completed}
                   onChange={(e) => handleFilterChange('completed', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 bg-white"
                 >
                   <option value="">Todos</option>
                   <option value="false">Pendientes</option>
                   <option value="true">Completadas</option>
                 </select>
               </div>
-            </div>
 
-            <div className="mt-4 flex justify-end">
-              <button
-                onClick={clearFilters}
-                className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
-              >
-                Limpiar filtros
-              </button>
+              <div className="flex md:items-end">
+                <Button variant="ghost" onClick={clearFilters} className="text-gray-700">
+                  Limpiar filtros
+                </Button>
+              </div>
             </div>
           </div>
         )}
@@ -263,31 +265,98 @@ const TaskPage = () => {
           </div>
         )}
 
-        {/* Tasks List */}
-        <div className="space-y-4">
-          {filteredTasks.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="text-gray-500 text-lg mb-2">
-                {tasks.length === 0 ? 'No tienes tareas aún' : 'No se encontraron tareas con los filtros aplicados'}
-              </div>
-              <p className="text-gray-400">
-                {tasks.length === 0 ? 'Crea tu primera tarea para comenzar' : 'Prueba cambiando los filtros'}
-              </p>
+        {/* Tabs */}
+        <Tabs defaultValue="todas" className="w-full">
+          <TabsList className="bg-white mb-6">
+            <TabsTrigger value="todas">Todas</TabsTrigger>
+            <TabsTrigger value="pendiente">Pendientes</TabsTrigger>
+            <TabsTrigger value="en-progreso">En Progreso</TabsTrigger>
+            <TabsTrigger value="completada">Completadas</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="todas">
+            {/* Tasks List */}
+            <div className="space-y-4">
+              {filteredTasks.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="text-gray-500 text-lg mb-2">
+                    {tasks.length === 0 ? 'No tienes tareas aún' : 'No se encontraron tareas con los filtros aplicados'}
+                  </div>
+                  <p className="text-gray-400">
+                    {tasks.length === 0 ? 'Crea tu primera tarea para comenzar' : 'Prueba cambiando los filtros'}
+                  </p>
+                </div>
+              ) : (
+                filteredTasks.map((task) => (
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    categories={categories}
+                    priorities={priorities}
+                    onToggleComplete={(taskId) => toggleTaskCompletion(taskId)}
+                    onEdit={handleEditTask}
+                    onDelete={handleDeleteTask}
+                  />
+                ))
+              )}
             </div>
-          ) : (
-            filteredTasks.map((task) => (
-              <TaskCard
-                key={task.id}
-                task={task}
-                categories={categories}
-                priorities={priorities}
-                onToggleComplete={(taskId) => toggleTaskCompletion(taskId)}
-                onEdit={handleEditTask}
-                onDelete={handleDeleteTask}
-              />
-            ))
-          )}
-        </div>
+          </TabsContent>
+
+          <TabsContent value="pendiente">
+            <div className="space-y-4">
+              {filteredTasks
+                .filter((t) => t.completed === false)
+                .map((task) => (
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    categories={categories}
+                    priorities={priorities}
+                    onToggleComplete={(taskId) => toggleTaskCompletion(taskId)}
+                    onEdit={handleEditTask}
+                    onDelete={handleDeleteTask}
+                  />
+                ))}
+            </div>
+          </TabsContent>
+
+          {/* Until we have a separate status field, treat "En Progreso" as pendientes (no completadas). */}
+          <TabsContent value="en-progreso">
+            <div className="space-y-4">
+              {filteredTasks
+                .filter((t) => t.completed === false)
+                .map((task) => (
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    categories={categories}
+                    priorities={priorities}
+                    onToggleComplete={(taskId) => toggleTaskCompletion(taskId)}
+                    onEdit={handleEditTask}
+                    onDelete={handleDeleteTask}
+                  />
+                ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="completada">
+            <div className="space-y-4">
+              {filteredTasks
+                .filter((t) => t.completed === true)
+                .map((task) => (
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    categories={categories}
+                    priorities={priorities}
+                    onToggleComplete={(taskId) => toggleTaskCompletion(taskId)}
+                    onEdit={handleEditTask}
+                    onDelete={handleDeleteTask}
+                  />
+                ))}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
