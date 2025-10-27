@@ -6,6 +6,10 @@ Este es el **prototipo no funcional navegable** de Captus, una aplicación de ge
 
 Captus es una plataforma web diseñada para ayudar a estudiantes universitarios a organizar su vida académica. Incluye gestión de tareas, notas, calendario, chat con IA y más.
 
+## 🎓 Créditos Académicos
+
+Prototipo frontend navegable desarrollado por estudiantes de **6º semestre de Ingeniería de Sistemas** de la **Universidad Popular del Cesar (UPC)**.
+
 ## ✨ Características Implementadas
 
 - ✅ **Navegación completa** entre todas las vistas

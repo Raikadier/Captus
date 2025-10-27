@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import { Menu } from 'lucide-react';
+import AcademicFooter from '../../shared/components/AcademicFooter';
 
 const MainLayout = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -35,6 +36,7 @@ const MainLayout = () => {
         {/* Content area */}
         <div className="flex-1 overflow-auto">
           <Outlet />
+          <AcademicFooter />
         </div>
       </div>
     </div>

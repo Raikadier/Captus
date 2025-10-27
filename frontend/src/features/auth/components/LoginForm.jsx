@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
+import AcademicFooter from '../../../shared/components/AcademicFooter';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -74,7 +75,7 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-cover bg-center relative"
+    <div className="min-h-screen flex flex-col justify-between bg-cover bg-center relative"
          style={{
            backgroundImage: `url('/fondLogin.png')`,
            backgroundColor: '#f5f5f5' // fallback color
@@ -159,6 +160,7 @@ const LoginForm = () => {
           </Link>
         </div>
       </div>
+      <AcademicFooter />
     </div>
   );
 };
