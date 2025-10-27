@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 import LoginForm from './features/auth/components/LoginForm';
 import HomePage from './features/dashboard/components/HomePage';
 import MainLayout from './features/dashboard/components/MainLayout';
@@ -14,17 +14,8 @@ import './App.css';
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Cargando...</div>
-      </div>
-    );
-  }
-
-  return isAuthenticated ? children : <Navigate to="/" />;
+  // Frontend-only: allow navigation without authentication
+  return children;
 };
 
 function App() {

@@ -1,7 +1,6 @@
 // StreakWidget - Shows user streak information
 import React, { useState, useEffect } from 'react';
 import { Flame, Target, Calendar } from 'lucide-react';
-import apiClient from '../api/client';
 
 const StreakWidget = () => {
   const [streakData, setStreakData] = useState(null);
@@ -12,28 +11,16 @@ const StreakWidget = () => {
   }, []);
 
   const fetchStreakData = async () => {
-    try {
-      const response = await apiClient.get('/streaks');
-      if (response.data && response.data.length > 0) {
-        setStreakData(response.data[0]);
-      } else {
-        // Default streak data if none exists
-        setStreakData({
-          current_streak: 0,
-          last_completed_date: null,
-          daily_goal: 5
-        });
-      }
-    } catch (error) {
-      console.error('Error fetching streak data:', error);
-      setStreakData({
-        current_streak: 0,
-        last_completed_date: null,
-        daily_goal: 5
-      });
-    } finally {
-      setLoading(false);
-    }
+    // Frontend-only: use mock streak data
+    const mock = {
+      current_streak: 2,
+      last_completed_date: new Date().toISOString(),
+      daily_goal: 5
+    };
+    // Simulate small delay
+    await new Promise((r) => setTimeout(r, 200));
+    setStreakData(mock);
+    setLoading(false);
   };
 
   if (loading) {

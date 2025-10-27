@@ -6,7 +6,6 @@ import { useTasks } from './hooks/useTasks';
 import TaskCard from './components/TaskCard';
 import TaskForm from './components/TaskForm';
 import StreakWidget from '../../shared/components/StreakWidget';
-import apiClient from '../../shared/api/client';
 
 const TaskPage = () => {
   const {
@@ -22,6 +21,7 @@ const TaskPage = () => {
 
   const [categories, setCategories] = useState([]);
   const [priorities, setPriorities] = useState([]);
+
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [filters, setFilters] = useState({
@@ -37,16 +37,19 @@ const TaskPage = () => {
   }, []);
 
   const fetchReferenceData = async () => {
-    try {
-      const [categoriesRes, prioritiesRes] = await Promise.all([
-        apiClient.get('/categories'),
-        apiClient.get('/priorities')
-      ]);
-      setCategories(categoriesRes.data);
-      setPriorities(prioritiesRes.data);
-    } catch (error) {
-      console.error('Error fetching reference data:', error);
-    }
+    // Frontend-only: use mock reference data
+    const mockCategories = [
+      { id: 1, name: 'Personal' },
+      { id: 2, name: 'Estudios' },
+      { id: 3, name: 'Trabajo' }
+    ];
+    const mockPriorities = [
+      { id: 1, name: 'Baja' },
+      { id: 2, name: 'Media' },
+      { id: 3, name: 'Alta' }
+    ];
+    setCategories(mockCategories);
+    setPriorities(mockPriorities);
   };
 
   const handleCreateTask = async (taskData) => {
