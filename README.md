@@ -78,7 +78,7 @@ Para una guía detallada de instalación, configuración y solución de problema
 
 ## 👥 Para Estudiantes
 
-Este proyecto está diseñado específicamente para estudiantes de 6to semestre de ingeniería de sistemas. El código está bien comentado y la estructura es fácil de entender para principiantes.
+Este proyecto está diseñado específicamente para estudiantes de la Universidad Popular del Cesar. El código está bien comentado y la estructura es fácil de entender para principiantes.
 
 ## 🆘 Soporte
 
