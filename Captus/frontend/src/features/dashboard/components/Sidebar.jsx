@@ -1,114 +1,100 @@
-// Sidebar - Equivalent to the collapsible sidebar in frmMain.cs
-// Animated sidebar with menu items and logo
-import React, { useState } from 'react';
+// Sidebar - Diseño como la plantilla con sidebar fijo
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import {
+  BookOpen,
   Home,
-  Plus,
-  List,
-  Bot,
-  FileText,
-  User,
+  CheckSquare,
   Calendar,
-  Users,
-  LogOut,
-  Menu,
-  X,
+  StickyNote,
   BarChart3,
-  Settings
+  MessageSquare,
+  Settings,
+  LogOut
 } from 'lucide-react';
 
-const Sidebar = ({ isCollapsed, onToggle }) => {
+const Sidebar = () => {
   const location = useLocation();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const menuItems = [
-    { path: '/home', icon: Home, label: 'Home', color: 'text-white' },
-    { path: '/tasks', icon: List, label: 'TaskList', color: 'text-white' },
-    { path: '/chatbot', icon: Bot, label: 'ChatBot', color: 'text-white' },
-    { path: '/notes', icon: FileText, label: 'Note', color: 'text-white' },
-    { path: '/calendar', icon: Calendar, label: 'Calendario', color: 'text-white' },
-    { path: '/estadisticas', icon: BarChart3, label: 'Estadísticas', color: 'text-white' },
-    { path: '/configuracion', icon: Settings, label: 'Configuración', color: 'text-white' },
-    { path: '/groups', icon: Users, label: 'Grupos', color: 'text-white' },
-    { path: '/profile', icon: User, label: 'Profile', color: 'text-white' },
+    { path: '/home', icon: Home, label: 'Inicio' },
+    { path: '/tasks', icon: CheckSquare, label: 'Tareas' },
+    { path: '/calendar', icon: Calendar, label: 'Calendario' },
+    { path: '/notes', icon: StickyNote, label: 'Notas' },
+    { path: '/estadisticas', icon: BarChart3, label: 'Estadísticas' },
+    { path: '/chatbot', icon: MessageSquare, label: 'Chat IA' },
+    { path: '/configuracion', icon: Settings, label: 'Configuración' },
   ];
 
   const isActive = (path) => location.pathname === path;
 
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
+
   return (
-    <div
-      className={`bg-green-600 text-white transition-all duration-300 ease-in-out flex flex-col ${
-        isCollapsed ? 'w-16' : 'w-64'
-      }`}
-      style={{ minHeight: '100vh' }}
-    >
-      {/* Header with logo and toggle button */}
-      <div className="p-4 border-b border-green-500">
-        <div className="flex items-center justify-between">
-          {!isCollapsed && (
-            <div className="flex items-center space-x-3">
-              <img
-                src="/LogoCaptus2Main.png"
-                alt="Captus Logo"
-                className="h-10 w-10 object-contain"
-              />
-              <span className="text-xl font-bold text-white">CAPTUS</span>
-            </div>
-          )}
-          <button
-            onClick={onToggle}
-            className="p-2 rounded hover:bg-green-700 transition-colors"
-          >
-            {isCollapsed ? <Menu size={20} /> : <X size={20} />}
-          </button>
-        </div>
+    <div className="fixed inset-y-0 left-0 w-60 bg-white border-r border-gray-200 z-10">
+      {/* Header con logo */}
+      <div className="flex items-center justify-center h-16 border-b border-gray-200">
+        <BookOpen className="text-green-600 mr-2" size={24} />
+        <h1 className="text-xl font-semibold text-green-600">Captus</h1>
       </div>
 
-      {/* Menu items */}
-      <nav className="flex-1 p-4">
-        <ul className="space-y-2 list-none p-0 m-0">
+      {/* Información del usuario */}
+      <div className="p-4">
+        <div className="flex items-center space-x-3 mb-6 p-3 bg-green-50 rounded-xl">
+          <div className="relative w-10 h-10 rounded-full overflow-hidden bg-green-600 flex items-center justify-center">
+            <span className="text-white font-semibold">
+              {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+            </span>
+            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+          </div>
+          <div>
+            <p className="font-medium text-gray-900">
+              {user?.name || 'Usuario'}
+            </p>
+            <p className="text-xs text-gray-500">Estudiante</p>
+          </div>
+        </div>
+
+        {/* Navegación */}
+        <nav className="space-y-1">
           {menuItems.map((item) => {
             const Icon = item.icon;
             return (
-              <li key={item.path}>
-                <Link
-                  to={item.path}
-                  className={`flex items-center space-x-3 px-3 py-3 rounded transition-all duration-200 text-white no-underline ${
-                    isActive(item.path)
-                      ? 'bg-green-700 shadow-lg'
-                      : 'hover:bg-green-700'
-                  }`}
-                >
-                  <Icon size={20} className={item.color} />
-                  {!isCollapsed && (
-                    <span className="font-medium">{item.label}</span>
-                  )}
-                </Link>
-              </li>
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-colors ${
+                  isActive(item.path)
+                    ? 'bg-green-50 text-green-600 border-l-4 border-green-600'
+                    : 'text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <span className={isActive(item.path) ? 'text-green-600' : 'text-gray-500'}>
+                  <Icon size={18} />
+                </span>
+                <span className="font-medium text-sm">{item.label}</span>
+              </Link>
             );
           })}
-        </ul>
-      </nav>
+        </nav>
 
-      {/* Logout button at bottom */}
-      <div className="p-4 border-t border-green-500">
-        <button
-          onClick={() => {
-            // Handle logout
-            if (window.confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-              // Logout logic here
-              window.location.href = '/login';
-            }
-          }}
-          className={`flex items-center space-x-3 px-3 py-3 rounded hover:bg-green-700 transition-colors w-full text-left ${
-            isCollapsed ? 'justify-center' : ''
-          }`}
-        >
-          <LogOut size={20} className="text-gray-300" />
-          {!isCollapsed && (
-            <span className="font-medium">Logout</span>
-          )}
-        </button>
+        {/* Botón de logout */}
+        <div className="mt-6 pt-4 border-t border-gray-200">
+          <button
+            onClick={handleLogout}
+            className="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors w-full text-left"
+          >
+            <LogOut size={18} className="text-gray-500" />
+            <span className="font-medium text-sm">Cerrar Sesión</span>
+          </button>
+        </div>
       </div>
     </div>
   );

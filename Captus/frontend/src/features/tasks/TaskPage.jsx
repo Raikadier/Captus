@@ -1,5 +1,4 @@
-// TaskPage - Equivalent to frmTask.cs
-// Main task management interface with sidebar and task list
+// TaskPage - Diseño como la plantilla con mejor UI
 import React, { useState, useEffect, useMemo } from 'react';
 import { Plus, Filter, Search as SearchIcon, Bell, Calendar as CalendarIcon } from 'lucide-react';
 import { useTasks } from './hooks/useTasks';
@@ -130,28 +129,40 @@ const TaskPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Mis Tareas</h1>
-          <p className="text-gray-600">Gestiona tus tareas y mantén tu racha de productividad</p>
+    <div className="p-8">
+      {/* Header */}
+      <header className="sticky top-0 bg-white rounded-xl shadow-sm p-6 mb-6 z-10">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Mis Tareas</h1>
+            <p className="text-gray-600 mt-1">Gestiona tus tareas y mantén tu racha de productividad</p>
+          </div>
+          <div className="flex items-center space-x-4">
+            <Button variant="outline" className="border-gray-300 relative bg-transparent">
+              <Bell size={18} className="text-gray-500" />
+              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-green-600 opacity-75 animate-ping"></span>
+                <span className="relative inline-flex rounded-full h-4 w-4 bg-green-600 items-center justify-center text-[10px] text-white font-bold">
+                  3
+                </span>
+              </span>
+            </Button>
+          </div>
         </div>
+      </header>
 
-        {/* Streak Widget */}
-        <div className="mb-8">
-          <StreakWidget />
-        </div>
+      {/* Streak Widget */}
+      <div className="mb-6">
+        <StreakWidget />
+      </div>
 
-        {/* Actions Bar */}
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      {/* Actions Bar */}
+      <Card className="p-6 bg-white rounded-xl shadow-sm mb-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
             <Button onClick={() => setShowTaskForm(true)} className="bg-green-600 hover:bg-green-700">
               <Plus size={18} className="mr-2" />
               Nueva Tarea
-            </Button>
-            <Button variant="outline" className="border-gray-300 bg-white">
-              <Bell size={18} className="text-gray-500" />
             </Button>
             <Button
               variant="outline"
@@ -169,7 +180,7 @@ const TaskPage = () => {
         </div>
 
         {/* Search */}
-        <div className="mb-6">
+        <div className="mt-4">
           <div className="relative">
             <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <Input
@@ -183,7 +194,7 @@ const TaskPage = () => {
 
         {/* Advanced Filters */}
         {showFilters && (
-          <div className="bg-white p-4 rounded-lg shadow mb-6">
+          <div className="mt-4 pt-4 border-t border-gray-200">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -192,7 +203,7 @@ const TaskPage = () => {
                 <select
                   value={filters.categoryId}
                   onChange={(e) => handleFilterChange('categoryId', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 bg-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-white"
                 >
                   <option value="">Todas las categorías</option>
                   {categories.map((category) => (
@@ -210,7 +221,7 @@ const TaskPage = () => {
                 <select
                   value={filters.priorityId}
                   onChange={(e) => handleFilterChange('priorityId', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 bg-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-white"
                 >
                   <option value="">Todas las prioridades</option>
                   {priorities.map((priority) => (
@@ -228,7 +239,7 @@ const TaskPage = () => {
                 <select
                   value={filters.completed}
                   onChange={(e) => handleFilterChange('completed', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 bg-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-white"
                 >
                   <option value="">Todos</option>
                   <option value="false">Pendientes</option>
@@ -244,120 +255,120 @@ const TaskPage = () => {
             </div>
           </div>
         )}
+      </Card>
 
-        {/* Task Form */}
-        {(showTaskForm || editingTask) && (
-          <div className="mb-6">
-            <TaskForm
-              task={editingTask}
-              categories={categories}
-              priorities={priorities}
-              onSubmit={editingTask ? handleUpdateTask : handleCreateTask}
-              onCancel={handleCancelForm}
-            />
-          </div>
-        )}
+      {/* Task Form */}
+      {(showTaskForm || editingTask) && (
+        <div className="mb-6">
+          <TaskForm
+            task={editingTask}
+            categories={categories}
+            priorities={priorities}
+            onSubmit={editingTask ? handleUpdateTask : handleCreateTask}
+            onCancel={handleCancelForm}
+          />
+        </div>
+      )}
 
-        {/* Error Message */}
-        {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
-            <div className="text-red-800">{error}</div>
-          </div>
-        )}
+      {/* Error Message */}
+      {error && (
+        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="text-red-800">{error}</div>
+        </div>
+      )}
 
-        {/* Tabs */}
-        <Tabs defaultValue="todas" className="w-full">
-          <TabsList className="bg-white mb-6">
-            <TabsTrigger value="todas">Todas</TabsTrigger>
-            <TabsTrigger value="pendiente">Pendientes</TabsTrigger>
-            <TabsTrigger value="en-progreso">En Progreso</TabsTrigger>
-            <TabsTrigger value="completada">Completadas</TabsTrigger>
-          </TabsList>
+      {/* Tabs */}
+      <Tabs defaultValue="todas" className="w-full">
+        <TabsList className="bg-white mb-6 rounded-xl">
+          <TabsTrigger value="todas">Todas</TabsTrigger>
+          <TabsTrigger value="pendiente">Pendientes</TabsTrigger>
+          <TabsTrigger value="en-progreso">En Progreso</TabsTrigger>
+          <TabsTrigger value="completada">Completadas</TabsTrigger>
+        </TabsList>
 
-          <TabsContent value="todas">
-            {/* Tasks List */}
-            <div className="space-y-4">
-              {filteredTasks.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="text-gray-500 text-lg mb-2">
-                    {tasks.length === 0 ? 'No tienes tareas aún' : 'No se encontraron tareas con los filtros aplicados'}
-                  </div>
-                  <p className="text-gray-400">
-                    {tasks.length === 0 ? 'Crea tu primera tarea para comenzar' : 'Prueba cambiando los filtros'}
-                  </p>
+        <TabsContent value="todas">
+          {/* Tasks List */}
+          <div className="space-y-4">
+            {filteredTasks.length === 0 ? (
+              <Card className="p-12 text-center bg-white rounded-xl shadow-sm">
+                <div className="text-gray-500 text-lg mb-2">
+                  {tasks.length === 0 ? 'No tienes tareas aún' : 'No se encontraron tareas con los filtros aplicados'}
                 </div>
-              ) : (
-                filteredTasks.map((task) => (
-                  <TaskCard
-                    key={task.id}
-                    task={task}
-                    categories={categories}
-                    priorities={priorities}
-                    onToggleComplete={(taskId) => toggleTaskCompletion(taskId)}
-                    onEdit={handleEditTask}
-                    onDelete={handleDeleteTask}
-                  />
-                ))
-              )}
-            </div>
-          </TabsContent>
+                <p className="text-gray-400">
+                  {tasks.length === 0 ? 'Crea tu primera tarea para comenzar' : 'Prueba cambiando los filtros'}
+                </p>
+              </Card>
+            ) : (
+              filteredTasks.map((task) => (
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  categories={categories}
+                  priorities={priorities}
+                  onToggleComplete={(taskId) => toggleTaskCompletion(taskId)}
+                  onEdit={handleEditTask}
+                  onDelete={handleDeleteTask}
+                />
+              ))
+            )}
+          </div>
+        </TabsContent>
 
-          <TabsContent value="pendiente">
-            <div className="space-y-4">
-              {filteredTasks
-                .filter((t) => t.completed === false)
-                .map((task) => (
-                  <TaskCard
-                    key={task.id}
-                    task={task}
-                    categories={categories}
-                    priorities={priorities}
-                    onToggleComplete={(taskId) => toggleTaskCompletion(taskId)}
-                    onEdit={handleEditTask}
-                    onDelete={handleDeleteTask}
-                  />
-                ))}
-            </div>
-          </TabsContent>
+        <TabsContent value="pendiente">
+          <div className="space-y-4">
+            {filteredTasks
+              .filter((t) => t.completed === false)
+              .map((task) => (
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  categories={categories}
+                  priorities={priorities}
+                  onToggleComplete={(taskId) => toggleTaskCompletion(taskId)}
+                  onEdit={handleEditTask}
+                  onDelete={handleDeleteTask}
+                />
+              ))}
+          </div>
+        </TabsContent>
 
-          {/* Until we have a separate status field, treat "En Progreso" as pendientes (no completadas). */}
-          <TabsContent value="en-progreso">
-            <div className="space-y-4">
-              {filteredTasks
-                .filter((t) => t.completed === false)
-                .map((task) => (
-                  <TaskCard
-                    key={task.id}
-                    task={task}
-                    categories={categories}
-                    priorities={priorities}
-                    onToggleComplete={(taskId) => toggleTaskCompletion(taskId)}
-                    onEdit={handleEditTask}
-                    onDelete={handleDeleteTask}
-                  />
-                ))}
-            </div>
-          </TabsContent>
+        {/* Until we have a separate status field, treat "En Progreso" as pendientes (no completadas). */}
+        <TabsContent value="en-progreso">
+          <div className="space-y-4">
+            {filteredTasks
+              .filter((t) => t.completed === false)
+              .map((task) => (
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  categories={categories}
+                  priorities={priorities}
+                  onToggleComplete={(taskId) => toggleTaskCompletion(taskId)}
+                  onEdit={handleEditTask}
+                  onDelete={handleDeleteTask}
+                />
+              ))}
+          </div>
+        </TabsContent>
 
-          <TabsContent value="completada">
-            <div className="space-y-4">
-              {filteredTasks
-                .filter((t) => t.completed === true)
-                .map((task) => (
-                  <TaskCard
-                    key={task.id}
-                    task={task}
-                    categories={categories}
-                    priorities={priorities}
-                    onToggleComplete={(taskId) => toggleTaskCompletion(taskId)}
-                    onEdit={handleEditTask}
-                    onDelete={handleDeleteTask}
-                  />
-                ))}
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
+        <TabsContent value="completada">
+          <div className="space-y-4">
+            {filteredTasks
+              .filter((t) => t.completed === true)
+              .map((task) => (
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  categories={categories}
+                  priorities={priorities}
+                  onToggleComplete={(taskId) => toggleTaskCompletion(taskId)}
+                  onEdit={handleEditTask}
+                  onDelete={handleDeleteTask}
+                />
+              ))}
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
