@@ -22,15 +22,15 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
   const location = useLocation();
 
   const menuItems = [
-    { path: '/home', icon: Home, label: 'Home', color: 'text-green-600' },
-    { path: '/tasks', icon: List, label: 'TaskList', color: 'text-gray-600' },
-    { path: '/chatbot', icon: Bot, label: 'ChatBot', color: 'text-gray-600' },
-    { path: '/notes', icon: FileText, label: 'Note', color: 'text-gray-600' },
-    { path: '/calendar', icon: Calendar, label: 'Calendario', color: 'text-gray-600' },
-    { path: '/estadisticas', icon: BarChart3, label: 'Estadísticas', color: 'text-gray-600' },
-    { path: '/configuracion', icon: Settings, label: 'Configuración', color: 'text-gray-600' },
-    { path: '/groups', icon: Users, label: 'Grupos', color: 'text-gray-600' },
-    { path: '/profile', icon: User, label: 'Profile', color: 'text-gray-600' },
+    { path: '/home', icon: Home, label: 'Home', color: 'text-white' },
+    { path: '/tasks', icon: List, label: 'TaskList', color: 'text-white' },
+    { path: '/chatbot', icon: Bot, label: 'ChatBot', color: 'text-white' },
+    { path: '/notes', icon: FileText, label: 'Note', color: 'text-white' },
+    { path: '/calendar', icon: Calendar, label: 'Calendario', color: 'text-white' },
+    { path: '/estadisticas', icon: BarChart3, label: 'Estadísticas', color: 'text-white' },
+    { path: '/configuracion', icon: Settings, label: 'Configuración', color: 'text-white' },
+    { path: '/groups', icon: Users, label: 'Grupos', color: 'text-white' },
+    { path: '/profile', icon: User, label: 'Profile', color: 'text-white' },
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -66,14 +66,14 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
 
       {/* Menu items */}
       <nav className="flex-1 p-4">
-        <ul className="space-y-2">
+        <ul className="space-y-2 list-none p-0 m-0">
           {menuItems.map((item) => {
             const Icon = item.icon;
             return (
               <li key={item.path}>
                 <Link
                   to={item.path}
-                  className={`flex items-center space-x-3 px-3 py-3 rounded transition-all duration-200 ${
+                  className={`flex items-center space-x-3 px-3 py-3 rounded transition-all duration-200 text-white no-underline ${
                     isActive(item.path)
                       ? 'bg-green-700 shadow-lg'
                       : 'hover:bg-green-700'

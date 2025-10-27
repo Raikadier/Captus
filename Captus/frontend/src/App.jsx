@@ -14,20 +14,25 @@ import SettingsPage from './features/settings/SettingsPage';
 import StatsPage from './features/stats/StatsPage';
 import { Toaster } from 'sonner';
 
-// Protected Route component
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Cargando...</div>
-      </div>
-    );
-  }
-
-  return isAuthenticated ? children : <Navigate to="/" />;
-};
+ // Protected Route component
+ const ProtectedRoute = ({ children }) => {
+   const { isAuthenticated, loading } = useAuth();
+ 
+   // En desarrollo, permite navegar sin autenticación para validar estilos/UX
+   if (import.meta.env.MODE !== 'production') {
+     return children;
+   }
+ 
+   if (loading) {
+     return (
+       <div className="min-h-screen flex items-center justify-center">
+         <div className="text-xl">Cargando...</div>
+       </div>
+     );
+   }
+ 
+   return isAuthenticated ? children : <Navigate to="/" />;
+ };
 
 function App() {
   return (
