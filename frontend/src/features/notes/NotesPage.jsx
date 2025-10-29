@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Bell, MessageSquare, Pin, Edit, Trash2, Search as SearchIcon } from 'lucide-react'
+import { Bell, MessageSquare, Pin, Edit, Trash2, Search as SearchIcon, Plus } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '../../ui/button'
 import { Card } from '../../ui/card'
 import { Input } from '../../ui/input'
@@ -89,7 +90,7 @@ const initialNotes = [
   },
 ]
 
-function NoteCard({ note }) {
+function NoteCard({ note, index }) {
   const colorClass = useMemo(() => {
     const map = {
       blue: 'bg-blue-50 border-blue-200',
@@ -103,38 +104,44 @@ function NoteCard({ note }) {
   }, [note.color])
 
   return (
-    <Card className={`p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow border ${colorClass}`}>
-      <div className="flex justify-between items-start mb-3">
-        <h3 className="font-semibold text-gray-900 text-base flex-1">{note.title}</h3>
-        {note.pinned && <Pin size={16} className="text-green-600 flex-shrink-0" />}
-      </div>
-      <p className="text-gray-600 text-sm mb-3 line-clamp-3">{note.content}</p>
-      <div className="flex justify-between items-center">
-        <Badge variant="outline" className="bg-white">
-          {note.subject}
-        </Badge>
-        <div className="flex gap-2">
-          <Button variant="ghost" size="icon" className="h-8 w-8" title="Editar">
-            <Edit size={14} />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-red-600 hover:text-red-700"
-            title="Eliminar"
-          >
-            <Trash2 size={14} />
-          </Button>
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: index * 0.05 }}>
+      <Card className={`p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow border ${colorClass}`}>
+        <div className="flex justify-between items-start mb-3">
+          <h3 className="font-semibold text-gray-900 text-base flex-1">{note.title}</h3>
+          {note.pinned && (
+            <motion.div initial={{ rotate: 0 }} animate={{ rotate: 45 }} transition={{ duration: 0.3 }}>
+              <Pin size={16} className="text-green-600 flex-shrink-0" />
+            </motion.div>
+          )}
         </div>
-      </div>
-      <p className="text-xs text-gray-400 mt-2">
-        Editado:{' '}
-        {new Date(note.lastEdited).toLocaleDateString('es-ES', {
-          day: 'numeric',
-          month: 'short',
-        })}
-      </p>
-    </Card>
+        <p className="text-gray-600 text-sm mb-3 line-clamp-3">{note.content}</p>
+        <div className="flex justify-between items-center">
+          <Badge variant="outline" className="bg-white">
+            {note.subject}
+          </Badge>
+          <div className="flex gap-2">
+            <Button variant="ghost" size="icon" className="h-8 w-8" title="Editar">
+              <Edit size={14} />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-red-600 hover:text-red-700"
+              title="Eliminar"
+            >
+              <Trash2 size={14} />
+            </Button>
+          </div>
+        </div>
+        <p className="text-xs text-gray-400 mt-2">
+          Editado:{' '}
+          {new Date(note.lastEdited).toLocaleDateString('es-ES', {
+            day: 'numeric',
+            month: 'short',
+          })}
+        </p>
+      </Card>
+    </motion.div>
   )
 }
 
@@ -156,7 +163,7 @@ export default function NotesPage() {
             n.subject.toLowerCase().includes(q)
           )
         }),
-    [notes, searchQuery],
+    [notes, searchQuery]
   )
 
   return (
@@ -171,7 +178,8 @@ export default function NotesPage() {
             </div>
             <div className="flex items-center space-x-4">
               <Button className="bg-green-600 hover:bg-green-700">
-                + Nueva Nota
+                <Plus size={16} className="mr-2" />
+                Nueva Nota
               </Button>
               <Button variant="outline" className="border-gray-300 relative bg-transparent">
                 <Bell size={18} className="text-gray-500" />
@@ -201,8 +209,8 @@ export default function NotesPage() {
               Notas Fijadas
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {pinnedNotes.map((note) => (
-                <NoteCard key={note.id} note={note} />
+              {pinnedNotes.map((note, index) => (
+                <NoteCard key={note.id} note={note} index={index} />
               ))}
             </div>
           </div>
@@ -211,11 +219,19 @@ export default function NotesPage() {
         {/* Regular Notes */}
         <div>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Todas las Notas</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {regularNotes.map((note) => (
-              <NoteCard key={note.id} note={note} />
-            ))}
-          </div>
+          <AnimatePresence>
+            {regularNotes.length === 0 ? (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-12 bg-white rounded-xl">
+                <p className="text-gray-500">No se encontraron notas</p>
+              </motion.div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {regularNotes.map((note, index) => (
+                  <NoteCard key={note.id} note={note} index={index} />
+                ))}
+              </div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 

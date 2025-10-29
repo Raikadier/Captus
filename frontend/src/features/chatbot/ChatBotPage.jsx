@@ -1,20 +1,25 @@
 // ChatBotPage - Equivalent to frmBot.cs
 // AI-powered chat interface with conversation history
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, MessageCircle } from 'lucide-react';
-import apiClient from '../../shared/api/client';
+import { Send, User, Sparkles, Plus, Menu } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const ChatBotPage = () => {
+  const [conversations, setConversations] = useState([
+    { id: 1, title: 'Nueva conversación', lastMessage: '¡Hola! Soy Captus AI...', timestamp: new Date() },
+  ]);
+  const [activeConversation, setActiveConversation] = useState(1);
   const [messages, setMessages] = useState([
     {
       id: 1,
       type: 'bot',
-      content: '¡Hola! Soy Captus AI, tu asistente personal. ¿En qué puedo ayudarte hoy?',
-      timestamp: new Date()
-    }
+      content: '¡Hola! Soy Captus AI, tu asistente personal de productividad académica. ¿En qué puedo ayudarte hoy?',
+      timestamp: new Date(),
+    },
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(true);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -32,24 +37,22 @@ const ChatBotPage = () => {
       id: Date.now(),
       type: 'user',
       content: inputMessage.trim(),
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInputMessage('');
     setIsLoading(true);
 
     try {
-      // TODO: Implement AI chat API call
-      // For now, simulate a response
       setTimeout(() => {
         const botResponse = {
           id: Date.now() + 1,
           type: 'bot',
-          content: `Entiendo que dijiste: "${userMessage.content}". Como asistente de productividad, puedo ayudarte con la gestión de tareas, organización del tiempo, y consejos para mantener tus rachas de productividad. ¿Qué específicamente necesitas?`,
-          timestamp: new Date()
+          content: `Entiendo que dijiste: "${userMessage.content}". Como tu asistente de productividad académica, puedo ayudarte con:\n\n• Gestión de tareas y organización\n• Técnicas de estudio efectivas\n• Mantener tu racha de productividad\n• Consejos para superar la procrastinación\n\n¿Qué te gustaría explorar?`,
+          timestamp: new Date(),
         };
-        setMessages(prev => [...prev, botResponse]);
+        setMessages((prev) => [...prev, botResponse]);
         setIsLoading(false);
       }, 1500);
     } catch (error) {
@@ -58,9 +61,9 @@ const ChatBotPage = () => {
         id: Date.now() + 1,
         type: 'bot',
         content: 'Lo siento, hubo un error al procesar tu mensaje. Por favor, intenta de nuevo.',
-        timestamp: new Date()
+        timestamp: new Date(),
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages((prev) => [...prev, errorMessage]);
       setIsLoading(false);
     }
   };
@@ -72,139 +75,194 @@ const ChatBotPage = () => {
     }
   };
 
+  const handleNewConversation = () => {
+    const newConv = {
+      id: Date.now(),
+      title: 'Nueva conversación',
+      lastMessage: '',
+      timestamp: new Date(),
+    };
+    setConversations((prev) => [newConv, ...prev]);
+    setActiveConversation(newConv.id);
+    setMessages([
+      {
+        id: Date.now(),
+        type: 'bot',
+        content: '¡Hola! Soy Captus AI, tu asistente personal de productividad académica. ¿En qué puedo ayudarte hoy?',
+        timestamp: new Date(),
+      },
+    ]);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header - equivalent to panel1 in frmBot.cs */}
-      <div className="bg-green-600 text-white p-4 shadow-lg">
-        <div className="max-w-7xl mx-auto flex items-center space-x-3">
-          <img src="/iconoCaptus&Ds.png" alt="Captus AI" className="w-12 h-12" />
-          <div>
-            <h1 className="text-xl font-bold">ChatBot - Captus</h1>
-            <p className="text-green-100 text-sm">Tu asistente personal de IA</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-4xl mx-auto p-4">
-        {/* Chat Container - equivalent to richTextBox1 */}
-        <div className="bg-white rounded-lg shadow-lg h-[600px] flex flex-col">
-          {/* Messages Area */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-4">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex items-start space-x-3 ${
-                  message.type === 'user' ? 'justify-end' : 'justify-start'
-                }`}
+    <div className="h-screen flex bg-white overflow-hidden">
+      <AnimatePresence>
+        {showSidebar && (
+          <motion.div
+            initial={{ width: 0, opacity: 0 }}
+            animate={{ width: 260, opacity: 1 }}
+            exit={{ width: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+            className="bg-gray-50 border-r border-gray-200 flex flex-col overflow-hidden"
+          >
+            <div className="p-4 border-b border-gray-200">
+              <button
+                onClick={handleNewConversation}
+                className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
               >
-                {message.type === 'bot' && (
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <Bot className="w-5 h-5 text-green-600" />
-                    </div>
-                  </div>
-                )}
+                <Plus size={18} />
+                <span className="font-medium">Nueva conversación</span>
+              </button>
+            </div>
 
-                <div
-                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                    message.type === 'user'
-                      ? 'bg-green-600 text-white'
-                      : 'bg-gray-100 text-gray-800'
+            <div className="flex-1 overflow-y-auto p-2">
+              {conversations.map((conv) => (
+                <button
+                  key={conv.id}
+                  onClick={() => setActiveConversation(conv.id)}
+                  className={`w-full text-left p-3 rounded-xl mb-1 transition-all duration-200 ${
+                    activeConversation === conv.id ? 'bg-white shadow-sm' : 'hover:bg-gray-100'
                   }`}
                 >
-                  <p className="text-sm">{message.content}</p>
-                  <p className={`text-xs mt-1 ${
-                    message.type === 'user' ? 'text-green-100' : 'text-gray-500'
-                  }`}>
-                    {message.timestamp.toLocaleTimeString()}
-                  </p>
-                </div>
+                  <p className="font-medium text-gray-900 text-sm truncate">{conv.title}</p>
+                  <p className="text-xs text-gray-500 truncate mt-1">{conv.lastMessage}</p>
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-                {message.type === 'user' && (
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <div className="h-16 border-b border-gray-200 flex items-center justify-between px-6">
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={() => setShowSidebar(!showSidebar)}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <Menu size={20} />
+            </button>
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-600 rounded-lg flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="font-semibold text-gray-900">Captus AI</h1>
+                <p className="text-xs text-gray-500">Tu asistente académico</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-3xl mx-auto px-4 py-8">
+            <AnimatePresence>
+              {messages.map((message) => (
+                <motion.div
+                  key={message.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className={`flex items-start space-x-4 mb-6 ${
+                    message.type === 'user' ? 'flex-row-reverse space-x-reverse' : ''
+                  }`}
+                >
+                  {/* Avatar */}
+                  <div
+                    className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
+                      message.type === 'bot' ? 'bg-gradient-to-br from-green-400 to-emerald-600' : 'bg-green-600'
+                    }`}
+                  >
+                    {message.type === 'bot' ? (
+                      <Sparkles className="w-5 h-5 text-white" />
+                    ) : (
                       <User className="w-5 h-5 text-white" />
+                    )}
+                  </div>
+
+                  {/* Message content */}
+                  <div className={`flex-1 ${message.type === 'user' ? 'flex justify-end' : ''}`}>
+                    <div
+                      className={`inline-block max-w-[85%] ${
+                        message.type === 'user'
+                          ? 'bg-green-600/10 border-l-4 border-green-600'
+                          : 'bg-card border-l-4 border-green-500'
+                      } rounded-xl p-4 shadow-sm`}
+                    >
+                      <p className="text-gray-900 text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                      <p className="text-xs text-gray-400 mt-2">
+                        {message.timestamp.toLocaleTimeString('es-ES', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </p>
                     </div>
                   </div>
-                )}
-              </div>
-            ))}
+                </motion.div>
+              ))}
+            </AnimatePresence>
 
             {isLoading && (
-              <div className="flex items-start space-x-3">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <Bot className="w-5 h-5 text-green-600" />
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-start space-x-4 mb-6"
+              >
+                <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-white" />
+                </div>
+                <div className="bg-card border-l-4 border-green-500 rounded-xl p-4 shadow-sm">
+                  <div className="flex space-x-2">
+                    <motion.div
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 0.6, repeat: Number.POSITIVE_INFINITY }}
+                      className="w-2 h-2 bg-green-600 rounded-full"
+                    />
+                    <motion.div
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 0.6, repeat: Number.POSITIVE_INFINITY, delay: 0.2 }}
+                      className="w-2 h-2 bg-green-600 rounded-full"
+                    />
+                    <motion.div
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 0.6, repeat: Number.POSITIVE_INFINITY, delay: 0.4 }}
+                      className="w-2 h-2 bg-green-600 rounded-full"
+                    />
                   </div>
                 </div>
-                <div className="bg-gray-100 px-4 py-2 rounded-lg">
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                  </div>
-                </div>
-              </div>
+              </motion.div>
             )}
 
             <div ref={messagesEndRef} />
           </div>
+        </div>
 
-          {/* Input Area - equivalent to panelBottom */}
-          <div className="border-t border-gray-200 p-4">
-            <div className="flex space-x-3">
-              <div className="flex-1">
+        <div className="border-t border-gray-200 p-4 bg-white">
+          <div className="max-w-3xl mx-auto">
+            <div className="flex items-end space-x-3">
+              <div className="flex-1 relative">
                 <textarea
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Escribe tu mensaje aquí..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
-                  rows="2"
+                  placeholder="Escribe tu mensaje..."
+                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none shadow-sm transition-all duration-200"
+                  rows="1"
                   disabled={isLoading}
+                  style={{ minHeight: '48px', maxHeight: '200px' }}
                 />
               </div>
               <button
                 onClick={handleSendMessage}
                 disabled={!inputMessage.trim() || isLoading}
-                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                className="p-3 bg-green-600 text-white rounded-xl hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
               >
-                <Send className="w-4 h-4" />
-                <span>Enviar</span>
+                <Send className="w-5 h-5" />
               </button>
             </div>
-          </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white p-4 rounded-lg shadow border-l-4 border-green-500">
-            <div className="flex items-center space-x-2">
-              <MessageCircle className="w-5 h-5 text-green-500" />
-              <h3 className="font-medium text-gray-900">Consejos de Productividad</h3>
-            </div>
-            <p className="text-sm text-gray-600 mt-2">
-              Pregúntame sobre técnicas para mejorar tu productividad
-            </p>
-          </div>
-
-          <div className="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
-            <div className="flex items-center space-x-2">
-              <Bot className="w-5 h-5 text-blue-500" />
-              <h3 className="font-medium text-gray-900">Análisis de Tareas</h3>
-            </div>
-            <p className="text-sm text-gray-600 mt-2">
-              Pide análisis de tus patrones de trabajo y rachas
-            </p>
-          </div>
-
-          <div className="bg-white p-4 rounded-lg shadow border-l-4 border-purple-500">
-            <div className="flex items-center space-x-2">
-              <User className="w-5 h-5 text-purple-500" />
-              <h3 className="font-medium text-gray-900">Recomendaciones</h3>
-            </div>
-            <p className="text-sm text-gray-600 mt-2">
-              Recibe sugerencias personalizadas basadas en tu actividad
+            <p className="text-xs text-gray-400 mt-2 text-center">
+              Captus AI puede cometer errores. Verifica la información importante.
             </p>
           </div>
         </div>
