@@ -1,7 +1,7 @@
 # 🚀 ACTUALIZACIÓN DEL PROYECTO — CAPTUS WEB (Versión Beta 2025)
 
 **Equipo:** Estudiantes de Ingeniería de Sistemas – 6.º semestre  
-**Tutor:** Profesor [Nombre del docente]  
+**Tutor:** Wilman Jose Vega Castilla
 **Duración:** 4 semanas (metodología XP)  
 **Versión:** Beta funcional – Octubre 2025
 
