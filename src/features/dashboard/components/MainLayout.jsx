@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import { Menu } from 'lucide-react';
-import AcademicFooter from '../../shared/components/AcademicFooter';
+import AcademicFooter from '../../../shared/components/AcademicFooter';
 
 const MainLayout = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
