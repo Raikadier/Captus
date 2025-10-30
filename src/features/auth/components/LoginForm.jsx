@@ -1,7 +1,6 @@
 // LoginForm - Equivalente a frmLogin.cs
 // Formulario de inicio de sesión con placeholders que desaparecen al enfocarse
 import React, { useState } from 'react';
-import { useAuth } from '../../../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import AcademicFooter from '../../../shared/components/AcademicFooter';
 
@@ -15,7 +14,6 @@ const LoginForm = () => {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  const { login, register } = useAuth();
   const navigate = useNavigate();
 
   const handleEmailFocus = () => {
@@ -48,24 +46,12 @@ const LoginForm = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
     setSuccessMessage('');
     setLoading(true);
-
-    try {
-      const result = await login(email, password);
-      if (result.success) {
-        navigate('/home');
-      } else {
-        setError(result.error);
-      }
-    } catch (err) {
-      setError('Ocurrió un error inesperado');
-    } finally {
-      setLoading(false);
-    }
+    navigate('/home');
   };
 
   const handleKeyPress = (e) => {
