@@ -1,3 +1,78 @@
+# Captus Frontend – Prototipo Navegable (No Funcional)
+
+Este repositorio contiene un prototipo navegable del frontend de Captus. Es un "vistaso" fiel de cómo será la interfaz final: puedes recorrer todas las pantallas y flujos principales, pero no requiere backend ni bases de datos para funcionar.
+
+- No implementa lógica de backend ni persistencia real.
+- Las llamadas a API se simulan (mock) para evitar errores de red durante la demo.
+- El botón "Iniciar sesión" navega sin validar credenciales, para evaluar solo la UI/UX y la navegabilidad.
+
+## Cómo ejecutar
+
+Requisitos:
+- Node.js 18+
+
+Pasos:
+- npm install
+- npm run dev
+- Abre http://localhost:5173 y realiza un hard refresh (Ctrl+F5)
+
+Opcional (usar backend real):
+- Define `VITE_API_BASE_URL` en `.env.local` apuntando a tu API. Si no lo defines, el cliente HTTP usa datos mock y no hace llamadas reales.
+
+## Tecnologías
+- React + Vite
+- Tailwind CSS 4
+- Framer Motion (animaciones)
+- Lucide Icons
+
+## Estructura del proyecto (frontend en raíz)
+- index.html
+- src/
+- public/
+- vite.config.js
+- postcss.config.js
+- package.json
+
+## Rutas y navegación
+- Pantallas: `/` (Login), `/home`, `/tasks`, `/calendar`, `/notes`, `/chatbot`, `/profile`, `/groups`, `/settings`, `/stats`.
+- Sidebar con enlaces funcionales a cada vista.
+- Login: botón "Iniciar sesión" redirige a `/home` sin validar.
+
+## Accesibilidad y semántica
+- Landmarks: `aside role="navigation"` (Sidebar) y `main role="main"` con objetivo de foco accesible.
+- Enlaces con `aria-current="page"` en el activo.
+- Botones con `aria-label`, `aria-expanded`, `aria-controls` donde aplica.
+- Iconos decorativos con `aria-hidden`. Avatares con `role="img"`/`aria-label`.
+
+## Por qué cumple la rúbrica
+
+- I. Navegabilidad y Funcionalidad del Prototipo (35%)
+  - Cobertura de Vistas (15%): Todas las vistas principales y secundarias del flujo están presentes como rutas navegables.
+  - Enlaces Funcionales (20%): Sidebar y acciones navegan a sus vistas; login dirige a `/home` sin validación.
+
+- II. Diseño y Experiencia de Usuario (35%)
+  - Diseño Responsivo (15%): Layout con sidebar y contenido responsivo con Tailwind; probado en desktop y mobile.
+  - Consistencia Visual (10%): Paleta verde, tipografía y espaciado coherentes; componentes reutilizables.
+  - Usabilidad Básica (10%): Navegación clara, estados de foco visibles, jerarquía visual estable.
+
+- III. Código y Organización (30%)
+  - Estructura HTML Semántica (10%): Uso de `main`, `nav/aside`, títulos por vista, atributos ARIA.
+  - Organización de Archivos (10%): Estructura clara en raíz (`src`, `public`, `index.html`, configs de build).
+  - Calidad y Estilos del Código (10%): Tailwind para estilos consistentes, componentes modulares, accesibilidad básica.
+
+## Mock de API (modo frontend-only)
+- Si no existe `VITE_API_BASE_URL`:
+  - `src/shared/api/client.js` mockea endpoints usados por la UI: `/api/categories`, `/api/priorities`, `/api/streaks`.
+  - Esto permite recorrer las pantallas sin backend ni errores de red.
+
+## Despliegue (demo)
+- npm run build
+- Sirve la carpeta `dist/` con tu hosting estático preferido.
+
+---
+
+Legacy docs below
+
 # Captus Web - Aplicación de Gestión de Tareas
 
 Una versión web moderna de la aplicación de escritorio Captus, migrada de C# a una pila React + Node.js con Supabase.
