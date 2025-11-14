@@ -1,22 +1,16 @@
 // src/routes/SubTaskRoutes.js
 import express from "express";
 import { SubTaskService } from "../service/SubTaskService.js";
-import { verifyToken } from "../middlewares/AuthMiddleware.js";
 
 const router = express.Router();
 const subTaskService = new SubTaskService();
 
-// Middleware para inyectar usuario en el servicio
-const injectUser = (req, res, next) => {
+router.use((req, _res, next) => {
   if (req.user) {
     subTaskService.setCurrentUser(req.user);
   }
   next();
-};
-
-// Aplicar middleware de autenticación y usuario a todas las rutas
-router.use(verifyToken);
-router.use(injectUser);
+});
 
 // Rutas de subtareas
 router.get("/", async (req, res) => {
@@ -37,13 +31,21 @@ router.get("/:id", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const result = await subTaskService.save(req.body);
+  const payload = {
+    ...req.body,
+    id_Task: req.body.id_Task ? parseInt(req.body.id_Task, 10) : undefined,
+  };
+  const result = await subTaskService.save(payload);
   res.status(result.success ? 201 : 400).json(result);
 });
 
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
-  const subTaskData = { ...req.body, id_SubTask: parseInt(id) };
+  const subTaskData = {
+    ...req.body,
+    id_SubTask: parseInt(id, 10),
+    id_Task: req.body.id_Task ? parseInt(req.body.id_Task, 10) : undefined,
+  };
   const result = await subTaskService.update(subTaskData);
   res.status(result.success ? 200 : 400).json(result);
 });

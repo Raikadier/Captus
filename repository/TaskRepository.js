@@ -1,90 +1,118 @@
 import BaseRepository from "./BaseRepository.js";
-import Task from "../models/TaskModels.js";
-import User from "../models/UserModels.js";
-import Category from "../models/CategoryModels.js";
-import Priority from "../models/PriorityModels.js";
+
+const mapFromDb = (row) => ({
+  id_Task: row.id,
+  title: row.title,
+  description: row.description,
+  creationDate: row.created_at,
+  endDate: row.due_date,
+  id_Priority: row.priority_id,
+  id_Category: row.category_id,
+  state: row.completed,
+  id_User: row.user_id,
+  parentTaskId: row.parent_task_id,
+  updatedAt: row.updated_at,
+});
+
+const mapToDb = (entity) => ({
+  title: entity.title,
+  description: entity.description ?? null,
+  due_date: entity.endDate ?? null,
+  priority_id: entity.id_Priority ?? null,
+  category_id: entity.id_Category ?? null,
+  completed: entity.state ?? false,
+  user_id: entity.id_User,
+  parent_task_id: entity.parentTaskId ?? null,
+});
 
 class TaskRepository extends BaseRepository {
   constructor() {
-    super(Task);
+    super("tasks", {
+      primaryKey: "id",
+      mapFromDb,
+      mapToDb,
+    });
   }
 
-  // Obtener todas las tareas
-  async getAll() {
-    try {
-      return await Task.findAll({
-        include: [User, Category, Priority],
-      });
-    } catch (error) {
-      console.error("Error al obtener tareas:", error);
-      return [];
-    }
+  async save(task) {
+    return super.save(task);
   }
 
-  // Obtener todas las tareas de un usuario específico
+  async update(task) {
+    if (!task?.id_Task) return null;
+    return super.update(task.id_Task, task);
+  }
+
   async getAllByUserId(userId) {
-    try {
-      if (!userId) return [];
-      return await Task.findAll({
-        where: { id_User: userId },
-        include: [User, Category, Priority],
-      });
-    } catch (error) {
-      console.error("Error al obtener tareas por usuario:", error);
-      return [];
+    if (!userId) return [];
+    const { data, error } = await this.client
+      .from(this.tableName)
+      .select("*")
+      .eq("user_id", userId)
+      .is("parent_task_id", null)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      throw new Error(error.message);
     }
+
+    return data.map(mapFromDb);
   }
 
-  // Obtener una tarea por su ID
-  async getById(id) {
-    try {
-      if (!id) return null;
-      return await Task.findByPk(id, {
-        include: [User, Category, Priority],
-      });
-    } catch (error) {
-      console.error("Error al obtener tarea por ID:", error);
-      return null;
+  async getOverdueByUser(userId) {
+    if (!userId) return [];
+    const now = new Date().toISOString();
+    const { data, error } = await this.client
+      .from(this.tableName)
+      .select("*")
+      .eq("user_id", userId)
+      .is("parent_task_id", null)
+      .eq("completed", false)
+      .lt("due_date", now);
+
+    if (error) {
+      throw new Error(error.message);
     }
+
+    return data.map(mapFromDb);
   }
 
-  // Actualizar tarea
-  async update(entity) {
-    try {
-      if (!entity || !entity.id_Task) return false;
+  async getCompletedToday(userId) {
+    if (!userId) return [];
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(startOfDay);
+    endOfDay.setDate(endOfDay.getDate() + 1);
 
-      const task = await Task.findByPk(entity.id_Task);
-      if (!task) return false;
+    const { data, error } = await this.client
+      .from(this.tableName)
+      .select("*")
+      .eq("user_id", userId)
+      .is("parent_task_id", null)
+      .eq("completed", true)
+      .gte("updated_at", startOfDay.toISOString())
+      .lt("updated_at", endOfDay.toISOString());
 
-      await task.update({
-        title: entity.title,
-        id_Category: entity.id_Category,
-        description: entity.description || null,
-        endDate: entity.endDate,
-        id_Priority: entity.id_Priority,
-        state: entity.state,
-        id_User: entity.id_User,
-      });
-
-      return true;
-    } catch (error) {
-      console.error("Error al actualizar tarea:", error);
-      return false;
-    }
+    if (error) throw new Error(error.message);
+    return data.map(mapFromDb);
   }
 
-  // Eliminar tarea
-  async delete(id) {
-    try {
-      if (!id) return false;
-      const deletedRows = await Task.destroy({
-        where: { id_Task: id },
-      });
-      return deletedRows > 0;
-    } catch (error) {
-      console.error("Error al eliminar tarea:", error);
-      return false;
+  async deleteByUser(userId) {
+    if (!userId) return true;
+    const { error } = await this.client.from(this.tableName).delete().eq("user_id", userId);
+    if (error) {
+      throw new Error(error.message);
     }
+    return true;
+  }
+
+  async deleteByCategory(categoryId) {
+    if (!categoryId) return true;
+    const { error } = await this.client.from(this.tableName).delete().eq("category_id", categoryId);
+    if (error) {
+      throw new Error(error.message);
+    }
+    return true;
   }
 }
 

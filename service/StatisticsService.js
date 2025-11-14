@@ -379,8 +379,8 @@ export class StatisticsService {
   }
 
   // ✅ Obtener mensaje motivacional basado en racha
-  getMotivationalMessage() {
-    const stats = this.getByCurrentUser();
+  async getMotivationalMessage() {
+    const stats = await this.getByCurrentUser();
     const streak = stats ? stats.racha : 0;
     return getMotivationalMessage(streak);
   }
@@ -389,7 +389,12 @@ export class StatisticsService {
   async getByCurrentUser() {
     try {
       if (!this.currentUser) return null;
-      return await statisticsRepository.getByUser(this.currentUser.id);
+      let stats = await statisticsRepository.getByUser(this.currentUser.id);
+      if (!stats) {
+        const defaults = statisticsRepository.defaultStatistics(this.currentUser.id);
+        stats = await statisticsRepository.save(defaults);
+      }
+      return stats;
     } catch (error) {
       console.error("Error obteniendo estadísticas del usuario:", error);
       return null;

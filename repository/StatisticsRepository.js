@@ -1,80 +1,94 @@
 import BaseRepository from "./BaseRepository.js";
-import Statistics from "../models/StatisticsModels.js";
-import User from "../models/UserModels.js";
+
+const mapFromDb = (row) => ({
+  id_Statistics: row.id,
+  id_User: row.user_id,
+  startDate: row.start_date,
+  endDate: row.end_date,
+  lastRachaDate: row.last_racha_date,
+  racha: row.racha,
+  totalTasks: row.total_tasks,
+  completedTasks: row.completed_tasks,
+  dailyGoal: row.daily_goal,
+  bestStreak: row.best_streak,
+  favoriteCategory: row.favorite_category,
+});
+
+const mapToDb = (entity) => ({
+  user_id: entity.id_User,
+  start_date: entity.startDate ?? null,
+  end_date: entity.endDate ?? null,
+  last_racha_date: entity.lastRachaDate ?? null,
+  racha: entity.racha ?? 0,
+  total_tasks: entity.totalTasks ?? 0,
+  completed_tasks: entity.completedTasks ?? 0,
+  daily_goal: entity.dailyGoal ?? 5,
+  best_streak: entity.bestStreak ?? 0,
+  favorite_category: entity.favoriteCategory ?? null,
+});
 
 export default class StatisticsRepository extends BaseRepository {
   constructor() {
-    super(Statistics);
+    super("statistics", {
+      primaryKey: "id",
+      mapFromDb,
+      mapToDb,
+    });
   }
 
   async getByUser(userId) {
-    try {
-      if (!userId) return null;
-      return await Statistics.findOne({
-        where: { id_User: userId },
-        include: [{ model: User, as: "User" }],
-      });
-    } catch (error) {
-      console.error("Error getting statistics by user:", error.message);
-      return null;
+    if (!userId) return null;
+    const { data, error } = await this.client
+      .from(this.tableName)
+      .select("*")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (error) {
+      if (error.code === "PGRST116") return null;
+      throw new Error(error.message);
     }
+
+    return data ? mapFromDb(data) : null;
   }
 
   async update(statistics) {
-    try {
-      if (!statistics || !statistics.id_User) return false;
+    if (!statistics?.id_User) return null;
+    const result = await this.client
+      .from(this.tableName)
+      .update(mapToDb(statistics))
+      .eq("user_id", statistics.id_User)
+      .select("*")
+      .maybeSingle();
 
-      const [updated] = await Statistics.update(
-        {
-          startDate: statistics.startDate,
-          endDate: statistics.endDate,
-          racha: statistics.racha,
-          totalTasks: statistics.totalTasks,
-          completedTasks: statistics.completedTasks,
-          dailyGoal: statistics.dailyGoal,
-          lastRachaDate: statistics.lastRachaDate ?? null,
-        },
-        { where: { id_User: statistics.id_User } }
-      );
-
-      return updated > 0;
-    } catch (error) {
-      console.error("Error updating statistics:", error.message);
-      return false;
+    if (result.error) {
+      throw new Error(result.error.message);
     }
-  }
 
-  async getById(id) {
-    try {
-      return await Statistics.findByPk(id, { include: [{ model: User, as: "User" }] });
-    } catch (error) {
-      console.error("Error getting statistics by id:", error.message);
-      return null;
-    }
+    return result.data ? mapFromDb(result.data) : null;
   }
 
   async delete(userId) {
-    try {
-      if (!userId) return false;
-      const deleted = await Statistics.destroy({ where: { id_User: userId } });
-      return deleted > 0;
-    } catch (error) {
-      console.error("Error deleting statistics:", error.message);
-      return false;
+    if (!userId) return false;
+    const { error } = await this.client.from(this.tableName).delete().eq("user_id", userId);
+    if (error) {
+      throw new Error(error.message);
     }
+    return true;
   }
 
-  // Estas son estadísticas por defecto al crear un usuario
-  defaultStatistics(user) {
+  defaultStatistics(userId) {
     return {
-      id_User: user.id_User,
+      id_User: userId,
       startDate: new Date(),
       endDate: new Date(),
       racha: 0,
       totalTasks: 0,
       completedTasks: 0,
       dailyGoal: 5,
+      bestStreak: 0,
       lastRachaDate: null,
+      favoriteCategory: null,
     };
   }
 }

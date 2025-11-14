@@ -1,22 +1,16 @@
 // src/routes/StatisticsRoutes.js
 import express from "express";
 import { StatisticsService } from "../service/StatisticsService.js";
-import { verifyToken } from "../middlewares/AuthMiddleware.js";
 
 const router = express.Router();
 const statisticsService = new StatisticsService();
 
-// Middleware para inyectar usuario en el servicio
-const injectUser = (req, res, next) => {
+router.use((req, _res, next) => {
   if (req.user) {
     statisticsService.setCurrentUser(req.user);
   }
   next();
-};
-
-// Aplicar middleware de autenticación y usuario a todas las rutas
-router.use(verifyToken);
-router.use(injectUser);
+});
 
 // Rutas de estadísticas
 router.get("/", async (req, res) => {
@@ -32,7 +26,7 @@ router.get("/achievements", async (req, res) => {
 });
 
 router.get("/motivational-message", async (req, res) => {
-  const messages = statisticsService.getMotivationalMessage();
+  const messages = await statisticsService.getMotivationalMessage();
   res.status(200).json({ success: true, data: messages });
 });
 
