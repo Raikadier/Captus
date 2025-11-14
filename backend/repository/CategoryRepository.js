@@ -1,102 +1,65 @@
 import BaseRepository from "./BaseRepository.js";
-import Category from "../models/CategoryModels.js";
-import User from "../models/UserModels.js";
+
+const mapFromDb = (row) => ({
+  id_Category: row.id,
+  name: row.name,
+  id_User: row.user_id,
+  createdAt: row.created_at,
+});
+
+const mapToDb = (entity) => ({
+  name: entity.name,
+  user_id: entity.id_User ?? null,
+});
 
 class CategoryRepository extends BaseRepository {
   constructor() {
-    super(Category);
+    super("categories", {
+      primaryKey: "id",
+      mapFromDb,
+      mapToDb,
+    });
   }
 
-  // Obtener todas las categorías
-  async getAll() {
-    try {
-      return await Category.findAll({
-        include: [User],
-      });
-    } catch (error) {
-      console.error("Error al obtener categorías:", error);
-      return [];
-    }
-  }
-
-  // Obtener todas las categorías de un usuario (incluyendo las globales)
   async getByUser(userId) {
-    try {
-      if (!userId) return [];
-      return await Category.findAll({
-        where: {
-          [require("sequelize").Op.or]: [
-            { id_User: userId },
-            { id_User: null }
-          ]
-        },
-        include: [User],
-      });
-    } catch (error) {
-      console.error("Error al obtener categorías por usuario:", error);
-      return [];
+    if (!userId) return this.getAll();
+    const { data, error } = await this.client
+      .from(this.tableName)
+      .select("*")
+      .or(`user_id.eq.${userId},user_id.is.null`)
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      throw new Error(error.message);
     }
+
+    return data.map(mapFromDb);
   }
 
-  // Obtener una categoría por su ID
-  async getById(id) {
-    try {
-      if (!id) return null;
-      return await Category.findByPk(id, {
-        include: [User],
-      });
-    } catch (error) {
-      console.error("Error al obtener categoría por ID:", error);
-      return null;
+  async getByName(name, userId) {
+    if (!name) return null;
+    let query = this.client.from(this.tableName).select("*").eq("name", name);
+    if (userId) {
+      query = query.eq("user_id", userId);
     }
+
+    const { data, error } = await query.limit(1).maybeSingle();
+    if (error) {
+      if (error.code === "PGRST116") return null;
+      throw new Error(error.message);
+    }
+
+    return data ? mapFromDb(data) : null;
   }
 
-  // Obtener una categoría por su nombre
-  async getByName(name) {
-    try {
-      if (!name) return null;
-      return await Category.findOne({
-        where: { name },
-        include: [User],
-      });
-    } catch (error) {
-      console.error("Error al obtener categoría por nombre:", error);
-      return null;
-    }
-  }
-
-  // Actualizar categoría
   async update(entity) {
-    try {
-      if (!entity || !entity.id_Category || !entity.name) return false;
-
-      const category = await Category.findByPk(entity.id_Category);
-      if (!category) return false;
-
-      await category.update({
-        name: entity.name,
-        id_User: entity.id_User || null,
-      });
-
-      return true;
-    } catch (error) {
-      console.error("Error al actualizar categoría:", error);
-      return false;
-    }
+    if (!entity?.id_Category) return null;
+    return super.update(entity.id_Category, entity);
   }
 
-  // Eliminar categoría
   async delete(id) {
-    try {
-      if (!id) return false;
-      const deletedRows = await Category.destroy({
-        where: { id_Category: id },
-      });
-      return deletedRows > 0;
-    } catch (error) {
-      console.error("Error al eliminar categoría:", error);
-      return false;
-    }
+    if (!id) return false;
+    return super.delete(id);
   }
 }
 

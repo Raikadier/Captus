@@ -1,93 +1,85 @@
 import BaseRepository from "./BaseRepository.js";
-import SubTask from "../models/SubTaskModels.js";
-import Task from "../models/TaskModels.js";
-import User from "../models/UserModels.js";
-import Category from "../models/CategoryModels.js";
-import Priority from "../models/PriorityModels.js";
+
+const mapFromDb = (row) => ({
+  id_SubTask: row.id,
+  title: row.title,
+  description: row.description,
+  creationDate: row.created_at,
+  endDate: row.due_date,
+  id_Priority: row.priority_id,
+  id_Category: row.category_id,
+  state: row.completed,
+  id_Task: row.parent_task_id,
+  id_User: row.user_id,
+});
+
+const mapToDb = (entity) => ({
+  title: entity.title,
+  description: entity.description ?? null,
+  due_date: entity.endDate ?? null,
+  priority_id: entity.id_Priority ?? null,
+  category_id: entity.id_Category ?? null,
+  completed: entity.state ?? false,
+  user_id: entity.id_User,
+  parent_task_id: entity.id_Task,
+});
 
 class SubTaskRepository extends BaseRepository {
   constructor() {
-    super(SubTask);
+    super("tasks", {
+      primaryKey: "id",
+      mapFromDb,
+      mapToDb,
+    });
   }
 
-  // Obtener todas las subtareas
-  async getAll() {
-    try {
-      return await SubTask.findAll({
-        include: [Task, User, Category, Priority],
-      });
-    } catch (error) {
-      console.error("Error al obtener subtareas:", error);
-      return [];
-    }
+  async save(subTask) {
+    return super.save(subTask);
   }
 
-  // Obtener todas las subtareas de una tarea específica
   async getAllByTaskId(taskId) {
-    try {
-      if (!taskId) return [];
-      return await SubTask.findAll({
-        where: { id_Task: taskId },
-        include: [Task, User, Category, Priority],
-      });
-    } catch (error) {
-      console.error("Error al obtener subtareas por tarea:", error);
-      return [];
+    if (!taskId) return [];
+    const { data, error } = await this.client
+      .from(this.tableName)
+      .select("*")
+      .eq("parent_task_id", taskId)
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      throw new Error(error.message);
     }
+
+    return data.map(mapFromDb);
   }
 
-  // Obtener una subtarea por su ID
   async getById(id) {
-    try {
-      if (!id) return null;
-      return await SubTask.findByPk(id, {
-        include: [Task, User, Category, Priority],
-      });
-    } catch (error) {
-      console.error("Error al obtener subtarea por ID:", error);
-      return null;
-    }
+    return super.getById(id);
   }
 
-  // Actualizar subtarea
-  async update(entity) {
-    try {
-      if (!entity || !entity.id_SubTask) return false;
-
-      const subTask = await SubTask.findByPk(entity.id_SubTask);
-      if (!subTask) return false;
-
-      await subTask.update({
-        title: entity.title,
-        id_Category: entity.id_Category,
-        description: entity.description || null,
-        creationDate: entity.creationDate,
-        endDate: entity.endDate,
-        id_Priority: entity.id_Priority,
-        state: entity.state,
-        id_Task: entity.id_Task,
-        id_User: entity.id_User,
-      });
-
-      return true;
-    } catch (error) {
-      console.error("Error al actualizar subtarea:", error);
-      return false;
-    }
+  async update(subTask) {
+    if (!subTask?.id_SubTask) return null;
+    return super.update(subTask.id_SubTask, subTask);
   }
 
-  // Eliminar subtarea
   async delete(id) {
-    try {
-      if (!id) return false;
-      const deletedRows = await SubTask.destroy({
-        where: { id_SubTask: id },
-      });
-      return deletedRows > 0;
-    } catch (error) {
-      console.error("Error al eliminar subtarea:", error);
-      return false;
+    if (!id) return false;
+    const { error } = await this.client.from(this.tableName).delete().eq("id", id);
+    if (error) {
+      throw new Error(error.message);
     }
+    return true;
+  }
+
+  async markAllAsCompleted(taskId) {
+    if (!taskId) return false;
+    const { error } = await this.client
+      .from(this.tableName)
+      .update({ completed: true })
+      .eq("parent_task_id", taskId);
+    if (error) {
+      throw new Error(error.message);
+    }
+    return true;
   }
 }
 

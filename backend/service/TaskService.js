@@ -14,11 +14,9 @@ const statisticsRepository = new StatisticsRepository();
 
 export class TaskService {
   constructor() {
-    // Simular sesión - en un entorno real esto vendría del contexto de autenticación
     this.currentUser = null;
   }
 
-  // Método para establecer el usuario actual (desde middleware de auth)
   setCurrentUser(user) {
     this.currentUser = user;
   }
@@ -27,15 +25,12 @@ export class TaskService {
     if (!task) {
       return new OperationResult(false, "La tarea no puede ser nula.");
     }
-
     if (!task.title || task.title.trim() === "") {
       return new OperationResult(false, "El título de la tarea no puede estar vacío.");
     }
-
     if (!task.id_User) {
       return new OperationResult(false, "La tarea debe tener un usuario asignado.");
     }
-
     return new OperationResult(true);
   }
 
@@ -44,24 +39,23 @@ export class TaskService {
       const validation = this.validateTask(task);
       if (!validation.success) return validation;
 
-      // Establecer fecha de creación si no existe
       if (!task.creationDate) {
         task.creationDate = new Date();
       }
 
       const savedTask = await taskRepository.save(task);
-      if (savedTask) {
-        return new OperationResult(true, "Tarea guardada exitosamente.", savedTask);
-      } else {
+      if (!savedTask) {
         return new OperationResult(false, "Error al guardar la tarea.");
       }
+
+      return new OperationResult(true, "Tarea guardada exitosamente.", savedTask);
     } catch (error) {
       return new OperationResult(false, `Error al guardar la tarea: ${error.message}`);
     }
   }
 
   validateTaskId(id) {
-    if (!id || id <= 0) {
+    if (!id) {
       return new OperationResult(false, "ID de tarea inválido.");
     }
     return new OperationResult(true);
@@ -72,22 +66,15 @@ export class TaskService {
       const validation = this.validateTaskId(id);
       if (!validation.success) return validation;
 
-      // Verificar que la tarea existe
       const existingTask = await taskRepository.getById(id);
-      if (!existingTask) {
+      if (!existingTask || existingTask.id_User !== this.currentUser?.id) {
         return new OperationResult(false, "Tarea no encontrada.");
       }
 
-      // Eliminar subtareas relacionadas primero
       await this.deleteSubTasksByParentTask(id);
+      await taskRepository.delete(id);
 
-      // Eliminar la tarea
-      const deleted = await taskRepository.delete(id);
-      if (deleted) {
-        return new OperationResult(true, "Tarea eliminada exitosamente.");
-      } else {
-        return new OperationResult(false, "Error al eliminar la tarea.");
-      }
+      return new OperationResult(true, "Tarea eliminada exitosamente.");
     } catch (error) {
       return new OperationResult(false, `Error al eliminar la tarea: ${error.message}`);
     }
@@ -106,15 +93,11 @@ export class TaskService {
 
   async deleteByUser(userId) {
     try {
-      if (!userId || userId <= 0) {
+      if (!userId) {
         return new OperationResult(false, "ID de usuario inválido.");
       }
 
-      const tasks = await taskRepository.getAllByUserId(userId);
-      for (const task of tasks) {
-        await this.delete(task.id_Task);
-      }
-
+      await taskRepository.deleteByUser(userId);
       return new OperationResult(true, "Tareas del usuario eliminadas exitosamente.");
     } catch (error) {
       return new OperationResult(false, `Error al eliminar tareas del usuario: ${error.message}`);
@@ -123,18 +106,11 @@ export class TaskService {
 
   async deleteByCategory(categoryId) {
     try {
-      if (!categoryId || categoryId <= 0) {
+      if (!categoryId) {
         return new OperationResult(false, "ID de categoría inválido.");
       }
 
-      // Obtener todas las tareas y filtrar por categoría
-      const allTasks = await taskRepository.getAll();
-      const tasksToDelete = allTasks.filter(task => task.id_Category === categoryId);
-
-      for (const task of tasksToDelete) {
-        await this.delete(task.id_Task);
-      }
-
+      await taskRepository.deleteByCategory(categoryId);
       return new OperationResult(true, "Tareas de la categoría eliminadas exitosamente.");
     } catch (error) {
       return new OperationResult(false, `Error al eliminar tareas de la categoría: ${error.message}`);
@@ -164,7 +140,7 @@ export class TaskService {
 
   async getIncompleteByUser() {
     try {
-      const tasks = await this.getTasksByUser(task => !task.state);
+      const tasks = await this.getTasksByUser((task) => !task.state);
       return new OperationResult(true, "Tareas incompletas obtenidas exitosamente.", tasks);
     } catch (error) {
       return new OperationResult(false, `Error al obtener tareas incompletas: ${error.message}`);
@@ -173,7 +149,7 @@ export class TaskService {
 
   async getCompletedByUser() {
     try {
-      const tasks = await this.getTasksByUser(task => task.state);
+      const tasks = await this.getTasksByUser((task) => task.state);
       return new OperationResult(true, "Tareas completadas obtenidas exitosamente.", tasks);
     } catch (error) {
       return new OperationResult(false, `Error al obtener tareas completadas: ${error.message}`);
@@ -182,16 +158,7 @@ export class TaskService {
 
   async getCompletedTodayByUser() {
     try {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      const tasks = await this.getTasksByUser(task => {
-        if (!task.state) return false;
-        const taskDate = new Date(task.creationDate);
-        taskDate.setHours(0, 0, 0, 0);
-        return taskDate.getTime() === today.getTime();
-      });
-
+      const tasks = await taskRepository.getCompletedToday(this.currentUser?.id);
       return new OperationResult(true, "Tareas completadas hoy obtenidas exitosamente.", tasks);
     } catch (error) {
       return new OperationResult(false, `Error al obtener tareas completadas hoy: ${error.message}`);
@@ -204,11 +171,11 @@ export class TaskService {
       if (!validation.success) return validation;
 
       const task = await taskRepository.getById(id);
-      if (task) {
+      if (task && task.id_User === this.currentUser?.id) {
         return new OperationResult(true, "Tarea encontrada.", task);
-      } else {
-        return new OperationResult(false, "Tarea no encontrada.");
       }
+
+      return new OperationResult(false, "Tarea no encontrada.");
     } catch (error) {
       return new OperationResult(false, `Error al obtener tarea: ${error.message}`);
     }
@@ -224,22 +191,22 @@ export class TaskService {
         return new OperationResult(false, "Tarea no encontrada.");
       }
 
-      // No permitir desmarcar una tarea completada
+      if (existingTask.id_User !== this.currentUser?.id) {
+        return new OperationResult(false, "No tienes acceso a esta tarea.");
+      }
+
       if (!task.state && existingTask.state) {
         return new OperationResult(false, "No se puede desmarcar una tarea completada.");
       }
 
       const updated = await taskRepository.update(task);
-      if (updated) {
-        // Si la tarea se completó, marcar todas las subtareas como completadas
-        if (task.state) {
-          await this.markAllSubTasksAsCompleted(task.id_Task);
-        }
-
-        return new OperationResult(true, "Tarea actualizada exitosamente.");
-      } else {
-        return new OperationResult(false, "Error al actualizar la tarea.");
+      if (updated && task.state) {
+        await this.markAllSubTasksAsCompleted(task.id_Task);
       }
+
+      return updated
+        ? new OperationResult(true, "Tarea actualizada exitosamente.", updated)
+        : new OperationResult(false, "Error al actualizar la tarea.");
     } catch (error) {
       return new OperationResult(false, `Error al actualizar tarea: ${error.message}`);
     }
@@ -261,8 +228,7 @@ export class TaskService {
 
   async getOverdueTasks() {
     try {
-      const now = new Date();
-      const tasks = await this.getTasksByUser(task => !task.state && new Date(task.endDate) < now);
+      const tasks = await taskRepository.getOverdueByUser(this.currentUser?.id);
       return new OperationResult(true, "Tareas vencidas obtenidas exitosamente.", tasks);
     } catch (error) {
       return new OperationResult(false, `Error al obtener tareas vencidas: ${error.message}`);
@@ -272,23 +238,36 @@ export class TaskService {
   async updateTaskState(taskId, state) {
     try {
       const task = await taskRepository.getById(taskId);
-      if (task) {
-        task.state = state;
-        const result = await this.update(task);
-
-        // Actualizar estadísticas si la tarea se completó
-        if (state) {
-          // Aquí iría la lógica de estadísticas
-          // const statisticsService = new StatisticsService();
-          // await statisticsService.checkStreak(this.currentUser.id);
-        }
-
-        return result;
-      } else {
+      if (!task || task.id_User !== this.currentUser?.id) {
         return new OperationResult(false, "Tarea no encontrada.");
       }
+
+      task.state = state;
+      const result = await this.update(task);
+
+      if (state) {
+        await this.updateStatisticsOnCompletion(task.id_User);
+      }
+
+      return result;
     } catch (error) {
       return new OperationResult(false, `Error al actualizar estado de tarea: ${error.message}`);
+    }
+  }
+
+  async updateStatisticsOnCompletion(userId) {
+    try {
+      const stats = await statisticsRepository.getByUser(userId);
+      if (!stats) return;
+
+      const updatedStats = {
+        ...stats,
+        completedTasks: (stats.completedTasks ?? 0) + 1,
+      };
+
+      await statisticsRepository.update(updatedStats);
+    } catch (error) {
+      console.error("Error actualizando estadísticas:", error);
     }
   }
 
@@ -302,8 +281,7 @@ export class TaskService {
         return new OperationResult(false, "El usuario es requerido.");
       }
 
-      // Obtener IDs de prioridad y categoría
-      const { priorityId, categoryId } = await this.getPriorityAndCategoryIds(priorityText, categoryText);
+      const { priorityId, categoryId } = await this.getPriorityAndCategoryIds(priorityText, categoryText, userId);
 
       const newTask = {
         title,
@@ -313,44 +291,36 @@ export class TaskService {
         id_Priority: priorityId,
         id_Category: categoryId,
         state: false,
-        id_User: userId
+        id_User: userId,
       };
 
       const savedTask = await this.save(newTask);
       if (savedTask.success) {
-        // Cargar relaciones
         await this.loadTaskRelations(savedTask.data);
-        return new OperationResult(true, "Tarea creada exitosamente.", savedTask.data);
-      } else {
-        return savedTask;
       }
+
+      return savedTask;
     } catch (error) {
       return new OperationResult(false, `Error al crear la tarea: ${error.message}`);
     }
   }
 
-  async getPriorityAndCategoryIds(priorityText, categoryText) {
-    let priorityId = 1; // Baja por defecto
-    let categoryId = 1; // General por defecto
+  async getPriorityAndCategoryIds(priorityText, categoryText, userId) {
+    let priorityId = null;
+    let categoryId = null;
 
     try {
-      // Obtener prioridad por nombre
       if (priorityText) {
         const priorities = await priorityRepository.getAll();
-        const priority = priorities.find(p =>
-          p.name.toLowerCase() === priorityText.toLowerCase()
-        );
+        const priority = priorities.find((p) => p.name.toLowerCase() === priorityText.toLowerCase());
         if (priority) {
           priorityId = priority.id_Priority;
         }
       }
 
-      // Obtener categoría por nombre
       if (categoryText) {
-        const categories = await categoryRepository.getAll();
-        const category = categories.find(c =>
-          c.name.toLowerCase() === categoryText.toLowerCase()
-        );
+        const categories = await categoryRepository.getByUser(userId);
+        const category = categories.find((c) => c.name.toLowerCase() === categoryText.toLowerCase());
         if (category) {
           categoryId = category.id_Category;
         }
@@ -364,12 +334,10 @@ export class TaskService {
 
   async loadTaskRelations(task) {
     try {
-      // Cargar categoría
       if (task.id_Category) {
         task.Category = await categoryRepository.getById(task.id_Category);
       }
 
-      // Cargar prioridad
       if (task.id_Priority) {
         task.Priority = await priorityRepository.getById(task.id_Priority);
       }

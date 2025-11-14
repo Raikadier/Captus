@@ -51,6 +51,8 @@ export class SubTaskService {
         return new OperationResult(false, "La tarea padre no es accesible para este usuario.");
       }
 
+      subTask.id_User = this.currentUser?.id;
+
       // Establecer fecha de creación si no existe
       if (!subTask.creationDate) {
         subTask.creationDate = new Date();
@@ -69,7 +71,7 @@ export class SubTaskService {
 
   async deleteByParentTask(taskId) {
     try {
-      if (!taskId || taskId <= 0) {
+      if (!taskId) {
         return new OperationResult(false, "ID de tarea inválido.");
       }
 
@@ -108,7 +110,7 @@ export class SubTaskService {
 
   async getById(id) {
     try {
-      if (!id || id <= 0) {
+      if (!id) {
         return new OperationResult(false, "ID de subtarea inválido.");
       }
 
@@ -183,7 +185,7 @@ export class SubTaskService {
 
   async delete(id) {
     try {
-      if (!id || id <= 0) {
+      if (!id) {
         return new OperationResult(false, "ID de subtarea inválido.");
       }
 
@@ -211,17 +213,12 @@ export class SubTaskService {
 
   async markAllAsCompleted(taskId) {
     try {
-      if (!taskId || taskId <= 0) {
+      if (!taskId) {
         return new OperationResult(false, "ID de tarea inválido.");
       }
 
-      const subTasks = await subTaskRepository.getAllByTaskId(taskId);
-      for (const subTask of subTasks) {
-        if (!subTask.state) {
-          subTask.state = true;
-          await subTaskRepository.update(subTask);
-        }
-      }
+      await subTaskRepository.markAllAsCompleted(taskId);
+      await this.checkAndCompleteParentTask(taskId);
 
       return new OperationResult(true, "Todas las subtareas marcadas como completadas.");
     } catch (error) {
@@ -231,7 +228,7 @@ export class SubTaskService {
 
   async getByTaskId(taskId) {
     try {
-      if (!taskId || taskId <= 0) {
+      if (!taskId) {
         return new OperationResult(false, "ID de tarea inválido.");
       }
 
