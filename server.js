@@ -2,11 +2,17 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
-import { createClient } from '@supabase/supabase-js';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
 import streakRoutes, { setStreakService } from './src/routes/streakRoutes.js';
+import TaskRoutes from './routes/TaskRoutes.js';
+import SubTaskRoutes from './routes/SubTaskRoutes.js';
+import StatisticsRoutes from './routes/StatisticsRoutes.js';
+import PriorityRoutes from './routes/PriorityRoutes.js';
+import buildSupabaseAuthMiddleware from './src/middlewares/verifySupabaseToken.js';
+import CategoryRoutes from './routes/CategoryRoutes.js';
+import { getSupabaseClient } from './src/lib/supabaseAdmin.js';
 
 dotenv.config();
 
@@ -22,43 +28,16 @@ app.use(cors({
 app.use(express.json());
 
 // Supabase admin client (for token verification and server-side operations)
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseAdmin = getSupabaseClient();
+const ENV_OK = !!supabaseAdmin;
 
-if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+if (!ENV_OK) {
   console.warn('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in environment variables.');
-}
-const ENV_OK = !!SUPABASE_URL && !!SUPABASE_SERVICE_ROLE_KEY;
-
-let supabaseAdmin = null;
-if (ENV_OK) {
-  supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-  // Initialize services with supabase admin
+} else {
   setStreakService(supabaseAdmin);
 }
 
-// Middleware: verify Supabase access token from Authorization: Bearer <token>
-const verifySupabaseToken = async (req, res, next) => {
-  const authHeader = req.headers['authorization'] || '';
-  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
-
-  if (!token) {
-    return res.status(401).json({ error: 'Access token required' });
-  }
-
-  try {
-    const { data, error } = await supabaseAdmin.auth.getUser(token);
-    if (error || !data?.user) {
-      return res.status(401).json({ error: 'Invalid token' });
-    }
-
-    req.user = { id: data.user.id, email: data.user.email };
-    req.accessToken = token;
-    return next();
-  } catch (err) {
-    return res.status(401).json({ error: 'Invalid token' });
-  }
-};
+const verifySupabaseToken = buildSupabaseAuthMiddleware(supabaseAdmin);
 
 // Health route
 app.get('/api/health', (req, res) => {
@@ -107,7 +86,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(
   '/api/streaks',
   (req, res, next) => {
-    if (!ENV_OK) {
+    if (!ENV_OK || !supabaseAdmin) {
       return res.status(503).json({ error: 'Server misconfiguration: set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY' });
     }
     return next();
@@ -115,6 +94,15 @@ app.use(
   verifySupabaseToken,
   streakRoutes
 );
+
+// Extended API routes
+if (ENV_OK && supabaseAdmin) {
+  app.use('/api/tasks', verifySupabaseToken, TaskRoutes);
+  app.use('/api/subtasks', verifySupabaseToken, SubTaskRoutes);
+  app.use('/api/statistics', verifySupabaseToken, StatisticsRoutes);
+  app.use('/api/categories', verifySupabaseToken, CategoryRoutes);
+  app.use('/api/priorities', PriorityRoutes);
+}
 
 // Root route
 app.get('/', (req, res) => {
