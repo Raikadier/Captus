@@ -8,6 +8,7 @@ const LoginForm = () => {
   const [password, setPassword] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
   const [name, setName] = useState('');
+  const [role, setRole] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
@@ -25,7 +26,7 @@ const LoginForm = () => {
     try {
       let result;
       if (isRegistering) {
-        result = await register(email, password, name);
+        result = await register(email, password, name, role);
         if (result.success) {
           if (result.requiresEmailConfirmation) {
             setSuccessMessage('Registro exitoso. Revisa tu email para confirmar tu cuenta.');
@@ -38,6 +39,7 @@ const LoginForm = () => {
       } else {
         result = await login(email, password);
         if (result.success) {
+          console.log("Usuario logueado:", result.user);
           navigate('/home');
         } else {
           setError(result.error);
@@ -88,6 +90,25 @@ const LoginForm = () => {
                 />
               </div>
             )}
+
+             {/* SELECT DE ROL */}
+            {isRegistering && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tipo de usuario (rol)
+                </label>
+
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg"
+                >
+                  <option value="estudiante">Estudiante</option>
+                  <option value="docente">Docente</option>
+                </select>
+              </div>
+            )}
+
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
