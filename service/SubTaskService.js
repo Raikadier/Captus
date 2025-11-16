@@ -36,6 +36,17 @@ export class SubTaskService {
     return new OperationResult(true);
   }
 
+  async create(subTask) {
+    return this.save(subTask);
+  }
+
+  async complete(id) {
+    const subTask = await this.getById(id);
+    if (!subTask.success) return subTask;
+    const updated = await this.update({ ...subTask.data, state: true });
+    return updated;
+  }
+
   async save(subTask) {
     try {
       const validation = this.validateSubTask(subTask);
