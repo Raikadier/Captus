@@ -14,6 +14,47 @@ export class ProjectService {
     this.currentUser = user;
   }
 
+  async getAllUserProjects() {
+    try {
+      if (!this.currentUser) return new OperationResult(false, "Usuario no autenticado.");
+
+      // Obtener proyectos creados por el usuario
+      const createdProjects = await this.getByCreator(this.currentUser.id);
+
+      // Obtener proyectos donde es miembro
+      const memberProjects = await projectMemberRepository.getByUser(this.currentUser.id);
+
+      // Combinar y eliminar duplicados
+      const allProjects = [...createdProjects.data];
+      memberProjects.forEach(memberProject => {
+        if (!allProjects.find(p => p.id_Project === memberProject.id_Project)) {
+          allProjects.push(memberProject.Project);
+        }
+      });
+
+      return new OperationResult(true, "Proyectos obtenidos exitosamente.", allProjects);
+    } catch (error) {
+      return new OperationResult(false, `Error al obtener proyectos: ${error.message}`);
+    }
+  }
+
+  async getMyProjects() {
+    return this.getByCreator(this.currentUser?.id);
+  }
+
+  async getProjectsAsMember() {
+    try {
+      if (!this.currentUser) return new OperationResult(false, "Usuario no autenticado.");
+
+      const memberProjects = await projectMemberRepository.getByUser(this.currentUser.id);
+      const projects = memberProjects.map(mp => mp.Project);
+
+      return new OperationResult(true, "Proyectos como miembro obtenidos exitosamente.", projects);
+    } catch (error) {
+      return new OperationResult(false, `Error al obtener proyectos como miembro: ${error.message}`);
+    }
+  }
+
   // Verificar si usuario es miembro de un proyecto
   async isProjectMember(projectId, userId = null) {
     const userToCheck = userId || this.currentUser?.id;

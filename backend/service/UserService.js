@@ -88,4 +88,43 @@ export class UserService {
       return new OperationResult(false, `Error: ${error.message}`);
     }
   }
+
+  async register(user) {
+    return this.save(user);
+  }
+
+  async login(username, password) {
+    // Supabase maneja login, devolver mensaje
+    return new OperationResult(false, "Login se maneja vía Supabase Auth.");
+  }
+
+  async getProfile() {
+    // Asumir que currentUser está disponible
+    if (!this.currentUser) return new OperationResult(false, "Usuario no autenticado.");
+    return this.getById(this.currentUser.id);
+  }
+
+  async updateProfile(user) {
+    if (!this.currentUser) return new OperationResult(false, "Usuario no autenticado.");
+    user.id_User = this.currentUser.id;
+    return this.update(user);
+  }
+
+  async changePassword(currentPassword, newPassword) {
+    // Supabase maneja passwords
+    return new OperationResult(false, "Cambio de password se maneja vía Supabase Auth.");
+  }
+
+  async isEmailRegistered(email) {
+    try {
+      const exists = await userRepository.isEmailRegistered(email);
+      return new OperationResult(true, exists ? "Email registrado." : "Email disponible.", { registered: exists });
+    } catch (error) {
+      return new OperationResult(false, `Error: ${error.message}`);
+    }
+  }
+
+  setCurrentUser(user) {
+    this.currentUser = user;
+  }
 }
