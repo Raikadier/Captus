@@ -119,6 +119,11 @@ class CommentLikeRepository extends BaseRepository {
     }
   }
 
+  // Alias para compatibilidad
+  async hasUserLikedComment(userId, commentId) {
+    return this.hasUserLiked(commentId, userId);
+  }
+
   // Agregar like a un comentario
   async addLike(commentId, userId) {
     try {
@@ -206,6 +211,33 @@ class CommentLikeRepository extends BaseRepository {
       console.error("Error al eliminar like:", error);
       return false;
     }
+  }
+
+  // Toggle like (agregar si no existe, remover si existe)
+  async toggleLike(userId, commentId) {
+    try {
+      if (!userId || !commentId) return false;
+
+      const hasLiked = await this.hasUserLiked(commentId, userId);
+      if (hasLiked) {
+        return await this.removeLike(commentId, userId);
+      } else {
+        return await this.addLike(commentId, userId);
+      }
+    } catch (error) {
+      console.error("Error al toggle like:", error);
+      return false;
+    }
+  }
+
+  // Agregar like explícitamente
+  async likeComment(userId, commentId) {
+    return this.addLike(commentId, userId);
+  }
+
+  // Remover like explícitamente
+  async unlikeComment(userId, commentId) {
+    return this.removeLike(commentId, userId);
   }
 }
 

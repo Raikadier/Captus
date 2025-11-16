@@ -1,45 +1,11 @@
-// src/service/UserService.js
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import UserRepository from "../repository/UserRepository.js";
 import { OperationResult } from "../shared/OperationResult.js";
 
 const userRepository = new UserRepository();
 
 export class UserService {
-  async login(username, password) {
-    try {
-      const user = await userRepository.getByUsername(username);
-      if (!user) {
-        return new OperationResult(false, "Usuario no encontrado.");
-      }
-
-      const passwordMatch = await bcrypt.compare(password, user.password);
-      if (!passwordMatch) {
-        return new OperationResult(false, "Credenciales inválidas.");
-      }
-
-      // Generamos el token (equivale a iniciar sesión)
-      const token = jwt.sign(
-        { id: user.id_User, username: user.userName },
-        process.env.JWT_SECRET || "claveSecreta123",
-        { expiresIn: "2h" }
-      );
-
-      return new OperationResult(true, "Inicio de sesión exitoso.", {
-        user,
-        token,
-      });
-    } catch (error) {
-      return new OperationResult(false, `Error: ${error.message}`);
-    }
-  }
-
-  async logout() {
-    // En JWT, el logout se maneja desde el frontend eliminando el token.
-    // Aquí podríamos implementar una blacklist si fuera necesario.
-    return new OperationResult(true, "Cierre de sesión exitoso (lado cliente).");
-  }
+  // Nota: Login y logout se manejan externamente con Supabase Auth.
+  // Este servicio maneja perfiles de usuario.
 
   async save(user) {
     try {
@@ -55,7 +21,7 @@ export class UserService {
         return new OperationResult(false, "El email ya está registrado.");
       }
 
-      user.password = await bcrypt.hash(user.password, 10);
+      // No hashear password, Supabase lo maneja
       const created = await userRepository.save(user);
       if (created)
         return new OperationResult(true, "Usuario creado exitosamente.", created);
@@ -111,11 +77,7 @@ export class UserService {
         return new OperationResult(false, "Usuario no encontrado.");
       }
 
-      // Si se está actualizando el password, hashearlo
-      if (user.password) {
-        user.password = await bcrypt.hash(user.password, 10);
-      }
-
+      // No hashear password, Supabase lo maneja
       const updated = await userRepository.update(user.id_User, user);
       if (updated) {
         return new OperationResult(true, "Usuario actualizado exitosamente.");

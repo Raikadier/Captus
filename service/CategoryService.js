@@ -1,53 +1,142 @@
 import CategoryRepository from "../repository/CategoryRepository.js";
+import { TaskService } from "./TaskService.js";
 import { OperationResult } from "../shared/OperationResult.js";
 
 const categoryRepository = new CategoryRepository();
+const taskService = new TaskService();
 
 export class CategoryService {
   constructor() {
+    // Simular sesión - en un entorno real esto vendría del contexto de autenticación
     this.currentUser = null;
   }
 
+  // Método para establecer el usuario actual (desde middleware de auth)
   setCurrentUser(user) {
     this.currentUser = user;
+    taskService.setCurrentUser(user);
   }
 
-  async getAvailableForUser() {
+  async delete(id) {
     try {
-      const categories = await categoryRepository.getByUser(this.currentUser?.id || null);
+      const category = await this.getById(id);
+      if (!id || id <= 0) {
+        return new OperationResult(false, "ID de categoría inválido.");
+      }
+
+      if (!category.success || !category.data) {
+        return new OperationResult(false, "Categoría no encontrada.");
+      }
+
+      // No permitir eliminar la categoría "General"
+      if (id === 1 || category.data.name === "General") {
+        return new OperationResult(false, "No se puede eliminar la categoría General.");
+      }
+
+      // Eliminar tareas relacionadas primero
+      await taskService.deleteByCategory(id);
+
+      const deleted = await categoryRepository.delete(id);
+      if (deleted) {
+        return new OperationResult(true, "Categoría eliminada exitosamente.");
+      } else {
+        return new OperationResult(false, "Error al eliminar la categoría.");
+      }
+    } catch (error) {
+      return new OperationResult(false, `Error al eliminar categoría: ${error.message}`);
+    }
+  }
+
+  async getAll() {
+    try {
+      if (!this.currentUser) {
+        return new OperationResult(false, "Usuario no autenticado.");
+      }
+
+      // Obtener categorías del usuario + globales
+      const categories = await categoryRepository.getByUser(this.currentUser.id);
       return new OperationResult(true, "Categorías obtenidas exitosamente.", categories);
     } catch (error) {
       return new OperationResult(false, `Error al obtener categorías: ${error.message}`);
     }
   }
 
-  async create(category) {
+  async getById(id) {
     try {
-      if (!category?.name) {
-        return new OperationResult(false, "El nombre de la categoría es obligatorio.");
+      if (!id || id <= 0) return new OperationResult(false, "ID de categoría inválido.");
+
+      const category = await categoryRepository.getById(id);
+      if (category) {
+        return new OperationResult(true, "Categoría encontrada.", category);
+      } else {
+        return new OperationResult(false, "Categoría no encontrada.");
       }
-
-      const payload = {
-        name: category.name,
-        id_User: this.currentUser?.id || null,
-      };
-
-      const created = await categoryRepository.save(payload);
-      return new OperationResult(true, "Categoría creada exitosamente.", created);
     } catch (error) {
-      return new OperationResult(false, `Error al crear categoría: ${error.message}`);
+      return new OperationResult(false, `Error al obtener categoría: ${error.message}`);
     }
   }
 
-  async delete(categoryId) {
+  async getByName(name) {
     try {
-      if (!categoryId) {
-        return new OperationResult(false, "ID de categoría inválido.");
+      if (!name || name.trim() === "") return new OperationResult(false, "Nombre de categoría inválido.");
+
+      const category = await categoryRepository.getByName(name);
+      if (category) {
+        return new OperationResult(true, "Categoría encontrada.", category);
+      } else {
+        return new OperationResult(false, "Categoría no encontrada.");
       }
-      await categoryRepository.delete(categoryId);
-      return new OperationResult(true, "Categoría eliminada exitosamente.");
     } catch (error) {
-      return new OperationResult(false, `Error al eliminar categoría: ${error.message}`);
+      return new OperationResult(false, `Error al obtener categoría por nombre: ${error.message}`);
+    }
+  }
+
+  async save(category) {
+    try {
+      if (!category) {
+        return new OperationResult(false, "La categoría no puede ser nula.");
+      }
+
+      const existingCategory = await this.getByName(category.name);
+      if (existingCategory.success && existingCategory.data) {
+        return new OperationResult(false, "Ya existe una categoría con ese nombre.");
+      }
+
+      const savedCategory = await categoryRepository.save(category);
+      if (savedCategory) {
+        return new OperationResult(true, "Categoría guardada exitosamente.", savedCategory);
+      } else {
+        return new OperationResult(false, "Error al guardar la categoría.");
+      }
+    } catch (error) {
+      return new OperationResult(false, `Error al guardar la categoría: ${error.message}`);
+    }
+  }
+
+  async update(category) {
+    try {
+      if (!category) {
+        return new OperationResult(false, "La categoría no puede ser nula.");
+      }
+
+      // No permitir actualizar la categoría "General"
+      if (category.id_Category === 1 || category.name === "General") {
+        return new OperationResult(false, "No se puede actualizar la categoría General.");
+      }
+
+      const existingCategory = await this.getById(category.id_Category);
+      if (!existingCategory.success || !existingCategory.data) {
+        return new OperationResult(false, "Categoría no encontrada.");
+      }
+
+      const updated = await categoryRepository.update(category);
+      if (updated) {
+        return new OperationResult(true, "Categoría actualizada exitosamente.");
+      } else {
+        return new OperationResult(false, "Error al actualizar la categoría.");
+      }
+    } catch (error) {
+      return new OperationResult(false, `Error al actualizar categoría: ${error.message}`);
     }
   }
 }

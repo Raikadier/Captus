@@ -117,6 +117,21 @@ class UserAchievementsRepository extends BaseRepository {
       completionRate: total > 0 ? Math.round((completed / total) * 100) : 0,
     };
   }
+
+  async delete(userId, achievementId) {
+    if (!userId || !achievementId) return false;
+    const { error } = await this.client
+      .from(this.tableName)
+      .delete()
+      .eq("user_id", userId)
+      .eq("achievement_id", achievementId);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return true;
+  }
 }
 
 export default UserAchievementsRepository;
