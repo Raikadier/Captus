@@ -12,6 +12,12 @@ import StatisticsRoutes from './routes/StatisticsRoutes.js';
 import PriorityRoutes from './routes/PriorityRoutes.js';
 import buildSupabaseAuthMiddleware from './src/middlewares/verifySupabaseToken.js';
 import CategoryRoutes from './routes/CategoryRoutes.js';
+import UserAchievementsRoutes from './routes/UserAchievementsRoutes.js';
+import RolRoutes from './routes/RolRoutes.js';
+import ProjectRoutes from './routes/ProjectRoutes.js';
+import ProjectMemberRoutes from './routes/ProjectMemberRoutes.js';
+import ProjectCommentRoutes from './routes/ProjectCommentRoutes.js';
+import CommentLikeRoutes from './routes/CommentLikeRoutes.js';
 import { getSupabaseClient } from './src/lib/supabaseAdmin.js';
 
 dotenv.config();
@@ -102,6 +108,12 @@ if (ENV_OK && supabaseAdmin) {
   app.use('/api/statistics', verifySupabaseToken, StatisticsRoutes);
   app.use('/api/categories', verifySupabaseToken, CategoryRoutes);
   app.use('/api/priorities', PriorityRoutes);
+  app.use('/api/achievements', verifySupabaseToken, UserAchievementsRoutes);
+  app.use('/api/roles', verifySupabaseToken, RolRoutes);
+  app.use('/api/projects', verifySupabaseToken, ProjectRoutes);
+  app.use('/api/project-members', verifySupabaseToken, ProjectMemberRoutes);
+  app.use('/api/project-comments', verifySupabaseToken, ProjectCommentRoutes);
+  app.use('/api/comment-likes', verifySupabaseToken, CommentLikeRoutes);
 }
 
 // Root route

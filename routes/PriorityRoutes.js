@@ -1,20 +1,17 @@
-// src/routes/PriorityRoutes.js
 import express from "express";
-import { PriorityService } from "../service/PriorityService.js";
+import { PriorityController } from "../controllers/PriorityController.js";
+import buildSupabaseAuthMiddleware from "../src/middlewares/verifySupabaseToken.js";
+import { getSupabaseClient } from "../src/lib/supabaseAdmin.js";
 
 const router = express.Router();
-const priorityService = new PriorityService();
+const priorityController = new PriorityController();
+const supabaseAdmin = getSupabaseClient();
+const verifySupabaseToken = buildSupabaseAuthMiddleware(supabaseAdmin);
 
-// Rutas de prioridades (no requieren autenticación ya que son datos maestros)
-router.get("/", async (req, res) => {
-  const result = await priorityService.getAll();
-  res.status(result.success ? 200 : 500).json(result);
-});
+// Rutas de prioridades (datos maestros, requieren autenticación)
+router.use(verifySupabaseToken);
 
-router.get("/:id", async (req, res) => {
-  const { id } = req.params;
-  const result = await priorityService.getById(parseInt(id));
-  res.status(result.success ? 200 : 404).json(result);
-});
+router.get("/", priorityController.getAll.bind(priorityController));
+router.get("/:id", priorityController.getById.bind(priorityController));
 
 export default router;

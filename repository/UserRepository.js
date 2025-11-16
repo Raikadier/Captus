@@ -1,53 +1,82 @@
 import BaseRepository from "./BaseRepository.js";
-import User from "../models/UserModels.js";
-import Statistics from "../models/StatisticsModels.js";
 import StatisticsRepository from "./StatisticsRepository.js";
+
+const mapFromDb = (row) => ({
+  id_User: row.id,
+  userName: row.username,
+  email: row.email,
+  firstName: row.first_name,
+  lastName: row.last_name,
+  createdAt: row.created_at,
+  updatedAt: row.updated_at,
+});
+
+const mapToDb = (entity) => ({
+  username: entity.userName,
+  email: entity.email,
+  first_name: entity.firstName ?? null,
+  last_name: entity.lastName ?? null,
+});
 
 export default class UserRepository extends BaseRepository {
   constructor() {
-    super(User);
+    super("users", {
+      primaryKey: "id",
+      mapFromDb,
+      mapToDb,
+    });
     this.statisticsRepository = new StatisticsRepository();
   }
 
-  
   async save(entity) {
-    const transaction = await User.sequelize.transaction();
     try {
-      if (!entity) return false;
+      if (!entity) return null;
 
-      // Crea usuario
-      const user = await User.create(entity, { transaction });
-      //Crear estadísticas por defecto
-        const stats = this.statisticsRepository.defaultStatistics(user);
-      const statsCreated = await this.statisticsRepository.save(stats, transaction);
-      if (!statsCreated) {
-        await transaction.rollback();
-        console.error("Error al guardar estadísticas. Usuario eliminado.");
-        return false;
+      // Inserta usuario en Supabase
+      const { data, error } = await this.client
+        .from(this.tableName)
+        .insert(mapToDb(entity))
+        .select("*")
+        .single();
+
+      if (error) {
+        console.error("Error saving user:", error.message);
+        return null;
       }
 
-      await transaction.commit();
+      const user = mapFromDb(data);
+
+      // Crear estadísticas por defecto
+      const stats = this.statisticsRepository.defaultStatistics(user.id_User);
+      const statsCreated = await this.statisticsRepository.save(stats);
+      if (!statsCreated) {
+        // Si falla, eliminar usuario creado
+        await this.client.from(this.tableName).delete().eq("id", user.id_User);
+        console.error("Error al guardar estadísticas. Usuario eliminado.");
+        return null;
+      }
+
       return user;
     } catch (error) {
-      await transaction.rollback();
       console.error("Error saving user:", error.message);
-      return false;
-    }
-  }
-
-  async login(username, password) {
-    try {
-      const user = await User.findOne({ where: { userName: username, password } });
-      return user || null;
-    } catch (error) {
-      console.error("Error in login:", error.message);
       return null;
     }
   }
 
   async getByUsername(username) {
     try {
-      return await User.findOne({ where: { userName: username } });
+      const { data, error } = await this.client
+        .from(this.tableName)
+        .select("*")
+        .eq("username", username)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error getting user by username:", error.message);
+        return null;
+      }
+
+      return data ? mapFromDb(data) : null;
     } catch (error) {
       console.error("Error getting user by username:", error.message);
       return null;
@@ -57,11 +86,42 @@ export default class UserRepository extends BaseRepository {
   // Verificar si email ya está registrado
   async isEmailRegistered(email) {
     try {
-      const count = await User.count({ where: { email } });
-      return count > 0;
+      const { data, error } = await this.client
+        .from(this.tableName)
+        .select("id")
+        .eq("email", email)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error checking email:", error.message);
+        return false;
+      }
+
+      return !!data;
     } catch (error) {
       console.error("Error checking email:", error.message);
       return false;
+    }
+  }
+
+  // Método adicional: obtener usuario por email
+  async getByEmail(email) {
+    try {
+      const { data, error } = await this.client
+        .from(this.tableName)
+        .select("*")
+        .eq("email", email)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error getting user by email:", error.message);
+        return null;
+      }
+
+      return data ? mapFromDb(data) : null;
+    } catch (error) {
+      console.error("Error getting user by email:", error.message);
+      return null;
     }
   }
 }

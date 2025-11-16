@@ -385,6 +385,20 @@ export class StatisticsService {
     return getMotivationalMessage(streak);
   }
 
+  // ✅ Obtener estadísticas de logros del usuario actual
+  async getAchievementsStats() {
+    try {
+      if (!this.currentUser) {
+        return new OperationResult(false, "Usuario no autenticado.");
+      }
+
+      const stats = await this.getAchievementStats(this.currentUser.id);
+      return stats;
+    } catch (error) {
+      return new OperationResult(false, `Error al obtener estadísticas de logros: ${error.message}`);
+    }
+  }
+
   // ✅ Obtener estadísticas del usuario actual
   async getByCurrentUser() {
     try {
