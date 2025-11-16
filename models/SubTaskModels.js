@@ -1,87 +1,25 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../db.js";
-import User from "./UserModels.js";
-import Category from "./CategoryModels.js";
-import Priority from "./PriorityModels.js";
-import Task from "./TaskModels.js";
-
-const SubTask = sequelize.define(
-  "SubTask",
-  {
-    id_SubTask: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
-    },
-    title: {
-      type: DataTypes.STRING(150),
-      allowNull: false,
-    },
-    id_Category: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: Category,
-        key: "id_Category",
-      },
-    },
-    description: {
-      type: DataTypes.STRING(250),
-      allowNull: true,
-    },
-    creationDate: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-    },
-    endDate: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    id_Priority: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: Priority,
-        key: "id_Priority",
-      },
-    },
-    state: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-    id_Task: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: Task,
-        key: "id_Task",
-      },
-    },
-    id_User: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: User,
-        key: "id_User",
-      },
-    },
-  },
-  {
-    tableName: "SubTask",
-    timestamps: false,
+export default class SubTask {
+  constructor({
+    id_SubTask = null,
+    title,
+    id_Category,
+    description = null,
+    creationDate = new Date(),
+    endDate,
+    id_Priority,
+    state = false,
+    id_Task,
+    id_User,
+  }) {
+    this.id_SubTask = id_SubTask;
+    this.title = title;
+    this.id_Category = id_Category;
+    this.description = description;
+    this.creationDate = creationDate;
+    this.endDate = endDate;
+    this.id_Priority = id_Priority;
+    this.state = state;
+    this.id_Task = id_Task;
+    this.id_User = id_User;
   }
-);
-
-Task.hasMany(SubTask, { foreignKey: "id_Task" , onDelete: "CASCADE" });
-SubTask.belongsTo(Task, { foreignKey: "id_Task" });
-
-User.hasMany(SubTask, { foreignKey: "id_User" , onDelete: "CASCADE" });
-SubTask.belongsTo(User, { foreignKey: "id_User" });
-
-Category.hasMany(SubTask, { foreignKey: "id_Category" , onDelete: "CASCADE" });
-SubTask.belongsTo(Category, { foreignKey: "id_Category" });
-
-Priority.hasMany(SubTask, { foreignKey: "id_Priority" , onDelete: "CASCADE" });
-SubTask.belongsTo(Priority, { foreignKey: "id_Priority" });
-
-export default SubTask;
+}
