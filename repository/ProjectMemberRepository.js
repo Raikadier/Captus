@@ -1,20 +1,40 @@
 import BaseRepository from "./BaseRepository.js";
-import ProjectMember from "../models/ProjectMembersModels.js";
-import User from "../models/UserModels.js";
-import Project from "../models/ProjectModels.js";
-import Rol from "../models/RolModels.js";
+
+const mapFromDb = (row) => ({
+  id_ProjectMember: row.id,
+  id_User: row.user_id,
+  id_Project: row.project_id,
+  id_Rol: row.role_id,
+});
+
+const mapToDb = (entity) => ({
+  user_id: entity.id_User,
+  project_id: entity.id_Project,
+  role_id: entity.id_Rol,
+});
 
 class ProjectMemberRepository extends BaseRepository {
   constructor() {
-    super(ProjectMember);
+    super("project_members", {
+      primaryKey: "id",
+      mapFromDb,
+      mapToDb,
+    });
   }
 
   // Obtener todos los miembros de proyectos
   async getAll() {
     try {
-      return await ProjectMember.findAll({
-        include: [User, Project, Rol],
-      });
+      const { data, error } = await this.client
+        .from(this.tableName)
+        .select("*");
+
+      if (error) {
+        console.error("Error al obtener miembros de proyectos:", error.message);
+        return [];
+      }
+
+      return data.map(mapFromDb);
     } catch (error) {
       console.error("Error al obtener miembros de proyectos:", error);
       return [];
@@ -25,10 +45,17 @@ class ProjectMemberRepository extends BaseRepository {
   async getByProject(projectId) {
     try {
       if (!projectId) return [];
-      return await ProjectMember.findAll({
-        where: { id_Project: projectId },
-        include: [User, Project, Rol],
-      });
+      const { data, error } = await this.client
+        .from(this.tableName)
+        .select("*")
+        .eq("project_id", projectId);
+
+      if (error) {
+        console.error("Error al obtener miembros por proyecto:", error.message);
+        return [];
+      }
+
+      return data.map(mapFromDb);
     } catch (error) {
       console.error("Error al obtener miembros por proyecto:", error);
       return [];
@@ -39,10 +66,17 @@ class ProjectMemberRepository extends BaseRepository {
   async getByUser(userId) {
     try {
       if (!userId) return [];
-      return await ProjectMember.findAll({
-        where: { id_User: userId },
-        include: [User, Project, Rol],
-      });
+      const { data, error } = await this.client
+        .from(this.tableName)
+        .select("*")
+        .eq("user_id", userId);
+
+      if (error) {
+        console.error("Error al obtener proyectos por usuario:", error.message);
+        return [];
+      }
+
+      return data.map(mapFromDb);
     } catch (error) {
       console.error("Error al obtener proyectos por usuario:", error);
       return [];
@@ -53,9 +87,7 @@ class ProjectMemberRepository extends BaseRepository {
   async getById(id) {
     try {
       if (!id) return null;
-      return await ProjectMember.findByPk(id, {
-        include: [User, Project, Rol],
-      });
+      return super.getById(id);
     } catch (error) {
       console.error("Error al obtener miembro por ID:", error);
       return null;
@@ -66,10 +98,19 @@ class ProjectMemberRepository extends BaseRepository {
   async isMember(projectId, userId) {
     try {
       if (!projectId || !userId) return false;
-      const member = await ProjectMember.findOne({
-        where: { id_Project: projectId, id_User: userId },
-      });
-      return member !== null;
+      const { data, error } = await this.client
+        .from(this.tableName)
+        .select("id")
+        .eq("project_id", projectId)
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error al verificar membresía:", error.message);
+        return false;
+      }
+
+      return !!data;
     } catch (error) {
       console.error("Error al verificar membresía:", error);
       return false;
@@ -80,11 +121,19 @@ class ProjectMemberRepository extends BaseRepository {
   async getUserRole(projectId, userId) {
     try {
       if (!projectId || !userId) return null;
-      const member = await ProjectMember.findOne({
-        where: { id_Project: projectId, id_User: userId },
-        include: [Rol],
-      });
-      return member ? member.Rol : null;
+      const { data, error } = await this.client
+        .from(this.tableName)
+        .select("role_id")
+        .eq("project_id", projectId)
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error al obtener rol de usuario:", error.message);
+        return null;
+      }
+
+      return data ? { id_Rol: data.role_id } : null; // Simplified, assuming Rol object
     } catch (error) {
       console.error("Error al obtener rol de usuario:", error);
       return null;
@@ -96,12 +145,18 @@ class ProjectMemberRepository extends BaseRepository {
     try {
       if (!projectId || !userId || !roleId) return false;
 
-      const [updated] = await ProjectMember.update(
-        { id_Rol: roleId },
-        { where: { id_Project: projectId, id_User: userId } }
-      );
+      const { error } = await this.client
+        .from(this.tableName)
+        .update({ role_id: roleId })
+        .eq("project_id", projectId)
+        .eq("user_id", userId);
 
-      return updated > 0;
+      if (error) {
+        console.error("Error al actualizar rol de miembro:", error.message);
+        return false;
+      }
+
+      return true;
     } catch (error) {
       console.error("Error al actualizar rol de miembro:", error);
       return false;
@@ -112,10 +167,18 @@ class ProjectMemberRepository extends BaseRepository {
   async removeMember(projectId, userId) {
     try {
       if (!projectId || !userId) return false;
-      const deleted = await ProjectMember.destroy({
-        where: { id_Project: projectId, id_User: userId },
-      });
-      return deleted > 0;
+      const { error } = await this.client
+        .from(this.tableName)
+        .delete()
+        .eq("project_id", projectId)
+        .eq("user_id", userId);
+
+      if (error) {
+        console.error("Error al eliminar miembro:", error.message);
+        return false;
+      }
+
+      return true;
     } catch (error) {
       console.error("Error al eliminar miembro:", error);
       return false;

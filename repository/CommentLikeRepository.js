@@ -1,20 +1,40 @@
 import BaseRepository from "./BaseRepository.js";
-import CommentLike from "../models/CommentLikeModels.js";
-import User from "../models/UserModels.js";
-import ProjectComment from "../models/ProjectCommentModels.js";
+
+const mapFromDb = (row) => ({
+  id_Like: row.id,
+  id_User: row.user_id,
+  id_Comment: row.comment_id,
+  createdAt: row.created_at,
+});
+
+const mapToDb = (entity) => ({
+  user_id: entity.id_User,
+  comment_id: entity.id_Comment,
+});
 
 class CommentLikeRepository extends BaseRepository {
   constructor() {
-    super(CommentLike);
+    super("comment_likes", {
+      primaryKey: "id",
+      mapFromDb,
+      mapToDb,
+    });
   }
 
   // Obtener todos los likes
   async getAll() {
     try {
-      return await CommentLike.findAll({
-        include: [User, ProjectComment],
-        order: [["createdAt", "DESC"]],
-      });
+      const { data, error } = await this.client
+        .from(this.tableName)
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error al obtener likes:", error.message);
+        return [];
+      }
+
+      return data.map(mapFromDb);
     } catch (error) {
       console.error("Error al obtener likes:", error);
       return [];
@@ -25,11 +45,18 @@ class CommentLikeRepository extends BaseRepository {
   async getByComment(commentId) {
     try {
       if (!commentId) return [];
-      return await CommentLike.findAll({
-        where: { id_Comment: commentId },
-        include: [User, ProjectComment],
-        order: [["createdAt", "DESC"]],
-      });
+      const { data, error } = await this.client
+        .from(this.tableName)
+        .select("*")
+        .eq("comment_id", commentId)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error al obtener likes por comentario:", error.message);
+        return [];
+      }
+
+      return data.map(mapFromDb);
     } catch (error) {
       console.error("Error al obtener likes por comentario:", error);
       return [];
@@ -40,11 +67,18 @@ class CommentLikeRepository extends BaseRepository {
   async getByUser(userId) {
     try {
       if (!userId) return [];
-      return await CommentLike.findAll({
-        where: { id_User: userId },
-        include: [User, ProjectComment],
-        order: [["createdAt", "DESC"]],
-      });
+      const { data, error } = await this.client
+        .from(this.tableName)
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error al obtener likes por usuario:", error.message);
+        return [];
+      }
+
+      return data.map(mapFromDb);
     } catch (error) {
       console.error("Error al obtener likes por usuario:", error);
       return [];
@@ -55,9 +89,7 @@ class CommentLikeRepository extends BaseRepository {
   async getById(id) {
     try {
       if (!id) return null;
-      return await CommentLike.findByPk(id, {
-        include: [User, ProjectComment],
-      });
+      return super.getById(id);
     } catch (error) {
       console.error("Error al obtener like por ID:", error);
       return null;
@@ -68,10 +100,19 @@ class CommentLikeRepository extends BaseRepository {
   async hasUserLiked(commentId, userId) {
     try {
       if (!commentId || !userId) return false;
-      const like = await CommentLike.findOne({
-        where: { id_Comment: commentId, id_User: userId },
-      });
-      return like !== null;
+      const { data, error } = await this.client
+        .from(this.tableName)
+        .select("id")
+        .eq("comment_id", commentId)
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error al verificar like:", error.message);
+        return false;
+      }
+
+      return !!data;
     } catch (error) {
       console.error("Error al verificar like:", error);
       return false;
@@ -87,12 +128,16 @@ class CommentLikeRepository extends BaseRepository {
       const existingLike = await this.hasUserLiked(commentId, userId);
       if (existingLike) return false;
 
-      const like = await CommentLike.create({
-        id_Comment: commentId,
-        id_User: userId,
-      });
+      const { error } = await this.client
+        .from(this.tableName)
+        .insert(mapToDb({ id_User: userId, id_Comment: commentId }));
 
-      return like !== null;
+      if (error) {
+        console.error("Error al agregar like:", error.message);
+        return false;
+      }
+
+      return true;
     } catch (error) {
       console.error("Error al agregar like:", error);
       return false;
@@ -103,10 +148,18 @@ class CommentLikeRepository extends BaseRepository {
   async removeLike(commentId, userId) {
     try {
       if (!commentId || !userId) return false;
-      const deleted = await CommentLike.destroy({
-        where: { id_Comment: commentId, id_User: userId },
-      });
-      return deleted > 0;
+      const { error } = await this.client
+        .from(this.tableName)
+        .delete()
+        .eq("comment_id", commentId)
+        .eq("user_id", userId);
+
+      if (error) {
+        console.error("Error al remover like:", error.message);
+        return false;
+      }
+
+      return true;
     } catch (error) {
       console.error("Error al remover like:", error);
       return false;
@@ -117,9 +170,17 @@ class CommentLikeRepository extends BaseRepository {
   async countLikes(commentId) {
     try {
       if (!commentId) return 0;
-      return await CommentLike.count({
-        where: { id_Comment: commentId },
-      });
+      const { count, error } = await this.client
+        .from(this.tableName)
+        .select("*", { count: "exact", head: true })
+        .eq("comment_id", commentId);
+
+      if (error) {
+        console.error("Error al contar likes:", error.message);
+        return 0;
+      }
+
+      return count;
     } catch (error) {
       console.error("Error al contar likes:", error);
       return 0;
@@ -130,10 +191,17 @@ class CommentLikeRepository extends BaseRepository {
   async delete(id) {
     try {
       if (!id) return false;
-      const deletedRows = await CommentLike.destroy({
-        where: { id_Like: id },
-      });
-      return deletedRows > 0;
+      const { error } = await this.client
+        .from(this.tableName)
+        .delete()
+        .eq("id", id);
+
+      if (error) {
+        console.error("Error al eliminar like:", error.message);
+        return false;
+      }
+
+      return true;
     } catch (error) {
       console.error("Error al eliminar like:", error);
       return false;
