@@ -23,11 +23,7 @@ const models = {
   Task,
   SubTask,
   Statistics,
-  UserAchievements,
+  UserAchievements
 };
-
-Object.values(models).forEach((model) => {
-  if (model.associate) model.associate(models);
-});
 
 export default models;

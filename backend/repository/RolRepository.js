@@ -1,15 +1,36 @@
 import BaseRepository from "./BaseRepository.js";
-import Rol from "../models/RolModels.js";
+
+const mapFromDb = (row) => ({
+  id_Rol: row.id,
+  name: row.name,
+});
+
+const mapToDb = (entity) => ({
+  name: entity.name,
+});
 
 class RolRepository extends BaseRepository {
   constructor() {
-    super(Rol);
+    super("roles", {
+      primaryKey: "id",
+      mapFromDb,
+      mapToDb,
+    });
   }
 
   // Obtener todos los roles
   async getAll() {
     try {
-      return await Rol.findAll();
+      const { data, error } = await this.client
+        .from(this.tableName)
+        .select("*");
+
+      if (error) {
+        console.error("Error al obtener roles:", error.message);
+        return [];
+      }
+
+      return data.map(mapFromDb);
     } catch (error) {
       console.error("Error al obtener roles:", error);
       return [];
@@ -20,7 +41,7 @@ class RolRepository extends BaseRepository {
   async getById(id) {
     try {
       if (!id) return null;
-      return await Rol.findByPk(id);
+      return super.getById(id);
     } catch (error) {
       console.error("Error al obtener rol por ID:", error);
       return null;
@@ -31,9 +52,18 @@ class RolRepository extends BaseRepository {
   async getByName(name) {
     try {
       if (!name) return null;
-      return await Rol.findOne({
-        where: { name },
-      });
+      const { data, error } = await this.client
+        .from(this.tableName)
+        .select("*")
+        .eq("name", name)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error al obtener rol por nombre:", error.message);
+        return null;
+      }
+
+      return data ? mapFromDb(data) : null;
     } catch (error) {
       console.error("Error al obtener rol por nombre:", error);
       return null;

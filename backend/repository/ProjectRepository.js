@@ -1,18 +1,41 @@
 import BaseRepository from "./BaseRepository.js";
-import Project from "../models/ProjectModels.js";
-import User from "../models/UserModels.js";
+
+const mapFromDb = (row) => ({
+  id_Project: row.id,
+  name: row.name,
+  description: row.description,
+  createdAt: row.created_at,
+  id_Creator: row.creator_id,
+});
+
+const mapToDb = (entity) => ({
+  name: entity.name,
+  description: entity.description ?? null,
+  creator_id: entity.id_Creator,
+});
 
 class ProjectRepository extends BaseRepository {
   constructor() {
-    super(Project);
+    super("projects", {
+      primaryKey: "id",
+      mapFromDb,
+      mapToDb,
+    });
   }
 
   // Obtener todos los proyectos
   async getAll() {
     try {
-      return await Project.findAll({
-        include: [{ model: User, as: "Creator" }],
-      });
+      const { data, error } = await this.client
+        .from(this.tableName)
+        .select("*");
+
+      if (error) {
+        console.error("Error al obtener proyectos:", error.message);
+        return [];
+      }
+
+      return data.map(mapFromDb);
     } catch (error) {
       console.error("Error al obtener proyectos:", error);
       return [];
@@ -23,10 +46,17 @@ class ProjectRepository extends BaseRepository {
   async getByCreator(creatorId) {
     try {
       if (!creatorId) return [];
-      return await Project.findAll({
-        where: { id_Creator: creatorId },
-        include: [{ model: User, as: "Creator" }],
-      });
+      const { data, error } = await this.client
+        .from(this.tableName)
+        .select("*")
+        .eq("creator_id", creatorId);
+
+      if (error) {
+        console.error("Error al obtener proyectos por creador:", error.message);
+        return [];
+      }
+
+      return data.map(mapFromDb);
     } catch (error) {
       console.error("Error al obtener proyectos por creador:", error);
       return [];
@@ -37,9 +67,7 @@ class ProjectRepository extends BaseRepository {
   async getById(id) {
     try {
       if (!id) return null;
-      return await Project.findByPk(id, {
-        include: [{ model: User, as: "Creator" }],
-      });
+      return super.getById(id);
     } catch (error) {
       console.error("Error al obtener proyecto por ID:", error);
       return null;
@@ -50,10 +78,18 @@ class ProjectRepository extends BaseRepository {
   async getByName(name) {
     try {
       if (!name) return null;
-      return await Project.findOne({
-        where: { name },
-        include: [{ model: User, as: "Creator" }],
-      });
+      const { data, error } = await this.client
+        .from(this.tableName)
+        .select("*")
+        .eq("name", name)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error al obtener proyecto por nombre:", error.message);
+        return null;
+      }
+
+      return data ? mapFromDb(data) : null;
     } catch (error) {
       console.error("Error al obtener proyecto por nombre:", error);
       return null;
@@ -63,20 +99,11 @@ class ProjectRepository extends BaseRepository {
   // Actualizar proyecto
   async update(entity) {
     try {
-      if (!entity || !entity.id_Project) return false;
-
-      const project = await Project.findByPk(entity.id_Project);
-      if (!project) return false;
-
-      await project.update({
-        name: entity.name,
-        description: entity.description || null,
-      });
-
-      return true;
+      if (!entity || !entity.id_Project) return null;
+      return super.update(entity.id_Project, entity);
     } catch (error) {
       console.error("Error al actualizar proyecto:", error);
-      return false;
+      return null;
     }
   }
 
@@ -84,10 +111,17 @@ class ProjectRepository extends BaseRepository {
   async delete(id) {
     try {
       if (!id) return false;
-      const deletedRows = await Project.destroy({
-        where: { id_Project: id },
-      });
-      return deletedRows > 0;
+      const { error } = await this.client
+        .from(this.tableName)
+        .delete()
+        .eq("id", id);
+
+      if (error) {
+        console.error("Error al eliminar proyecto:", error.message);
+        return false;
+      }
+
+      return true;
     } catch (error) {
       console.error("Error al eliminar proyecto:", error);
       return false;

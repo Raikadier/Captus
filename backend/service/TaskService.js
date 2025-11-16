@@ -271,6 +271,14 @@ export class TaskService {
     }
   }
 
+  async create(task) {
+    return this.save(task);
+  }
+
+  async complete(id) {
+    return this.updateTaskState(id, true);
+  }
+
   async createAndSaveTask(title, description, endDate, priorityText, categoryText, userId) {
     try {
       if (!title || title.trim() === "") {
