@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import LoginForm from './features/auth/components/LoginForm';
+import TeacherDashboard from './features/dashboard/teacher/TeacherDashboard';
 import HomePage from './features/dashboard/components/HomePage';
 import MainLayout from './features/dashboard/components/MainLayout';
 import TaskPage from './features/tasks/TaskPage';
@@ -41,17 +42,10 @@ function App() {
         <div className="App p-4 md:p-6 text-primary">
           <Toaster richColors position="top-right" />
           <Routes>
-            <Route path="/" element={<LoginForm />} />
-            <Route
-              path="/home"
-              element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <HomePage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
+
+            <Route path="/" element={<TeacherDashboard />} />
+
+            
             <Route
               path="/tasks"
               element={
