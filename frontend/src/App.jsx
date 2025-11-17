@@ -43,7 +43,26 @@ function App() {
           <Toaster richColors position="top-right" />
           <Routes>
 
-            <Route path="/" element={<TeacherDashboard />} />
+            <Route
+            path="/teacher-dashboard"
+            element={
+            <ProtectedRoute>
+            <TeacherDashboard />
+            </ProtectedRoute>
+            }
+            />
+
+
+            <Route
+              path="/home"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <HomePage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
 
             
             <Route
