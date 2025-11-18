@@ -2,11 +2,10 @@
 import tailwindcssAnimate from 'tailwindcss-animate'
 
 export default {
-  darkMode: 'class',
+  darkMode: ['class'],
   content: [
     './index.html',
     './src/**/*.{js,jsx,ts,tsx}',
-    '../frontend-example/**/*.{js,jsx,ts,tsx}',
   ],
   theme: {
     container: {
@@ -24,8 +23,8 @@ export default {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         primary: {
-          DEFAULT: '#10b981',
-          foreground: '#ffffff',
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
