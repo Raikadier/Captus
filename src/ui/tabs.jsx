@@ -9,9 +9,6 @@ export function Tabs({ defaultValue, value: controlledValue, onValueChange, clas
   const setValue = React.useCallback(
     (v) => {
       if (controlledValue === undefined) setUncontrolledValue(v)
-      // minimal diagnostic log to validate interactions
-      // eslint-disable-next-line no-console
-      console.log('[Tabs] value change:', v)
       onValueChange?.(v)
     },
     [controlledValue, onValueChange],

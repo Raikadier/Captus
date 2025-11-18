@@ -1,11 +1,17 @@
 // MainLayout - Layout principal con sidebar fijo como la plantilla
 import React, { useState, useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import Sidebar from './Sidebar';
+import TeacherSidebar from './TeacherSidebar';
+import { useTheme } from '../../../context/themeContext';
 
 const MainLayout = ({ children }) => {
   const [sidebarWidth, setSidebarWidth] = useState(240);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const location = useLocation();
+  const { darkMode } = useTheme();
 
   useEffect(() => {
     const handleResize = () => {
@@ -25,10 +31,16 @@ const MainLayout = ({ children }) => {
     };
   }, []);
 
+  const isTeacher = location.pathname.startsWith('/teacher');
+
   return (
-    <div className="min-h-screen bg-[#F6F7FB]">
+    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-[#F6F7FB]'}`}>
       {/* Sidebar fijo */}
-      <Sidebar />
+      {isTeacher ? (
+        <TeacherSidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
+      ) : (
+        <Sidebar />
+      )}
 
       {/* Contenido principal */}
       <motion.div

@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Bell, MessageSquare, TrendingUp, CheckSquare, Target, Award } from 'lucide-react'
 import { Button } from '../../ui/button'
 import { Card } from '../../ui/card'
+import apiClient from '../../shared/api/client'
 
 function getCurrentDate() {
   const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
@@ -24,22 +25,15 @@ function getCurrentDate() {
   return `${days[now.getDay()]}, ${now.getDate()} de ${months[now.getMonth()]} de ${now.getFullYear()}`
 }
 
-const subjects = [
-  { name: 'Matemáticas III', grade: 8.5, progress: 85, tasks: 12, color: 'blue' },
-  { name: 'Literatura Española', grade: 9.0, progress: 90, tasks: 8, color: 'purple' },
-  { name: 'Historia Mundial', grade: 7.8, progress: 78, tasks: 10, color: 'red' },
-  { name: 'Química Orgánica', grade: 8.2, progress: 82, tasks: 15, color: 'orange' },
-  { name: 'Programación Web', grade: 9.2, progress: 92, tasks: 6, color: 'green' },
-  { name: 'Filosofía Moderna', grade: 8.0, progress: 80, tasks: 9, color: 'yellow' },
-]
+const defaultStats = {
+  averageGrade: 0,
+  completedTasks: 0,
+  totalTasks: 0,
+  studyHours: 0,
+  streak: 0,
+};
 
-const stats = {
-  averageGrade: 8.45,
-  completedTasks: 48,
-  totalTasks: 60,
-  studyHours: 156,
-  streak: 12,
-}
+const subjects = [];
 
 function StatCard({ icon, label, value, bgColor }) {
   return (
@@ -91,9 +85,35 @@ function SubjectProgress({ subject }) {
 }
 
 export default function StatsPage() {
-  const completionPercent = Math.round((stats.completedTasks / stats.totalTasks) * 100)
-  const circumference = 2 * Math.PI * 88
-  const strokeDasharray = `${(stats.completedTasks / stats.totalTasks) * circumference} ${circumference}`
+  const [stats, setStats] = useState(defaultStats);
+
+  const completionPercent = useMemo(() => {
+    if (!stats.totalTasks) return 0;
+    return Math.round((stats.completedTasks / stats.totalTasks) * 100);
+  }, [stats.completedTasks, stats.totalTasks]);
+
+  const circumference = 2 * Math.PI * 88;
+  const strokeDasharray = `${(stats.totalTasks ? stats.completedTasks / stats.totalTasks : 0) * circumference} ${circumference}`;
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const { data } = await apiClient.get('/statistics');
+        const payload = data?.data ?? data;
+        if (!payload) return;
+        setStats({
+          averageGrade: payload.averageGrade ?? 0,
+          completedTasks: payload.completedTasks ?? 0,
+          totalTasks: payload.totalTasks ?? 0,
+          studyHours: payload.studyHours ?? 0,
+          streak: payload.racha ?? payload.streak ?? 0,
+        });
+      } catch (err) {
+        console.error('Error fetching statistics', err);
+      }
+    };
+    fetchStats();
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#F6F7FB]">
@@ -116,7 +136,7 @@ export default function StatsPage() {
           <StatCard
             icon={<TrendingUp className="text-green-600" size={28} />}
             label="Promedio General"
-            value={stats.averageGrade.toFixed(2)}
+            value={stats.averageGrade?.toFixed ? stats.averageGrade.toFixed(2) : stats.averageGrade}
             bgColor="bg-green-50"
           />
           <StatCard

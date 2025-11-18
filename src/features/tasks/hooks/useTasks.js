@@ -1,54 +1,35 @@
 // Custom hook for task management using Supabase (RLS)
 import { useState, useEffect, useCallback } from 'react';
-import { supabase, getCurrentUser } from '../../../shared/api/supabase';
+import apiClient from '../../../shared/api/client';
+import { useAuth } from '../../../context/AuthContext';
 
 export const useTasks = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user } = useAuth();
 
-  // Build a Supabase query with optional filters
-  const buildTasksQuery = (filters = {}) => {
-    let query = supabase
-      .from('tasks')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (filters.categoryId) {
-      query = query.eq('category_id', Number(filters.categoryId));
-    }
-    if (filters.priorityId) {
-      query = query.eq('priority_id', Number(filters.priorityId));
-    }
-    if (filters.completed !== undefined && filters.completed !== null && filters.completed !== '') {
-      query = query.eq('completed', String(filters.completed) === 'true' || filters.completed === true);
-    }
-    if (filters.searchText) {
-      // Search in title OR description
-      const text = String(filters.searchText).trim();
-      if (text.length > 0) {
-        query = query.or(`title.ilike.%${text}%,description.ilike.%${text}%`);
-      }
-    }
-    if (filters.isOverdue) {
-      query = query
-        .lt('due_date', new Date().toISOString())
-        .eq('completed', false);
-    }
-
-    return query;
-  };
+  // Normaliza la tarea recibida desde el backend
+  const normalizeTask = (task) => ({
+    id: task.id_Task ?? task.id ?? task.id_task,
+    title: task.title,
+    description: task.description,
+    due_date: task.endDate ?? task.due_date,
+    priority_id: task.id_Priority ?? task.priority_id,
+    category_id: task.id_Category ?? task.category_id,
+    completed: task.state ?? task.completed,
+    created_at: task.creationDate ?? task.created_at,
+    updated_at: task.updatedAt ?? task.updated_at,
+  });
 
   // Fetch all tasks
-  const fetchTasks = useCallback(async (filters = {}) => {
+  const fetchTasks = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-
-      const { data, error } = await buildTasksQuery(filters);
-      if (error) throw error;
-
-      setTasks(Array.isArray(data) ? data : []);
+      const { data } = await apiClient.get('/tasks');
+      const list = Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : [];
+      setTasks(list.map(normalizeTask));
     } catch (err) {
       console.error('Error fetching tasks:', err);
       setError(err.message || 'Failed to fetch tasks');
@@ -61,64 +42,46 @@ export const useTasks = () => {
   const createTask = useCallback(async (taskData) => {
     try {
       setError(null);
-
-      const { data: userData, error: userError } = await supabase.auth.getUser();
-      if (userError) throw userError;
-      const userId = userData?.user?.id;
-      if (!userId) throw new Error('User not authenticated');
+      if (!user?.id) throw new Error('User not authenticated');
 
       const payload = {
         title: taskData.title ?? '',
         description: taskData.description ?? null,
-        due_date: taskData.due_date ?? null,
-        priority_id: taskData.priority_id ?? 1,
-        category_id: taskData.category_id ?? 1,
-        completed: taskData.completed ?? false,
-        parent_task_id: taskData.parent_task_id ?? null,
-        user_id: userId, // Required by RLS policy (user_id = auth.uid())
+        endDate: taskData.due_date ?? taskData.endDate ?? null,
+        id_Priority: taskData.priority_id ?? taskData.id_Priority ?? null,
+        id_Category: taskData.category_id ?? taskData.id_Category ?? null,
+        state: taskData.completed ?? false,
+        parentTaskId: taskData.parent_task_id ?? taskData.parentTaskId ?? null,
+        id_User: user.id,
       };
 
-      const { data, error } = await supabase
-        .from('tasks')
-        .insert(payload)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      setTasks(prev => [data, ...prev]);
-      return data;
+      const { data } = await apiClient.post('/tasks', payload);
+      if (!data?.success) throw new Error(data?.message || 'Error creando tarea');
+      const created = normalizeTask(data.data);
+      setTasks(prev => [created, ...prev]);
+      return created;
     } catch (err) {
       console.error('Error creating task:', err);
       setError(err.message || 'Failed to create task');
       throw err;
     }
-  }, []);
+  }, [user?.id]);
 
   // Update a task
   const updateTask = useCallback(async (taskId, updateData) => {
     try {
       setError(null);
-
-      // Sanitize payload (do not allow changing user_id/id/created_at)
-      const {
-        id, user_id, created_at, updated_at,
-        ...rest
-      } = updateData || {};
-
-      const { data, error } = await supabase
-        .from('tasks')
-        .update(rest)
-        .eq('id', taskId)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      setTasks(prev => prev.map(task =>
-        task.id === taskId ? data : task
-      ));
-      return data;
+      const payload = {
+        ...updateData,
+        endDate: updateData?.due_date ?? updateData?.endDate ?? null,
+        id_Priority: updateData?.priority_id ?? updateData?.id_Priority ?? null,
+        id_Category: updateData?.category_id ?? updateData?.id_Category ?? null,
+      };
+      const { data } = await apiClient.put(`/tasks/${taskId}`, payload);
+      if (!data?.success) throw new Error(data?.message || 'Error actualizando tarea');
+      const updated = normalizeTask(data.data);
+      setTasks(prev => prev.map(task => (task.id === taskId ? updated : task)));
+      return updated;
     } catch (err) {
       console.error('Error updating task:', err);
       setError(err.message || 'Failed to update task');
@@ -130,14 +93,8 @@ export const useTasks = () => {
   const deleteTask = useCallback(async (taskId) => {
     try {
       setError(null);
-
-      const { error } = await supabase
-        .from('tasks')
-        .delete()
-        .eq('id', taskId);
-
-      if (error) throw error;
-
+      const { data } = await apiClient.delete(`/tasks/${taskId}`);
+      if (data?.success === false) throw new Error(data?.message || 'Error al eliminar');
       setTasks(prev => prev.filter(task => task.id !== taskId));
     } catch (err) {
       console.error('Error deleting task:', err);
@@ -147,93 +104,30 @@ export const useTasks = () => {
   }, []);
 
   // Toggle task completion
-  const toggleTaskCompletion = useCallback(async (taskId, completed) => {
-    return updateTask(taskId, { completed: !completed });
-  }, [updateTask]);
-
-  // Get subtasks for a task
-  const getSubtasks = useCallback(async (parentTaskId) => {
+  const toggleTaskCompletion = useCallback(async (taskId) => {
     try {
-      const { data, error } = await supabase
-        .from('tasks')
-        .select('*')
-        .eq('parent_task_id', parentTaskId)
-        .order('created_at', { ascending: true });
-
-      if (error) throw error;
-      return data;
+      const { data } = await apiClient.put(`/tasks/${taskId}/complete`);
+      if (!data?.success) throw new Error(data?.message || 'Error actualizando tarea');
+      const updated = normalizeTask(data.data);
+      setTasks(prev => prev.map(task => (task.id === taskId ? updated : task)));
+      return updated;
     } catch (err) {
-      console.error('Error fetching subtasks:', err);
-      throw err;
-    }
-  }, []);
-
-  // Create subtask
-  const createSubtask = useCallback(async (parentTaskId, subtaskData) => {
-    try {
-      const user = await getCurrentUser();
-      if (!user?.id) throw new Error('User not authenticated');
-
-      const payload = {
-        title: subtaskData.title ?? '',
-        description: subtaskData.description ?? null,
-        due_date: subtaskData.due_date ?? null,
-        priority_id: subtaskData.priority_id ?? 1,
-        category_id: subtaskData.category_id ?? 1,
-        completed: subtaskData.completed ?? false,
-        user_id: user.id,
-        parent_task_id: parentTaskId,
-      };
-
-      const { data, error } = await supabase
-        .from('tasks')
-        .insert(payload)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    } catch (err) {
-      console.error('Error creating subtask:', err);
+      console.error('Error toggling task:', err);
+      setError(err.message || 'Failed to toggle task');
       throw err;
     }
   }, []);
 
   // Get overdue tasks
   const getOverdueTasks = useCallback(async () => {
-    try {
-      const { data, error } = await supabase
-        .from('tasks')
-        .select('*')
-        .eq('completed', false)
-        .lt('due_date', new Date().toISOString())
-        .order('due_date', { ascending: true });
-
-      if (error) throw error;
-      return data;
-    } catch (err) {
-      console.error('Error fetching overdue tasks:', err);
-      throw err;
-    }
+    const { data } = await apiClient.get('/tasks?overdue=true');
+    return Array.isArray(data?.data) ? data.data.map(normalizeTask) : [];
   }, []);
 
   // Get completed tasks today
   const getCompletedTasksToday = useCallback(async () => {
-    try {
-      const today = new Date().toISOString().split('T')[0];
-      const { data, error } = await supabase
-        .from('tasks')
-        .select('*')
-        .eq('completed', true)
-        .gte('updated_at', `${today}T00:00:00.000Z`)
-        .lt('updated_at', `${today}T23:59:59.999Z`);
-
-      if (error) throw error;
-      return data;
-    } catch (err) {
-      console.error('Error fetching completed tasks today:', err);
-      throw err;
-    }
+    const { data } = await apiClient.get('/tasks?completedToday=true');
+    return Array.isArray(data?.data) ? data.data.map(normalizeTask) : [];
   }, []);
 
   // Load tasks on mount
@@ -250,8 +144,6 @@ export const useTasks = () => {
     updateTask,
     deleteTask,
     toggleTaskCompletion,
-    getSubtasks,
-    createSubtask,
     getOverdueTasks,
     getCompletedTasksToday,
     refetch: fetchTasks
