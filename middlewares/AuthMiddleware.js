@@ -61,6 +61,7 @@ export const verifyProjectAdmin = (projectMemberRepository) => {
 
       next();
     } catch (error) {
+      console.error("verifyProjectAdmin error:", error);
       return res.status(500).json(
         new OperationResult(false, "Error verificando permisos")
       );
@@ -84,6 +85,7 @@ export const verifyProjectMember = (projectMemberRepository) => {
 
       next();
     } catch (error) {
+      console.error("verifyProjectMember error:", error);
       return res.status(500).json(
         new OperationResult(false, "Error verificando membresía")
       );

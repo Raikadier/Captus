@@ -80,7 +80,11 @@ const swaggerOptions = {
       },
     ],
   },
-  apis: ['./src/routes/streakRoutes.js'],
+  apis: [
+    './src/routes/streakRoutes.js',
+    './routes/**/*.js',
+    './docs/swaggerRoutes.js'
+  ],
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
@@ -127,6 +131,40 @@ app.get('/', (req, res) => {
   });
 });
 
+// API base helper
+app.get('/api', (req, res) => {
+  res.json({
+    message: 'Captus API',
+    status: 'Running',
+    health: '/api/health',
+    docs: '/api-docs',
+    endpoints: [
+      '/api/health',
+      '/api/streaks',
+      '/api/tasks',
+      '/api/subtasks',
+      '/api/statistics',
+      '/api/categories',
+      '/api/priorities',
+      '/api/achievements',
+      '/api/roles',
+      '/api/projects',
+      '/api/project-members',
+      '/api/project-comments',
+      '/api/comment-likes',
+      '/api/users'
+    ]
+  });
+});
+
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+  const apiBase = `http://localhost:${PORT}/api`;
+  console.log('===================================');
+  console.log(`Backend running on http://localhost:${PORT}`);
+  console.log(`Health check: ${apiBase}/health`);
+  console.log(`Swagger UI:   http://localhost:${PORT}/api-docs`);
+  console.log(`API base:     ${apiBase}`);
+  console.log(`Frontend:     ${frontendUrl}`);
+  console.log('===================================');
 });

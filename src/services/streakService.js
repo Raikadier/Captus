@@ -59,6 +59,7 @@ class StreakService {
       try {
         streak = await this.getUserStreak(userId);
       } catch (error) {
+        console.warn('No existing streak, creating new one:', error);
         // Create new streak if none exists
         streak = new Streak({
           user_id: userId,

@@ -253,8 +253,6 @@ export class StatisticsService {
     try {
       const allTasksResult = await taskService.getAll();
       const allTasks = allTasksResult.success ? allTasksResult.data : [];
-
-      const subTasksResult = await taskService.getAll(); // Esto debería ser del SubTaskService
       const subTasks = []; // TODO: Implementar método en SubTaskService
 
       let highPriorityTasks = 0;

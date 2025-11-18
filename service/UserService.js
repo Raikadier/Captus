@@ -93,7 +93,7 @@ export class UserService {
     return this.save(user);
   }
 
-  async login(username, password) {
+  async login() {
     // Supabase maneja login, devolver mensaje
     return new OperationResult(false, "Login se maneja vía Supabase Auth.");
   }
@@ -110,7 +110,7 @@ export class UserService {
     return this.update(user);
   }
 
-  async changePassword(currentPassword, newPassword) {
+  async changePassword() {
     // Supabase maneja passwords
     return new OperationResult(false, "Cambio de password se maneja vía Supabase Auth.");
   }

@@ -1,6 +1,4 @@
 import BaseRepository from "./BaseRepository.js";
-import UserAchievemens from "../models/UserAchievements.js";
-import User from "../models/User.js";
 
 const mapFromDb = (row) => ({
   id_User: row.user_id,
