@@ -16,51 +16,12 @@ export class ProjectMemberService {
     this.currentUser = user;
   }
 
-  async addMember(projectId, memberData) {
-    try {
-      if (!projectId || !memberData?.userId || !memberData?.roleId) {
-        return new OperationResult(false, "Datos de miembro inválidos.");
-      }
-
-      // Verificar que el usuario actual tenga permisos (creador o admin)
-      const isCreator = await this.isCreator(projectId, this.currentUser.id);
-      const isAdmin = await this.isAdmin(projectId, this.currentUser.id);
-
-      if (!isCreator && !isAdmin) {
-        return new OperationResult(false, "No tienes permisos para agregar miembros.");
-      }
-
-      // Verificar que el usuario a agregar no sea ya miembro
-      const alreadyMember = await this.isMember(projectId, memberData.userId);
-      if (alreadyMember) {
-        return new OperationResult(false, "El usuario ya es miembro del proyecto.");
-      }
-
-      const member = await projectMemberRepository.save({
-        id_User: memberData.userId,
-        id_Project: projectId,
-        id_Rol: memberData.roleId
-      });
-
-      if (member) {
-        return new OperationResult(true, "Miembro agregado exitosamente.", member);
-      } else {
-        return new OperationResult(false, "Error al agregar miembro.");
-      }
-    } catch (error) {
-      return new OperationResult(false, `Error al agregar miembro: ${error.message}`);
-    }
-  }
-
-  async updateMemberRole(projectId, userId, roleId) {
-    return this.updateRole(projectId, userId, roleId);
-  }
-
   async isCreator(projectId, userId) {
     try {
       const project = await projectRepository.getById(projectId);
       return project && project.id_Creator === userId;
     } catch (error) {
+      console.error('isCreator error:', error);
       return false;
     }
   }
@@ -70,6 +31,7 @@ export class ProjectMemberService {
       const role = await this.getUserRole(projectId, userId);
       return role && (role.name === "Administrador" || role.name === "Admin");
     } catch (error) {
+      console.error('isAdmin error:', error);
       return false;
     }
   }

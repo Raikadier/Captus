@@ -12,6 +12,7 @@ cd Captus
 
 # 2. Instalación automática
 npm run setup
+# (incluye postinstall con patch-package para arreglar util._extend en spawn-command)
 
 # 3. Configurar variables de entorno
 # Copia backend/env.example a backend/.env
@@ -23,9 +24,10 @@ npm run dev
 ```
 
 ### **URLs de Acceso**
-- **Frontend:** http://localhost:5173
-- **Backend API:** http://localhost:4000/api
-- **Documentación API:** http://localhost:4000/api-docs
+- **Frontend:** http://localhost:5173 (Vite moverá al siguiente puerto libre si 5173 está ocupado; revisa la consola)
+- **Backend API base:** http://localhost:4000/api (devuelve JSON con enlaces útiles)
+- **Health Check:** http://localhost:4000/api/health
+- **Documentación API (Swagger):** http://localhost:4000/api-docs
 
 ## 📋 Características
 
@@ -70,6 +72,8 @@ npm run dev              # Ejecutar ambos servicios
 npm run setup            # Configuración inicial
 npm run check:ports      # Verificar puertos disponibles
 npm run health           # Verificar estado del backend
+npm run lint --prefix backend   # Lint backend
+npm run lint --prefix frontend  # Lint frontend
 ```
 
 ## 📚 Documentación Completa
@@ -86,7 +90,8 @@ Si tienes problemas:
 1. Ejecuta `npm run check:ports`
 2. Verifica las variables de entorno
 3. Consulta [SETUP.md](./SETUP.md) para solución de problemas
-4. Revisa los logs en la consola
+4. Revisa los logs en la consola (backend imprime health/docs/api/frontend)
+5. Consulta `/api` y `/api/health` para validar el backend
 
 ## 📄 Licencia
 

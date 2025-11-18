@@ -23,6 +23,7 @@ export const buildSupabaseAuthMiddleware = (client = requireSupabaseClient()) =>
       req.accessToken = token;
       return next();
     } catch (error) {
+      console.error('verifySupabaseToken error:', error);
       return res.status(401).json({ error: 'Invalid token' });
     }
   };
