@@ -1,43 +1,41 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react'
 
-/**
- * Tema y modo compacto (derivado del layout de v0).
- * Persistimos en localStorage para mantener la experiencia entre sesiones.
- */
 const ThemeContext = createContext({
   darkMode: false,
   setDarkMode: () => {},
   compactView: false,
   setCompactView: () => {},
-});
+})
 
-export const ThemeProvider = ({ children }) => {
-  const [darkMode, setDarkMode] = useState(false);
-  const [compactView, setCompactView] = useState(false);
-
-  useEffect(() => {
-    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
-    const savedCompactView = localStorage.getItem('compactView') === 'true';
-    setDarkMode(savedDarkMode);
-    setCompactView(savedCompactView);
-  }, []);
+export function ThemeProvider({ children }) {
+  const [darkMode, setDarkMode] = useState(false)
+  const [compactView, setCompactView] = useState(false)
 
   useEffect(() => {
-    localStorage.setItem('darkMode', String(darkMode));
-  }, [darkMode]);
+    const savedDarkMode = localStorage.getItem('darkMode') === 'true'
+    const savedCompactView = localStorage.getItem('compactView') === 'true'
+    setDarkMode(savedDarkMode)
+    setCompactView(savedCompactView)
+  }, [])
 
   useEffect(() => {
-    localStorage.setItem('compactView', String(compactView));
-  }, [compactView]);
+    localStorage.setItem('darkMode', String(darkMode))
+    if (darkMode) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }, [darkMode])
 
-  const value = { darkMode, setDarkMode, compactView, setCompactView };
+  useEffect(() => {
+    localStorage.setItem('compactView', String(compactView))
+  }, [compactView])
 
   return (
-    <ThemeContext.Provider value={value}>
+    <ThemeContext.Provider value={{ darkMode, setDarkMode, compactView, setCompactView }}>
       {children}
     </ThemeContext.Provider>
-  );
-};
+  )
+}
 
-// eslint-disable-next-line react-refresh/only-export-components
-export const useTheme = () => useContext(ThemeContext);
+export const useTheme = () => useContext(ThemeContext)

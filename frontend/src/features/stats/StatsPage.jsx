@@ -1,9 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
-import { Bell, MessageSquare, TrendingUp, CheckSquare, Target, Award } from 'lucide-react'
+import { Sparkles, TrendingUp, CheckSquare, Target, Award, BarChart3 } from 'lucide-react'
 import { Button } from '../../ui/button'
 import { Card } from '../../ui/card'
-import apiClient from '../../shared/api/client'
 
 function getCurrentDate() {
   const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
@@ -25,15 +24,22 @@ function getCurrentDate() {
   return `${days[now.getDay()]}, ${now.getDate()} de ${months[now.getMonth()]} de ${now.getFullYear()}`
 }
 
-const defaultStats = {
-  averageGrade: 0,
-  completedTasks: 0,
-  totalTasks: 0,
-  studyHours: 0,
-  streak: 0,
-};
+const subjects = [
+  { name: 'Matemáticas III', grade: 8.5, progress: 85, tasks: 12, color: 'blue' },
+  { name: 'Literatura Española', grade: 9.0, progress: 90, tasks: 8, color: 'purple' },
+  { name: 'Historia Mundial', grade: 7.8, progress: 78, tasks: 10, color: 'red' },
+  { name: 'Química Orgánica', grade: 8.2, progress: 82, tasks: 15, color: 'orange' },
+  { name: 'Programación Web', grade: 9.2, progress: 92, tasks: 6, color: 'green' },
+  { name: 'Filosofía Moderna', grade: 8.0, progress: 80, tasks: 9, color: 'yellow' },
+]
 
-const subjects = [];
+const stats = {
+  averageGrade: 8.45,
+  completedTasks: 48,
+  totalTasks: 60,
+  studyHours: 156,
+  streak: 12,
+}
 
 function StatCard({ icon, label, value, bgColor }) {
   return (
@@ -84,50 +90,38 @@ function SubjectProgress({ subject }) {
   )
 }
 
+function MonthBar({ month, color, value, label }) {
+  return (
+    <div className="flex justify-between items-center">
+      <span className="text-gray-600">{month}</span>
+      <div className="flex items-center gap-2">
+        <div className="w-32 bg-gray-200 rounded-full h-2">
+          <div className={`${color} h-2 rounded-full`} style={{ width: `${value}%` }} />
+        </div>
+        <span className="text-sm font-medium text-gray-900">{label}</span>
+      </div>
+    </div>
+  )
+}
+
 export default function StatsPage() {
-  const [stats, setStats] = useState(defaultStats);
-
-  const completionPercent = useMemo(() => {
-    if (!stats.totalTasks) return 0;
-    return Math.round((stats.completedTasks / stats.totalTasks) * 100);
-  }, [stats.completedTasks, stats.totalTasks]);
-
-  const circumference = 2 * Math.PI * 88;
-  const strokeDasharray = `${(stats.totalTasks ? stats.completedTasks / stats.totalTasks : 0) * circumference} ${circumference}`;
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const { data } = await apiClient.get('/statistics');
-        const payload = data?.data ?? data;
-        if (!payload) return;
-        setStats({
-          averageGrade: payload.averageGrade ?? 0,
-          completedTasks: payload.completedTasks ?? 0,
-          totalTasks: payload.totalTasks ?? 0,
-          studyHours: payload.studyHours ?? 0,
-          streak: payload.racha ?? payload.streak ?? 0,
-        });
-      } catch (err) {
-        console.error('Error fetching statistics', err);
-      }
-    };
-    fetchStats();
-  }, []);
+  const completionPercent = Math.round((stats.completedTasks / stats.totalTasks) * 100)
+  const circumference = 2 * Math.PI * 88
+  const strokeDasharray = `${(stats.completedTasks / stats.totalTasks) * circumference} ${circumference}`
 
   return (
-    <div className="min-h-screen bg-[#F6F7FB]">
-      <div className="max-w-7xl mx-auto p-8">
+    <div className="p-6 space-y-6">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <header className="sticky top-0 bg-white rounded-xl shadow-sm p-6 mb-6 z-10">
+        <header className="bg-white rounded-xl shadow-sm p-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">📊 Mis Estadísticas</h1>
-              <p className="text-gray-600 mt-1">{getCurrentDate()}</p>
+              <div className="flex items-center gap-2 mb-1">
+                <BarChart3 size={24} className="text-gray-400" />
+                <h1 className="text-2xl font-bold text-gray-900">Mis Estadísticas</h1>
+              </div>
+              <p className="text-gray-600 text-sm">{getCurrentDate()}</p>
             </div>
-            <Button variant="outline" className="border-gray-300 relative bg-transparent">
-              <Bell size={18} className="text-gray-500" />
-            </Button>
           </div>
         </header>
 
@@ -136,7 +130,7 @@ export default function StatsPage() {
           <StatCard
             icon={<TrendingUp className="text-green-600" size={28} />}
             label="Promedio General"
-            value={stats.averageGrade?.toFixed ? stats.averageGrade.toFixed(2) : stats.averageGrade}
+            value={stats.averageGrade.toFixed(2)}
             bgColor="bg-green-50"
           />
           <StatCard
@@ -169,7 +163,7 @@ export default function StatsPage() {
           </div>
         </Card>
 
-        {/* Charts mock (no external libs) */}
+        {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="p-6 bg-white rounded-xl shadow-sm">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Completación de Tareas</h2>
@@ -198,7 +192,7 @@ export default function StatsPage() {
 
           <Card className="p-6 bg-white rounded-xl shadow-sm">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Rendimiento Mensual</h2>
-            <div className="space-y-4">
+            <div className="space-y-4 pt-8">
               <MonthBar month="Septiembre" color="bg-blue-600" value={75} label="7.5" />
               <MonthBar month="Octubre" color="bg-green-600" value={85} label="8.5" />
               <MonthBar month="Noviembre" color="bg-green-600" value={90} label="9.0" />
@@ -208,28 +202,14 @@ export default function StatsPage() {
       </div>
 
       {/* Floating AI Chat Button */}
-      <Link to="/chatbot" title="Hablar con Captus">
+      <Link to="/chatbot">
         <Button
-          className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-xl transition-all"
+          className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110 active:scale-95"
           size="icon"
         >
-          <MessageSquare size={24} />
+          <Sparkles size={24} />
         </Button>
       </Link>
-    </div>
-  )
-}
-
-function MonthBar({ month, color, value, label }) {
-  return (
-    <div className="flex justify-between items-center">
-      <span className="text-gray-600">{month}</span>
-      <div className="flex items-center gap-2">
-        <div className="w-32 bg-gray-200 rounded-full h-2">
-          <div className={`${color} h-2 rounded-full`} style={{ width: `${value}%` }} />
-        </div>
-        <span className="text-sm font-medium text-gray-900">{label}</span>
-      </div>
     </div>
   )
 }

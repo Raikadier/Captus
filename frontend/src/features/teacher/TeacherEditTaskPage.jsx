@@ -1,97 +1,189 @@
-import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
-import { Button } from '../../ui/button';
-import { Input } from '../../ui/input';
-import { Textarea } from '../../ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
-import { ArrowLeft, Pencil } from 'lucide-react';
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { ArrowLeft, Save, Calendar, FileText, BookOpen } from 'lucide-react'
+import { Button } from '../../ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card'
+import { Input } from '../../ui/input'
+import { Label } from '../../ui/label'
+import { Textarea } from '../../ui/textarea'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../ui/select'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '../../ui/breadcrumb'
 
 const mockTask = {
   id: 1,
-  title: 'Ensayo sobre el capítulo 2',
-  description: 'Redactar un ensayo con los conceptos principales del capítulo 2.',
-  dueDate: '2025-11-22',
-  course: 'Programación I',
-  priority: 'high',
-};
+  title: "Ensayo sobre el capítulo 2",
+  description: "Realizar un análisis crítico del capítulo 2 del libro de texto, enfocándose en los conceptos principales.",
+  course: "Programación I",
+  dueDate: "2025-11-22",
+  points: 100,
+}
 
-const TeacherEditTaskPage = () => {
-  const navigate = useNavigate();
-  const { taskId } = useParams();
-  const [title, setTitle] = useState(mockTask.title);
-  const [description, setDescription] = useState(mockTask.description);
-  const [priority, setPriority] = useState(mockTask.priority);
-  const [dueDate, setDueDate] = useState(mockTask.dueDate);
+export default function TeacherEditTaskPage({ taskId }) {
+  const router = useNavigate()
+  const [title, setTitle] = useState(mockTask.title)
+  const [description, setDescription] = useState(mockTask.description)
+  const [course, setCourse] = useState(mockTask.course)
+  const [dueDate, setDueDate] = useState(mockTask.dueDate)
+  const [points, setPoints] = useState(mockTask.points.toString())
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // TODO: llamar backend/supabase para actualizar
-    navigate('/teacher/tasks');
-  };
+  const handleSave = () => {
+    if (title.trim() && description.trim() && dueDate && points) {
+      console.log('[v0] Saving task edits:', { taskId, title, description, course, dueDate, points })
+      router('/teacher/tasks')
+    }
+  }
 
   return (
-    <div className="p-6 space-y-6 max-w-4xl mx-auto">
-      <Button variant="ghost" onClick={() => navigate(-1)} className="text-gray-600 hover:text-gray-900">
-        <ArrowLeft size={16} className="mr-2" />
-        Volver
-      </Button>
+    <div className="p-6 space-y-6">
+      {/* Breadcrumbs */}
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/teacher">Panel Profesor</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/teacher/tasks">Tareas</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Editar Tarea</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
+      {/* Header */}
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        <Button
+          variant="ghost"
+          onClick={() => router(-1)}
+          className="mb-4 text-gray-600 hover:text-gray-900"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Volver
+        </Button>
+
+        <div className="flex items-center gap-3">
+          <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
+            <FileText className="w-8 h-8 text-blue-600" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Editar Tarea</h1>
+            <p className="text-sm text-gray-500">Modifica los detalles de la tarea</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Form */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-2xl">
-            <Pencil size={20} className="text-green-600" />
-            Editar tarea
-          </CardTitle>
-          <p className="text-sm text-gray-500">ID: {taskId}</p>
+          <CardTitle>Información de la Tarea</CardTitle>
         </CardHeader>
-        <CardContent>
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <div>
-              <label className="text-sm font-medium text-gray-700">Título</label>
-              <Input className="mt-1" value={title} onChange={(e) => setTitle(e.target.value)} required />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-700">Descripción</label>
-              <Textarea
-                className="mt-1"
-                rows={4}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+        <CardContent className="space-y-6">
+          {/* Title */}
+          <div className="space-y-2">
+            <Label htmlFor="title">
+              <FileText className="w-4 h-4 inline mr-2" />
+              Título de la Tarea
+            </Label>
+            <Input
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Ej: Ensayo sobre el capítulo 2"
+            />
+          </div>
+
+          {/* Description */}
+          <div className="space-y-2">
+            <Label htmlFor="description">Descripción</Label>
+            <Textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Describe los detalles y requisitos de la tarea..."
+              rows={6}
+            />
+          </div>
+
+          {/* Course */}
+          <div className="space-y-2">
+            <Label htmlFor="course">
+              <BookOpen className="w-4 h-4 inline mr-2" />
+              Curso
+            </Label>
+            <Select value={course} onValueChange={setCourse}>
+              <SelectTrigger id="course">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Programación I">Programación I</SelectItem>
+                <SelectItem value="Matemáticas Aplicadas">Matemáticas Aplicadas</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Due Date and Points */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="dueDate">
+                <Calendar className="w-4 h-4 inline mr-2" />
+                Fecha de Entrega
+              </Label>
+              <Input
+                id="dueDate"
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
               />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium text-gray-700">Prioridad</label>
-                <Select value={priority} onValueChange={setPriority}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Selecciona prioridad" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="high">Alta</SelectItem>
-                    <SelectItem value="medium">Media</SelectItem>
-                    <SelectItem value="low">Baja</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700">Fecha de entrega</label>
-                <Input className="mt-1" type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
-              </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="points">Puntos</Label>
+              <Input
+                id="points"
+                type="number"
+                min="0"
+                max="100"
+                value={points}
+                onChange={(e) => setPoints(e.target.value)}
+                placeholder="100"
+              />
             </div>
-            <div className="flex gap-3 justify-end">
-              <Button variant="outline" type="button" onClick={() => navigate(-1)}>
-                Cancelar
-              </Button>
-              <Button type="submit" className="bg-green-600 hover:bg-green-700 text-white">
-                Guardar cambios
-              </Button>
-            </div>
-          </form>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex justify-end gap-3 pt-4">
+            <Button
+              variant="outline"
+              onClick={() => router(-1)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleSave}
+              className="bg-green-600 hover:bg-green-700"
+              disabled={!title.trim() || !description.trim() || !dueDate || !points}
+            >
+              <Save className="w-4 h-4 mr-2" />
+              Guardar Cambios
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
-  );
-};
-
-export default TeacherEditTaskPage;
+  )
+}

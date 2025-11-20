@@ -1,22 +1,51 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ClipboardList, Calendar, Pencil, FolderOpen, Plus } from 'lucide-react';
-import { Button } from '../../ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
-import { Badge } from '../../ui/badge';
+import React from 'react'
+import { useNavigate } from 'react-router-dom'
+import { ClipboardList, Calendar, Pencil, FolderOpen, Plus } from 'lucide-react'
+import { Button } from '../../ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card'
+import { Badge } from '../../ui/badge'
 
 const mockCreatedTasks = [
-  { id: 1, title: 'Ensayo sobre el capítulo 2', course: 'Programación I', dueDate: '2025-11-22', submissions: 18, totalStudents: 28 },
-  { id: 2, title: 'Problemas del Tema 3', course: 'Matemáticas Aplicadas', dueDate: '2025-11-24', submissions: 30, totalStudents: 32 },
-  { id: 3, title: 'Proyecto final - Primera entrega', course: 'Programación I', dueDate: '2025-11-28', submissions: 15, totalStudents: 28 },
-  { id: 4, title: 'Quiz de repaso', course: 'Matemáticas Aplicadas', dueDate: '2025-11-25', submissions: 25, totalStudents: 32 },
-];
+  {
+    id: 1,
+    title: "Ensayo sobre el capítulo 2",
+    course: "Programación I",
+    dueDate: "2025-11-22",
+    submissions: 18,
+    totalStudents: 28,
+  },
+  {
+    id: 2,
+    title: "Problemas del Tema 3",
+    course: "Matemáticas Aplicadas",
+    dueDate: "2025-11-24",
+    submissions: 30,
+    totalStudents: 32,
+  },
+  {
+    id: 3,
+    title: "Proyecto final - Primera entrega",
+    course: "Programación I",
+    dueDate: "2025-11-28",
+    submissions: 15,
+    totalStudents: 28,
+  },
+  {
+    id: 4,
+    title: "Quiz de repaso",
+    course: "Matemáticas Aplicadas",
+    dueDate: "2025-11-25",
+    submissions: 25,
+    totalStudents: 32,
+  },
+]
 
-const TeacherTasksCreatedPage = () => {
-  const navigate = useNavigate();
+export default function TeacherTasksCreatedPage() {
+  const router = useNavigate()
 
   return (
     <div className="p-6 space-y-6">
+      {/* Header */}
       <div className="bg-white rounded-xl shadow-sm p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-start space-x-4">
@@ -28,13 +57,17 @@ const TeacherTasksCreatedPage = () => {
               <p className="text-gray-600 mt-1">Gestiona todas las tareas que has creado para tus cursos</p>
             </div>
           </div>
-          <Button className="bg-green-600 hover:bg-green-700" onClick={() => navigate('/teacher/tasks/new')}>
+          <Button
+            className="bg-green-600 hover:bg-green-700"
+            onClick={() => console.log('[v0] Create new task')}
+          >
             <Plus size={18} className="mr-2" />
             Crear tarea
           </Button>
         </div>
       </div>
 
+      {/* Tasks Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {mockCreatedTasks.map((task) => (
           <Card key={task.id} className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
@@ -51,6 +84,7 @@ const TeacherTasksCreatedPage = () => {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Due Date */}
               <div className="flex items-center text-gray-600">
                 <Calendar size={18} className="mr-2 text-gray-400" />
                 <span className="text-sm">
@@ -58,6 +92,7 @@ const TeacherTasksCreatedPage = () => {
                 </span>
               </div>
 
+              {/* Submissions */}
               <div className="flex items-center justify-between bg-gray-50 rounded-lg p-3">
                 <div className="flex items-center">
                   <FolderOpen size={18} className="mr-2 text-gray-400" />
@@ -68,15 +103,19 @@ const TeacherTasksCreatedPage = () => {
                 </span>
               </div>
 
+              {/* Action Buttons */}
               <div className="flex gap-2 pt-2">
                 <Button
                   className="flex-1 bg-green-600 hover:bg-green-700"
-                  onClick={() => navigate(`/teacher/reviews?course=${encodeURIComponent(task.course)}`)}
+                  onClick={() => router(`/teacher/reviews?course=${encodeURIComponent(task.course)}`)}
                 >
                   <FolderOpen size={16} className="mr-2" />
                   Revisar entregas
                 </Button>
-                <Button variant="outline" onClick={() => navigate(`/teacher/tasks/${task.id}/edit`)}>
+                <Button
+                  variant="outline"
+                  onClick={() => router(`/teacher/tasks/${task.id}/edit`)}
+                >
                   <Pencil size={16} />
                 </Button>
               </div>
@@ -85,15 +124,21 @@ const TeacherTasksCreatedPage = () => {
         ))}
       </div>
 
+      {/* Empty State (if no tasks) */}
       {mockCreatedTasks.length === 0 && (
         <Card className="border-2 border-dashed border-gray-300">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <ClipboardList size={48} className="text-gray-400 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No hay tareas creadas</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              No hay tareas creadas
+            </h3>
             <p className="text-gray-600 mb-4 text-center">
               Comienza creando tu primera tarea para tus cursos
             </p>
-            <Button className="bg-green-600 hover:bg-green-700" onClick={() => navigate('/teacher/tasks/new')}>
+            <Button
+              className="bg-green-600 hover:bg-green-700"
+              onClick={() => console.log('[v0] Create first task')}
+            >
               <Plus size={18} className="mr-2" />
               Crear primera tarea
             </Button>
@@ -101,7 +146,5 @@ const TeacherTasksCreatedPage = () => {
         </Card>
       )}
     </div>
-  );
-};
-
-export default TeacherTasksCreatedPage;
+  )
+}

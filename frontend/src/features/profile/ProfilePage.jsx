@@ -1,92 +1,57 @@
-// ProfilePage - User profile management
-import React, { useState, useEffect } from 'react';
-import { User, Mail, Phone, Calendar, Edit3, Save, X } from 'lucide-react';
+import React, { useState } from 'react'
+import { User, Mail, Phone, Calendar, Edit3, Save, X } from 'lucide-react'
+import { Input } from '../../ui/input'
 
-const ProfilePage = () => {
-  const [user, setUser] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
+const mockUser = {
+  id: 'user-123',
+  name: 'Juan Pérez',
+  email: 'juan@example.com',
+  phone: '+57 300 123 4567',
+  created_at: '2024-01-15T10:30:00Z',
+  last_login: new Date().toISOString()
+}
+
+export default function ProfilePage() {
+  const [user] = useState(mockUser)
+  const [isEditing, setIsEditing] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: ''
-  });
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    fetchUserProfile();
-  }, []);
-
-  const fetchUserProfile = async () => {
-    try {
-      // TODO: Implement get current user profile API
-      // For now, simulate user data
-      const mockUser = {
-        id: 'user-123',
-        name: 'Juan Pérez',
-        email: 'juan@example.com',
-        phone: '+57 300 123 4567',
-        created_at: '2024-01-15T10:30:00Z',
-        last_login: new Date().toISOString()
-      };
-      setUser(mockUser);
-      setFormData({
-        name: mockUser.name,
-        email: mockUser.email,
-        phone: mockUser.phone || ''
-      });
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    name: mockUser.name,
+    email: mockUser.email,
+    phone: mockUser.phone || ''
+  })
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
-    }));
-  };
+    }))
+  }
 
   const handleSave = async () => {
-    setSaving(true);
+    setSaving(true)
     try {
-      // TODO: Implement update profile API
-      console.log('Updating profile:', formData);
-      setUser(prev => ({
-        ...prev,
-        ...formData
-      }));
-      setIsEditing(false);
-      alert('Perfil actualizado exitosamente');
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      alert('Perfil actualizado exitosamente')
+      setIsEditing(false)
     } catch (error) {
-      console.error('Error updating profile:', error);
-      alert('Error al actualizar el perfil');
+      alert('Error al actualizar el perfil')
     } finally {
-      setSaving(false);
+      setSaving(false)
     }
-  };
+  }
 
   const handleCancel = () => {
     setFormData({
       name: user.name,
       email: user.email,
       phone: user.phone || ''
-    });
-    setIsEditing(false);
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Cargando perfil...</div>
-      </div>
-    );
+    })
+    setIsEditing(false)
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="bg-green-600 text-white p-6 shadow-lg">
         <div className="max-w-4xl mx-auto">
@@ -156,11 +121,11 @@ const ProfilePage = () => {
                   Nombre Completo
                 </label>
                 {isEditing ? (
-                  <input
+                  <Input
                     type="text"
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                    className="w-full"
                   />
                 ) : (
                   <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
@@ -176,11 +141,11 @@ const ProfilePage = () => {
                   Correo Electrónico
                 </label>
                 {isEditing ? (
-                  <input
+                  <Input
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                    className="w-full"
                   />
                 ) : (
                   <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
@@ -196,12 +161,12 @@ const ProfilePage = () => {
                   Teléfono
                 </label>
                 {isEditing ? (
-                  <input
+                  <Input
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
                     placeholder="Ingresa tu número de teléfono"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                    className="w-full"
                   />
                 ) : (
                   <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
@@ -251,7 +216,5 @@ const ProfilePage = () => {
         </div>
       </div>
     </div>
-  );
-};
-
-export default ProfilePage;
+  )
+}

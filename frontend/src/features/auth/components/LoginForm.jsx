@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Eye, EyeOff } from 'lucide-react';
+import { BookOpen, Eye, EyeOff, User, GraduationCap } from 'lucide-react';
+import { Button } from '../../../ui/button';
+import { Input } from '../../../ui/input';
+import { Label } from '../../../ui/label';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -85,10 +88,10 @@ const LoginForm = () => {
                         : 'border-gray-200 bg-white hover:border-gray-300'
                     }`}
                   >
+                    <GraduationCap className={`h-6 w-6 ${userRole === 'student' ? 'text-green-600' : 'text-gray-400'}`} />
                     <span className={`text-sm font-medium ${userRole === 'student' ? 'text-green-600' : 'text-gray-700'}`}>
                       Estudiante
                     </span>
-                    <span className="text-xs text-gray-500 text-center">Acceso a panel de estudiante</span>
                   </button>
                   <button
                     type="button"
@@ -99,22 +102,22 @@ const LoginForm = () => {
                         : 'border-gray-200 bg-white hover:border-gray-300'
                     }`}
                   >
+                    <User className={`h-6 w-6 ${userRole === 'teacher' ? 'text-green-600' : 'text-gray-400'}`} />
                     <span className={`text-sm font-medium ${userRole === 'teacher' ? 'text-green-600' : 'text-gray-700'}`}>
                       Profesor
                     </span>
-                    <span className="text-xs text-gray-500 text-center">Acceso a panel docente</span>
                   </button>
                 </div>
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                  <Label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
                     Nombre completo
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     id="name"
                     name="name"
                     type="text"
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    className="w-full"
                     placeholder="Tu nombre completo"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -124,15 +127,15 @@ const LoginForm = () => {
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <Label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                 Correo electrónico
-              </label>
-              <input
+              </Label>
+              <Input
                 id="email"
                 name="email"
                 type="email"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                className="w-full"
                 placeholder="tu@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -140,16 +143,16 @@ const LoginForm = () => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <Label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                 Contraseña
-              </label>
+              </Label>
               <div className="relative">
-                <input
+                <Input
                   id="password"
                   name="password"
                   type={showPassword ? 'text' : 'password'}
                   required
-                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  className="w-full pr-10"
                   placeholder="Tu contraseña"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -180,13 +183,13 @@ const LoginForm = () => {
               </div>
             )}
 
-            <button
+            <Button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-green-600 hover:bg-green-700"
             >
               {loading ? 'Cargando...' : isRegistering ? 'Crear cuenta' : 'Iniciar sesión'}
-            </button>
+            </Button>
           </form>
 
           <div className="mt-6 text-center">
