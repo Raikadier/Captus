@@ -1,94 +1,91 @@
-import React from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Button } from '../../ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
-import { Badge } from '../../ui/badge';
-import { ArrowLeft, BookOpen, Calendar as CalendarIcon, ClipboardList } from 'lucide-react';
+import React from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { BookOpen, Calendar as CalendarIcon, CheckSquare, Users, ArrowLeft } from 'lucide-react'
+import { Button } from '../../ui/button'
+
+const tabs = ['Overview', 'Contenido', 'Tareas', 'Anuncios', 'Estudiantes']
 
 const mockCourse = {
-  id: 1,
-  name: 'Programación I',
-  teacher: 'Prof. García',
-  lessons: [
-    { id: 1, title: 'Introducción a JavaScript', date: '2025-11-18' },
-    { id: 2, title: 'Funciones y Scope', date: '2025-11-20' },
-    { id: 3, title: 'DOM y Eventos', date: '2025-11-25' },
-  ],
-  tasks: [
-    { id: 1, title: 'Ensayo cap. 2', dueDate: '2025-11-22', status: 'Pendiente' },
-    { id: 2, title: 'Proyecto parcial', dueDate: '2025-11-28', status: 'En progreso' },
-  ],
-};
+  name: 'Curso de Ejemplo',
+  professor: 'Dr. Juan Pérez',
+  progress: 72,
+  description: 'Descripción breve del curso y sus objetivos.',
+}
 
-const StudentCourseDetailPage = () => {
-  const navigate = useNavigate();
-  const { courseId } = useParams();
+const mockTasks = [
+  { id: 1, title: 'Ensayo capítulo 2', dueDate: '2025-11-22', status: 'Pendiente' },
+  { id: 2, title: 'Quiz módulo 3', dueDate: '2025-11-25', status: 'En progreso' },
+]
+
+export default function StudentCourseDetailPage() {
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const [activeTab, setActiveTab] = React.useState('Overview')
 
   return (
     <div className="p-6 space-y-6">
-      <Button variant="ghost" onClick={() => navigate('/courses')} className="text-gray-600 hover:text-gray-900">
-        <ArrowLeft size={16} className="mr-2" />
-        Volver a cursos
-      </Button>
-
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <div className="flex items-start gap-4">
-          <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center">
-            <BookOpen className="w-7 h-7 text-green-600" />
+      <div className="bg-white rounded-xl shadow-sm p-6 flex items-start justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+            <BookOpen className="text-green-600" />
           </div>
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold text-gray-900">{mockCourse.name}</h1>
-            <p className="text-sm text-gray-600">Docente: {mockCourse.teacher}</p>
-            <p className="text-xs text-gray-500 mt-1">ID curso: {courseId}</p>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">{mockCourse.name} #{id}</h1>
+            <p className="text-sm text-gray-600">Profesor: {mockCourse.professor}</p>
           </div>
         </div>
+        <Button variant="ghost" className="gap-2" onClick={() => navigate('/courses')}>
+          <ArrowLeft className="w-4 h-4" /> Volver
+        </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <CalendarIcon size={18} className="text-green-600" />
-              Próximas clases
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {mockCourse.lessons.map((lesson) => (
-              <div key={lesson.id} className="p-3 rounded-lg border border-gray-100 flex items-center justify-between">
-                <div>
-                  <p className="font-semibold text-gray-900">{lesson.title}</p>
-                  <p className="text-sm text-gray-600">Fecha: {lesson.date}</p>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div className="flex gap-2 p-4 flex-wrap">
+          {tabs.map((tab) => (
+            <Button
+              key={tab}
+              variant={activeTab === tab ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setActiveTab(tab)}
+              className="active:scale-95"
+            >
+              {tab}
+            </Button>
+          ))}
+        </div>
+        <div className="p-6 border-t border-gray-200">
+          {activeTab === 'Overview' && (
+            <div className="space-y-3 text-gray-700">
+              <p>{mockCourse.description}</p>
+              <p><strong>Progreso:</strong> {mockCourse.progress}%</p>
+            </div>
+          )}
+          {activeTab === 'Contenido' && <div className="text-sm text-gray-600">Contenido del curso (mock).</div>}
+          {activeTab === 'Tareas' && (
+            <div className="space-y-3">
+              {mockTasks.map((t) => (
+                <div key={t.id} className="p-3 border border-gray-200 rounded-lg flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-gray-900">{t.title}</p>
+                    <p className="text-sm text-gray-600 flex items-center gap-2">
+                      <CalendarIcon className="w-4 h-4 text-green-600" /> {t.dueDate}
+                    </p>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => navigate(`/tasks/${t.id}`)}>
+                    Ver tarea
+                  </Button>
                 </div>
-                <Button variant="outline" size="sm">Ver</Button>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <ClipboardList size={18} className="text-blue-600" />
-              Tareas del curso
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {mockCourse.tasks.map((task) => (
-              <div key={task.id} className="p-3 rounded-lg border border-gray-100 flex items-center justify-between">
-                <div>
-                  <p className="font-semibold text-gray-900">{task.title}</p>
-                  <p className="text-sm text-gray-600">Entrega: {task.dueDate}</p>
-                </div>
-                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                  {task.status}
-                </Badge>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+              ))}
+            </div>
+          )}
+          {activeTab === 'Anuncios' && <div className="text-sm text-gray-600">Sin anuncios aún.</div>}
+          {activeTab === 'Estudiantes' && (
+            <div className="text-sm text-gray-600 flex items-center gap-2">
+              <Users className="w-4 h-4" /> Lista de estudiantes (mock)
+            </div>
+          )}
+        </div>
       </div>
     </div>
-  );
-};
-
-export default StudentCourseDetailPage;
+  )
+}

@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Bell, MessageSquare, Pin, Edit, Trash2, Search as SearchIcon, Plus } from 'lucide-react'
-// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '../../ui/button'
 import { Card } from '../../ui/card'

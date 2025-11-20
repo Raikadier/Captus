@@ -38,17 +38,18 @@ const StreakWidget = () => {
   const fetchStreakData = async () => {
     try {
       const response = await apiClient.get('/streaks');
-      // Backend devuelve { data, success? } o directamente la fila
-      const payload = response?.data;
-      const data = payload?.data ?? payload;
-      setStreakData(
-        data || {
+      const data = response?.data;
+      if (data) {
+        setStreakData(data);
+      } else {
+        // Default streak data if none exists
+        setStreakData({
           current_streak: 0,
           last_completed_date: null,
           daily_goal: 5,
           completed_today: 0
-        }
-      );
+        });
+      }
     } catch (error) {
       console.error('Error fetching streak data:', error);
       setStreakData({

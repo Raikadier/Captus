@@ -2,7 +2,6 @@
 // AI-powered chat interface with conversation history
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, User, Sparkles, Plus, Menu } from 'lucide-react';
-// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 
 const ChatBotPage = () => {
