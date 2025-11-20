@@ -1,8 +1,9 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { BookOpen } from 'lucide-react'
+import { BookOpen, Clock, ChevronRight } from 'lucide-react'
 import { Button } from '../../ui/button'
 
+// Mock data
 const mockCourses = [
   {
     id: '1',
@@ -36,6 +37,7 @@ export default function StudentCoursesPage() {
   return (
     <div className="p-6 space-y-6">
       <div className="max-w-7xl mx-auto">
+        {/* Header */}
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
@@ -48,39 +50,54 @@ export default function StudentCoursesPage() {
           </div>
         </div>
 
+        {/* Courses Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {mockCourses.map((course) => (
             <div
               key={course.id}
-              className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow cursor-pointer active:scale-95"
+              className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow cursor-pointer hover:scale-[1.02] duration-200"
               onClick={() => navigate(`/courses/${course.id}`)}
             >
-              <div className="w-full h-32 rounded-lg mb-4" style={{ backgroundColor: course.color }} />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">{course.name}</h3>
+              <div
+                className="w-full h-32 rounded-lg mb-4"
+                style={{ backgroundColor: course.color }}
+              />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {course.name}
+              </h3>
               <p className="text-sm text-gray-600 mb-4">{course.professor}</p>
 
               <div className="space-y-2 mb-4">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-600">Progreso</span>
-                  <span className="font-semibold text-gray-900">{course.progress}%</span>
+                  <span className="font-semibold text-gray-900">
+                    {course.progress}%
+                  </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
-                    className="h-2 rounded-full bg-green-500 transition-all duration-500"
+                    className="bg-green-600 h-2 rounded-full transition-all"
                     style={{ width: `${course.progress}%` }}
                   />
                 </div>
-                <div className="text-xs text-gray-500">Última actividad: {course.lastUpdate}</div>
               </div>
 
               <div className="flex items-center justify-between">
-                <Button variant="ghost" className="text-green-600 hover:text-green-700 hover:bg-green-50" onClick={() => navigate(`/courses/${course.id}`)}>
+                <div className="flex items-center gap-1 text-sm text-gray-600">
+                  <Clock className="w-4 h-4" />
+                  <span>Hace {course.lastUpdate}</span>
+                </div>
+                <Button
+                  size="sm"
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    navigate(`/courses/${course.id}`)
+                  }}
+                >
                   Ver curso
+                  <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
-                <span className="text-sm text-gray-500 flex items-center gap-1">
-                  <BookOpen className="w-4 h-4" />
-                  {course.id}
-                </span>
               </div>
             </div>
           ))}

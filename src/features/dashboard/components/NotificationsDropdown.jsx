@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react'
 import { CheckCircle } from 'lucide-react'
 import { ScrollArea } from '../../../ui/scroll-area'
 import { Button } from '../../../ui/button'
-import { useNavigate } from 'react-router-dom'
 
 const mockNotifications = [
   {
@@ -37,7 +36,6 @@ const mockNotifications = [
 
 export default function NotificationsDropdown({ isOpen, onClose }) {
   const dropdownRef = useRef(null)
-  const navigate = useNavigate()
 
   useEffect(() => {
     if (!isOpen) return
@@ -58,8 +56,6 @@ export default function NotificationsDropdown({ isOpen, onClose }) {
 
   const handleViewAll = () => {
     onClose()
-    // Assuming there is a notifications page, if not, maybe to home or toast
-    // navigate('/notifications')
   }
 
   return (
