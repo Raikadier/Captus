@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Eye, EyeOff } from 'lucide-react';
+import { supabase } from '../../../shared/api/supabase';
 
 const LoginForm = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('teacher@gmail.com');
+  const [password, setPassword] = useState('123456789');
   const [isRegistering, setIsRegistering] = useState(false);
   const [name, setName] = useState('');
   const [error, setError] = useState('');
@@ -38,7 +39,15 @@ const LoginForm = () => {
       } else {
         result = await login(email, password);
         if (result.success) {
-          navigate('/home');
+          // Check if user is a teacher
+          const { data: { user } } = await supabase.auth.getUser();
+          const isTeacher = user?.email === 'teacher@gmail.com' || user?.user_metadata?.role === 'teacher';
+
+          if (isTeacher) {
+            navigate('/teacher/home');
+          } else {
+            navigate('/home');
+          }
         } else {
           setError(result.error);
         }
