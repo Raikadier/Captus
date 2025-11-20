@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Bell, Calendar as CalendarIcon, CheckSquare, MessageSquare, StickyNote, BarChart3, Clock } from 'lucide-react';
 import { Button } from '../../../ui/button';
 import { Card } from '../../../ui/card';
-import NotificationsDropdown from '../../notifications/NotificationsDropdown';
 
 function getCurrentDate() {
   const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
@@ -94,8 +93,6 @@ function CalendarEvent({ event }) {
 }
 
 const HomePage = () => {
-  const [showDropdown, setShowDropdown] = useState(false);
-
   return (
     <div className="p-8">
       {/* Header */}
@@ -105,12 +102,8 @@ const HomePage = () => {
             <h1 className="text-2xl font-bold text-gray-900">👋 Bienvenida, María</h1>
             <p className="text-gray-600 mt-1">{getCurrentDate()}</p>
           </div>
-          <div className="relative flex items-center space-x-4">
-            <Button
-              variant="outline"
-              className="border-gray-300 relative bg-transparent"
-              onClick={() => setShowDropdown((v) => !v)}
-            >
+          <div className="flex items-center space-x-4">
+            <Button variant="outline" className="border-gray-300 relative bg-transparent">
               <Bell size={18} className="text-gray-500" />
               <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center">
                 <span className="absolute inline-flex h-full w-full rounded-full bg-green-600 opacity-75 animate-ping"></span>
@@ -119,7 +112,6 @@ const HomePage = () => {
                 </span>
               </span>
             </Button>
-            <NotificationsDropdown isOpen={showDropdown} onClose={() => setShowDropdown(false)} />
           </div>
         </div>
       </header>

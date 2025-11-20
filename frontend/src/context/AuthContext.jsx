@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../shared/api/supabase';
 
@@ -17,7 +16,6 @@ export const AuthProvider = ({ children }) => {
   // Keep token for compatibility with axios interceptor reading localStorage('token')
   const [token, setToken] = useState(() => localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
-  const [role, setRole] = useState(null);
 
   // Initialize session/user on app start and subscribe to auth changes
   useEffect(() => {
@@ -31,14 +29,12 @@ export const AuthProvider = ({ children }) => {
         if (!mounted) return;
 
         setUser(userData?.user ?? null);
-        setRole(userData?.user?.user_metadata?.role ?? null);
         const accessToken = sessionData?.session?.access_token ?? null;
         setToken(accessToken ?? null);
         setLoading(false);
       } catch {
         if (!mounted) return;
         setUser(null);
-        setRole(null);
         setToken(null);
         setLoading(false);
       }
@@ -48,7 +44,6 @@ export const AuthProvider = ({ children }) => {
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      setRole(session?.user?.user_metadata?.role ?? null);
       const accessToken = session?.access_token ?? null;
       setToken(accessToken ?? null);
       // localStorage('token') is already synced in supabase.js listener
@@ -67,7 +62,6 @@ export const AuthProvider = ({ children }) => {
       if (error) throw error;
 
       setUser(data.user ?? null);
-      setRole(data.user?.user_metadata?.role ?? null);
       const accessToken = data.session?.access_token ?? null;
       setToken(accessToken ?? null);
 
@@ -77,12 +71,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (email, password, name, roleValue = 'student') => {
+  const register = async (email, password, name) => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { name, role: roleValue } }
+        options: { data: { name } }
       });
       if (error) throw error;
 
@@ -92,7 +86,6 @@ export const AuthProvider = ({ children }) => {
       // If session exists, user is logged in already
       if (data.session) {
         setUser(data.user ?? null);
-        setRole(data.user?.user_metadata?.role ?? roleValue ?? null);
         const accessToken = data.session?.access_token ?? null;
         setToken(accessToken ?? null);
       }
@@ -110,7 +103,6 @@ export const AuthProvider = ({ children }) => {
       // ignore logout errors for UX simplicity
     } finally {
       setUser(null);
-      setRole(null);
       setToken(null);
       localStorage.removeItem('token');
     }
@@ -123,7 +115,6 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     token,
-    role,
     loading,
     login,
     register,

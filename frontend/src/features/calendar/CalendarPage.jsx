@@ -1,13 +1,13 @@
 // CalendarPage - Monthly calendar view with tasks
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Calendar, Plus, Clock } from 'lucide-react';
-// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 
 const CalendarPage = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [tasks, setTasks] = useState([]);
+  const [showTaskForm, setShowTaskForm] = useState(false);
   const [view, setView] = useState("month");
 
   // Mock tasks data - TODO: Replace with API call
@@ -100,7 +100,13 @@ const CalendarPage = () => {
             <h1 className="text-2xl font-bold text-gray-900">Calendario</h1>
             <p className="text-gray-600 mt-1">Organiza tus eventos y tareas</p>
           </div>
-          <div />
+          <button
+            onClick={() => setShowTaskForm(true)}
+            className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-xl text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 shadow-sm hover:shadow-md"
+          >
+            <Plus className="h-5 w-5 mr-2" />
+            Nuevo Evento
+          </button>
         </div>
 
         {/* View tabs */}

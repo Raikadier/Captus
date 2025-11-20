@@ -1,6 +1,7 @@
 // ProfilePage - User profile management
 import React, { useState, useEffect } from 'react';
 import { User, Mail, Phone, Calendar, Edit3, Save, X } from 'lucide-react';
+import apiClient from '../../shared/api/client';
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);

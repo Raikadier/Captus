@@ -1,97 +1,68 @@
-import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
-import { Button } from '../../ui/button';
-import { Input } from '../../ui/input';
-import { Textarea } from '../../ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
-import { ArrowLeft, Pencil } from 'lucide-react';
+import React, { useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { ClipboardList, ArrowLeft } from 'lucide-react'
+import { Button } from '../../ui/button'
+import { Input } from '../../ui/input'
 
-const mockTask = {
-  id: 1,
-  title: 'Ensayo sobre el capítulo 2',
-  description: 'Redactar un ensayo con los conceptos principales del capítulo 2.',
-  dueDate: '2025-11-22',
-  course: 'Programación I',
-  priority: 'high',
-};
+export default function TeacherEditTaskPage() {
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const [formData, setFormData] = useState({
+    title: 'Título de la tarea',
+    description: 'Descripción de la tarea',
+    dueDate: '2025-11-25',
+  })
 
-const TeacherEditTaskPage = () => {
-  const navigate = useNavigate();
-  const { taskId } = useParams();
-  const [title, setTitle] = useState(mockTask.title);
-  const [description, setDescription] = useState(mockTask.description);
-  const [priority, setPriority] = useState(mockTask.priority);
-  const [dueDate, setDueDate] = useState(mockTask.dueDate);
-
+  const handleChange = (field) => (e) => setFormData({ ...formData, [field]: e.target.value })
   const handleSubmit = (e) => {
-    e.preventDefault();
-    // TODO: llamar backend/supabase para actualizar
-    navigate('/teacher/tasks');
-  };
+    e.preventDefault()
+    navigate('/teacher/tasks')
+  }
 
   return (
-    <div className="p-6 space-y-6 max-w-4xl mx-auto">
-      <Button variant="ghost" onClick={() => navigate(-1)} className="text-gray-600 hover:text-gray-900">
-        <ArrowLeft size={16} className="mr-2" />
-        Volver
-      </Button>
+    <div className="p-6 space-y-6">
+      <div className="flex items-center gap-3 bg-white rounded-xl shadow-sm p-6">
+        <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+          <ClipboardList className="text-green-600" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Editar tarea #{id}</h1>
+          <p className="text-sm text-gray-600">Actualiza la información de la tarea</p>
+        </div>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-2xl">
-            <Pencil size={20} className="text-green-600" />
-            Editar tarea
-          </CardTitle>
-          <p className="text-sm text-gray-500">ID: {taskId}</p>
-        </CardHeader>
-        <CardContent>
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <div>
-              <label className="text-sm font-medium text-gray-700">Título</label>
-              <Input className="mt-1" value={title} onChange={(e) => setTitle(e.target.value)} required />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-700">Descripción</label>
-              <Textarea
-                className="mt-1"
-                rows={4}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium text-gray-700">Prioridad</label>
-                <Select value={priority} onValueChange={setPriority}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Selecciona prioridad" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="high">Alta</SelectItem>
-                    <SelectItem value="medium">Media</SelectItem>
-                    <SelectItem value="low">Baja</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700">Fecha de entrega</label>
-                <Input className="mt-1" type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
-              </div>
-            </div>
-            <div className="flex gap-3 justify-end">
-              <Button variant="outline" type="button" onClick={() => navigate(-1)}>
-                Cancelar
-              </Button>
-              <Button type="submit" className="bg-green-600 hover:bg-green-700 text-white">
-                Guardar cambios
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <Button type="button" variant="ghost" onClick={() => navigate('/teacher/tasks')}>
+            <ArrowLeft className="w-4 h-4 mr-2" /> Volver
+          </Button>
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">Título</label>
+          <Input value={formData.title} onChange={handleChange('title')} required />
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">Descripción</label>
+          <textarea
+            value={formData.description}
+            onChange={handleChange('description')}
+            rows={4}
+            className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/30 transition-all"
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">Fecha límite</label>
+          <Input type="date" value={formData.dueDate} onChange={handleChange('dueDate')} />
+        </div>
+        <div className="flex gap-2">
+          <Button type="button" variant="outline" onClick={() => navigate('/teacher/tasks')}>
+            Cancelar
+          </Button>
+          <Button type="submit" className="bg-green-600 hover:bg-green-700">
+            Guardar cambios
+          </Button>
+        </div>
+      </form>
     </div>
-  );
-};
-
-export default TeacherEditTaskPage;
+  )
+}

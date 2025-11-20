@@ -8,16 +8,13 @@ const LoginForm = () => {
   const [password, setPassword] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
   const [name, setName] = useState('');
-  const [userRole, setUserRole] = useState('student');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const { login, register, role } = useAuth();
+  const { login, register } = useAuth();
   const navigate = useNavigate();
-
-  const getHomeForRole = (roleValue) => (roleValue === 'teacher' ? '/teacher' : '/home');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,12 +25,12 @@ const LoginForm = () => {
     try {
       let result;
       if (isRegistering) {
-        result = await register(email, password, name, userRole);
+        result = await register(email, password, name);
         if (result.success) {
           if (result.requiresEmailConfirmation) {
-            setSuccessMessage('Revisa tu correo para confirmar tu cuenta');
+            setSuccessMessage('Registro exitoso. Revisa tu email para confirmar tu cuenta.');
           } else {
-            navigate(getHomeForRole(userRole));
+            navigate('/home');
           }
         } else {
           setError(result.error);
@@ -41,14 +38,13 @@ const LoginForm = () => {
       } else {
         result = await login(email, password);
         if (result.success) {
-          const targetRole = role || result?.role || result?.data?.user?.user_metadata?.role || 'student';
-          navigate(getHomeForRole(targetRole));
+          navigate('/home');
         } else {
           setError(result.error);
         }
       }
     } catch (err) {
-      setError(err?.message || 'Ocurrió un error inesperado');
+      setError('Ocurrió un error inesperado');
     } finally {
       setLoading(false);
     }
@@ -57,6 +53,7 @@ const LoginForm = () => {
   return (
     <div className="min-h-screen bg-[#F6F7FB] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
+        {/* Header */}
         <div className="text-center">
           <div className="flex justify-center mb-4">
             <div className="bg-green-600 p-3 rounded-xl">
@@ -71,56 +68,25 @@ const LoginForm = () => {
           </p>
         </div>
 
+        {/* Form */}
         <div className="bg-white rounded-xl shadow-sm p-8">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {isRegistering && (
-              <>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setUserRole('student')}
-                    className={`flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all ${
-                      userRole === 'student'
-                        ? 'border-green-600 bg-green-50'
-                        : 'border-gray-200 bg-white hover:border-gray-300'
-                    }`}
-                  >
-                    <span className={`text-sm font-medium ${userRole === 'student' ? 'text-green-600' : 'text-gray-700'}`}>
-                      Estudiante
-                    </span>
-                    <span className="text-xs text-gray-500 text-center">Acceso a panel de estudiante</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setUserRole('teacher')}
-                    className={`flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all ${
-                      userRole === 'teacher'
-                        ? 'border-green-600 bg-green-50'
-                        : 'border-gray-200 bg-white hover:border-gray-300'
-                    }`}
-                  >
-                    <span className={`text-sm font-medium ${userRole === 'teacher' ? 'text-green-600' : 'text-gray-700'}`}>
-                      Profesor
-                    </span>
-                    <span className="text-xs text-gray-500 text-center">Acceso a panel docente</span>
-                  </button>
-                </div>
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                    Nombre completo
-                  </label>
-                  <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                    placeholder="Tu nombre completo"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                </div>
-              </>
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                  Nombre completo
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  placeholder="Tu nombre completo"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
             )}
 
             <div>
@@ -185,7 +151,7 @@ const LoginForm = () => {
               disabled={loading}
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Cargando...' : isRegistering ? 'Crear cuenta' : 'Iniciar sesión'}
+              {loading ? 'Cargando...' : (isRegistering ? 'Crear cuenta' : 'Iniciar sesión')}
             </button>
           </form>
 
@@ -195,7 +161,10 @@ const LoginForm = () => {
               onClick={() => setIsRegistering(!isRegistering)}
               className="text-green-600 hover:text-green-500 text-sm font-medium"
             >
-              {isRegistering ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate'}
+              {isRegistering
+                ? '¿Ya tienes cuenta? Inicia sesión'
+                : '¿No tienes cuenta? Regístrate'
+              }
             </button>
           </div>
         </div>
@@ -204,4 +173,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default LoginForm
