@@ -52,12 +52,6 @@ const mockTasks = [
   },
 ];
 
-const upcomingEvents = [
-  { time: '10:00 AM', title: 'Examen de Cálculo III', type: 'Examen', date: 'Lunes' },
-  { time: '2:00 PM', title: 'Entrega de proyecto', type: 'Entrega', date: 'Martes' },
-  { time: '4:00 PM', title: 'Reunión con tutor', type: 'Reunión', date: 'Miércoles' },
-];
-
 function StatCard({ icon, label, value, bgColor }) {
   return (
     <Card className="p-4 border border-gray-200 rounded-xl hover:shadow-md transition-shadow">
@@ -69,37 +63,6 @@ function StatCard({ icon, label, value, bgColor }) {
         </div>
       </div>
     </Card>
-  );
-}
-
-function CalendarEvent({ event }) {
-  const getTypeColor = (type) => {
-    switch (type) {
-      case 'Examen':
-        return 'bg-red-100 text-red-800';
-      case 'Entrega':
-        return 'bg-orange-100 text-orange-800';
-      case 'Reunión':
-        return 'bg-blue-100 text-blue-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  return (
-    <div className="flex items-start space-x-3 p-3 rounded-lg hover:bg-[#F6F7FB] transition-colors">
-      <div className="flex-shrink-0 w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center text-green-600">
-        <Clock size={18} />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="font-medium text-gray-900 text-sm">{event.title}</p>
-        <p className="text-xs text-gray-500 mt-0.5">{event.time}</p>
-        <div className="flex items-center mt-1 space-x-2">
-          <span className={`text-xs px-2 py-0.5 rounded-full ${getTypeColor(event.type)}`}>{event.type}</span>
-          <span className="text-xs text-green-600 font-medium">{event.date}</span>
-        </div>
-      </div>
-    </div>
   );
 }
 
