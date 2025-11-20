@@ -181,9 +181,6 @@ export default function NotesPage() {
                 <Plus size={16} className="mr-2" />
                 Nueva Nota
               </Button>
-              <Button variant="outline" className="border-gray-300 relative bg-transparent">
-                <Bell size={18} className="text-gray-500" />
-              </Button>
             </div>
           </div>
         </header>
@@ -235,15 +232,6 @@ export default function NotesPage() {
         </div>
       </div>
 
-      {/* Floating AI Chat Button */}
-      <Link to="/chatbot" title="Hablar con Captus">
-        <Button
-          className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-xl transition-all"
-          size="icon"
-        >
-          <MessageSquare size={24} />
-        </Button>
-      </Link>
     </div>
   )
 }
