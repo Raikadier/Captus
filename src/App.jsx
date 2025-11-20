@@ -50,7 +50,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="App p-4 md:p-6 text-primary">
+        <div className="App text-primary">
           <Toaster richColors position="top-right" />
           <Routes>
             <Route path="/" element={<LoginForm />} />

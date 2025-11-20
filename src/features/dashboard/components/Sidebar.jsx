@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext'
-import { motion, AnimatePresence } from 'framer-motion'
 import {
   BookOpen,
   Home,
@@ -10,7 +9,7 @@ import {
   Calendar as CalendarIcon,
   StickyNote,
   BarChart3,
-  MessageSquare,
+  Sparkles,
   Settings,
   Users,
   LogOut,
@@ -18,7 +17,7 @@ import {
   ChevronRight,
 } from 'lucide-react'
 
-const Sidebar = () => {
+const Sidebar = ({ onCollapseChange }) => {
   const location = useLocation()
   const { user, logout } = useAuth()
   const navigate = useNavigate()
@@ -32,9 +31,17 @@ const Sidebar = () => {
     { path: '/notes', icon: StickyNote, label: 'Notas' },
     { path: '/groups', icon: Users, label: 'Grupos' },
     { path: '/stats', icon: BarChart3, label: 'Estadísticas' },
-    { path: '/chatbot', icon: MessageSquare, label: 'Captus AI' },
+    { path: '/chatbot', icon: Sparkles, label: 'Captus AI' },
     { path: '/settings', icon: Settings, label: 'Configuración' },
   ]
+
+  const handleCollapse = () => {
+    const newState = !isCollapsed
+    setIsCollapsed(newState)
+    if (onCollapseChange) {
+      onCollapseChange(newState)
+    }
+  }
 
   const isActive = (path) => location.pathname === path
 
@@ -44,110 +51,92 @@ const Sidebar = () => {
   }
 
   return (
-    <motion.div
-      initial={false}
-      animate={{ width: isCollapsed ? 80 : 240 }}
-      transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-      className="fixed inset-y-0 left-0 bg-[hsl(var(--sidebar-background))] border-r border-[hsl(var(--sidebar-border))] z-10 flex flex-col shadow-sm"
+    <div
+      className={`fixed inset-y-0 left-0 bg-sidebar border-r border-sidebar-border z-10 flex flex-col transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] animate-in slide-in-from-left-10 duration-500 ${
+        isCollapsed ? 'w-20' : 'w-60'
+      }`}
     >
-      <div className="flex items-center justify-between h-16 border-b border-[hsl(var(--sidebar-border))] px-4">
-        <AnimatePresence mode="wait">
-          {!isCollapsed && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="flex items-center space-x-2"
-            >
-              <BookOpen className="text-[hsl(var(--sidebar-primary))]" size={24} />
-              <h1 className="text-xl font-semibold text-[hsl(var(--sidebar-primary))]">Captus</h1>
-            </motion.div>
-          )}
-          {isCollapsed && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <BookOpen className="text-[hsl(var(--sidebar-primary))]" size={24} />
-            </motion.div>
-          )}
-        </AnimatePresence>
+      <div className={`flex items-center justify-between h-16 border-b border-sidebar-border px-4`}>
+        {!isCollapsed ? (
+          <div className="flex items-center space-x-2 transition-opacity duration-200">
+            <BookOpen className="text-primary" size={24} />
+            <h1 className={`text-xl font-semibold text-primary`}>Captus</h1>
+          </div>
+        ) : (
+          <div className="transition-opacity duration-200">
+            <BookOpen className="text-primary" size={24} />
+          </div>
+        )}
         <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-1.5 rounded-lg hover:bg-[hsl(var(--sidebar-accent))] text-[hsl(var(--sidebar-foreground))] transition-colors"
+          onClick={handleCollapse}
+          className={`p-1.5 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors`}
           title={isCollapsed ? 'Expandir' : 'Colapsar'}
         >
           {isCollapsed ? <ChevronRight size={18} className="text-muted-foreground" /> : <ChevronLeft size={18} className="text-muted-foreground" />}
         </button>
       </div>
 
-      <div className="p-4 flex-shrink-0">
-        <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} mb-6 p-3 bg-[hsl(var(--sidebar-accent))] rounded-xl transition-all duration-200 shadow-sm`}>
-          <div className="relative w-10 h-10 rounded-full overflow-hidden bg-[hsl(var(--sidebar-primary))] flex items-center justify-center flex-shrink-0 shadow-md">
-            <span className="text-white font-semibold">{user?.name ? user.name.charAt(0).toUpperCase() : 'U'}</span>
-            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
-          </div>
-          <AnimatePresence>
+      <div className="flex-1 overflow-y-auto flex flex-col">
+        <div className="p-4 flex-shrink-0">
+          <div
+            className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} mb-6 p-3 bg-sidebar-accent/50 rounded-xl transition-all duration-200`}
+          >
+            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-primary flex items-center justify-center flex-shrink-0 shadow-md">
+              <span className="text-primary-foreground font-semibold">{user?.name ? user.name.charAt(0).toUpperCase() : 'U'}</span>
+            </div>
             {!isCollapsed && (
-              <motion.div initial={{ opacity: 0, width: 0 }} animate={{ opacity: 1, width: 'auto' }} exit={{ opacity: 0, width: 0 }} transition={{ duration: 0.2 }}>
-                <p className="font-medium text-[hsl(var(--sidebar-foreground))] whitespace-nowrap">{user?.name || 'Usuario'}</p>
-                <p className="text-xs text-muted-foreground whitespace-nowrap">Estudiante</p>
-              </motion.div>
+              <div className="transition-opacity duration-200">
+                <p className={`font-medium text-sidebar-foreground whitespace-nowrap`}>{user?.name || 'Usuario'}</p>
+                <p className={`text-xs text-muted-foreground whitespace-nowrap`}>Estudiante</p>
+              </div>
             )}
-          </AnimatePresence>
-        </div>
+          </div>
 
-        <nav className="space-y-1">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            const active = isActive(item.path);
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} px-3 py-2.5 rounded-xl transition-all duration-200 active:scale-95 ${
-                  active
-                    ? 'bg-[hsl(var(--sidebar-accent))] text-[hsl(var(--sidebar-primary))] font-medium shadow-sm'
-                    : 'text-muted-foreground hover:bg-[hsl(var(--sidebar-accent))]'
-                }`}
-                title={isCollapsed ? item.label : ''}
-              >
-                <span className={active ? 'text-[hsl(var(--sidebar-primary))]' : 'text-muted-foreground'}>
-                  <Icon size={18} />
-                </span>
-                <AnimatePresence>
+          <nav className="space-y-1">
+            {menuItems.map((item) => {
+              const Icon = item.icon
+              const active = isActive(item.path)
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} px-3 py-2.5 rounded-xl transition-all duration-200 active:scale-95 ${
+                    active
+                      ? 'bg-sidebar-accent text-primary font-medium shadow-sm'
+                      : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'
+                  }`}
+                  title={isCollapsed ? item.label : ''}
+                >
+                  <span className={active ? 'text-primary' : 'text-muted-foreground'}>
+                    <Icon size={18} />
+                  </span>
                   {!isCollapsed && (
-                    <motion.span initial={{ opacity: 0, width: 0 }} animate={{ opacity: 1, width: 'auto' }} exit={{ opacity: 0, width: 0 }} transition={{ duration: 0.2 }} className="font-medium text-sm whitespace-nowrap">
+                    <span className="font-medium text-sm whitespace-nowrap transition-opacity duration-200">
                       {item.label}
-                    </motion.span>
+                    </span>
                   )}
-                </AnimatePresence>
-              </Link>
-            );
-          })}
-        </nav>
+                </Link>
+              )
+            })}
+          </nav>
+        </div>
       </div>
 
-      <div className="mt-auto p-4 border-t border-gray-200">
+      <div className={`flex-shrink-0 p-4 border-t border-sidebar-border`}>
         <button
           onClick={handleLogout}
-          className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} px-3 py-2.5 rounded-xl text-muted-foreground hover:bg-[hsl(var(--sidebar-accent))] hover:text-[hsl(var(--sidebar-foreground))] transition-all duration-200 w-full active:scale-95`}
+          className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} px-3 py-2.5 rounded-xl text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-all duration-200 w-full active:scale-95`}
           title={isCollapsed ? 'Cerrar Sesión' : ''}
         >
-          <LogOut size={18} className="text-muted-foreground" />
-          <AnimatePresence>
-            {!isCollapsed && (
-              <motion.span initial={{ opacity: 0, width: 0 }} animate={{ opacity: 1, width: 'auto' }} exit={{ opacity: 0, width: 0 }} transition={{ duration: 0.2 }} className="font-medium text-sm whitespace-nowrap">
-                Cerrar Sesión
-              </motion.span>
-            )}
-          </AnimatePresence>
+          <LogOut size={18} />
+          {!isCollapsed && (
+            <span className="font-medium text-sm whitespace-nowrap transition-opacity duration-200">
+              Cerrar Sesión
+            </span>
+          )}
         </button>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
