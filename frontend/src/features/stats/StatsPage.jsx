@@ -105,9 +105,6 @@ export default function StatsPage() {
               <h1 className="text-2xl font-bold text-gray-900">📊 Mis Estadísticas</h1>
               <p className="text-gray-600 mt-1">{getCurrentDate()}</p>
             </div>
-            <Button variant="outline" className="border-gray-300 relative bg-transparent">
-              <Bell size={18} className="text-gray-500" />
-            </Button>
           </div>
         </header>
 
