@@ -21,6 +21,14 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     let mounted = true;
 
+    // En desarrollo, bypass autenticación para VERIFICACIÓN VISUAL
+    if (import.meta.env.MODE !== 'production') {
+      setUser({ id: 'dev-user', name: 'Usuario de Desarrollo', email: 'dev@captus.com' });
+      setToken('dev-token');
+      setLoading(false);
+      return;
+    }
+
     const initAuth = async () => {
       try {
         const { data: sessionData } = await supabase.auth.getSession();
@@ -58,6 +66,10 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
+      if (import.meta.env.MODE !== 'production') {
+          return { success: true };
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
 
@@ -73,6 +85,10 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (email, password, name) => {
     try {
+      if (import.meta.env.MODE !== 'production') {
+          return { success: true, requiresEmailConfirmation: false };
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -98,6 +114,11 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
+      if (import.meta.env.MODE !== 'production') {
+        setUser(null);
+        setToken(null);
+        return;
+      }
       await supabase.auth.signOut();
     } catch {
       // ignore logout errors for UX simplicity
