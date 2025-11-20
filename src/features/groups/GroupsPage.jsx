@@ -125,20 +125,20 @@ export default function GroupsPage() {
   return (
     <div className="p-6 space-y-6">
       <div className="max-w-7xl mx-auto">
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-card rounded-xl shadow-sm p-6 border border-border">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                <Users className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Mis Grupos</h1>
-                <p className="text-sm text-gray-600">Colabora con tu equipo</p>
+                <h1 className="text-2xl font-bold text-foreground">Mis Grupos</h1>
+                <p className="text-sm text-muted-foreground">Colabora con tu equipo</p>
               </div>
             </div>
             <button
               onClick={() => setShowCreateForm(true)}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 font-medium"
+              className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2 font-medium"
             >
               <Plus className="w-5 h-5" />
               Nuevo Grupo
@@ -150,13 +150,13 @@ export default function GroupsPage() {
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
             <input
               type="text"
               placeholder="Buscar grupos..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-foreground placeholder:text-muted-foreground"
             />
           </div>
         </div>
@@ -165,25 +165,25 @@ export default function GroupsPage() {
           {filteredGroups.map((group) => (
             <div
               key={group.id}
-              className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+              className="bg-card rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-border"
               onClick={() => setSelectedGroup(group)}
             >
               <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Users className="w-6 h-6 text-green-600" />
+                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Users className="w-6 h-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900">{group.name}</h3>
-                      <p className="text-sm text-gray-500">{group.members} miembros</p>
+                      <h3 className="text-lg font-semibold text-foreground">{group.name}</h3>
+                      <p className="text-sm text-muted-foreground">{group.members} miembros</p>
                     </div>
                   </div>
                 </div>
 
-                <p className="text-gray-600 text-sm mb-4 line-clamp-2">{group.description}</p>
+                <p className="text-muted-foreground text-sm mb-4 line-clamp-2">{group.description}</p>
 
-                <div className="flex items-center justify-between text-sm text-gray-500 mb-4 pb-4 border-b border-gray-100">
+                <div className="flex items-center justify-between text-sm text-muted-foreground mb-4 pb-4 border-b border-border">
                   <div className="flex items-center gap-1">
                     <CheckSquare className="w-4 h-4" />
                     <span>{group.tasks} tareas</span>
@@ -197,7 +197,7 @@ export default function GroupsPage() {
                       e.stopPropagation()
                       handleJoinGroup(group.id)
                     }}
-                    className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+                    className="flex-1 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
                   >
                     Unirse
                   </button>
@@ -206,7 +206,7 @@ export default function GroupsPage() {
                       e.stopPropagation()
                       setSelectedGroup(group)
                     }}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+                    className="px-4 py-2 border border-border text-foreground rounded-lg text-sm font-medium hover:bg-muted transition-colors"
                   >
                     Ver
                   </button>
@@ -217,16 +217,16 @@ export default function GroupsPage() {
         </div>
 
         {filteredGroups.length === 0 && (
-          <div className="text-center py-16 bg-white rounded-xl shadow-sm">
-            <Users className="mx-auto h-16 w-16 text-gray-300 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No hay grupos</h3>
-            <p className="text-gray-500 mb-6">
+          <div className="text-center py-16 bg-card rounded-xl shadow-sm border border-border">
+            <Users className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold text-foreground mb-2">No hay grupos</h3>
+            <p className="text-muted-foreground mb-6">
               {searchQuery ? 'No se encontraron grupos con ese criterio' : 'Crea tu primer grupo para comenzar a colaborar'}
             </p>
             {!searchQuery && (
               <button
                 onClick={() => setShowCreateForm(true)}
-                className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors inline-flex items-center gap-2 font-medium"
+                className="bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors inline-flex items-center gap-2 font-medium"
               >
                 <Plus className="w-5 h-5" />
                 Crear Grupo
@@ -237,13 +237,13 @@ export default function GroupsPage() {
 
         {showCreateForm && (
           <div className="fixed inset-0 bg-black/30 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="bg-card rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-border">
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-bold text-gray-900">Crear Nuevo Grupo</h3>
+                  <h3 className="text-xl font-bold text-foreground">Crear Nuevo Grupo</h3>
                   <button
                     onClick={() => setShowCreateForm(false)}
-                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <X className="w-6 h-6" />
                   </button>
@@ -251,39 +251,39 @@ export default function GroupsPage() {
 
                 <div className="space-y-5">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Nombre del Grupo</label>
+                    <label className="block text-sm font-medium text-foreground mb-2">Nombre del Grupo</label>
                     <input
                       type="text"
                       value={groupName}
                       onChange={(e) => setGroupName(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground placeholder:text-muted-foreground"
                       placeholder="Ingresa el nombre del grupo"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
+                    <label className="block text-sm font-medium text-foreground mb-2">Descripción</label>
                     <textarea
                       rows={3}
                       value={groupDescription}
                       onChange={(e) => setGroupDescription(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+                      className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none bg-background text-foreground placeholder:text-muted-foreground"
                       placeholder="Describe el propósito del grupo"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Curso</label>
+                    <label className="block text-sm font-medium text-foreground mb-2">Curso</label>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
                           variant="outline"
-                          className="w-full justify-between bg-white hover:bg-gray-50 border-gray-300"
+                          className="w-full justify-between bg-background hover:bg-muted border-border text-foreground"
                         >
                           <span className="text-sm">
                             {selectedCourse || 'Selecciona un curso'}
                           </span>
-                          <ChevronDown size={16} className="ml-2 text-gray-500" />
+                          <ChevronDown size={16} className="ml-2 text-muted-foreground" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="start" className="w-full min-w-[400px]">
@@ -292,7 +292,7 @@ export default function GroupsPage() {
                             setSelectedCourse('')
                             setSelectedStudents([])
                           }}
-                          className={!selectedCourse ? 'bg-green-50 text-green-700' : ''}
+                          className={!selectedCourse ? 'bg-primary/10 text-primary' : ''}
                         >
                           Selecciona un curso
                         </DropdownMenuItem>
@@ -301,7 +301,7 @@ export default function GroupsPage() {
                             setSelectedCourse('Matemáticas III')
                             setSelectedStudents([])
                           }}
-                          className={selectedCourse === 'Matemáticas III' ? 'bg-green-50 text-green-700' : ''}
+                          className={selectedCourse === 'Matemáticas III' ? 'bg-primary/10 text-primary' : ''}
                         >
                           Matemáticas III
                         </DropdownMenuItem>
@@ -310,7 +310,7 @@ export default function GroupsPage() {
                             setSelectedCourse('Física II')
                             setSelectedStudents([])
                           }}
-                          className={selectedCourse === 'Física II' ? 'bg-green-50 text-green-700' : ''}
+                          className={selectedCourse === 'Física II' ? 'bg-primary/10 text-primary' : ''}
                         >
                           Física II
                         </DropdownMenuItem>
@@ -319,7 +319,7 @@ export default function GroupsPage() {
                             setSelectedCourse('Literatura Española')
                             setSelectedStudents([])
                           }}
-                          className={selectedCourse === 'Literatura Española' ? 'bg-green-50 text-green-700' : ''}
+                          className={selectedCourse === 'Literatura Española' ? 'bg-primary/10 text-primary' : ''}
                         >
                           Literatura Española
                         </DropdownMenuItem>
@@ -329,7 +329,7 @@ export default function GroupsPage() {
 
                   {selectedCourse && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-foreground mb-2">
                         Añadir Integrantes ({selectedStudents.length} seleccionados)
                       </label>
                       <div className="relative">
@@ -342,19 +342,19 @@ export default function GroupsPage() {
                           }}
                           onFocus={() => setShowSuggestions(true)}
                           placeholder="Escribe el nombre del estudiante..."
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground placeholder:text-muted-foreground"
                         />
 
                         {showSuggestions && searchInput && suggestedStudents.length > 0 && (
-                          <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                          <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
                             {suggestedStudents.map((student) => (
                               <div
                                 key={student.id}
                                 onClick={() => addStudent(student)}
-                                className="px-4 py-2 hover:bg-green-50 cursor-pointer transition-colors border-b border-gray-100 last:border-b-0"
+                                className="px-4 py-2 hover:bg-primary/10 cursor-pointer transition-colors border-b border-border last:border-b-0"
                               >
-                                <div className="text-sm font-medium text-gray-900">{student.name}</div>
-                                <div className="text-xs text-gray-500">{student.email}</div>
+                                <div className="text-sm font-medium text-foreground">{student.name}</div>
+                                <div className="text-xs text-muted-foreground">{student.email}</div>
                               </div>
                             ))}
                           </div>
@@ -366,12 +366,12 @@ export default function GroupsPage() {
                           {selectedStudents.map((student) => (
                             <div
                               key={student.id}
-                              className="flex items-center gap-2 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm"
+                              className="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm"
                             >
                               <span>{student.name}</span>
                               <button
                                 onClick={() => removeStudent(student.id)}
-                                className="hover:bg-green-200 rounded-full p-0.5 transition-colors"
+                                className="hover:bg-primary/20 rounded-full p-0.5 transition-colors"
                               >
                                 <X className="w-3 h-3" />
                               </button>
@@ -381,7 +381,7 @@ export default function GroupsPage() {
                       )}
 
                       {searchInput && suggestedStudents.length === 0 && (
-                        <p className="mt-2 text-sm text-gray-500">No se encontraron estudiantes</p>
+                        <p className="mt-2 text-sm text-muted-foreground">No se encontraron estudiantes</p>
                       )}
                     </div>
                   )}
@@ -397,13 +397,13 @@ export default function GroupsPage() {
                       setSelectedStudents([])
                       setSearchInput('')
                     }}
-                    className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors"
+                    className="flex-1 px-4 py-2 text-sm font-medium text-foreground bg-muted border border-border rounded-lg hover:bg-muted/80 transition-colors"
                   >
                     Cancelar
                   </button>
                   <button
                     onClick={handleCreateGroup}
-                    className="flex-1 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
+                    className="flex-1 px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-lg hover:bg-primary/90 transition-colors"
                   >
                     Crear Grupo
                   </button>
@@ -415,30 +415,30 @@ export default function GroupsPage() {
 
         {selectedGroup && (
           <div className="fixed inset-0 bg-black/30 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="bg-card rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-border">
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                      <Users className="w-6 h-6 text-green-600" />
+                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                      <Users className="w-6 h-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold text-gray-900">{selectedGroup.name}</h3>
-                      <p className="text-gray-600 text-sm">{selectedGroup.description}</p>
+                      <h3 className="text-xl font-bold text-foreground">{selectedGroup.name}</h3>
+                      <p className="text-muted-foreground text-sm">{selectedGroup.description}</p>
                     </div>
                   </div>
                   <button
                     onClick={() => setSelectedGroup(null)}
-                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <X className="w-6 h-6" />
                   </button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                  <div className="bg-green-50 p-4 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">{selectedGroup.members}</div>
-                    <div className="text-sm text-green-700 font-medium">Miembros</div>
+                  <div className="bg-primary/10 p-4 rounded-lg">
+                    <div className="text-2xl font-bold text-primary">{selectedGroup.members}</div>
+                    <div className="text-sm text-primary font-medium">Miembros</div>
                   </div>
                   <div className="bg-blue-50 p-4 rounded-lg">
                     <div className="text-2xl font-bold text-blue-600">{selectedGroup.tasks}</div>
@@ -453,27 +453,27 @@ export default function GroupsPage() {
                 </div>
 
                 <div>
-                  <h4 className="text-lg font-bold text-gray-900 mb-4">Funcionalidades del Grupo</h4>
+                  <h4 className="text-lg font-bold text-foreground mb-4">Funcionalidades del Grupo</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
                       <MessageCircle className="w-6 h-6 text-blue-600 mb-2" />
-                      <h5 className="font-semibold text-gray-900 mb-1">Chat del Grupo</h5>
-                      <p className="text-sm text-gray-600">Comunicación en tiempo real con los miembros</p>
+                      <h5 className="font-semibold text-foreground mb-1">Chat del Grupo</h5>
+                      <p className="text-sm text-muted-foreground">Comunicación en tiempo real con los miembros</p>
                     </div>
-                    <div className="p-4 bg-green-50 rounded-lg border border-green-100">
-                      <CheckSquare className="w-6 h-6 text-green-600 mb-2" />
-                      <h5 className="font-semibold text-gray-900 mb-1">Tareas Compartidas</h5>
-                      <p className="text-sm text-gray-600">Asigna y sigue tareas del equipo</p>
+                    <div className="p-4 bg-primary/10 rounded-lg border border-primary/20">
+                      <CheckSquare className="w-6 h-6 text-primary mb-2" />
+                      <h5 className="font-semibold text-foreground mb-1">Tareas Compartidas</h5>
+                      <p className="text-sm text-muted-foreground">Asigna y sigue tareas del equipo</p>
                     </div>
                     <div className="p-4 bg-purple-50 rounded-lg border border-purple-100">
                       <Calendar className="w-6 h-6 text-purple-600 mb-2" />
-                      <h5 className="font-semibold text-gray-900 mb-1">Calendario Compartido</h5>
-                      <p className="text-sm text-gray-600">Coordina eventos y reuniones</p>
+                      <h5 className="font-semibold text-foreground mb-1">Calendario Compartido</h5>
+                      <p className="text-sm text-muted-foreground">Coordina eventos y reuniones</p>
                     </div>
                     <div className="p-4 bg-orange-50 rounded-lg border border-orange-100">
                       <Users className="w-6 h-6 text-orange-600 mb-2" />
-                      <h5 className="font-semibold text-gray-900 mb-1">Gestión de Miembros</h5>
-                      <p className="text-sm text-gray-600">Invita y administra miembros del grupo</p>
+                      <h5 className="font-semibold text-foreground mb-1">Gestión de Miembros</h5>
+                      <p className="text-sm text-muted-foreground">Invita y administra miembros del grupo</p>
                     </div>
                   </div>
                 </div>
@@ -481,13 +481,13 @@ export default function GroupsPage() {
                 <div className="mt-6 flex gap-3">
                   <button
                     onClick={() => handleJoinGroup(selectedGroup.id)}
-                    className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium"
+                    className="flex-1 bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors font-medium"
                   >
                     Unirse al Grupo
                   </button>
                   <button
                     onClick={() => setSelectedGroup(null)}
-                    className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                    className="px-6 py-3 border border-border text-foreground rounded-lg hover:bg-muted transition-colors font-medium"
                   >
                     Cerrar
                   </button>
