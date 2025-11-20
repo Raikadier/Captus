@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/themeContext';
 import LoginForm from './features/auth/components/LoginForm';
 import HomePage from './features/dashboard/components/HomePage';
 import MainLayout from './features/dashboard/components/MainLayout';
@@ -49,10 +50,11 @@ import { Toaster } from 'sonner';
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <div className="App text-primary">
-          <Toaster richColors position="top-right" />
-          <Routes>
+      <ThemeProvider>
+        <Router>
+          <div className="App text-primary">
+            <Toaster richColors position="top-right" />
+            <Routes>
             <Route path="/" element={<LoginForm />} />
             <Route
               path="/home"
@@ -256,9 +258,10 @@ function App() {
               }
             />
             <Route path="*" element={<Navigate to="/home" />} />
-          </Routes>
-        </div>
-      </Router>
+            </Routes>
+          </div>
+        </Router>
+      </ThemeProvider>
     </AuthProvider>
   );
 }
