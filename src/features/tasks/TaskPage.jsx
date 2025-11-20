@@ -137,17 +137,6 @@ const TaskPage = () => {
             <h1 className="text-2xl font-bold text-gray-900">Mis Tareas</h1>
             <p className="text-gray-600 mt-1">Gestiona tus tareas y mantén tu racha de productividad</p>
           </div>
-          <div className="flex items-center space-x-4">
-            <Button variant="outline" className="border-gray-300 relative bg-transparent">
-              <Bell size={18} className="text-gray-500" />
-              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-green-600 opacity-75 animate-ping"></span>
-                <span className="relative inline-flex rounded-full h-4 w-4 bg-green-600 items-center justify-center text-[10px] text-white font-bold">
-                  3
-                </span>
-              </span>
-            </Button>
-          </div>
         </div>
       </header>
 

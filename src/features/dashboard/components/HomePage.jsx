@@ -241,14 +241,6 @@ const HomePage = () => {
         </div>
       </div>
 
-      <Link to="/chatbot" title="Hablar con Captus AI">
-        <Button
-          className={`fixed bottom-6 right-6 h-14 w-14 rounded-full bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110 active:scale-95 animate-pulse`}
-          size="icon"
-        >
-          <Sparkles size={24} />
-        </Button>
-      </Link>
     </div>
   )
 }
