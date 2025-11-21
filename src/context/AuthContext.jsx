@@ -65,6 +65,24 @@ export const AuthProvider = ({ children }) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
+
+      // After successful login, sync user with backend
+      try {
+        const response = await fetch('/api/users/profile', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${data.session.access_token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          console.warn('Failed to sync user with backend:', response.status);
+        }
+      } catch (syncError) {
+        console.warn('Error syncing user:', syncError);
+      }
+
       return { success: true, data };
     } catch (err) {
       console.error('Login error:', err);
@@ -74,14 +92,59 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (email, password, name) => {
     try {
+      // Validate password strength
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+      if (!passwordRegex.test(password)) {
+        return {
+          success: false,
+          error: 'La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número'
+        };
+      }
+
+      // First check if email is already registered in our users table
+      try {
+        const response = await fetch('/api/users/check-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email })
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.registered) {
+            return { success: false, error: 'Este email ya está registrado' };
+          }
+        }
+      } catch (checkError) {
+        console.warn('Could not check email registration:', checkError);
+        // Continue with registration anyway
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { name }
+          data: {
+            name: name,
+            display_name: name,
+            full_name: name
+          }
         }
       });
-      if (error) throw error;
+
+      if (error) {
+        // Handle specific Supabase errors
+        if (error.message && (
+          error.message.includes('already registered') ||
+          error.message.includes('already been registered') ||
+          error.message.includes('User already registered')
+        )) {
+          return { success: false, error: 'Este email ya está registrado' };
+        }
+        throw error;
+      }
 
       // If email confirmation is enabled in Supabase, session might be null
       const requiresEmailConfirmation = !data.session;
@@ -89,7 +152,17 @@ export const AuthProvider = ({ children }) => {
       return { success: true, requiresEmailConfirmation };
     } catch (err) {
       console.error('Registration error:', err);
-      return { success: false, error: err.message || 'Registration failed' };
+
+      // Handle specific error messages
+      if (err.message && (
+        err.message.includes('already registered') ||
+        err.message.includes('already been registered') ||
+        err.message.includes('User already registered')
+      )) {
+        return { success: false, error: 'Este email ya está registrado' };
+      }
+
+      return { success: false, error: err.message || 'Error en el registro' };
     }
   };
 
