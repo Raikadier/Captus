@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const getBaseUrl = () => {
-  let url = import.meta.env.VITE_API_BASE_URL || '/api';
+  let url = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
   // Ensure it ends with /api if it's a full URL and doesn't have it
   if (url.startsWith('http') && !url.endsWith('/api')) {
     url = `${url}/api`;
@@ -41,8 +41,13 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Token expired or invalid
+      console.warn('Unauthorized access. Redirecting to login...');
       localStorage.removeItem('token');
-      window.location.href = '/';
+      // Optional: Dispatch a custom event or use a callback if we had access to the router/context here
+      // But window.location is a safe fallback for hard redirects
+      if (window.location.pathname !== '/' && window.location.pathname !== '/login') {
+         window.location.href = '/';
+      }
     }
     return Promise.reject(error);
   }
