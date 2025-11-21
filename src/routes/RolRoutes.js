@@ -1,7 +1,7 @@
 import express from "express";
 import { RolController } from "../controllers/RolController.js";
-import buildSupabaseAuthMiddleware from "../src/middlewares/verifySupabaseToken.js";
-import { getSupabaseClient } from "../src/lib/supabaseAdmin.js";
+import buildSupabaseAuthMiddleware from "../middlewares/verifySupabaseToken.js";
+import { getSupabaseClient } from "../lib/supabaseAdmin.js";
 
 const router = express.Router();
 const rolController = new RolController();

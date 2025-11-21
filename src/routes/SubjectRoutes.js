@@ -1,8 +1,8 @@
 import express from "express";
 import { SubjectController } from "../controllers/SubjectController.js";
-import buildSupabaseAuthMiddleware from "../src/middlewares/verifySupabaseToken.js";
-import { requireTeacherRole } from "../src/middlewares/requireRole.js";
-import { getSupabaseClient } from "../src/lib/supabaseAdmin.js";
+import buildSupabaseAuthMiddleware from "../middlewares/verifySupabaseToken.js";
+import { requireTeacherRole } from "../middlewares/requireRole.js";
+import { getSupabaseClient } from "../lib/supabaseAdmin.js";
 
 const router = express.Router();
 const subjectController = new SubjectController();

@@ -1,4 +1,4 @@
-import { requireSupabaseClient } from '../src/lib/supabaseAdmin.js';
+import { requireSupabaseClient } from '../lib/supabaseAdmin.js';
 
 export default class BaseRepository {
   constructor(tableName, { primaryKey = 'id', mapToDb, mapFromDb, select = '*' } = {}) {
