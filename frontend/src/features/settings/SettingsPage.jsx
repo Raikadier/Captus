@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronRight, Globe, Lock, MessageSquare, Palette, Shield, User, Bell, Eye, EyeOff, Check, Sparkles } from 'lucide-react'
 import { Button } from '../../ui/button'
@@ -6,6 +6,9 @@ import { Card } from '../../ui/card'
 import { Label } from '../../ui/label'
 import { Switch } from '../../ui/switch'
 import { useTheme } from '../../context/themeContext'
+import { useAuth } from '../../context/AuthContext'
+import { supabase } from '../../shared/api/supabase'
+import { toast } from 'sonner'
 
 function getCurrentDate() {
   const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
@@ -58,10 +61,165 @@ function SettingsMenuItem({
 
 export default function SettingsPage() {
   const { darkMode, setDarkMode } = useTheme()
+  const { user } = useAuth()
   // compactView is not in the context in frontend codebase yet, so I'll simulate it locally or assume false
   const [compactView, setCompactView] = useState(false)
 
   const [activeSection, setActiveSection] = useState('perfil')
+  const [userData, setUserData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    career: '',
+    bio: ''
+  })
+
+  useEffect(() => {
+    fetchUserProfile()
+  }, [])
+
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      // Get the current session to obtain the access token
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+
+      if (sessionError || !sessionData?.session?.access_token) {
+        console.error('No valid session found:', sessionError)
+        toast.error('Sesión expirada. Por favor, inicia sesión nuevamente.')
+        return
+      }
+
+      const token = sessionData.session.access_token
+
+      // Combine first and last name
+      const fullName = `${formData.firstName} ${formData.lastName}`.trim()
+
+      const updateData = {
+        name: fullName,
+        carrer: formData.career,
+        bio: formData.bio
+      }
+
+      console.log('Updating profile:', updateData)
+
+      // Make API call to update profile
+      const userId = sessionData.session.user.id
+      const response = await fetch(`/api/users/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateData)
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        console.log('Profile updated successfully:', result)
+
+        // Update local state
+        setUserData(prev => ({
+          ...prev,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          name: fullName,
+          carrer: formData.career,
+          bio: formData.bio
+        }))
+
+        toast.success('Perfil actualizado exitosamente')
+      } else {
+        const errorData = await response.json()
+        console.error('Failed to update profile:', response.status, errorData)
+        toast.error(`Error al actualizar perfil: ${errorData.message || 'Error desconocido'}`)
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error)
+      toast.error('Error al actualizar el perfil')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const fetchUserProfile = async () => {
+    setError('')
+    setLoading(true)
+
+    try {
+      console.log('Fetching user profile from settings...')
+
+      // Get the current session to obtain the access token
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+
+      if (sessionError || !sessionData?.session?.access_token) {
+        console.error('No valid session found:', sessionError)
+        setError('Sesión no válida. Por favor, inicia sesión nuevamente.')
+        setLoading(false)
+        return
+      }
+
+      const token = sessionData.session.access_token
+      console.log('Using token:', token.substring(0, 20) + '...')
+
+      const response = await fetch('/api/users/profile', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+      console.log('Response status:', response.status)
+
+      if (response.ok) {
+        const userDataResponse = await response.json()
+        console.log('Raw response:', userDataResponse)
+
+        if (userDataResponse.success && userDataResponse.data) {
+          const user = userDataResponse.data
+          console.log('User object:', user)
+
+          // Split full name into first and last name
+          const nameParts = user.name ? user.name.split(' ') : ['', '']
+          const firstName = nameParts[0] || ''
+          const lastName = nameParts.slice(1).join(' ') || ''
+
+          const userWithSplitName = {
+            ...user,
+            firstName,
+            lastName,
+            fullName: user.name
+          }
+
+          console.log('Setting user data:', userWithSplitName)
+          setUserData(userWithSplitName)
+          setFormData({
+            firstName,
+            lastName,
+            email: user.email || '',
+            career: user.carrer || '',
+            bio: user.bio || ''
+          })
+        } else {
+          console.error('No success or no data in response:', userDataResponse)
+          setError('No se pudieron cargar los datos del perfil')
+        }
+      } else {
+        const errorText = await response.text()
+        console.error('Failed to fetch user profile:', response.status, errorText)
+        setError(`Error al cargar perfil: ${response.status}`)
+      }
+    } catch (error) {
+      console.error('Error fetching user profile:', error)
+      setError('Error de conexión al cargar perfil')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Notification settings
   const [taskReminders, setTaskReminders] = useState(true)
@@ -150,78 +308,106 @@ export default function SettingsPage() {
                 <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} ${compactView ? 'mb-4' : 'mb-6'}`}>
                   Información Personal
                 </h2>
-                <div className={compactView ? 'space-y-3' : 'space-y-4'}>
-                  <div className="flex items-center space-x-4">
-                    <div className={`${compactView ? 'w-16 h-16' : 'w-20 h-20'} rounded-full overflow-hidden bg-green-600 flex items-center justify-center`}>
-                      <span className={`text-white ${compactView ? 'text-xl' : 'text-2xl'} font-semibold`}>MG</span>
+                {loading ? (
+                  <div className="text-center py-8">
+                    <div className="text-xl">Cargando información del perfil...</div>
+                  </div>
+                ) : error ? (
+                  <div className="text-center py-8">
+                    <div className="text-red-600 text-lg mb-4">Error: {error}</div>
+                    <Button onClick={fetchUserProfile} variant="outline">
+                      Reintentar
+                    </Button>
+                  </div>
+                ) : (
+                  <div className={compactView ? 'space-y-3' : 'space-y-4'}>
+                    <div className="flex items-center space-x-4">
+                      <div className={`${compactView ? 'w-16 h-16' : 'w-20 h-20'} rounded-full overflow-hidden bg-green-600 flex items-center justify-center`}>
+                        <span className={`text-white ${compactView ? 'text-xl' : 'text-2xl'} font-semibold`}>MG</span>
+                      </div>
+                      <div>
+                        <Button variant="outline" size="sm">
+                          Cambiar Foto
+                        </Button>
+                      </div>
+                    </div>
+                    <div className={`grid grid-cols-1 md:grid-cols-2 ${compactView ? 'gap-3' : 'gap-4'}`}>
+                      <div>
+                        <Label htmlFor="nombre" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                          Nombre
+                        </Label>
+                        <input
+                          id="nombre"
+                          type="text"
+                          value={formData.firstName}
+                          onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
+                          placeholder="Tu nombre"
+                          className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600`}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="apellido" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                          Apellido
+                        </Label>
+                        <input
+                          id="apellido"
+                          type="text"
+                          value={formData.lastName}
+                          onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
+                          placeholder="Tu apellido"
+                          className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600`}
+                        />
+                      </div>
                     </div>
                     <div>
-                      <Button variant="outline" size="sm">
-                        Cambiar Foto
+                      <Label htmlFor="email" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Email
+                      </Label>
+                      <input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        disabled
+                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 opacity-60 cursor-not-allowed`}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="carrera" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Carrera
+                      </Label>
+                      <input
+                        id="carrera"
+                        type="text"
+                        value={formData.career}
+                        onChange={(e) => setFormData(prev => ({ ...prev, career: e.target.value }))}
+                        placeholder="Ej: Ingeniería de Sistemas"
+                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600`}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="bio" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Biografía
+                      </Label>
+                      <textarea
+                        id="bio"
+                        rows={3}
+                        value={formData.bio}
+                        onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
+                        placeholder="Cuéntanos un poco sobre ti..."
+                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600`}
+                      />
+                    </div>
+                    <div className={compactView ? 'mt-4' : 'mt-6'}>
+                      <Button
+                        onClick={handleSave}
+                        disabled={saving}
+                        className="bg-green-600 hover:bg-green-700 disabled:opacity-50"
+                      >
+                        {saving ? 'Guardando...' : 'Guardar Cambios'}
                       </Button>
                     </div>
                   </div>
-                  <div className={`grid grid-cols-1 md:grid-cols-2 ${compactView ? 'gap-3' : 'gap-4'}`}>
-                    <div>
-                      <Label htmlFor="nombre" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        Nombre
-                      </Label>
-                      <input
-                        id="nombre"
-                        type="text"
-                        defaultValue="María"
-                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600`}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="apellido" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        Apellido
-                      </Label>
-                      <input
-                        id="apellido"
-                        type="text"
-                        defaultValue="García"
-                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600`}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <Label htmlFor="email" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                      Email
-                    </Label>
-                    <input
-                      id="email"
-                      type="email"
-                      defaultValue="maria.garcia@universidad.edu"
-                      className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600`}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="carrera" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                      Carrera
-                    </Label>
-                    <input
-                      id="carrera"
-                      type="text"
-                      defaultValue="Ingeniería de Sistemas"
-                      className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600`}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="bio" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                      Biografía
-                    </Label>
-                    <textarea
-                      id="bio"
-                      rows={3}
-                      placeholder="Cuéntanos un poco sobre ti..."
-                      className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600`}
-                    />
-                  </div>
-                </div>
-                <div className={compactView ? 'mt-4' : 'mt-6'}>
-                  <Button className="bg-green-600 hover:bg-green-700">Guardar Cambios</Button>
-                </div>
+                )}
               </Card>
             )}
 

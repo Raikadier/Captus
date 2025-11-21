@@ -6,6 +6,8 @@ const mapFromDb = (row) => ({
   userName: row.name || row.email?.split('@')[0], // Usar name o extraer de email
   email: row.email,
   name: row.name,
+  carrer: row.carrer,
+  bio: row.bio,
   createdAt: row.created_at,
   updatedAt: row.updated_at,
 });
@@ -14,6 +16,8 @@ const mapToDb = (entity) => ({
   id: entity.id_User, // Para upsert
   email: entity.email,
   name: entity.name || entity.userName,
+  carrer: entity.carrer,
+  bio: entity.bio,
   created_at: entity.createdAt || new Date(),
   updated_at: entity.updatedAt || new Date(),
 });

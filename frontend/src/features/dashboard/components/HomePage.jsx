@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Bell, Calendar as CalendarIcon, CheckSquare, Sparkles, StickyNote, Clock } from 'lucide-react';
 import { Button } from '../../../ui/button';
 import { Card } from '../../../ui/card';
 import NotificationsDropdown from './NotificationsDropdown';
+import { useAuth } from '../../../context/AuthContext';
 
 function getCurrentDate() {
   const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
@@ -68,10 +69,18 @@ function StatCard({ icon, label, value, bgColor }) {
 
 const HomePage = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [userName, setUserName] = useState('')
   const navigate = useNavigate()
+  const { user } = useAuth()
   // Mock darkMode, in real app use context
   const darkMode = false
   const unreadCount = 3
+
+  useEffect(() => {
+    if (user?.user_metadata?.name) {
+      setUserName(user.user_metadata.name.split(' ')[0]) // Solo el primer nombre
+    }
+  }, [user])
 
   return (
     <div className={`p-8 ${darkMode ? 'bg-gray-900' : ''}`}>
@@ -81,7 +90,7 @@ const HomePage = () => {
         <div className="flex justify-between items-center">
           <div>
             <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              👋 Bienvenida, María
+              👋 ¡Hola{userName ? `, ${userName}` : ''}! Bienvenido a Captus
             </h1>
             <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
               {getCurrentDate()}
