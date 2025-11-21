@@ -192,7 +192,8 @@ export default function SettingsPage() {
             ...user,
             firstName,
             lastName,
-            fullName: user.name
+            fullName: user.name,
+            createdAt: user.createdAt || user.created_at
           }
 
           console.log('Setting user data:', userWithSplitName)
@@ -406,6 +407,56 @@ export default function SettingsPage() {
                         {saving ? 'Guardando...' : 'Guardar Cambios'}
                       </Button>
                     </div>
+
+                    {/* Fecha de registro decorativa */}
+                    {userData?.createdAt && (
+                      <div className={`mt-6 text-center ${compactView ? 'py-3' : 'py-4'}`}>
+                        <div className={`inline-flex items-center gap-3 px-6 py-3 rounded-full border-2 ${
+                          darkMode
+                            ? 'bg-gradient-to-r from-green-900/20 to-blue-900/20 border-green-600/30'
+                            : 'bg-gradient-to-r from-green-50 to-blue-50 border-green-200'
+                        } backdrop-blur-sm`}>
+                          <div className="flex items-center gap-2">
+                            <div className={`w-2 h-2 rounded-full ${
+                              darkMode ? 'bg-green-400' : 'bg-green-500'
+                            } animate-pulse`}></div>
+                            <span className={`text-sm font-medium ${
+                              darkMode ? 'text-green-300' : 'text-green-700'
+                            }`}>
+                              Miembro desde
+                            </span>
+                          </div>
+                          <div className={`px-3 py-1 rounded-lg ${
+                            darkMode ? 'bg-gray-800/50' : 'bg-white/70'
+                          } border border-green-200/50`}>
+                            <span className={`font-bold ${
+                              darkMode ? 'text-white' : 'text-gray-800'
+                            }`}>
+                              {new Date(userData.createdAt).toLocaleDateString('es-ES', {
+                                day: 'numeric',
+                                month: 'long',
+                                year: 'numeric'
+                              })}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className={`text-sm font-medium ${
+                              darkMode ? 'text-blue-300' : 'text-blue-700'
+                            }`}>
+                              🎉
+                            </span>
+                            <div className={`w-2 h-2 rounded-full ${
+                              darkMode ? 'bg-blue-400' : 'bg-blue-500'
+                            } animate-pulse`}></div>
+                          </div>
+                        </div>
+                        <p className={`text-xs mt-2 ${
+                          darkMode ? 'text-gray-400' : 'text-gray-500'
+                        }`}>
+                          ¡Gracias por ser parte de Captus!
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
               </Card>
