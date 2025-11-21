@@ -14,42 +14,36 @@ const defaultCode = `graph TD
     D --> E
     E --> F[Fin]`;
 
-// Custom hook for debouncing
-function useDebounce(value, delay) {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-}
-
 export default function DiagramEditor({ open, onOpenChange, initialData, onSave }) {
   const [title, setTitle] = useState('');
   const [code, setCode] = useState(defaultCode);
+  const [debouncedCode, setDebouncedCode] = useState(defaultCode);
   const [loading, setLoading] = useState(false);
-
-  // Debounce the code for preview to improve performance
-  const debouncedCode = useDebounce(code, 800);
 
   useEffect(() => {
     if (open) {
       if (initialData) {
         setTitle(initialData.title);
         setCode(initialData.code);
+        setDebouncedCode(initialData.code);
       } else {
         setTitle('');
         setCode(defaultCode);
+        setDebouncedCode(defaultCode);
       }
     }
   }, [open, initialData]);
+
+  // Simple debouncing logic
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedCode(code);
+    }, 800);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [code]);
 
   const handleSave = async () => {
     if (!title.trim()) return;
@@ -106,6 +100,7 @@ export default function DiagramEditor({ open, onOpenChange, initialData, onSave 
                       scrollBeyondLastLine: false,
                       wordWrap: 'on',
                     }}
+                    loading={<div className="p-4 text-sm text-gray-500">Cargando editor...</div>}
                   />
                </div>
             </div>

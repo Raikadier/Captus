@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, memo } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import mermaid from 'mermaid';
 import { Button } from '../../ui/button';
 import { Download, FileImage, FileText } from 'lucide-react';
@@ -10,7 +10,7 @@ mermaid.initialize({
   securityLevel: 'loose',
 });
 
-const MermaidRenderer = memo(function MermaidRenderer({ code, allowExport = false }) {
+export default function MermaidRenderer({ code, allowExport = false }) {
   const containerRef = useRef(null);
   const [svgContent, setSvgContent] = useState('');
   const [error, setError] = useState(null);
@@ -155,6 +155,4 @@ const MermaidRenderer = memo(function MermaidRenderer({ code, allowExport = fals
       )}
     </div>
   );
-});
-
-export default MermaidRenderer;
+}
