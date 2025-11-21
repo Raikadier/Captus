@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../shared/api/supabase';
 
@@ -14,10 +13,7 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  // Keep token for compatibility with axios interceptor reading localStorage('token')
-  const [token, setToken] = useState(() => localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
-  const [role, setRole] = useState(null);
 
   // Initialize session/user on app start and subscribe to auth changes
   useEffect(() => {
@@ -25,39 +21,43 @@ export const AuthProvider = ({ children }) => {
 
     const initAuth = async () => {
       try {
+        // Check for existing session
         const { data: sessionData } = await supabase.auth.getSession();
-        const { data: userData } = await supabase.auth.getUser();
 
         if (!mounted) return;
 
-        setUser(userData?.user ?? null);
-        setRole(userData?.user?.user_metadata?.role ?? null);
-        const accessToken = sessionData?.session?.access_token ?? null;
-        setToken(accessToken ?? null);
-        setLoading(false);
-      } catch {
-        if (!mounted) return;
-        setUser(null);
-        setRole(null);
-        setToken(null);
-        setLoading(false);
+        if (sessionData?.session?.user) {
+           setUser(sessionData.session.user);
+           // Token is handled by onAuthStateChange in supabase.js, but we can ensure it here too
+           localStorage.setItem('token', sessionData.session.access_token);
+        } else {
+           setUser(null);
+        }
+      } catch (error) {
+        console.error('Auth initialization error:', error);
+        if (mounted) setUser(null);
+      } finally {
+        if (mounted) setLoading(false);
       }
     };
 
     initAuth();
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setRole(session?.user?.user_metadata?.role ?? null);
-      const accessToken = session?.access_token ?? null;
-      setToken(accessToken ?? null);
-      // localStorage('token') is already synced in supabase.js listener
+    // Subscribe to auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        setUser(session.user);
+      } else {
+        setUser(null);
+      }
+
+      // Note: Token management (localStorage) is centralized in shared/api/supabase.js
+      // so we don't need to duplicate it here, just react to user state.
     });
 
     return () => {
       mounted = false;
-      // v2 returns { data: { subscription } }
-      listener?.subscription?.unsubscribe?.();
+      subscription?.unsubscribe();
     };
   }, []);
 
@@ -65,40 +65,30 @@ export const AuthProvider = ({ children }) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-
-      setUser(data.user ?? null);
-      setRole(data.user?.user_metadata?.role ?? null);
-      const accessToken = data.session?.access_token ?? null;
-      setToken(accessToken ?? null);
-
-      return { success: true };
+      return { success: true, data };
     } catch (err) {
+      console.error('Login error:', err);
       return { success: false, error: err.message || 'Login failed' };
     }
   };
 
-  const register = async (email, password, name, roleValue = 'student') => {
+  const register = async (email, password, name) => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { name, role: roleValue } }
+        options: {
+          data: { name }
+        }
       });
       if (error) throw error;
 
-      // If email confirmation is required, there will be no session
+      // If email confirmation is enabled in Supabase, session might be null
       const requiresEmailConfirmation = !data.session;
-
-      // If session exists, user is logged in already
-      if (data.session) {
-        setUser(data.user ?? null);
-        setRole(data.user?.user_metadata?.role ?? roleValue ?? null);
-        const accessToken = data.session?.access_token ?? null;
-        setToken(accessToken ?? null);
-      }
 
       return { success: true, requiresEmailConfirmation };
     } catch (err) {
+      console.error('Registration error:', err);
       return { success: false, error: err.message || 'Registration failed' };
     }
   };
@@ -106,30 +96,28 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await supabase.auth.signOut();
-    } catch {
-      // ignore logout errors for UX simplicity
-    } finally {
       setUser(null);
-      setRole(null);
-      setToken(null);
-      localStorage.removeItem('token');
+      // localStorage clearing is handled by supabase.js onAuthStateChange
+    } catch (error) {
+      console.error('Logout error:', error);
     }
   };
 
   const redirectToTasks = () => {
+    // This can be used by consumers to redirect after login
+    // In a real app, you might use useNavigate() from react-router-dom
+    // but since this context is often above Router or needs a hard redirect:
     window.location.href = '/tasks';
   };
 
   const value = {
     user,
-    token,
-    role,
     loading,
+    isAuthenticated: !!user,
     login,
     register,
     logout,
     redirectToTasks,
-    isAuthenticated: !!user,
   };
 
   return (

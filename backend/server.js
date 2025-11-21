@@ -18,6 +18,8 @@ import ProjectRoutes from './routes/ProjectRoutes.js';
 import ProjectMemberRoutes from './routes/ProjectMemberRoutes.js';
 import ProjectCommentRoutes from './routes/ProjectCommentRoutes.js';
 import CommentLikeRoutes from './routes/CommentLikeRoutes.js';
+import SubjectRoutes from './routes/SubjectRoutes.js';
+import aiRouter from './src/routes/ai.js';
 import { getSupabaseClient } from './src/lib/supabaseAdmin.js';
 
 dotenv.config();
@@ -92,6 +94,11 @@ const swaggerSpec = swaggerJsdoc(swaggerOptions);
 // Swagger documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+// AI routes
+if (ENV_OK && supabaseAdmin) {
+  app.use('/ai', verifySupabaseToken, aiRouter);
+}
+
 // API routes (minimal)
 app.use(
   '/api/streaks',
@@ -118,6 +125,7 @@ if (ENV_OK && supabaseAdmin) {
   app.use('/api/project-members', verifySupabaseToken, ProjectMemberRoutes);
   app.use('/api/project-comments', verifySupabaseToken, ProjectCommentRoutes);
   app.use('/api/comment-likes', verifySupabaseToken, CommentLikeRoutes);
+  app.use('/api/subjects', verifySupabaseToken, SubjectRoutes);
 }
 
 // Root route
@@ -168,3 +176,5 @@ app.listen(PORT, () => {
   console.log(`Frontend:     ${frontendUrl}`);
   console.log('===================================');
 });
+
+

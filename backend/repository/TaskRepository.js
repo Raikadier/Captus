@@ -1,28 +1,39 @@
 import BaseRepository from "./BaseRepository.js";
 
+// Mapping to match Frontend expectations directly
 const mapFromDb = (row) => ({
-  id_Task: row.id,
+  id: row.id,
   title: row.title,
   description: row.description,
+  created_at: row.created_at,
+  due_date: row.due_date,
+  priority_id: row.priority_id,
+  category_id: row.category_id,
+  completed: row.completed,
+  user_id: row.user_id,
+  parent_task_id: row.parent_task_id,
+  updated_at: row.updated_at,
+  // Keeping legacy properties for safety if backend logic relies on them
+  id_Task: row.id,
+  state: row.completed,
   creationDate: row.created_at,
   endDate: row.due_date,
   id_Priority: row.priority_id,
   id_Category: row.category_id,
-  state: row.completed,
   id_User: row.user_id,
   parentTaskId: row.parent_task_id,
-  updatedAt: row.updated_at,
 });
 
 const mapToDb = (entity) => ({
+  // Handles both legacy (id_Task) and new (id) formats
   title: entity.title,
   description: entity.description ?? null,
-  due_date: entity.endDate ?? null,
-  priority_id: entity.id_Priority ?? null,
-  category_id: entity.id_Category ?? null,
-  completed: entity.state ?? false,
-  user_id: entity.id_User,
-  parent_task_id: entity.parentTaskId ?? null,
+  due_date: entity.due_date ?? entity.endDate ?? null,
+  priority_id: entity.priority_id ?? entity.id_Priority ?? null,
+  category_id: entity.category_id ?? entity.id_Category ?? null,
+  completed: entity.completed ?? entity.state ?? false,
+  user_id: entity.user_id ?? entity.id_User,
+  parent_task_id: entity.parent_task_id ?? entity.parentTaskId ?? null,
 });
 
 class TaskRepository extends BaseRepository {
@@ -39,8 +50,9 @@ class TaskRepository extends BaseRepository {
   }
 
   async update(task) {
-    if (!task?.id_Task) return null;
-    return super.update(task.id_Task, task);
+    const id = task.id ?? task.id_Task;
+    if (!id) return null;
+    return super.update(id, task);
   }
 
   async getAllByUserId(userId) {

@@ -1,58 +1,45 @@
-// MainLayout - Layout principal con sidebar fijo como la plantilla
-import React, { useState, useEffect } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
-// eslint-disable-next-line no-unused-vars
-import { motion } from 'framer-motion';
-import Sidebar from './Sidebar';
-import TeacherSidebar from './TeacherSidebar';
-import { useTheme } from '../../../context/themeContext';
+import React, { useState } from 'react'
+import { Outlet, useLocation, Link } from 'react-router-dom'
+import { Sparkles } from 'lucide-react'
+import Sidebar from './Sidebar'
+import TeacherSidebar from './TeacherSidebar'
+import { Button } from '../../../ui/button'
 
 const MainLayout = ({ children }) => {
-  const [sidebarWidth, setSidebarWidth] = useState(240);
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const location = useLocation();
-  const { darkMode } = useTheme();
+  const location = useLocation()
+  const isTeacher = location.pathname.startsWith('/teacher')
+  const [isCollapsed, setIsCollapsed] = useState(false)
 
-  useEffect(() => {
-    const handleResize = () => {
-      const sidebar = document.querySelector('[class*="fixed inset-y-0 left-0"]');
-      if (sidebar) setSidebarWidth(sidebar.offsetWidth);
-    };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-
-    const observer = new MutationObserver(handleResize);
-    const sidebar = document.querySelector('[class*="fixed inset-y-0 left-0"]');
-    if (sidebar) observer.observe(sidebar, { attributes: true, attributeFilter: ['style'] });
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      observer.disconnect();
-    };
-  }, []);
-
-  const isTeacher = location.pathname.startsWith('/teacher');
+  // Don't show the floating button on the chatbot page itself to avoid redundancy
+  const showFloatingButton = location.pathname !== '/chatbot'
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-[#F6F7FB]'}`}>
-      {/* Sidebar fijo */}
+    <div className="min-h-screen bg-background animate-in fade-in duration-500">
       {isTeacher ? (
-        <TeacherSidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
+        <TeacherSidebar />
       ) : (
-        <Sidebar />
+        <Sidebar onCollapseChange={setIsCollapsed} />
       )}
-
-      {/* Contenido principal */}
-      <motion.div
-        initial={false}
-        animate={{ marginLeft: sidebarWidth }}
-        transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-        className="min-h-screen"
+      <div
+        className={`min-h-screen transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+          isCollapsed ? 'ml-20' : 'ml-60'
+        }`}
       >
         {children || <Outlet />}
-      </motion.div>
-    </div>
-  );
-};
+      </div>
 
-export default MainLayout;
+      {showFloatingButton && (
+        <Link to="/chatbot" title="Hablar con Captus AI">
+          <Button
+            className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110 active:scale-95 animate-pulse z-50"
+            size="icon"
+          >
+            <Sparkles size={24} />
+          </Button>
+        </Link>
+      )}
+    </div>
+  )
+}
+
+export default MainLayout

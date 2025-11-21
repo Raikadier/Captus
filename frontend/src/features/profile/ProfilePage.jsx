@@ -1,6 +1,9 @@
 // ProfilePage - User profile management
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Phone, Calendar, Edit3, Save, X } from 'lucide-react';
+import { Link } from 'react-router-dom'
+import { User, Mail, Phone, Calendar, Edit3, Save, X, Sparkles } from 'lucide-react';
+import { Button } from '../../ui/button'
+import { Input } from '../../ui/input'
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -59,7 +62,7 @@ const ProfilePage = () => {
         ...formData
       }));
       setIsEditing(false);
-      alert('Perfil actualizado exitosamente');
+      // alert('Perfil actualizado exitosamente');
     } catch (error) {
       console.error('Error updating profile:', error);
       alert('Error al actualizar el perfil');
@@ -156,11 +159,11 @@ const ProfilePage = () => {
                   Nombre Completo
                 </label>
                 {isEditing ? (
-                  <input
+                  <Input
                     type="text"
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                    className="w-full"
                   />
                 ) : (
                   <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
@@ -176,11 +179,11 @@ const ProfilePage = () => {
                   Correo Electrónico
                 </label>
                 {isEditing ? (
-                  <input
+                  <Input
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                    className="w-full"
                   />
                 ) : (
                   <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
@@ -196,12 +199,12 @@ const ProfilePage = () => {
                   Teléfono
                 </label>
                 {isEditing ? (
-                  <input
+                  <Input
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
                     placeholder="Ingresa tu número de teléfono"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                    className="w-full"
                   />
                 ) : (
                   <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">

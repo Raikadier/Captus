@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Bell, MessageSquare, TrendingUp, CheckSquare, Target, Award } from 'lucide-react'
 import { Button } from '../../ui/button'
@@ -24,16 +24,6 @@ function getCurrentDate() {
   const now = new Date()
   return `${days[now.getDay()]}, ${now.getDate()} de ${months[now.getMonth()]} de ${now.getFullYear()}`
 }
-
-const defaultStats = {
-  averageGrade: 0,
-  completedTasks: 0,
-  totalTasks: 0,
-  studyHours: 0,
-  streak: 0,
-};
-
-const subjects = [];
 
 function StatCard({ icon, label, value, bgColor }) {
   return (
@@ -67,7 +57,8 @@ function SubjectProgress({ subject }) {
       <div className="flex justify-between items-center mb-2">
         <div>
           <h3 className="font-medium text-gray-900">{subject.name}</h3>
-          <p className="text-sm text-gray-500">{subject.tasks} tareas</p>
+          {/* Display progress if available, or default text */}
+          <p className="text-sm text-gray-500">{subject.progress ? `${subject.progress}% completado` : ''}</p>
         </div>
         <div className="text-right">
           <p className="text-lg font-bold text-gray-900">{subject.grade}</p>
@@ -77,7 +68,7 @@ function SubjectProgress({ subject }) {
       <div className="w-full bg-gray-200 rounded-full h-3">
         <div
           className={`h-3 rounded-full transition-all ${getColorClass(subject.color)}`}
-          style={{ width: `${subject.progress}%` }}
+          style={{ width: `${subject.progress || 0}%` }}
         />
       </div>
     </div>
@@ -85,35 +76,55 @@ function SubjectProgress({ subject }) {
 }
 
 export default function StatsPage() {
-  const [stats, setStats] = useState(defaultStats);
-
-  const completionPercent = useMemo(() => {
-    if (!stats.totalTasks) return 0;
-    return Math.round((stats.completedTasks / stats.totalTasks) * 100);
-  }, [stats.completedTasks, stats.totalTasks]);
-
-  const circumference = 2 * Math.PI * 88;
-  const strokeDasharray = `${(stats.totalTasks ? stats.completedTasks / stats.totalTasks : 0) * circumference} ${circumference}`;
+  const [stats, setStats] = useState({
+    averageGrade: 0,
+    completedTasks: 0,
+    totalTasks: 0,
+    studyHours: 0,
+    racha: 0, // Backend uses 'racha' or 'streak'
+    subjects: []
+  });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const { data } = await apiClient.get('/statistics');
-        const payload = data?.data ?? data;
-        if (!payload) return;
-        setStats({
-          averageGrade: payload.averageGrade ?? 0,
-          completedTasks: payload.completedTasks ?? 0,
-          totalTasks: payload.totalTasks ?? 0,
-          studyHours: payload.studyHours ?? 0,
-          streak: payload.racha ?? payload.streak ?? 0,
-        });
-      } catch (err) {
-        console.error('Error fetching statistics', err);
+        const response = await apiClient.get('/statistics');
+        // Backend returns { success: true, data: {...} } or just {...} depending on controller
+        // Based on StatisticsController.js: res.status(200).json(result.data) where result.data is the object
+        // But let's be safe
+        const data = response.data?.data || response.data;
+
+        if (data) {
+          setStats({
+            averageGrade: data.averageGrade || 0,
+            completedTasks: data.completedTasks || 0,
+            totalTasks: data.totalTasks || 0,
+            studyHours: data.studyHours || 0,
+            racha: data.racha || data.streak || 0,
+            subjects: data.subjects || []
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+      } finally {
+        setLoading(false);
       }
     };
+
     fetchStats();
   }, []);
+
+  const completionPercent = stats.totalTasks > 0
+    ? Math.round((stats.completedTasks / stats.totalTasks) * 100)
+    : 0;
+
+  const circumference = 2 * Math.PI * 88;
+  const strokeDasharray = `${(completionPercent / 100) * circumference} ${circumference}`;
+
+  if (loading) {
+     return <div className="min-h-screen flex items-center justify-center bg-[#F6F7FB]">Cargando estadísticas...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-[#F6F7FB]">
@@ -125,9 +136,6 @@ export default function StatsPage() {
               <h1 className="text-2xl font-bold text-gray-900">📊 Mis Estadísticas</h1>
               <p className="text-gray-600 mt-1">{getCurrentDate()}</p>
             </div>
-            <Button variant="outline" className="border-gray-300 relative bg-transparent">
-              <Bell size={18} className="text-gray-500" />
-            </Button>
           </div>
         </header>
 
@@ -136,7 +144,7 @@ export default function StatsPage() {
           <StatCard
             icon={<TrendingUp className="text-green-600" size={28} />}
             label="Promedio General"
-            value={stats.averageGrade?.toFixed ? stats.averageGrade.toFixed(2) : stats.averageGrade}
+            value={stats.averageGrade.toFixed(2)}
             bgColor="bg-green-50"
           />
           <StatCard
@@ -154,20 +162,27 @@ export default function StatsPage() {
           <StatCard
             icon={<Award className="text-purple-600" size={28} />}
             label="Racha Actual"
-            value={`${stats.streak} días`}
+            value={`${stats.racha} días`}
             bgColor="bg-purple-50"
           />
         </div>
 
         {/* Progress by Subject */}
-        <Card className="p-6 bg-white rounded-xl shadow-sm mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">Progreso por Materia</h2>
-          <div className="space-y-6">
-            {subjects.map((subject) => (
-              <SubjectProgress key={subject.name} subject={subject} />
-            ))}
-          </div>
-        </Card>
+        {stats.subjects && stats.subjects.length > 0 ? (
+          <Card className="p-6 bg-white rounded-xl shadow-sm mb-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">Progreso por Materia</h2>
+            <div className="space-y-6">
+              {stats.subjects.map((subject) => (
+                <SubjectProgress key={subject.id || subject.name} subject={subject} />
+              ))}
+            </div>
+          </Card>
+        ) : (
+           <Card className="p-6 bg-white rounded-xl shadow-sm mb-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">Materias</h2>
+              <p className="text-gray-500">No hay materias registradas aún. ¡Agrega algunas para ver tu progreso académico!</p>
+           </Card>
+        )}
 
         {/* Charts mock (no external libs) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -199,6 +214,7 @@ export default function StatsPage() {
           <Card className="p-6 bg-white rounded-xl shadow-sm">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Rendimiento Mensual</h2>
             <div className="space-y-4">
+              {/* Mock data for monthly performance as backend doesn't support this granularity yet */}
               <MonthBar month="Septiembre" color="bg-blue-600" value={75} label="7.5" />
               <MonthBar month="Octubre" color="bg-green-600" value={85} label="8.5" />
               <MonthBar month="Noviembre" color="bg-green-600" value={90} label="9.0" />
