@@ -1,19 +1,19 @@
-import { groq, together, MODEL_FAST, MODEL_REASONING } from "../model.js";
+import { groq, MODEL_FAST } from "../model.js";
 import { orchestrator } from "../orchestrator.js";
 
+// Lista estricta de palabras clave solicitada
 const actionKeywords = [
   "crea",
+  "crear",
   "agrega",
   "añade",
   "organiza",
-  "marca",
+  "ordena",
   "completa",
-  "agenda",
-  "evento",
-  "tarea",
-  "recordatorio",
+  "marca",
+  "registra",
   "programa",
-  "planifica",
+  "agenda"
 ];
 
 const requiresAction = (text = "") => {
@@ -22,18 +22,23 @@ const requiresAction = (text = "") => {
 };
 
 export const tutorAgent = async (message, userId) => {
-  // Si el usuario pide una acción, delegamos al orquestador (Together + tools).
+  // 1. Dual Provider Logic:
+  // Si contiene verbo de acción -> Together (via orchestrator, que usa tools)
+  // Si NO contiene verbo -> Groq (chat simple)
+
   if (requiresAction(message)) {
+    console.info("[AI/Tutor] Switch to Together (Action Detected)");
     return await orchestrator(message, userId);
   }
 
+  console.info("[AI/Tutor] Switch to Groq (Simple Query)");
   // Consultas rápidas/teóricas usan Groq (sin tools).
   const response = await groq.chat.completions.create({
     model: MODEL_FAST,
     messages: [
       {
         role: "system",
-        content: "Eres un tutor académico experto.",
+        content: "Eres un tutor académico experto y conciso. Responde brevemente.",
       },
       { role: "user", content: message },
     ],
@@ -41,5 +46,3 @@ export const tutorAgent = async (message, userId) => {
 
   return response.choices[0].message.content;
 };
-
-export { requiresAction };

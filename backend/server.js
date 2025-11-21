@@ -22,6 +22,9 @@ import SubjectRoutes from './routes/SubjectRoutes.js';
 import aiRouter from './src/routes/ai.js';
 import { getSupabaseClient } from './src/lib/supabaseAdmin.js';
 
+// Ensure dotenv is configured before anything else if possible,
+// though imports are hoisted, side-effect imports like 'dotenv/config' are better.
+// But here we call it explicitly.
 dotenv.config();
 
 const app = express();
