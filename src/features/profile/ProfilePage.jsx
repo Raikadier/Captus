@@ -1,7 +1,7 @@
 // ProfilePage - User profile management
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'
-import { User, Mail, Phone, Calendar, Edit3, Save, X, Sparkles } from 'lucide-react';
+import { User, Mail, Calendar, Edit3, Save, X, Sparkles } from 'lucide-react';
 import { Button } from '../../ui/button'
 import { Input } from '../../ui/input'
 
@@ -9,9 +9,11 @@ const ProfilePage = () => {
   const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
-    phone: ''
+    career: '',
+    bio: ''
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -22,22 +24,48 @@ const ProfilePage = () => {
 
   const fetchUserProfile = async () => {
     try {
-      // TODO: Implement get current user profile API
-      // For now, simulate user data
-      const mockUser = {
-        id: 'user-123',
-        name: 'Juan Pérez',
-        email: 'juan@example.com',
-        phone: '+57 300 123 4567',
-        created_at: '2024-01-15T10:30:00Z',
-        last_login: new Date().toISOString()
-      };
-      setUser(mockUser);
-      setFormData({
-        name: mockUser.name,
-        email: mockUser.email,
-        phone: mockUser.phone || ''
+      console.log('Fetching user profile...');
+      const response = await fetch('/api/users/profile', {
+        credentials: 'include'
       });
+      console.log('Response status:', response.status);
+
+      if (response.ok) {
+        const userData = await response.json();
+        console.log('User data received:', userData);
+
+        if (userData.success && userData.data) {
+          const user = userData.data;
+          console.log('User object:', user);
+
+          // Split full name into first and last name
+          const nameParts = user.name ? user.name.split(' ') : ['', ''];
+          const firstName = nameParts[0] || '';
+          const lastName = nameParts.slice(1).join(' ') || '';
+
+          const userWithSplitName = {
+            ...user,
+            firstName,
+            lastName,
+            fullName: user.name
+          };
+
+          console.log('Setting user data:', userWithSplitName);
+          setUser(userWithSplitName);
+          setFormData({
+            firstName,
+            lastName,
+            email: user.email || '',
+            career: user.carrer || '', // Note: using 'carrer' as per user's table
+            bio: user.bio || ''
+          });
+        } else {
+          console.error('Invalid user data structure:', userData);
+        }
+      } else {
+        const errorText = await response.text();
+        console.error('Failed to fetch user profile:', response.status, errorText);
+      }
     } catch (error) {
       console.error('Error fetching user profile:', error);
     } finally {
@@ -55,11 +83,27 @@ const ProfilePage = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
+      // Combine first and last name
+      const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+
+      const updateData = {
+        name: fullName,
+        carrer: formData.career, // Note: using 'carrer' as per user's table
+        bio: formData.bio
+      };
+
       // TODO: Implement update profile API
-      console.log('Updating profile:', formData);
+      console.log('Updating profile:', updateData);
+
+      // For now, update local state
       setUser(prev => ({
         ...prev,
-        ...formData
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        name: fullName,
+        phone: formData.phone,
+        carrer: formData.career,
+        bio: formData.bio
       }));
       setIsEditing(false);
       // alert('Perfil actualizado exitosamente');
@@ -73,9 +117,11 @@ const ProfilePage = () => {
 
   const handleCancel = () => {
     setFormData({
-      name: user.name,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
-      phone: user.phone || ''
+      career: user.carrer || '',
+      bio: user.bio || ''
     });
     setIsEditing(false);
   };
@@ -107,7 +153,7 @@ const ProfilePage = () => {
                 <User size={48} />
               </div>
               <div>
-                <h2 className="text-3xl font-bold">{user.name}</h2>
+                <h2 className="text-3xl font-bold">{user.fullName}</h2>
                 <p className="text-green-100 mt-1">{user.email}</p>
                 <div className="flex items-center space-x-4 mt-3 text-sm">
                   <div className="flex items-center space-x-1">
@@ -153,22 +199,42 @@ const ProfilePage = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Name Field */}
+              {/* First Name Field */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Nombre Completo
+                  Nombre
                 </label>
                 {isEditing ? (
                   <Input
                     type="text"
-                    value={formData.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    value={formData.firstName}
+                    onChange={(e) => handleInputChange('firstName', e.target.value)}
                     className="w-full"
                   />
                 ) : (
                   <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
                     <User className="h-5 w-5 text-gray-400" />
-                    <span className="text-gray-900">{user.name}</span>
+                    <span className="text-gray-900">{user.firstName}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Last Name Field */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Apellido
+                </label>
+                {isEditing ? (
+                  <Input
+                    type="text"
+                    value={formData.lastName}
+                    onChange={(e) => handleInputChange('lastName', e.target.value)}
+                    className="w-full"
+                  />
+                ) : (
+                  <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
+                    <User className="h-5 w-5 text-gray-400" />
+                    <span className="text-gray-900">{user.lastName}</span>
                   </div>
                 )}
               </div>
@@ -193,23 +259,44 @@ const ProfilePage = () => {
                 )}
               </div>
 
-              {/* Phone Field */}
+
+              {/* Career Field */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Teléfono
+                  Carrera
                 </label>
                 {isEditing ? (
                   <Input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => handleInputChange('phone', e.target.value)}
-                    placeholder="Ingresa tu número de teléfono"
+                    type="text"
+                    value={formData.career}
+                    onChange={(e) => handleInputChange('career', e.target.value)}
+                    placeholder="Ej: Ingeniería de Sistemas"
                     className="w-full"
                   />
                 ) : (
                   <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
-                    <Phone className="h-5 w-5 text-gray-400" />
-                    <span className="text-gray-900">{user.phone || 'No especificado'}</span>
+                    <User className="h-5 w-5 text-gray-400" />
+                    <span className="text-gray-900">{user.carrer || 'No especificada'}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Bio Field - Full Width */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Biografía
+                </label>
+                {isEditing ? (
+                  <textarea
+                    value={formData.bio}
+                    onChange={(e) => handleInputChange('bio', e.target.value)}
+                    placeholder="Cuéntanos un poco sobre ti..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 resize-none"
+                    rows={3}
+                  />
+                ) : (
+                  <div className="p-3 bg-gray-50 rounded-md">
+                    <span className="text-gray-900">{user.bio || 'Sin biografía'}</span>
                   </div>
                 )}
               </div>
