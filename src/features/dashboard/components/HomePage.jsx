@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../context/AuthContext';
 import { Bell, Calendar as CalendarIcon, CheckSquare, Sparkles, StickyNote, Clock } from 'lucide-react';
 import { Button } from '../../../ui/button';
 import { Card } from '../../../ui/card';
@@ -67,6 +68,7 @@ function StatCard({ icon, label, value, bgColor }) {
 }
 
 const HomePage = () => {
+  const { user } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const navigate = useNavigate()
   // Mock darkMode, in real app use context
@@ -81,7 +83,7 @@ const HomePage = () => {
         <div className="flex justify-between items-center">
           <div>
             <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              👋 Bienvenida, María
+              👋 Bienvenid@ {user?.name ? user.name.split(' ')[0] : 'Estudiante'}
             </h1>
             <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
               {getCurrentDate()}
