@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Eye, EyeOff } from 'lucide-react';
+import { BookOpen, Eye, EyeOff, GraduationCap, User } from 'lucide-react';
 import { supabase } from '../../../shared/api/supabase';
 
 const LoginForm = () => {
@@ -9,6 +9,7 @@ const LoginForm = () => {
   const [password, setPassword] = useState('123456789');
   const [isRegistering, setIsRegistering] = useState(false);
   const [name, setName] = useState('');
+  const [userRole, setUserRole] = useState('student');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
@@ -26,7 +27,7 @@ const LoginForm = () => {
     try {
       let result;
       if (isRegistering) {
-        result = await register(email, password, name);
+        result = await register(email, password, name, userRole);
         if (result.success) {
           if (result.requiresEmailConfirmation) {
             setSuccessMessage('Registro exitoso. Revisa tu email para confirmar tu cuenta.');
@@ -95,6 +96,44 @@ const LoginForm = () => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
+              </div>
+            )}
+
+            {isRegistering && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Tipo de usuario
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setUserRole('student')}
+                    className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
+                      userRole === 'student'
+                        ? 'border-green-600 bg-green-50'
+                        : 'border-gray-200 bg-white hover:border-gray-300'
+                    }`}
+                  >
+                    <GraduationCap className={`h-6 w-6 ${userRole === 'student' ? 'text-green-600' : 'text-gray-400'}`} />
+                    <span className={`text-sm font-medium ${userRole === 'student' ? 'text-green-600' : 'text-gray-700'}`}>
+                      Estudiante
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setUserRole('teacher')}
+                    className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
+                      userRole === 'teacher'
+                        ? 'border-green-600 bg-green-50'
+                        : 'border-gray-200 bg-white hover:border-gray-300'
+                    }`}
+                  >
+                    <User className={`h-6 w-6 ${userRole === 'teacher' ? 'text-green-600' : 'text-gray-400'}`} />
+                    <span className={`text-sm font-medium ${userRole === 'teacher' ? 'text-green-600' : 'text-gray-700'}`}>
+                      Profesor
+                    </span>
+                  </button>
+                </div>
               </div>
             )}
 
@@ -182,4 +221,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm
+export default LoginForm;
