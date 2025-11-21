@@ -25,6 +25,7 @@ import TeacherDiagramsPage from './features/teacher/TeacherDiagramsPage';
 import TeacherReviewsPage from './features/teacher/TeacherReviewsPage';
 import TeacherEditTaskPage from './features/teacher/TeacherEditTaskPage';
 import TeacherCalendarPage from './features/teacher/TeacherCalendarPage';
+import StudentDiagramsPage from './features/student/StudentDiagramsPage';
 import { Toaster } from 'sonner';
 
  // Protected Route component
@@ -162,6 +163,16 @@ function App() {
                 <ProtectedRoute>
                   <MainLayout>
                     <SettingsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/diagrams"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <StudentDiagramsPage />
                   </MainLayout>
                 </ProtectedRoute>
               }
