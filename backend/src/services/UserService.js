@@ -1,157 +1,186 @@
-// User service - migrated from C# BLL\UserLogic.cs
-import User from '../models/user.js';
+import UserRepository from "../repositories/UserRepository.js";
+import { StatisticsService } from "./StatisticsService.js";
+import { OperationResult } from "../shared/OperationResult.js";
 
-class UserService {
-  constructor(supabase) {
-    this.supabase = supabase;
+const userRepository = new UserRepository();
+
+export class UserService {
+  constructor() {
+    this.statisticsService = new StatisticsService();
   }
 
-  // Get user by ID
-  async getUserById(userId) {
-    try {
-      const { data, error } = await this.supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .single();
+  // Nota: Login y logout se manejan externamente con Supabase Auth.
+  // Este servicio maneja perfiles de usuario.
 
-      if (error) {
-        if (error.code === 'PGRST116') {
-          throw new Error('User not found');
-        }
-        throw error;
+  async save(user) {
+    try {
+      if (!user) return new OperationResult(false, "El usuario no puede ser nulo.");
+      const existingUser = await userRepository.getByUsername(user.userName);
+      if (existingUser) {
+        return new OperationResult(false, "El nombre de usuario ya existe.");
       }
 
-      return User.fromDatabase(data);
-    } catch (error) {
-      throw new Error(`Failed to get user: ${error.message}`);
-    }
-  }
-
-  // Get all users (admin function)
-  async getAllUsers() {
-    try {
-      const { data, error } = await this.supabase
-        .from('users')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      return data.map(row => User.fromDatabase(row));
-    } catch (error) {
-      throw new Error(`Failed to get users: ${error.message}`);
-    }
-  }
-
-  // Create or update user from Supabase auth
-  async syncUserFromAuth(authUser) {
-    try {
-      const user = User.fromSupabaseAuth(authUser);
-
-      const { data, error } = await this.supabase
-        .from('users')
-        .upsert(user.toDatabase(), { onConflict: 'id' })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      return User.fromDatabase(data);
-    } catch (error) {
-      throw new Error(`Failed to sync user: ${error.message}`);
-    }
-  }
-
-  // Update user profile
-  async updateUser(userId, updateData) {
-    try {
-      const existingUser = await this.getUserById(userId);
-
-      const updatedUser = new User({
-        ...existingUser,
-        ...updateData,
-        updated_at: new Date()
-      });
-
-      const validation = updatedUser.validate();
-      if (!validation.isValid) {
-        throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
+      // Verificar email único
+      const emailExists = await userRepository.isEmailRegistered(user.email);
+      if (emailExists) {
+        return new OperationResult(false, "El email ya está registrado.");
       }
 
-      const { data, error } = await this.supabase
-        .from('users')
-        .update(updatedUser.toDatabase())
-        .eq('id', userId)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      return User.fromDatabase(data);
+      // No hashear password, Supabase lo maneja
+      const created = await userRepository.save(user);
+      if (created)
+        return new OperationResult(true, "Usuario creado exitosamente.", created);
+      else return new OperationResult(false, "Error al crear usuario.");
     } catch (error) {
-      throw new Error(`Failed to update user: ${error.message}`);
+      return new OperationResult(false, `Error: ${error.message}`);
     }
   }
 
-  // Delete user (admin function)
-  async deleteUser(userId) {
+  async getAll() {
     try {
-      // Check if user exists
-      await this.getUserById(userId);
-
-      // Note: In a real application, you might want to soft delete
-      // or handle related data cleanup (tasks, streaks, etc.)
-      const { error } = await this.supabase
-        .from('users')
-        .delete()
-        .eq('id', userId);
-
-      if (error) throw error;
-
-      return true;
+      const users = await userRepository.getAll();
+      return new OperationResult(true, "Usuarios obtenidos exitosamente.", users);
     } catch (error) {
-      throw new Error(`Failed to delete user: ${error.message}`);
+      return new OperationResult(false, `Error: ${error.message}`);
     }
   }
 
-  // Get user statistics
-  async getUserStats(userId) {
+  async getById(id) {
     try {
-      // Get task counts
-      const { data: taskStats, error: taskError } = await this.supabase
-        .from('tasks')
-        .select('completed, id')
-        .eq('user_id', userId);
+      const user = await userRepository.getById(id);
+      if (user) {
+        return new OperationResult(true, "Usuario encontrado.", user);
+      } else {
+        return new OperationResult(false, "Usuario no encontrado.");
+      }
+    } catch (error) {
+      return new OperationResult(false, `Error: ${error.message}`);
+    }
+  }
 
-      if (taskError) throw taskError;
+  async delete(id) {
+    try {
+      const deleted = await userRepository.delete(id);
+      if (deleted) {
+        return new OperationResult(true, "Usuario eliminado exitosamente.");
+      } else {
+        return new OperationResult(false, "Error al eliminar usuario.");
+      }
+    } catch (error) {
+      return new OperationResult(false, `Error: ${error.message}`);
+    }
+  }
 
-      const totalTasks = taskStats.length;
-      const completedTasks = taskStats.filter(task => task.completed).length;
-      const pendingTasks = totalTasks - completedTasks;
-
-      // Get streak info
-      const { data: streakData, error: streakError } = await this.supabase
-        .from('streaks')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
-
-      let currentStreak = 0;
-      if (!streakError && streakData) {
-        currentStreak = streakData.current_streak;
+  async update(user) {
+    try {
+      if (!user || !user.id_User) {
+        return new OperationResult(false, "Datos de usuario inválidos.");
       }
 
-      return {
-        totalTasks,
-        completedTasks,
-        pendingTasks,
-        currentStreak
-      };
+      const existingUser = await userRepository.getById(user.id_User);
+      if (!existingUser) {
+        return new OperationResult(false, "Usuario no encontrado.");
+      }
+
+      // No hashear password, Supabase lo maneja
+      const updated = await userRepository.update(user.id_User, user);
+      if (updated) {
+        return new OperationResult(true, "Usuario actualizado exitosamente.");
+      } else {
+        return new OperationResult(false, "Error al actualizar usuario.");
+      }
     } catch (error) {
-      throw new Error(`Failed to get user stats: ${error.message}`);
+      return new OperationResult(false, `Error: ${error.message}`);
     }
+  }
+
+  async register(user) {
+    return this.save(user);
+  }
+
+  async login() {
+    // Supabase maneja login, devolver mensaje
+    return new OperationResult(false, "Login se maneja vía Supabase Auth.");
+  }
+
+  async getProfile() {
+    // Asumir que currentUser está disponible
+    if (!this.currentUser) return new OperationResult(false, "Usuario no autenticado.");
+
+    // Sincronizar usuario de Supabase con tabla local si no existe
+    await this.syncUserFromSupabase(this.currentUser);
+
+    // Obtener el perfil del usuario
+    const userResult = await this.getById(this.currentUser.id);
+    if (!userResult.success) return userResult;
+
+    // Asegurar que las estadísticas existan
+    try {
+      this.statisticsService.setCurrentUser(this.currentUser);
+      await this.statisticsService.getByCurrentUser();
+    } catch (error) {
+      console.warn("Error inicializando estadísticas para usuario:", error);
+    }
+
+    return userResult;
+  }
+
+  async syncUserFromSupabase(supabaseUser) {
+    try {
+      // Verificar si el usuario ya existe en la tabla local
+      const existingUser = await userRepository.getById(supabaseUser.id);
+
+      if (!existingUser) {
+        // Crear usuario en tabla local
+        // Buscar nombre en propiedades directas primero, luego en user_metadata
+        const displayName = supabaseUser.name ||
+                           supabaseUser.display_name ||
+                           supabaseUser.full_name ||
+                           supabaseUser.user_metadata?.name ||
+                           supabaseUser.user_metadata?.display_name ||
+                           supabaseUser.user_metadata?.full_name ||
+                           supabaseUser.email?.split('@')[0] ||
+                           'Usuario';
+
+        const userData = {
+          id_User: supabaseUser.id,
+          email: supabaseUser.email,
+          name: displayName,
+          userName: displayName,
+          password: null, // No almacenamos password, Supabase lo maneja
+          lastName: '',
+          phone: supabaseUser.user_metadata?.phone || null
+        };
+
+        await userRepository.save(userData);
+        console.log(`Usuario sincronizado: ${supabaseUser.email} con nombre: ${displayName}`);
+      }
+    } catch (error) {
+      console.error("Error sincronizando usuario:", error);
+    }
+  }
+
+  async updateProfile(user) {
+    if (!this.currentUser) return new OperationResult(false, "Usuario no autenticado.");
+    user.id_User = this.currentUser.id;
+    return this.update(user);
+  }
+
+  async changePassword() {
+    // Supabase maneja passwords
+    return new OperationResult(false, "Cambio de password se maneja vía Supabase Auth.");
+  }
+
+  async isEmailRegistered(email) {
+    try {
+      const exists = await userRepository.isEmailRegistered(email);
+      return new OperationResult(true, exists ? "Email registrado." : "Email disponible.", { registered: exists });
+    } catch (error) {
+      return new OperationResult(false, `Error: ${error.message}`);
+    }
+  }
+
+  setCurrentUser(user) {
+    this.currentUser = user;
   }
 }
-
-export default UserService;

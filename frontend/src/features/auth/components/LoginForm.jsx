@@ -5,8 +5,8 @@ import { BookOpen, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../../../shared/api/supabase';
 
 const LoginForm = () => {
-  const [email, setEmail] = useState('teacher@gmail.com');
-  const [password, setPassword] = useState('123456789');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
   const [name, setName] = useState('');
   const [error, setError] = useState('');

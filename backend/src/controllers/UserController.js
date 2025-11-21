@@ -42,7 +42,11 @@ export class UserController {
 
   async isEmailRegistered(req, res) {
     const { email } = req.body;
-    const result = await userService.isEmailRegistered(email);
-    res.status(200).json(result);
+    try {
+      const result = await userService.isEmailRegistered(email);
+      res.status(200).json({ registered: result.data?.registered || false });
+    } catch (error) {
+      res.status(500).json({ registered: false, error: error.message });
+    }
   }
 }

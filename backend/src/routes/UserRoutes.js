@@ -11,11 +11,13 @@ const verifySupabaseToken = buildSupabaseAuthMiddleware(supabaseAdmin);
 // Rutas públicas
 router.post("/login", userController.login.bind(userController));
 router.post("/register", userController.register.bind(userController));
+router.post("/check-email", userController.isEmailRegistered.bind(userController));
 
 // Rutas protegidas (requieren token)
 router.use(verifySupabaseToken);
 router.use(userController.injectUser);
 
+router.get("/profile", userController.getProfile.bind(userController));
 router.get("/all", userController.getProfile.bind(userController));
 router.get("/:id", userController.getProfile.bind(userController));
 router.put("/:id", userController.updateProfile.bind(userController));
