@@ -1,130 +1,157 @@
-import UserRepository from "../repositories/UserRepository.js";
-import { OperationResult } from "../shared/OperationResult.js";
+// User service - migrated from C# BLL\UserLogic.cs
+import User from '../models/user.js';
 
-const userRepository = new UserRepository();
+class UserService {
+  constructor(supabase) {
+    this.supabase = supabase;
+  }
 
-export class UserService {
-  // Nota: Login y logout se manejan externamente con Supabase Auth.
-  // Este servicio maneja perfiles de usuario.
-
-  async save(user) {
+  // Get user by ID
+  async getUserById(userId) {
     try {
-      if (!user) return new OperationResult(false, "El usuario no puede ser nulo.");
-      const existingUser = await userRepository.getByUsername(user.userName);
-      if (existingUser) {
-        return new OperationResult(false, "El nombre de usuario ya existe.");
+      const { data, error } = await this.supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          throw new Error('User not found');
+        }
+        throw error;
       }
 
-      // Verificar email único
-      const emailExists = await userRepository.isEmailRegistered(user.email);
-      if (emailExists) {
-        return new OperationResult(false, "El email ya está registrado.");
-      }
-
-      // No hashear password, Supabase lo maneja
-      const created = await userRepository.save(user);
-      if (created)
-        return new OperationResult(true, "Usuario creado exitosamente.", created);
-      else return new OperationResult(false, "Error al crear usuario.");
+      return User.fromDatabase(data);
     } catch (error) {
-      return new OperationResult(false, `Error: ${error.message}`);
+      throw new Error(`Failed to get user: ${error.message}`);
     }
   }
 
-  async getAll() {
+  // Get all users (admin function)
+  async getAllUsers() {
     try {
-      const users = await userRepository.getAll();
-      return new OperationResult(true, "Usuarios obtenidos exitosamente.", users);
+      const { data, error } = await this.supabase
+        .from('users')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      return data.map(row => User.fromDatabase(row));
     } catch (error) {
-      return new OperationResult(false, `Error: ${error.message}`);
+      throw new Error(`Failed to get users: ${error.message}`);
     }
   }
 
-  async getById(id) {
+  // Create or update user from Supabase auth
+  async syncUserFromAuth(authUser) {
     try {
-      const user = await userRepository.getById(id);
-      if (user) {
-        return new OperationResult(true, "Usuario encontrado.", user);
-      } else {
-        return new OperationResult(false, "Usuario no encontrado.");
-      }
+      const user = User.fromSupabaseAuth(authUser);
+
+      const { data, error } = await this.supabase
+        .from('users')
+        .upsert(user.toDatabase(), { onConflict: 'id' })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return User.fromDatabase(data);
     } catch (error) {
-      return new OperationResult(false, `Error: ${error.message}`);
+      throw new Error(`Failed to sync user: ${error.message}`);
     }
   }
 
-  async delete(id) {
+  // Update user profile
+  async updateUser(userId, updateData) {
     try {
-      const deleted = await userRepository.delete(id);
-      if (deleted) {
-        return new OperationResult(true, "Usuario eliminado exitosamente.");
-      } else {
-        return new OperationResult(false, "Error al eliminar usuario.");
+      const existingUser = await this.getUserById(userId);
+
+      const updatedUser = new User({
+        ...existingUser,
+        ...updateData,
+        updated_at: new Date()
+      });
+
+      const validation = updatedUser.validate();
+      if (!validation.isValid) {
+        throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
       }
+
+      const { data, error } = await this.supabase
+        .from('users')
+        .update(updatedUser.toDatabase())
+        .eq('id', userId)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return User.fromDatabase(data);
     } catch (error) {
-      return new OperationResult(false, `Error: ${error.message}`);
+      throw new Error(`Failed to update user: ${error.message}`);
     }
   }
 
-  async update(user) {
+  // Delete user (admin function)
+  async deleteUser(userId) {
     try {
-      if (!user || !user.id_User) {
-        return new OperationResult(false, "Datos de usuario inválidos.");
-      }
+      // Check if user exists
+      await this.getUserById(userId);
 
-      const existingUser = await userRepository.getById(user.id_User);
-      if (!existingUser) {
-        return new OperationResult(false, "Usuario no encontrado.");
-      }
+      // Note: In a real application, you might want to soft delete
+      // or handle related data cleanup (tasks, streaks, etc.)
+      const { error } = await this.supabase
+        .from('users')
+        .delete()
+        .eq('id', userId);
 
-      // No hashear password, Supabase lo maneja
-      const updated = await userRepository.update(user.id_User, user);
-      if (updated) {
-        return new OperationResult(true, "Usuario actualizado exitosamente.");
-      } else {
-        return new OperationResult(false, "Error al actualizar usuario.");
-      }
+      if (error) throw error;
+
+      return true;
     } catch (error) {
-      return new OperationResult(false, `Error: ${error.message}`);
+      throw new Error(`Failed to delete user: ${error.message}`);
     }
   }
 
-  async register(user) {
-    return this.save(user);
-  }
-
-  async login() {
-    // Supabase maneja login, devolver mensaje
-    return new OperationResult(false, "Login se maneja vía Supabase Auth.");
-  }
-
-  async getProfile() {
-    // Asumir que currentUser está disponible
-    if (!this.currentUser) return new OperationResult(false, "Usuario no autenticado.");
-    return this.getById(this.currentUser.id);
-  }
-
-  async updateProfile(user) {
-    if (!this.currentUser) return new OperationResult(false, "Usuario no autenticado.");
-    user.id_User = this.currentUser.id;
-    return this.update(user);
-  }
-
-  async changePassword() {
-    // Supabase maneja passwords
-    return new OperationResult(false, "Cambio de password se maneja vía Supabase Auth.");
-  }
-
-  async isEmailRegistered(email) {
+  // Get user statistics
+  async getUserStats(userId) {
     try {
-      const exists = await userRepository.isEmailRegistered(email);
-      return new OperationResult(true, exists ? "Email registrado." : "Email disponible.", { registered: exists });
-    } catch (error) {
-      return new OperationResult(false, `Error: ${error.message}`);
-    }
-  }
+      // Get task counts
+      const { data: taskStats, error: taskError } = await this.supabase
+        .from('tasks')
+        .select('completed, id')
+        .eq('user_id', userId);
 
-  setCurrentUser(user) {
-    this.currentUser = user;
+      if (taskError) throw taskError;
+
+      const totalTasks = taskStats.length;
+      const completedTasks = taskStats.filter(task => task.completed).length;
+      const pendingTasks = totalTasks - completedTasks;
+
+      // Get streak info
+      const { data: streakData, error: streakError } = await this.supabase
+        .from('streaks')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+
+      let currentStreak = 0;
+      if (!streakError && streakData) {
+        currentStreak = streakData.current_streak;
+      }
+
+      return {
+        totalTasks,
+        completedTasks,
+        pendingTasks,
+        currentStreak
+      };
+    } catch (error) {
+      throw new Error(`Failed to get user stats: ${error.message}`);
+    }
   }
 }
+
+export default UserService;

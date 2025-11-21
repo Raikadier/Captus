@@ -1,7 +1,7 @@
 import express from "express";
 import { UserAchievementsController } from "../controllers/UserAchievementsController.js";
-import buildSupabaseAuthMiddleware from "../src/middlewares/verifySupabaseToken.js";
-import { getSupabaseClient } from "../src/lib/supabaseAdmin.js";
+import buildSupabaseAuthMiddleware from "../middlewares/verifySupabaseToken.js";
+import { getSupabaseClient } from "../lib/supabaseAdmin.js";
 
 const router = express.Router();
 const userAchievementsController = new UserAchievementsController();

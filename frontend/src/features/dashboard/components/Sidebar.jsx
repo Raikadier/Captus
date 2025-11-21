@@ -86,7 +86,7 @@ const Sidebar = ({ onCollapseChange }) => {
             </div>
             {!isCollapsed && (
               <div className="transition-opacity duration-200">
-                <p className={`font-medium text-sidebar-foreground whitespace-nowrap`}>{user?.name || 'Usuario'}</p>
+                <p className={`font-medium text-sidebar-foreground whitespace-nowrap`}>{user?.name ? user.name.split(' ')[0] : 'Usuario'}</p>
                 <p className={`text-xs text-muted-foreground whitespace-nowrap`}>Estudiante</p>
               </div>
             )}
