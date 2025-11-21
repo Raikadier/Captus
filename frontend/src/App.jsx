@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { ThemeProvider } from './context/themeContext';
+import { ThemeProvider, useTheme } from './context/themeContext';
 import LoginForm from './features/auth/components/LoginForm';
 import HomePage from './features/dashboard/components/HomePage';
 import MainLayout from './features/dashboard/components/MainLayout';
@@ -47,220 +47,228 @@ import { Toaster } from 'sonner';
    return isAuthenticated ? children : <Navigate to="/" />;
  };
 
+function AppContent() {
+  const { fontSize } = useTheme();
+
+  return (
+    <Router>
+      <div className={`App text-primary font-${fontSize}`}>
+        <Toaster richColors position="top-right" />
+        <Routes>
+        <Route path="/" element={<LoginForm />} />
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <HomePage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/courses"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <StudentCoursesPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/courses/:id"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <StudentCourseDetailPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tasks"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <TaskPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chatbot"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <ChatBotPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/notes"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <NotesPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <ProfilePage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/calendar"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <CalendarPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/groups"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <GroupsPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/stats"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <StatsPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <SettingsPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        {/* Rutas docente */}
+        <Route
+          path="/teacher/home"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <TeacherHomePage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher/courses"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <TeacherCoursesPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher/courses/:id"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <TeacherCourseDetailPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher/tasks/:id/edit"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <TeacherEditTaskPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher/tasks"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <TeacherTasksCreatedPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher/reviews/:studentId"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <TeacherReviewsPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher/stats"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <TeacherStatsPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher/diagrams"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <TeacherDiagramsPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher/calendar"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <TeacherCalendarPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to="/home" />} />
+        </Routes>
+      </div>
+    </Router>
+  );
+}
+
 function App() {
   return (
     <AuthProvider>
       <ThemeProvider>
-        <Router>
-          <div className="App text-primary">
-            <Toaster richColors position="top-right" />
-            <Routes>
-            <Route path="/" element={<LoginForm />} />
-            <Route
-              path="/home"
-              element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <HomePage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/courses"
-              element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <StudentCoursesPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/courses/:id"
-              element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <StudentCourseDetailPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/tasks"
-              element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <TaskPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/chatbot"
-              element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <ChatBotPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/notes"
-              element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <NotesPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <ProfilePage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/calendar"
-              element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <CalendarPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/groups"
-              element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <GroupsPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/stats"
-              element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <StatsPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/settings"
-              element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <SettingsPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            {/* Rutas docente */}
-            <Route
-              path="/teacher/home"
-              element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <TeacherHomePage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/teacher/courses"
-              element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <TeacherCoursesPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/teacher/courses/:id"
-              element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <TeacherCourseDetailPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/teacher/tasks/:id/edit"
-              element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <TeacherEditTaskPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/teacher/tasks"
-              element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <TeacherTasksCreatedPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/teacher/reviews/:studentId"
-              element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <TeacherReviewsPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/teacher/stats"
-              element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <TeacherStatsPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/teacher/diagrams"
-              element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <TeacherDiagramsPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/teacher/calendar"
-              element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <TeacherCalendarPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route path="*" element={<Navigate to="/home" />} />
-            </Routes>
-          </div>
-        </Router>
+        <AppContent />
       </ThemeProvider>
     </AuthProvider>
   );

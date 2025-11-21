@@ -40,6 +40,11 @@ export class UserController {
     res.status(result.success ? 200 : 400).json(result);
   }
 
+  async deleteAccount(req, res) {
+    const result = await userService.deleteAccount();
+    res.status(result.success ? 200 : 400).json(result);
+  }
+
   async isEmailRegistered(req, res) {
     const { email } = req.body;
     try {

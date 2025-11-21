@@ -5,6 +5,14 @@ import { Button } from '../../ui/button'
 import { Card } from '../../ui/card'
 import { Label } from '../../ui/label'
 import { Switch } from '../../ui/switch'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '../../ui/dialog'
 import { useTheme } from '../../context/themeContext'
 import { useAuth } from '../../context/AuthContext'
 import { supabase } from '../../shared/api/supabase'
@@ -60,16 +68,25 @@ function SettingsMenuItem({
 }
 
 export default function SettingsPage() {
-  const { darkMode, setDarkMode } = useTheme()
+  const { darkMode, toggleTheme, compactView, setCompactView, fontSize, changeFontSize } = useTheme()
   const { user } = useAuth()
-  // compactView is not in the context in frontend codebase yet, so I'll simulate it locally or assume false
-  const [compactView, setCompactView] = useState(false)
 
   const [activeSection, setActiveSection] = useState('perfil')
   const [userData, setUserData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [changingPassword, setChangingPassword] = useState(false)
+  const [deletingAccount, setDeletingAccount] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deleteStep, setDeleteStep] = useState(1) // 1: primera confirmación, 2: segunda confirmación
+  const [countdown, setCountdown] = useState(10) // 10 segundos para la confirmación final
+  const [countdownActive, setCountdownActive] = useState(false)
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  })
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -81,6 +98,19 @@ export default function SettingsPage() {
   useEffect(() => {
     fetchUserProfile()
   }, [])
+
+  // Contador para la confirmación final
+  useEffect(() => {
+    let interval
+    if (countdownActive && countdown > 0) {
+      interval = setInterval(() => {
+        setCountdown(prev => prev - 1)
+      }, 1000)
+    } else if (countdown === 0) {
+      setCountdownActive(false)
+    }
+    return () => clearInterval(interval)
+  }, [countdownActive, countdown])
 
   const handleSave = async () => {
     setSaving(true)
@@ -144,6 +174,135 @@ export default function SettingsPage() {
     } finally {
       setSaving(false)
     }
+  }
+
+  const handleChangePassword = async () => {
+    // Validar campos
+    if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
+      toast.error('Todos los campos de contraseña son obligatorios')
+      return
+    }
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error('Las contraseñas nuevas no coinciden')
+      return
+    }
+
+    // Validar fortaleza de la nueva contraseña
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/
+    if (!passwordRegex.test(passwordData.newPassword)) {
+      toast.error('La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número')
+      return
+    }
+
+    setChangingPassword(true)
+
+    try {
+      // Usar Supabase Auth para cambiar la contraseña
+      const { error } = await supabase.auth.updateUser({
+        password: passwordData.newPassword
+      })
+
+      if (error) {
+        console.error('Error changing password:', error)
+        toast.error(`Error al cambiar contraseña: ${error.message}`)
+        return
+      }
+
+      // Limpiar campos
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      })
+
+      toast.success('Contraseña cambiada exitosamente')
+
+    } catch (error) {
+      console.error('Error changing password:', error)
+      toast.error('Error al cambiar contraseña')
+    } finally {
+      setChangingPassword(false)
+    }
+  }
+
+  const handleDeleteAccount = () => {
+    setShowDeleteModal(true)
+    setDeleteStep(1)
+  }
+
+  const handleConfirmDelete = () => {
+    if (deleteStep === 1) {
+      // Pasar a la segunda confirmación
+      setDeleteStep(2)
+      setCountdown(10)
+      setCountdownActive(true)
+    } else if (deleteStep === 2 && countdown === 0) {
+      // Ejecutar la eliminación
+      executeDeleteAccount()
+    }
+  }
+
+  const executeDeleteAccount = async () => {
+    setDeletingAccount(true)
+    setCountdownActive(false)
+
+    try {
+      // Get the current session to obtain the access token
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+
+      if (sessionError || !sessionData?.session?.access_token) {
+        console.error('No valid session found:', sessionError)
+        toast.error('Sesión expirada. Por favor, inicia sesión nuevamente.')
+        setShowDeleteModal(false)
+        return
+      }
+
+      const token = sessionData.session.access_token
+
+      // Llamar al endpoint de eliminación de cuenta
+      const response = await fetch('/api/users/account', {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        console.log('Account deleted successfully:', result)
+
+        toast.success('Cuenta eliminada exitosamente. Redirigiendo...')
+
+        // Cerrar sesión en Supabase
+        await supabase.auth.signOut()
+
+        // Redirigir al login después de un breve delay
+        setTimeout(() => {
+          window.location.href = '/'
+        }, 2000)
+
+      } else {
+        const errorData = await response.json()
+        console.error('Failed to delete account:', response.status, errorData)
+        toast.error(`Error al eliminar cuenta: ${errorData.message || 'Error desconocido'}`)
+        setShowDeleteModal(false)
+      }
+    } catch (error) {
+      console.error('Error deleting account:', error)
+      toast.error('Error de conexión al eliminar cuenta')
+      setShowDeleteModal(false)
+    } finally {
+      setDeletingAccount(false)
+    }
+  }
+
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false)
+    setDeleteStep(1)
+    setCountdown(10)
+    setCountdownActive(false)
   }
 
   const fetchUserProfile = async () => {
@@ -222,28 +381,12 @@ export default function SettingsPage() {
     }
   }
 
-  // Notification settings
-  const [taskReminders, setTaskReminders] = useState(true)
-  const [calendarEvents, setCalendarEvents] = useState(true)
-  const [syncedNotes, setSyncedNotes] = useState(false)
-  const [weeklySummary, setWeeklySummary] = useState(true)
-  const [emailNotifications, setEmailNotifications] = useState(true)
-  const [pushNotifications, setPushNotifications] = useState(true)
-
   // Security settings
-  const [twoFactorAuth, setTwoFactorAuth] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
 
-  // Privacy settings
-  const [profilePublic, setProfilePublic] = useState(true)
-  const [showEmail, setShowEmail] = useState(false)
-  const [showActivity, setShowActivity] = useState(true)
-  const [dataCollection, setDataCollection] = useState(true)
 
-  // Language settings
-  const [selectedLanguage, setSelectedLanguage] = useState('es')
-  const [selectedTimezone, setSelectedTimezone] = useState('America/Bogota')
-  const [dateFormat, setDateFormat] = useState('DD/MM/YYYY')
+
+
 
   return (
     <div className={`${darkMode ? 'bg-gray-900' : 'bg-[#F6F7FB]'}`}>
@@ -274,22 +417,10 @@ export default function SettingsPage() {
                   onClick={() => setActiveSection('seguridad')}
                 />
                 <SettingsMenuItem
-                  icon={<Bell size={18} />}
-                  label="Notificaciones"
-                  active={activeSection === 'notificaciones'}
-                  onClick={() => setActiveSection('notificaciones')}
-                />
-                <SettingsMenuItem
                   icon={<Palette size={18} />}
                   label="Apariencia"
                   active={activeSection === 'apariencia'}
                   onClick={() => setActiveSection('apariencia')}
-                />
-                <SettingsMenuItem
-                  icon={<Globe size={18} />}
-                  label="Idioma y Región"
-                  active={activeSection === 'idioma'}
-                  onClick={() => setActiveSection('idioma')}
                 />
                 <SettingsMenuItem
                   icon={<Shield size={18} />}
@@ -464,169 +595,77 @@ export default function SettingsPage() {
 
             {/* SEGURIDAD SECTION */}
             {activeSection === 'seguridad' && (
-              <>
-                <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
-                  <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} ${compactView ? 'mb-4' : 'mb-6'}`}>
-                    Cambiar Contraseña
-                  </h2>
-                  <div className={compactView ? 'space-y-3' : 'space-y-4'}>
-                    <div>
-                      <Label htmlFor="current-password" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        Contraseña Actual
-                      </Label>
-                      <div className="relative">
-                        <input
-                          id="current-password"
-                          type={showPassword ? 'text' : 'password'}
-                          className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} pr-10 border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600`}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                        >
-                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                        </button>
-                      </div>
-                    </div>
-                    <div>
-                      <Label htmlFor="new-password" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        Nueva Contraseña
-                      </Label>
-                      <input
-                        id="new-password"
-                        type="password"
-                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600`}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="confirm-password" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        Confirmar Nueva Contraseña
-                      </Label>
-                      <input
-                        id="confirm-password"
-                        type="password"
-                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600`}
-                      />
-                    </div>
-                  </div>
-                  <div className={compactView ? 'mt-4' : 'mt-6'}>
-                    <Button className="bg-green-600 hover:bg-green-700">Actualizar Contraseña</Button>
-                  </div>
-                </Card>
-
-                <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
-                  <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} ${compactView ? 'mb-4' : 'mb-6'}`}>
-                    Autenticación de Dos Factores
-                  </h2>
-                  <div className={`flex items-center justify-between ${compactView ? 'py-2' : 'py-3'}`}>
-                    <div>
-                      <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                        Habilitar 2FA
-                      </p>
-                      <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
-                        Añade una capa extra de seguridad a tu cuenta
-                      </p>
-                    </div>
-                    <Switch checked={twoFactorAuth} onCheckedChange={setTwoFactorAuth} />
-                  </div>
-                  {twoFactorAuth && (
-                    <div className={`${compactView ? 'mt-3' : 'mt-4'} p-4 ${darkMode ? 'bg-gray-700' : 'bg-green-50'} rounded-lg`}>
-                      <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        Escanea este código QR con tu aplicación de autenticación
-                      </p>
-                      <div className={`${compactView ? 'w-32 h-32' : 'w-40 h-40'} ${darkMode ? 'bg-gray-600' : 'bg-white'} rounded-lg mt-3 mx-auto flex items-center justify-center`}>
-                        <span className={darkMode ? 'text-gray-400' : 'text-gray-400'}>QR Code</span>
-                      </div>
-                    </div>
-                  )}
-                </Card>
-
-                <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
-                  <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} ${compactView ? 'mb-4' : 'mb-6'}`}>
-                    Sesiones Activas
-                  </h2>
-                  <div className={compactView ? 'space-y-2' : 'space-y-3'}>
-                    <div className={`p-3 ${darkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Chrome en Windows</p>
-                          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'} mt-1`}>Bogotá, Colombia • Ahora</p>
-                        </div>
-                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Activa</span>
-                      </div>
-                    </div>
-                    <div className={`p-3 ${darkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Safari en iPhone</p>
-                          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'} mt-1`}>Medellín, Colombia • Hace 2 días</p>
-                        </div>
-                        <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">
-                          Cerrar
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className={compactView ? 'mt-3' : 'mt-4'}>
-                    <Button variant="outline" className="w-full">Cerrar todas las sesiones</Button>
-                  </div>
-                </Card>
-              </>
-            )}
-
-            {/* NOTIFICACIONES SECTION */}
-            {activeSection === 'notificaciones' && (
               <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
                 <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} ${compactView ? 'mb-4' : 'mb-6'}`}>
-                  Preferencias de Notificaciones
+                  Cambiar Contraseña
                 </h2>
                 <div className={compactView ? 'space-y-3' : 'space-y-4'}>
-                  <div className={`flex items-center justify-between ${compactView ? 'py-2' : 'py-3'} border-b ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
-                    <div>
-                      <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Notificaciones por email</p>
-                      <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Recibe actualizaciones por correo electrónico</p>
+                  <div>
+                    <Label htmlFor="current-password" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      Contraseña Actual
+                    </Label>
+                    <div className="relative">
+                      <input
+                        id="current-password"
+                        type={showPassword ? 'text' : 'password'}
+                        value={passwordData.currentPassword}
+                        onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
+                        placeholder="Ingresa tu contraseña actual"
+                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} pr-10 border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
                     </div>
-                    <Switch checked={emailNotifications} onCheckedChange={setEmailNotifications} />
                   </div>
-                  <div className={`flex items-center justify-between ${compactView ? 'py-2' : 'py-3'} border-b ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
-                    <div>
-                      <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Notificaciones push</p>
-                      <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Recibe notificaciones en tiempo real</p>
-                    </div>
-                    <Switch checked={pushNotifications} onCheckedChange={setPushNotifications} />
+                  <div>
+                    <Label htmlFor="new-password" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      Nueva Contraseña
+                    </Label>
+                    <input
+                      id="new-password"
+                      type="password"
+                      value={passwordData.newPassword}
+                      onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
+                      placeholder="Ingresa tu nueva contraseña"
+                      className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600`}
+                    />
                   </div>
-                  <div className={`flex items-center justify-between ${compactView ? 'py-2' : 'py-3'} border-b ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
-                    <div>
-                      <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Recordatorios de tareas</p>
-                      <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Recibe notificaciones sobre tareas pendientes</p>
-                    </div>
-                    <Switch checked={taskReminders} onCheckedChange={setTaskReminders} />
+                  <div>
+                    <Label htmlFor="confirm-password" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      Confirmar Nueva Contraseña
+                    </Label>
+                    <input
+                      id="confirm-password"
+                      type="password"
+                      value={passwordData.confirmPassword}
+                      onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                      placeholder="Confirma tu nueva contraseña"
+                      className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600`}
+                    />
                   </div>
-                  <div className={`flex items-center justify-between ${compactView ? 'py-2' : 'py-3'} border-b ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
-                    <div>
-                      <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Eventos del calendario</p>
-                      <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Recibe alertas sobre próximos eventos</p>
-                    </div>
-                    <Switch checked={calendarEvents} onCheckedChange={setCalendarEvents} />
+                  <div className={`p-3 ${darkMode ? 'bg-blue-900/20 border-blue-600/30' : 'bg-blue-50 border-blue-200'} border rounded-lg`}>
+                    <p className={`text-sm ${darkMode ? 'text-blue-300' : 'text-blue-700'}`}>
+                      <strong>Requisitos de contraseña:</strong> Mínimo 8 caracteres, una mayúscula, una minúscula y un número.
+                    </p>
                   </div>
-                  <div className={`flex items-center justify-between ${compactView ? 'py-2' : 'py-3'} border-b ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
-                    <div>
-                      <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Notas sincronizadas</p>
-                      <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Notificaciones cuando se actualicen tus notas</p>
-                    </div>
-                    <Switch checked={syncedNotes} onCheckedChange={setSyncedNotes} />
-                  </div>
-                  <div className={`flex items-center justify-between ${compactView ? 'py-2' : 'py-3'}`}>
-                    <div>
-                      <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Resumen semanal</p>
-                      <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Recibe un resumen de tu progreso cada semana</p>
-                    </div>
-                    <Switch checked={weeklySummary} onCheckedChange={setWeeklySummary} />
-                  </div>
+                </div>
+                <div className={compactView ? 'mt-4' : 'mt-6'}>
+                  <Button
+                    onClick={handleChangePassword}
+                    disabled={changingPassword}
+                    className="bg-green-600 hover:bg-green-700 disabled:opacity-50"
+                  >
+                    {changingPassword ? 'Cambiando...' : 'Actualizar Contraseña'}
+                  </Button>
                 </div>
               </Card>
             )}
+
 
             {/* APARIENCIA SECTION */}
             {activeSection === 'apariencia' && (
@@ -640,7 +679,7 @@ export default function SettingsPage() {
                       <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Modo oscuro</p>
                       <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Activa el tema oscuro en toda la aplicación</p>
                     </div>
-                    <Switch checked={darkMode} onCheckedChange={setDarkMode} />
+                    <Switch checked={darkMode} onCheckedChange={toggleTheme} />
                   </div>
                   <div className={`flex items-center justify-between ${compactView ? 'py-2' : 'py-3'} border-b ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
                     <div>
@@ -654,155 +693,150 @@ export default function SettingsPage() {
                       Tamaño de fuente
                     </Label>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm">Pequeña</Button>
-                      <Button variant="outline" size="sm" className="bg-green-50 border-green-600 text-green-600">Media</Button>
-                      <Button variant="outline" size="sm">Grande</Button>
-                    </div>
-                  </div>
-                  <div className={compactView ? 'py-2' : 'py-3'}>
-                    <Label className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-3 block`}>
-                      Color de acento
-                    </Label>
-                    <div className="flex gap-2">
-                      <button className="w-10 h-10 rounded-full bg-green-600 border-2 border-green-700 flex items-center justify-center">
-                        <Check size={20} className="text-white" />
-                      </button>
-                      <button className="w-10 h-10 rounded-full bg-blue-600 hover:border-2 hover:border-blue-700"></button>
-                      <button className="w-10 h-10 rounded-full bg-purple-600 hover:border-2 hover:border-purple-700"></button>
-                      <button className="w-10 h-10 rounded-full bg-orange-600 hover:border-2 hover:border-orange-700"></button>
-                      <button className="w-10 h-10 rounded-full bg-pink-600 hover:border-2 hover:border-pink-700"></button>
+                      <Button
+                        variant={fontSize === 'small' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => changeFontSize('small')}
+                        className={fontSize === 'small' ? 'bg-green-600 hover:bg-green-700' : ''}
+                      >
+                        Pequeña
+                      </Button>
+                      <Button
+                        variant={fontSize === 'medium' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => changeFontSize('medium')}
+                        className={fontSize === 'medium' ? 'bg-green-600 hover:bg-green-700' : ''}
+                      >
+                        Media
+                      </Button>
+                      <Button
+                        variant={fontSize === 'large' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => changeFontSize('large')}
+                        className={fontSize === 'large' ? 'bg-green-600 hover:bg-green-700' : ''}
+                      >
+                        Grande
+                      </Button>
                     </div>
                   </div>
                 </div>
               </Card>
             )}
 
-            {/* IDIOMA Y REGIÓN SECTION */}
-            {activeSection === 'idioma' && (
-              <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
-                <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} ${compactView ? 'mb-4' : 'mb-6'}`}>
-                  Configuración Regional
-                </h2>
-                <div className={compactView ? 'space-y-3' : 'space-y-4'}>
-                  <div>
-                    <Label htmlFor="language" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                      Idioma
-                    </Label>
-                    <select
-                      id="language"
-                      value={selectedLanguage}
-                      onChange={(e) => setSelectedLanguage(e.target.value)}
-                      className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600`}
-                    >
-                      <option value="es">Español</option>
-                      <option value="en">English</option>
-                      <option value="pt">Português</option>
-                      <option value="fr">Français</option>
-                    </select>
-                  </div>
-                  <div>
-                    <Label htmlFor="timezone" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                      Zona Horaria
-                    </Label>
-                    <select
-                      id="timezone"
-                      value={selectedTimezone}
-                      onChange={(e) => setSelectedTimezone(e.target.value)}
-                      className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600`}
-                    >
-                      <option value="America/Bogota">Bogotá (GMT-5)</option>
-                      <option value="America/Mexico_City">Ciudad de México (GMT-6)</option>
-                      <option value="America/Buenos_Aires">Buenos Aires (GMT-3)</option>
-                      <option value="America/Santiago">Santiago (GMT-3)</option>
-                      <option value="Europe/Madrid">Madrid (GMT+1)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <Label htmlFor="dateformat" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                      Formato de Fecha
-                    </Label>
-                    <select
-                      id="dateformat"
-                      value={dateFormat}
-                      onChange={(e) => setDateFormat(e.target.value)}
-                      className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600`}
-                    >
-                      <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-                      <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-                      <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-                    </select>
-                  </div>
-                  <div className={`p-3 ${darkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
-                    <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                      <strong>Vista previa:</strong> {new Date().toLocaleDateString('es-CO')}
-                    </p>
-                  </div>
-                </div>
-                <div className={compactView ? 'mt-4' : 'mt-6'}>
-                  <Button className="bg-green-600 hover:bg-green-700">Guardar Cambios</Button>
-                </div>
-              </Card>
-            )}
+
 
             {/* PRIVACIDAD SECTION */}
             {activeSection === 'privacidad' && (
-              <>
-                <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
-                  <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} ${compactView ? 'mb-4' : 'mb-6'}`}>
-                    Configuración de Privacidad
-                  </h2>
-                  <div className={compactView ? 'space-y-3' : 'space-y-4'}>
-                    <div className={`flex items-center justify-between ${compactView ? 'py-2' : 'py-3'} border-b ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
-                      <div>
-                        <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Perfil público</p>
-                        <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Permite que otros usuarios vean tu perfil</p>
-                      </div>
-                      <Switch checked={profilePublic} onCheckedChange={setProfilePublic} />
-                    </div>
-                    <div className={`flex items-center justify-between ${compactView ? 'py-2' : 'py-3'} border-b ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
-                      <div>
-                        <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Mostrar email</p>
-                        <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Tu email será visible en tu perfil público</p>
-                      </div>
-                      <Switch checked={showEmail} onCheckedChange={setShowEmail} />
-                    </div>
-                    <div className={`flex items-center justify-between ${compactView ? 'py-2' : 'py-3'} border-b ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
-                      <div>
-                        <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Mostrar actividad</p>
-                        <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Otros pueden ver tu última actividad</p>
-                      </div>
-                      <Switch checked={showActivity} onCheckedChange={setShowActivity} />
-                    </div>
-                    <div className={`flex items-center justify-between ${compactView ? 'py-2' : 'py-3'}`}>
-                      <div>
-                        <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Recopilación de datos</p>
-                        <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Permitir análisis para mejorar la experiencia</p>
-                      </div>
-                      <Switch checked={dataCollection} onCheckedChange={setDataCollection} />
-                    </div>
-                  </div>
-                </Card>
-
-                <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
-                  <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} ${compactView ? 'mb-4' : 'mb-6'}`}>
-                    Gestión de Datos
-                  </h2>
-                  <div className={compactView ? 'space-y-2' : 'space-y-3'}>
-                    <Button variant="outline" className="w-full justify-start">
-                      Descargar mis datos
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50">
-                      Eliminar mi cuenta
-                    </Button>
-                  </div>
-                  <div className={`${compactView ? 'mt-3' : 'mt-4'} p-3 ${darkMode ? 'bg-gray-700' : 'bg-yellow-50'} rounded-lg`}>
-                    <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                      ⚠️ La eliminación de cuenta es permanente y no se puede deshacer
-                    </p>
-                  </div>
-                </Card>
-              </>
+              <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
+                <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} ${compactView ? 'mb-4' : 'mb-6'}`}>
+                  Gestión de Datos
+                </h2>
+                <div className={compactView ? 'space-y-2' : 'space-y-3'}>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+                    onClick={handleDeleteAccount}
+                    disabled={deletingAccount}
+                  >
+                    {deletingAccount ? 'Eliminando cuenta...' : 'Eliminar mi cuenta'}
+                  </Button>
+                </div>
+                <div className={`${compactView ? 'mt-3' : 'mt-4'} p-3 ${darkMode ? 'bg-red-900/20 border-red-600/30' : 'bg-red-50 border-red-200'} border rounded-lg`}>
+                  <p className={`text-sm ${darkMode ? 'text-red-300' : 'text-red-700'}`}>
+                    ⚠️ <strong>Advertencia importante:</strong> La eliminación de tu cuenta es <strong>permanente</strong> e <strong>irreversible</strong>.
+                    Perderás acceso a todas tus tareas, estadísticas, rachas y datos almacenados. Esta acción no se puede deshacer.
+                  </p>
+                </div>
+              </Card>
             )}
+
+            {/* Delete Account Modal */}
+            <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+              <DialogContent className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'} max-w-md`}>
+                <DialogHeader>
+                  <DialogTitle className={`text-xl font-bold ${darkMode ? 'text-red-400' : 'text-red-600'}`}>
+                    ⚠️ Eliminar Cuenta
+                  </DialogTitle>
+                  <DialogDescription className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    {deleteStep === 1 ? (
+                      <div className="space-y-3">
+                        <p>¿Estás seguro de que quieres eliminar tu cuenta?</p>
+                        <div className={`p-3 rounded-lg ${darkMode ? 'bg-red-900/30' : 'bg-red-50'}`}>
+                          <p className={`text-sm font-medium ${darkMode ? 'text-red-300' : 'text-red-700'} mb-2`}>
+                            Esta acción es <strong>IRREVERSIBLE</strong> y eliminará:
+                          </p>
+                          <ul className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'} space-y-1`}>
+                            <li>• Todas tus tareas y subtareas</li>
+                            <li>• Tus estadísticas y rachas de productividad</li>
+                            <li>• Tus logros y medallas desbloqueadas</li>
+                            <li>• Toda tu información personal</li>
+                          </ul>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <div className={`p-4 rounded-lg border-2 ${darkMode ? 'bg-red-900/30 border-red-600' : 'bg-red-50 border-red-300'}`}>
+                          <h3 className={`font-bold text-lg ${darkMode ? 'text-red-400' : 'text-red-600'} mb-2`}>
+                            🚨 ÚLTIMA ADVERTENCIA 🚨
+                          </h3>
+                          <p className={`${darkMode ? 'text-red-300' : 'text-red-700'} font-medium`}>
+                            Esta es tu última oportunidad para cancelar.
+                          </p>
+                          <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'} mt-2`}>
+                            ¿Realmente quieres <strong>ELIMINAR DEFINITIVAMENTE</strong> tu cuenta de Captus?
+                          </p>
+                          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'} mt-2`}>
+                            No podrás recuperar ningún dato después de esto.
+                          </p>
+                        </div>
+                        {countdownActive && (
+                          <div className={`text-center p-3 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                            <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                              El botón se habilitará en: <span className="font-bold text-red-500">{countdown}s</span>
+                            </p>
+                            <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                              <div
+                                className="bg-red-500 h-2 rounded-full transition-all duration-1000"
+                                style={{ width: `${(countdown / 10) * 100}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={handleCancelDelete}
+                    disabled={deletingAccount}
+                    className={darkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : ''}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={handleConfirmDelete}
+                    disabled={deleteStep === 2 && countdown > 0}
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    {deletingAccount ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Eliminando...
+                      </div>
+                    ) : deleteStep === 1 ? (
+                      'Continuar'
+                    ) : countdown > 0 ? (
+                      `Eliminar en ${countdown}s`
+                    ) : (
+                      '🗑️ Eliminar Definitivamente'
+                    )}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
           </div>
         </div>
       </div>
