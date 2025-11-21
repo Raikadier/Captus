@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
 import { BookOpen, Users, Calendar, PlusCircle, ListChecks, BarChart3, Network, ClipboardList, Loader2 } from 'lucide-react'
 import { Button } from '../../ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card'
@@ -21,6 +22,7 @@ const mockPendingReviews = [
 
 export default function TeacherHomePage() {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
@@ -44,7 +46,7 @@ export default function TeacherHomePage() {
             <BookOpen className="text-green-600" size={32} />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Bienvenido Profesor</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Bienvenid@ {user?.name ? user.name.split(' ')[0] : 'Profesor'}</h1>
             <p className="text-gray-600 mt-1">Revisa tus cursos y actividades académicas</p>
           </div>
         </div>
