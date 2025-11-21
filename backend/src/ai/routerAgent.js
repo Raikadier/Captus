@@ -21,15 +21,18 @@ Eres un router IA. Clasificas mensajes en una de estas categorías:
 - tutor
 - notifications
 
-Responde SOLAMENTE con la categoría.
+Responde SOLAMENTE con la categoría en minúsculas, sin puntuación.
         `,
       },
       { role: "user", content: message },
     ],
   });
 
-  const category = classification.choices[0].message.content.trim();
-  console.info("[AI/router] classified", { userId, category, ms: Date.now() - started });
+  // Robustness Fix: Normalize input (lowercase, remove punctuation)
+  const rawCategory = classification.choices[0].message.content.trim();
+  const category = rawCategory.toLowerCase().replace(/[^a-z]/g, '');
+
+  console.info("[AI/router] classified", { userId, raw: rawCategory, normalized: category, ms: Date.now() - started });
 
   switch (category) {
     case "task":
@@ -48,6 +51,9 @@ Responde SOLAMENTE con la categoría.
       return await notificationAgent(message, userId);
 
     default:
-      return "No entendí la solicitud. Intenta reformular el mensaje.";
+      // Fallback logic could go here, for now we return a friendly error
+      // or maybe forward to a general chat agent if one existed.
+      console.warn(`[AI/router] Unhandled category: ${category}`);
+      return "No entendí si es una tarea, nota o evento. Intenta ser más específico (ej: 'Crea una tarea...').";
   }
 };
