@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, memo } from 'react';
 import mermaid from 'mermaid';
 import { Button } from '../../ui/button';
 import { Download, FileImage, FileText } from 'lucide-react';
@@ -10,7 +10,7 @@ mermaid.initialize({
   securityLevel: 'loose',
 });
 
-export default function MermaidRenderer({ code, allowExport = false }) {
+const MermaidRenderer = memo(function MermaidRenderer({ code, allowExport = false }) {
   const containerRef = useRef(null);
   const [svgContent, setSvgContent] = useState('');
   const [error, setError] = useState(null);
@@ -43,8 +43,6 @@ export default function MermaidRenderer({ code, allowExport = false }) {
         console.error('Mermaid render error:', err);
         if (isMounted) {
           setError('Error al renderizar el diagrama. Verifica la sintaxis.');
-          // Keep the previous valid content or clear?
-          // Usually better to show error message.
         }
       }
     };
@@ -157,4 +155,6 @@ export default function MermaidRenderer({ code, allowExport = false }) {
       )}
     </div>
   );
-}
+});
+
+export default MermaidRenderer;
