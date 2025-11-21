@@ -3,8 +3,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, User, Sparkles, Plus, Menu } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../../context/AuthContext';
 
 const ChatBotPage = () => {
+  const { user } = useAuth();
   const [conversations, setConversations] = useState([
     { id: 1, title: 'Nueva conversación', lastMessage: '¡Hola! Soy Captus AI...', timestamp: new Date() },
   ]);
@@ -22,6 +24,9 @@ const ChatBotPage = () => {
   const [showSidebar, setShowSidebar] = useState(true);
   const messagesEndRef = useRef(null);
 
+  // Access environment variable for API URL
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -32,6 +37,17 @@ const ChatBotPage = () => {
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
+    if (!user) {
+       // Fallback if user is not loaded, though AuthGuard should handle this
+       const errorMessage = {
+        id: Date.now() + 1,
+        type: 'bot',
+        content: 'Error: No se ha identificado al usuario. Por favor inicia sesión nuevamente.',
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+      return;
+    }
 
     const userMessage = {
       id: Date.now(),
@@ -45,16 +61,39 @@ const ChatBotPage = () => {
     setIsLoading(true);
 
     try {
-      setTimeout(() => {
-        const botResponse = {
-          id: Date.now() + 1,
-          type: 'bot',
-          content: `Entiendo que dijiste: "${userMessage.content}". Como tu asistente de productividad académica, puedo ayudarte con:\n\n• Gestión de tareas y organización\n• Técnicas de estudio efectivas\n• Mantener tu racha de productividad\n• Consejos para superar la procrastinación\n\n¿Qué te gustaría explorar?`,
-          timestamp: new Date(),
-        };
-        setMessages((prev) => [...prev, botResponse]);
-        setIsLoading(false);
-      }, 1500);
+      const response = await fetch(`${API_URL}/ai/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Add authorization header if needed, though the backend might rely on the body userId for now or token in cookie
+          // However, the middleware typically expects Bearer token.
+          // Let's assume we need to send the token if available in localStorage or via Supabase session
+          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+        },
+        body: JSON.stringify({
+          message: userMessage.content,
+          userId: user.id // UUID from AuthContext
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+
+      // The backend returns { result: "string response" }
+      const botResponseContent = data.result;
+
+      const botResponse = {
+        id: Date.now() + 1,
+        type: 'bot',
+        content: botResponseContent,
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, botResponse]);
+      setIsLoading(false);
+
     } catch (error) {
       console.error('Error sending message:', error);
       const errorMessage = {
