@@ -1,9 +1,14 @@
 import UserRepository from "../repositories/UserRepository.js";
+import { StatisticsService } from "./StatisticsService.js";
 import { OperationResult } from "../shared/OperationResult.js";
 
 const userRepository = new UserRepository();
 
 export class UserService {
+  constructor() {
+    this.statisticsService = new StatisticsService();
+  }
+
   // Nota: Login y logout se manejan externamente con Supabase Auth.
   // Este servicio maneja perfiles de usuario.
 
@@ -101,7 +106,58 @@ export class UserService {
   async getProfile() {
     // Asumir que currentUser está disponible
     if (!this.currentUser) return new OperationResult(false, "Usuario no autenticado.");
-    return this.getById(this.currentUser.id);
+
+    // Sincronizar usuario de Supabase con tabla local si no existe
+    await this.syncUserFromSupabase(this.currentUser);
+
+    // Obtener el perfil del usuario
+    const userResult = await this.getById(this.currentUser.id);
+    if (!userResult.success) return userResult;
+
+    // Asegurar que las estadísticas existan
+    try {
+      this.statisticsService.setCurrentUser(this.currentUser);
+      await this.statisticsService.getByCurrentUser();
+    } catch (error) {
+      console.warn("Error inicializando estadísticas para usuario:", error);
+    }
+
+    return userResult;
+  }
+
+  async syncUserFromSupabase(supabaseUser) {
+    try {
+      // Verificar si el usuario ya existe en la tabla local
+      const existingUser = await userRepository.getById(supabaseUser.id);
+
+      if (!existingUser) {
+        // Crear usuario en tabla local
+        // Buscar nombre en propiedades directas primero, luego en user_metadata
+        const displayName = supabaseUser.name ||
+                           supabaseUser.display_name ||
+                           supabaseUser.full_name ||
+                           supabaseUser.user_metadata?.name ||
+                           supabaseUser.user_metadata?.display_name ||
+                           supabaseUser.user_metadata?.full_name ||
+                           supabaseUser.email?.split('@')[0] ||
+                           'Usuario';
+
+        const userData = {
+          id_User: supabaseUser.id,
+          email: supabaseUser.email,
+          name: displayName,
+          userName: displayName,
+          password: null, // No almacenamos password, Supabase lo maneja
+          lastName: '',
+          phone: supabaseUser.user_metadata?.phone || null
+        };
+
+        await userRepository.save(userData);
+        console.log(`Usuario sincronizado: ${supabaseUser.email} con nombre: ${displayName}`);
+      }
+    } catch (error) {
+      console.error("Error sincronizando usuario:", error);
+    }
   }
 
   async updateProfile(user) {
