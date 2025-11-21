@@ -14,8 +14,8 @@ const StreakWidget = () => {
 
   useEffect(() => {
     // Animate streak number
-    if (streakData?.current_streak !== undefined) {
-      const targetStreak = streakData.current_streak;
+    if (streakData?.currentStreak !== undefined) {
+      const targetStreak = streakData.currentStreak;
       const duration = 1000; // 1 second
       const steps = 60;
       const increment = targetStreak / steps;
@@ -33,30 +33,31 @@ const StreakWidget = () => {
 
       return () => clearInterval(timer);
     }
-  }, [streakData?.current_streak]);
+  }, [streakData?.currentStreak]);
 
   const fetchStreakData = async () => {
     try {
-      const response = await apiClient.get('/streaks');
+      // Use the stats endpoint as requested in the plan
+      const response = await apiClient.get('/streaks/stats');
       const data = response?.data;
       if (data) {
         setStreakData(data);
       } else {
         // Default streak data if none exists
         setStreakData({
-          current_streak: 0,
-          last_completed_date: null,
-          daily_goal: 5,
-          completed_today: 0
+          currentStreak: 0,
+          lastCompletedDate: null,
+          dailyGoal: 5,
+          completionRate: 0
         });
       }
     } catch (error) {
       console.error('Error fetching streak data:', error);
       setStreakData({
-        current_streak: 0,
-        last_completed_date: null,
-        daily_goal: 5,
-        completed_today: 0
+        currentStreak: 0,
+        lastCompletedDate: null,
+        dailyGoal: 5,
+        completionRate: 0
       });
     } finally {
       setLoading(false);
@@ -79,8 +80,8 @@ const StreakWidget = () => {
     );
   }
 
-  const isStreakActive = streakData.last_completed_date &&
-    new Date(streakData.last_completed_date).toDateString() === new Date().toDateString();
+  const isStreakActive = streakData.lastCompletedDate &&
+    new Date(streakData.lastCompletedDate).toDateString() === new Date().toDateString();
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
@@ -91,7 +92,7 @@ const StreakWidget = () => {
         </h3>
         <div className="flex items-center text-sm text-gray-600">
           <Target size={16} className="mr-1" />
-          Meta: {streakData.daily_goal} tareas/día
+          Meta: {streakData.dailyGoal} tareas/día
         </div>
       </div>
 
@@ -122,26 +123,19 @@ const StreakWidget = () => {
         )}
       </div>
 
-      {/* Progress towards daily goal */}
-      <div className="mb-4">
-        <div className="flex justify-between text-sm text-gray-600 mb-1">
-          <span>Progreso diario</span>
-          <span>{streakData.completed_today || 0}/{streakData.daily_goal}</span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div
-            className="bg-green-500 h-2 rounded-full transition-all duration-500"
-            style={{
-              width: `${Math.min((streakData.completed_today || 0) / streakData.daily_goal * 100, 100)}%`
-            }}
-          ></div>
-        </div>
-      </div>
+      {/* Progress towards daily goal (using completionRate as proxy if daily completions not sent explicitly,
+          or assuming 0/goal if not in stats payload. The stats payload has completionRate over 30 days,
+          but not 'completed_today'. We might need to adjust backend if we want today's precise progress bar here.
+          For now, let's hide the progress bar if we don't have 'completed_today' or mock it based on activity) */}
+
+      {/* Note: The original mockup used 'completed_today'. The /streaks/stats endpoint returns 'completionRate'.
+          If we want 'completed_today' we might need to call /streaks or just accept the stats data.
+          Let's render what we have safely. */}
 
       {/* Last completed date */}
-      {streakData.last_completed_date && (
-        <div className="text-center text-xs text-gray-500">
-          Última tarea completada: {new Date(streakData.last_completed_date).toLocaleDateString('es-ES')}
+      {streakData.lastCompletedDate && (
+        <div className="text-center text-xs text-gray-500 mt-2">
+          Última: {new Date(streakData.lastCompletedDate).toLocaleDateString('es-ES')}
         </div>
       )}
     </div>

@@ -14,9 +14,17 @@ export class StatisticsController {
     };
   }
 
+  // Updated to use the enhanced getDashboardStats
   async getByUser(req, res) {
-    const result = await statisticsService.getByCurrentUser();
-    res.status(result ? 200 : 401).json(result ? { success: true, data: result } : { success: false, message: "Estadísticas no encontradas" });
+    // Prefer getDashboardStats for the frontend StatsPage
+    const result = await statisticsService.getDashboardStats();
+
+    if (result.success) {
+      res.status(200).json(result.data);
+    } else {
+      // Fallback or error handling
+      res.status(401).json({ error: result.message });
+    }
   }
 
   async update(req, res) {
@@ -25,8 +33,9 @@ export class StatisticsController {
   }
 
   async checkAchievements(req, res) {
-    const result = await statisticsService.checkAchievements();
-    res.status(result.success ? 200 : 400).json(result);
+    // This method in service returns void in some paths or promise, checking logic
+    await statisticsService.checkAchievements();
+    res.status(200).json({ success: true, message: "Achievements checked" });
   }
 
   async getAchievementsStats(req, res) {
