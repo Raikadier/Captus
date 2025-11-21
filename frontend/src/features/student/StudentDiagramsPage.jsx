@@ -5,6 +5,7 @@ import { Button } from '../../ui/button'
 import { useDiagrams } from '../../hooks/useDiagrams'
 import MermaidRenderer from '../../components/diagrams/MermaidRenderer'
 import DiagramEditor from '../../components/diagrams/DiagramEditor'
+import ErrorBoundary from '../../components/shared/ErrorBoundary'
 import {
   Dialog,
   DialogContent,
@@ -140,12 +141,14 @@ export default function StudentDiagramsPage() {
         </div>
       )}
 
-      <DiagramEditor
-        open={isEditorOpen}
-        onOpenChange={setIsEditorOpen}
-        initialData={editingDiagram}
-        onSave={handleSave}
-      />
+      <ErrorBoundary>
+        <DiagramEditor
+          open={isEditorOpen}
+          onOpenChange={setIsEditorOpen}
+          initialData={editingDiagram}
+          onSave={handleSave}
+        />
+      </ErrorBoundary>
 
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <DialogContent>
