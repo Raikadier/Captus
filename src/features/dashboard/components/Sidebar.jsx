@@ -15,6 +15,7 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  GitBranch,
 } from 'lucide-react'
 
 const Sidebar = ({ onCollapseChange }) => {
@@ -27,6 +28,7 @@ const Sidebar = ({ onCollapseChange }) => {
     { path: '/home', icon: Home, label: 'Inicio' },
     { path: '/courses', icon: BookOpen, label: 'Cursos' },
     { path: '/tasks', icon: CheckSquare, label: 'Tareas' },
+    { path: '/diagrams', icon: GitBranch, label: 'Diagramas' },
     { path: '/calendar', icon: CalendarIcon, label: 'Calendario' },
     { path: '/notes', icon: StickyNote, label: 'Notas' },
     { path: '/groups', icon: Users, label: 'Grupos' },
