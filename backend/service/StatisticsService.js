@@ -326,7 +326,8 @@ export class StatisticsService {
   async getAchievementsStats() {
     try {
       if (!this.currentUser) return new OperationResult(false, "Usuario no autenticado.");
-      return this.getAchievementStats(this.currentUser.id); // There was a bug here in original code, keeping safe
+      const stats = await userAchievementsRepository.getAchievementStats(this.currentUser.id);
+      return new OperationResult(true, "Estadísticas obtenidas exitosamente.", stats);
     } catch (error) {
       return new OperationResult(false, `Error al obtener estadísticas de logros: ${error.message}`);
     }

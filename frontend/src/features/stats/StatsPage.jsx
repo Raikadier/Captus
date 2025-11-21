@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Bell, MessageSquare, TrendingUp, CheckSquare, Target, Award } from 'lucide-react'
+import { Bell, MessageSquare, TrendingUp, CheckSquare, Target, Award, Settings } from 'lucide-react'
 import { Button } from '../../ui/button'
 import { Card } from '../../ui/card'
 import apiClient from '../../shared/api/client'
+import { ManageSubjectsDialog } from '../subjects/components/ManageSubjectsDialog'
 
 function getCurrentDate() {
   const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
@@ -86,32 +87,29 @@ export default function StatsPage() {
   });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const response = await apiClient.get('/statistics');
-        // Backend returns { success: true, data: {...} } or just {...} depending on controller
-        // Based on StatisticsController.js: res.status(200).json(result.data) where result.data is the object
-        // But let's be safe
-        const data = response.data?.data || response.data;
+  const fetchStats = async () => {
+    try {
+      const response = await apiClient.get('/statistics');
+      const data = response.data?.data || response.data;
 
-        if (data) {
-          setStats({
-            averageGrade: data.averageGrade || 0,
-            completedTasks: data.completedTasks || 0,
-            totalTasks: data.totalTasks || 0,
-            studyHours: data.studyHours || 0,
-            racha: data.racha || data.streak || 0,
-            subjects: data.subjects || []
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching stats:', error);
-      } finally {
-        setLoading(false);
+      if (data) {
+        setStats({
+          averageGrade: data.averageGrade || 0,
+          completedTasks: data.completedTasks || 0,
+          totalTasks: data.totalTasks || 0,
+          studyHours: data.studyHours || 0,
+          racha: data.racha || data.streak || 0,
+          subjects: data.subjects || []
+        });
       }
-    };
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchStats();
   }, []);
 
@@ -136,6 +134,15 @@ export default function StatsPage() {
               <h1 className="text-2xl font-bold text-gray-900">📊 Mis Estadísticas</h1>
               <p className="text-gray-600 mt-1">{getCurrentDate()}</p>
             </div>
+            <ManageSubjectsDialog
+              onUpdate={fetchStats}
+              trigger={
+                <Button variant="outline" className="gap-2">
+                  <Settings className="h-4 w-4" />
+                  Gestionar Materias
+                </Button>
+              }
+            />
           </div>
         </header>
 
