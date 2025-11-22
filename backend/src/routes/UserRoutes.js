@@ -27,4 +27,8 @@ router.put("/:id", userController.updateProfile.bind(userController));
 router.put("/change-password", userController.changePassword.bind(userController));
 router.delete("/account", userController.deleteAccount.bind(userController));
 
+// Legacy/Teammate routes preserved
+router.delete("/account", userController.deleteAccount.bind(userController));
+router.post("/check-email", userController.isEmailRegistered.bind(userController));
+
 export default router;
