@@ -1,8 +1,10 @@
 import BaseRepository from "./BaseRepository.js";
 
 const mapFromDb = (row) => ({
-  id_Priority: row.id,
+  id: row.id,
   name: row.name,
+  // Legacy support
+  id_Priority: row.id,
 });
 
 const mapToDb = (entity) => ({

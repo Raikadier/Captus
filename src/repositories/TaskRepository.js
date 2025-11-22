@@ -11,7 +11,6 @@ const mapFromDb = (row) => ({
   category_id: row.category_id,
   completed: row.completed,
   user_id: row.user_id,
-  parent_task_id: row.parent_task_id,
   updated_at: row.updated_at,
   // Keeping legacy properties for safety if backend logic relies on them
   id_Task: row.id,
@@ -21,7 +20,6 @@ const mapFromDb = (row) => ({
   id_Priority: row.priority_id,
   id_Category: row.category_id,
   id_User: row.user_id,
-  parentTaskId: row.parent_task_id,
 });
 
 const mapToDb = (entity) => ({
@@ -33,7 +31,6 @@ const mapToDb = (entity) => ({
   category_id: entity.category_id ?? entity.id_Category ?? null,
   completed: entity.completed ?? entity.state ?? false,
   user_id: entity.user_id ?? entity.id_User,
-  parent_task_id: entity.parent_task_id ?? entity.parentTaskId ?? null,
 });
 
 class TaskRepository extends BaseRepository {
@@ -61,7 +58,6 @@ class TaskRepository extends BaseRepository {
       .from(this.tableName)
       .select("*")
       .eq("user_id", userId)
-      .is("parent_task_id", null)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -78,7 +74,6 @@ class TaskRepository extends BaseRepository {
       .from(this.tableName)
       .select("*")
       .eq("user_id", userId)
-      .is("parent_task_id", null)
       .eq("completed", false)
       .lt("due_date", now);
 
@@ -100,7 +95,6 @@ class TaskRepository extends BaseRepository {
       .from(this.tableName)
       .select("*")
       .eq("user_id", userId)
-      .is("parent_task_id", null)
       .eq("completed", true)
       .gte("updated_at", startOfDay.toISOString())
       .lt("updated_at", endOfDay.toISOString());

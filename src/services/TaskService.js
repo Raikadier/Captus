@@ -21,16 +21,37 @@ export class TaskService {
     this.currentUser = user;
   }
 
-  validateTask(task) {
+  validateTask(task, isUpdate = false) {
     if (!task) {
       return new OperationResult(false, "La tarea no puede ser nula.");
     }
-    if (!task.title || task.title.trim() === "") {
-      return new OperationResult(false, "El título de la tarea no puede estar vacío.");
+
+    // For updates, only validate fields that are being updated
+    if (!isUpdate) {
+      if (!task.title || task.title.trim() === "") {
+        return new OperationResult(false, "El título de la tarea no puede estar vacío.");
+      }
+      if (!task.user_id && !task.id_User) {
+        return new OperationResult(false, "La tarea debe tener un usuario asignado.");
+      }
+    } else {
+      // For updates, user_id is required but title might not be present if only updating completion status
+      if (!task.user_id && !task.id_User && !task.id_Task) {
+        return new OperationResult(false, "La tarea debe tener un usuario asignado.");
+      }
     }
-    if (!task.id_User) {
-      return new OperationResult(false, "La tarea debe tener un usuario asignado.");
+
+    // Validate due date is not in the past - only allow today and future dates
+    if (task.due_date) {
+      const dueDate = new Date(task.due_date + 'T00:00:00'); // Ensure we compare dates only, not times
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Reset to start of today
+
+      if (dueDate < today) {
+        return new OperationResult(false, "La fecha límite no puede ser anterior a hoy. Selecciona una fecha actual o futura.");
+      }
     }
+
     return new OperationResult(true);
   }
 
@@ -71,10 +92,10 @@ export class TaskService {
         return new OperationResult(false, "Tarea no encontrada.");
       }
 
-      await this.deleteSubTasksByParentTask(id);
+      // Note: Subtasks functionality removed - no parent_task_id column exists
       await taskRepository.delete(id);
 
-      return new OperationResult(true, "Tarea eliminada exitosamente.");
+      return new OperationResult(true, "¡Tarea eliminada exitosamente! La tarea ha sido removida permanentemente de tu lista.");
     } catch (error) {
       return new OperationResult(false, `Error al eliminar la tarea: ${error.message}`);
     }
@@ -183,7 +204,7 @@ export class TaskService {
 
   async update(task) {
     try {
-      const validation = this.validateTask(task);
+      const validation = this.validateTask(task, true); // isUpdate = true
       if (!validation.success) return validation;
 
       const existingTask = await taskRepository.getById(task.id_Task);
@@ -200,9 +221,6 @@ export class TaskService {
       }
 
       const updated = await taskRepository.update(task);
-      if (updated && task.state) {
-        await this.markAllSubTasksAsCompleted(task.id_Task);
-      }
 
       return updated
         ? new OperationResult(true, "Tarea actualizada exitosamente.", updated)

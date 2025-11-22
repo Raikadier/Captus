@@ -1,10 +1,12 @@
 import BaseRepository from "./BaseRepository.js";
 
 const mapFromDb = (row) => ({
-  id_Category: row.id,
+  id: row.id,
   name: row.name,
   id_User: row.user_id,
   createdAt: row.created_at,
+  // Legacy support
+  id_Category: row.id,
 });
 
 const mapToDb = (entity) => {
