@@ -17,6 +17,9 @@ export default defineConfig({
       '@features': path.resolve(__dirname, './src/features'),
       '@ui': path.resolve(__dirname, './src/ui'),
       '@public': path.resolve(__dirname, './public'),
+      // Force resolve to local frontend node_modules to avoid dual-react instance issues
+      react: path.resolve(__dirname, './node_modules/react'),
+      'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
     },
   },
   server: {
