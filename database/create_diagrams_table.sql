@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS diagrams (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  course_id UUID REFERENCES subjects(id) ON DELETE SET NULL,
+  course_id INTEGER REFERENCES subjects(id) ON DELETE SET NULL,
   title TEXT NOT NULL,
   code TEXT NOT NULL,
   created_at TIMESTAMPTZ DEFAULT now(),
