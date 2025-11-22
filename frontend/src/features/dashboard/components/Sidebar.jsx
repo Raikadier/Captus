@@ -15,6 +15,7 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  GitBranch,
 } from 'lucide-react'
 
 const Sidebar = ({ onCollapseChange }) => {
@@ -27,6 +28,7 @@ const Sidebar = ({ onCollapseChange }) => {
     { path: '/home', icon: Home, label: 'Inicio' },
     { path: '/courses', icon: BookOpen, label: 'Cursos' },
     { path: '/tasks', icon: CheckSquare, label: 'Tareas' },
+    { path: '/diagrams', icon: GitBranch, label: 'Diagramas' },
     { path: '/calendar', icon: CalendarIcon, label: 'Calendario' },
     { path: '/notes', icon: StickyNote, label: 'Notas' },
     { path: '/groups', icon: Users, label: 'Grupos' },
@@ -86,7 +88,7 @@ const Sidebar = ({ onCollapseChange }) => {
             </div>
             {!isCollapsed && (
               <div className="transition-opacity duration-200">
-                <p className={`font-medium text-sidebar-foreground whitespace-nowrap`}>{user?.name || 'Usuario'}</p>
+                <p className={`font-medium text-sidebar-foreground whitespace-nowrap`}>{user?.name ? user.name.split(' ')[0] : 'Usuario'}</p>
                 <p className={`text-xs text-muted-foreground whitespace-nowrap`}>Estudiante</p>
               </div>
             )}
