@@ -1,5 +1,6 @@
 import UserRepository from "../repositories/UserRepository.js";
 import { StatisticsService } from "./StatisticsService.js";
+import CategoryService from "./CategoryService.js";
 import { OperationResult } from "../shared/OperationResult.js";
 
 const userRepository = new UserRepository();
@@ -7,6 +8,7 @@ const userRepository = new UserRepository();
 export class UserService {
   constructor() {
     this.statisticsService = new StatisticsService();
+    this.categoryService = new CategoryService();
   }
 
   // Nota: Login y logout se manejan externamente con Supabase Auth.
@@ -122,6 +124,14 @@ export class UserService {
       console.warn("Error inicializando estadísticas para usuario:", error);
     }
 
+    // Asegurar que las categorías existan (se crean automáticamente en syncUserFromSupabase)
+    try {
+      this.categoryService.setCurrentUser(this.currentUser);
+      await this.categoryService.getAll();
+    } catch (error) {
+      console.warn("Error inicializando categorías para usuario:", error);
+    }
+
     return userResult;
   }
 
@@ -154,6 +164,19 @@ export class UserService {
 
         await userRepository.save(userData);
         console.log(`Usuario sincronizado: ${supabaseUser.email} con nombre: ${displayName}`);
+
+        // Crear categoría "General" para el nuevo usuario
+        try {
+          this.categoryService.setCurrentUser({ id: supabaseUser.id });
+          const generalCategory = {
+            name: "General",
+            id_User: supabaseUser.id
+          };
+          await this.categoryService.save(generalCategory);
+          console.log(`Categoría "General" creada para usuario: ${supabaseUser.email}`);
+        } catch (error) {
+          console.warn("Error creando categoría General:", error);
+        }
       }
     } catch (error) {
       console.error("Error sincronizando usuario:", error);
@@ -216,6 +239,21 @@ export class UserService {
         console.warn("Error eliminando logros:", error);
       }
 
+      // Eliminar categorías del usuario (antes de tareas, ya que tareas dependen de categorías)
+      try {
+        const categoriesResult = await this.categoryService.getAll();
+        if (categoriesResult.success) {
+          for (const category of categoriesResult.data) {
+            // Solo eliminar categorías del usuario (no la "General" global si existe)
+            if (category.id_User === userId) {
+              await this.categoryService.delete(category.id_Category);
+            }
+          }
+        }
+      } catch (error) {
+        console.warn("Error eliminando categorías:", error);
+      }
+
       // Eliminar tareas y subtareas del usuario
       try {
         const taskService = (await import("./TaskService.js")).TaskService;
@@ -249,5 +287,7 @@ export class UserService {
 
   setCurrentUser(user) {
     this.currentUser = user;
+    this.statisticsService.setCurrentUser(user);
+    this.categoryService.setCurrentUser(user);
   }
 }

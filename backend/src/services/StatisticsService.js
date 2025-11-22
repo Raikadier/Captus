@@ -415,4 +415,50 @@ export class StatisticsService {
       return new OperationResult(false, `Error al actualizar meta diaria: ${error.message}`);
     }
   }
+
+  async getCategoryStats() {
+    try {
+      if (!this.currentUser) return new OperationResult(false, "Usuario no autenticado.");
+
+      const allTasksResult = await taskService.getAll();
+      const allTasks = allTasksResult.success ? allTasksResult.data : [];
+
+      const categoryStats = {};
+
+      // Initialize with all user categories
+      const categoriesResult = await (await import("./CategoryService.js")).default.prototype.getAll.call({ currentUser: this.currentUser });
+      if (categoriesResult.success) {
+        categoriesResult.data.forEach(category => {
+          categoryStats[category.id_Category] = {
+            id: category.id_Category,
+            name: category.name,
+            totalTasks: 0,
+            completedTasks: 0,
+            completionRate: 0
+          };
+        });
+      }
+
+      // Calculate stats for each category
+      allTasks.forEach(task => {
+        if (task.id_Category && categoryStats[task.id_Category]) {
+          categoryStats[task.id_Category].totalTasks++;
+          if (task.state) {
+            categoryStats[task.id_Category].completedTasks++;
+          }
+        }
+      });
+
+      // Calculate completion rates
+      Object.values(categoryStats).forEach(stat => {
+        stat.completionRate = stat.totalTasks > 0
+          ? Math.round((stat.completedTasks / stat.totalTasks) * 100)
+          : 0;
+      });
+
+      return new OperationResult(true, "Estadísticas por categoría obtenidas exitosamente.", Object.values(categoryStats));
+    } catch (error) {
+      return new OperationResult(false, `Error al obtener estadísticas por categoría: ${error.message}`);
+    }
+  }
 }
