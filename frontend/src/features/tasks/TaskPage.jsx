@@ -1,6 +1,6 @@
 // TaskPage - Diseño como la plantilla con mejor UI
 import React, { useState, useEffect } from 'react';
-import { Plus, Filter, Search as SearchIcon, Bell, Calendar as CalendarIcon } from 'lucide-react';
+import { Plus, Filter, Search as SearchIcon, Bell, Calendar as CalendarIcon, AlertTriangle } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { useTasks } from './hooks/useTasks';
 import TaskCard from './components/TaskCard';
@@ -13,6 +13,7 @@ import { Input } from '../../ui/input';
 import { Badge } from '../../ui/badge';
 import { Button } from '../../ui/button';
 import { Card } from '../../ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../../ui/dialog';
 import './TaskTabs.css';
 
 const TaskPage = () => {
@@ -40,6 +41,10 @@ const TaskPage = () => {
     completed: ''
   });
   const [showFilters, setShowFilters] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState({
+    isOpen: false,
+    task: null
+  });
 
   useEffect(() => {
     fetchReferenceData();
@@ -76,14 +81,27 @@ const TaskPage = () => {
     }
   };
 
-  const handleDeleteTask = async (taskId) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar esta tarea?')) {
+  const handleDeleteTask = (taskId) => {
+    const task = tasks.find(t => t.id === taskId);
+    setDeleteDialog({
+      isOpen: true,
+      task: task
+    });
+  };
+
+  const confirmDeleteTask = async () => {
+    if (deleteDialog.task) {
       try {
-        await deleteTask(taskId);
+        await deleteTask(deleteDialog.task.id);
+        setDeleteDialog({ isOpen: false, task: null });
       } catch (error) {
         console.error('Error deleting task:', error);
       }
     }
+  };
+
+  const cancelDeleteTask = () => {
+    setDeleteDialog({ isOpen: false, task: null });
   };
 
   const handleEditTask = (task) => {
@@ -419,6 +437,33 @@ const TaskPage = () => {
           <CategoryManagement />
         </TabsContent>
       </Tabs>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialog.isOpen} onOpenChange={(open) => !open && cancelDeleteTask()}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <AlertTriangle className="h-5 w-5" />
+              Confirmar Eliminación
+            </DialogTitle>
+            <DialogDescription className="text-left">
+              ¿Estás seguro de que quieres eliminar la tarea <strong>"{deleteDialog.task?.title}"</strong>?
+              <br /><br />
+              <span className="text-red-600 font-medium">
+                ⚠️ Esta acción no se puede deshacer y la tarea será removida permanentemente de tu lista.
+              </span>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={cancelDeleteTask}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={confirmDeleteTask}>
+              Eliminar Tarea
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

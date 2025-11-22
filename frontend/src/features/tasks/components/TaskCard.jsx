@@ -60,7 +60,8 @@ const TaskCard = ({
               {priority && (
                 <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                   priority.name === 'Alta' ? 'bg-red-100 text-red-800' :
-                  priority.name === 'Media' ? 'bg-yellow-100 text-yellow-800' :
+                  priority.name === 'Media' ? 'bg-orange-100 text-orange-800' :
+                  priority.name === 'Baja' ? 'bg-green-100 text-green-800' :
                   'bg-gray-100 text-gray-800'
                 }`}>
                   {priority.name}
@@ -86,7 +87,7 @@ const TaskCard = ({
           </div>
         </div>
 
-        {showActions && (
+        {showActions && !task.completed && (
           <div className="flex items-center space-x-2 ml-4">
             <button
               onClick={() => onEdit(task)}
