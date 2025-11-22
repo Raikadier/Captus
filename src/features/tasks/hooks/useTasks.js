@@ -57,14 +57,17 @@ export const useTasks = () => {
       const user = await getCurrentUser();
       if (!user?.id) throw new Error('User not authenticated');
 
+      // Set default values for required fields
+      const defaultDueDate = new Date();
+      defaultDueDate.setDate(defaultDueDate.getDate() + 1); // Default to tomorrow
+
       const payload = {
         title: taskData.title ?? '',
         description: taskData.description ?? null,
-        due_date: taskData.due_date ?? null,
-        priority_id: taskData.priority_id ?? 1,
-        category_id: taskData.category_id ?? 1,
+        due_date: taskData.due_date ? new Date(taskData.due_date).toISOString().split('T')[0] : defaultDueDate.toISOString().split('T')[0],
+        priority_id: taskData.priority_id && taskData.priority_id !== '' ? parseInt(taskData.priority_id) : 1, // Default to "Baja" (1)
+        category_id: taskData.category_id && taskData.category_id !== '' ? parseInt(taskData.category_id) : 6, // Default to existing category (Personal = 6)
         completed: taskData.completed ?? false,
-        parent_task_id: taskData.parent_task_id ?? null,
         user_id: user.id,
       };
 
@@ -85,13 +88,22 @@ export const useTasks = () => {
     try {
       setError(null);
 
-      // Sanitize payload
+      const user = await getCurrentUser();
+      if (!user?.id) throw new Error('User not authenticated');
+
+      // Sanitize payload but keep user_id
       const {
-        id, user_id, created_at, updated_at,
+        id, created_at, updated_at,
         ...rest
       } = updateData || {};
 
-      const response = await apiClient.put(`/tasks/${taskId}`, rest);
+      // Add user_id to payload
+      const payload = {
+        ...rest,
+        user_id: user.id
+      };
+
+      const response = await apiClient.put(`/tasks/${taskId}`, payload);
       const data = response.data?.data;
 
       setTasks(prev => prev.map(task =>
@@ -120,10 +132,25 @@ export const useTasks = () => {
 
   // Toggle task completion
   const toggleTaskCompletion = useCallback(async (taskId, completed) => {
-    // We can use the specific complete endpoint or generic update
-    // The backend has /complete but update works too. Let's use update for consistency with local state toggle
-    return updateTask(taskId, { completed: !completed });
-  }, [updateTask]);
+    // Find the current task to get ALL its data
+    const currentTask = tasks.find(t => t.id === taskId);
+
+    if (!currentTask) {
+      throw new Error('Task not found');
+    }
+
+    // Include ALL required fields to avoid null constraint errors
+    const updateData = {
+      completed: !completed,
+      title: currentTask.title, // Required field
+      due_date: currentTask.due_date ? currentTask.due_date.split('T')[0] : null,
+      priority_id: currentTask.priority_id || currentTask.id_Priority || 1, // Required field
+      category_id: currentTask.category_id || currentTask.id_Category || 6, // Required field - default to existing category (Personal = 6)
+      description: currentTask.description || null
+    };
+
+    return updateTask(taskId, updateData);
+  }, [tasks, updateTask]);
 
   // Get subtasks for a task
   const getSubtasks = useCallback(async (parentTaskId) => {
