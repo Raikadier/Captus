@@ -74,8 +74,15 @@ export class UserController {
   }
 
   async deleteAccount(req, res) {
-    const result = await userService.deleteAccount();
-    res.status(result.success ? 200 : 400).json(result);
+    try {
+      const userId = req.user?.id;
+      if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+      const result = await userService.deleteAccount(userId);
+      res.status(result.success ? 200 : 400).json(result);
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
   }
 
   async isEmailRegistered(req, res) {
