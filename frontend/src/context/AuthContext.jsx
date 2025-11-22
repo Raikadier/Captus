@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../shared/api/supabase';
+// import apiClient from '../shared/api/client'; // Removed unused import
 
 const AuthContext = createContext();
 
@@ -28,7 +29,6 @@ export const AuthProvider = ({ children }) => {
 
         if (sessionData?.session?.user) {
            setUser(sessionData.session.user);
-           // Token is handled by onAuthStateChange in supabase.js, but we can ensure it here too
            localStorage.setItem('token', sessionData.session.access_token);
         } else {
            setUser(null);
@@ -74,6 +74,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (email, password, name, role = 'student') => {
     try {
+      // Create user in Supabase Auth with role in metadata
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -104,9 +105,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   const redirectToTasks = () => {
-    // This can be used by consumers to redirect after login
-    // In a real app, you might use useNavigate() from react-router-dom
-    // but since this context is often above Router or needs a hard redirect:
     window.location.href = '/tasks';
   };
 
