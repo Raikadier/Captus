@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import { GitBranch, Plus, Pencil, Trash2, Layout } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '../../ui/card'
-import { Button } from '../../ui/button'
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@ui/card'
+import { Button } from '@ui/button'
 import { useDiagrams } from '../../hooks/useDiagrams'
-import MermaidRenderer from '../../components/diagrams/MermaidRenderer'
-import DiagramEditor from '../../components/diagrams/DiagramEditor'
-import ErrorBoundary from '../../components/shared/ErrorBoundary'
+import MermaidRenderer from '@components/diagrams/MermaidRenderer'
+import DiagramEditor from '@components/diagrams/DiagramEditor'
+import ErrorBoundary from '@components/shared/ErrorBoundary'
 import {
   Dialog,
   DialogContent,
@@ -13,7 +13,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../../ui/dialog"
+} from "@ui/dialog"
 import { toast } from "sonner"
 
 export default function TeacherDiagramsPage() {

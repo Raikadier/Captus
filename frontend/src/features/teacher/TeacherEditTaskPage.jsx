@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ClipboardList, ArrowLeft } from 'lucide-react'
-import { Button } from '../../ui/button'
-import { Input } from '../../ui/input'
+import { Button } from '@ui/button'
+import { Input } from '@ui/input'
 
 export default function TeacherEditTaskPage() {
   const { id } = useParams()

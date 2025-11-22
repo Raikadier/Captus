@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { BookOpen, Clock, ChevronRight } from 'lucide-react'
-import { Button } from '../../ui/button'
+import { Button } from '@ui/button'
 
 // Mock data
 const mockCourses = [

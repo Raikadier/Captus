@@ -1,6 +1,6 @@
 import React from 'react'
 import { Calendar as CalendarIcon } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@ui/card'
 
 const events = [
   { id: 1, title: 'Clase magistral', date: '2025-11-24', time: '10:00 AM' },

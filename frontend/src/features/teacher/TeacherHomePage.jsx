@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext'
+import { useAuth } from '@context/AuthContext'
 import { BookOpen, Users, Calendar, PlusCircle, ListChecks, BarChart3, Network, ClipboardList, Loader2 } from 'lucide-react'
-import { Button } from '../../ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card'
+import { Button } from '@ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@ui/card'
 
 const mockCourses = [
   { id: '1', name: 'Matemáticas Aplicadas', students: 32, pendingTasks: 4 },

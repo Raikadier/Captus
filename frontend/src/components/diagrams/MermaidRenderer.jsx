@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import mermaid from 'mermaid';
-import { Button } from '../../ui/button';
+import { Button } from '@ui/button';
 import { Download, FileImage, FileText } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 

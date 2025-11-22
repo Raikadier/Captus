@@ -1,6 +1,6 @@
 import React from 'react'
 import { BarChart3 } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@ui/card'
 
 const mockStats = [
   { label: 'Tareas revisadas', value: 48 },

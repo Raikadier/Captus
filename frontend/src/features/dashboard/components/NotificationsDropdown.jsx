@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 import { CheckCircle } from 'lucide-react'
-import { ScrollArea } from '../../../ui/scroll-area'
-import { Button } from '../../../ui/button'
+import { ScrollArea } from '@ui/scroll-area'
+import { Button } from '@ui/button'
 
 const mockNotifications = [
   {

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight, Calendar, Plus, Clock, X } from 'lucide-react'
-import { useTheme } from '../../context/themeContext'
-import { Button } from '../../ui/button'
-import { Input } from '../../ui/input'
-import { Label } from '../../ui/label'
-import { Textarea } from '../../ui/textarea'
+import { useTheme } from '@context/themeContext'
+import { Button } from '@ui/button'
+import { Input } from '@ui/input'
+import { Label } from '@ui/label'
+import { Textarea } from '@ui/textarea'
 
 function CreateEventModal({ onClose, onCreate, selectedDate }) {
   const [title, setTitle] = useState('')

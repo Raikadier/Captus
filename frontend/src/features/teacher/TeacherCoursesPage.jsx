@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { BookOpen, PlusCircle } from 'lucide-react'
-import { Button } from '../../ui/button'
+import { Button } from '@ui/button'
 
 const mockCourses = [
   { id: '1', name: 'Matemáticas Aplicadas', students: 32, pendingTasks: 4 },

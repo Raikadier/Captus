@@ -6,11 +6,11 @@ import TaskCard from './components/TaskCard';
 import TaskForm from './components/TaskForm';
 import StreakWidget from '../../shared/components/StreakWidget';
 import apiClient from '../../shared/api/client';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../ui/tabs';
-import { Input } from '../../ui/input';
-import { Badge } from '../../ui/badge';
-import { Button } from '../../ui/button';
-import { Card } from '../../ui/card';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@ui/tabs';
+import { Input } from '@ui/input';
+import { Badge } from '@ui/badge';
+import { Button } from '@ui/button';
+import { Card } from '@ui/card';
 
 const TaskPage = () => {
   const {

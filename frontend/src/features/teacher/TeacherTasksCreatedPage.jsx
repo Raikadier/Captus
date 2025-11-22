@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ClipboardList, Edit2 } from 'lucide-react'
-import { Button } from '../../ui/button'
+import { Button } from '@ui/button'
 
 const mockTasks = [
   { id: 1, title: 'Ensayo cap. 2', course: 'Programación I', status: 'En revisión', dueDate: '2025-11-22' },

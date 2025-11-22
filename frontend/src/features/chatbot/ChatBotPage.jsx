@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, User, Sparkles, Plus, Menu } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '@context/AuthContext';
 
 const ChatBotPage = () => {
   const { user } = useAuth();

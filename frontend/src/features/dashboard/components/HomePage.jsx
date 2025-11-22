@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '@context/AuthContext';
 import { Bell, Calendar as CalendarIcon, CheckSquare, Sparkles, StickyNote, Clock } from 'lucide-react';
-import { Button } from '../../../ui/button';
-import { Card } from '../../../ui/card';
+import { Button } from '@ui/button';
+import { Card } from '@ui/card';
 import NotificationsDropdown from './NotificationsDropdown';
 
 function getCurrentDate() {

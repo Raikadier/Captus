@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Bell, MessageSquare, TrendingUp, CheckSquare, Target, Award, Settings } from 'lucide-react'
-import { Button } from '../../ui/button'
-import { Card } from '../../ui/card'
+import { Button } from '@ui/button'
+import { Card } from '@ui/card'
 import apiClient from '../../shared/api/client'
-import { ManageSubjectsDialog } from '../subjects/components/ManageSubjectsDialog'
+import { ManageSubjectsDialog } from '@features/subjects/components/ManageSubjectsDialog'
 
 function getCurrentDate() {
   const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']

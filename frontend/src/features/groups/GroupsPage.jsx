@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { Users, Plus, MessageCircle, Calendar, CheckSquare, Search, X, ChevronDown } from 'lucide-react'
-import { Button } from '../../ui/button'
+import { Button } from '@ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '../../ui/dropdown-menu'
+} from '@ui/dropdown-menu'
 
 export default function GroupsPage() {
   const [groups, setGroups] = useState([])

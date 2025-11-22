@@ -1,7 +1,7 @@
 // AddTaskForm - Equivalent to frmAddTask.cs
 // Form for creating new tasks with all the original features
 import React, { useState, useEffect } from 'react';
-import { useTasks } from '../hooks/useTasks';
+import { useTasks } from '@features/tasks/hooks/useTasks';
 import { X, RefreshCw } from 'lucide-react';
 
 const AddTaskForm = ({ onClose, onTaskAdded }) => {

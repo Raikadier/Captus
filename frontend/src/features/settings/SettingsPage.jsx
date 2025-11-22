@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronRight, Globe, Lock, MessageSquare, Palette, Shield, User, Bell, Eye, EyeOff, Check, Sparkles } from 'lucide-react'
-import { Button } from '../../ui/button'
-import { Card } from '../../ui/card'
-import { Label } from '../../ui/label'
-import { Switch } from '../../ui/switch'
-import { useTheme } from '../../context/themeContext'
+import { Button } from '@ui/button'
+import { Card } from '@ui/card'
+import { Label } from '@ui/label'
+import { Switch } from '@ui/switch'
+import { useTheme } from '@context/themeContext'
 
 function getCurrentDate() {
   const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '@context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Eye, EyeOff, GraduationCap, User } from 'lucide-react';
 import { supabase } from '../../../shared/api/supabase';
-import { Button } from '../../../ui/button';
-import { Input } from '../../../ui/input';
-import { Label } from '../../../ui/label';
+import { Button } from '@ui/button';
+import { Input } from '@ui/input';
+import { Label } from '@ui/label';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('teacher@gmail.com');

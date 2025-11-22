@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'
 import { User, Mail, Phone, Calendar, Edit3, Save, X, Sparkles } from 'lucide-react';
-import { Button } from '../../ui/button'
-import { Input } from '../../ui/input'
+import { Button } from '@ui/button'
+import { Input } from '@ui/input'
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);

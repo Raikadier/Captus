@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ListChecks } from 'lucide-react'
-import { Button } from '../../ui/button'
+import { Button } from '@ui/button'
 
 const mockReviews = [
   { id: 1, student: 'María Gómez', task: 'Ensayo cap. 2', course: 'Programación I' },

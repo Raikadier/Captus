@@ -1,7 +1,7 @@
 // TaskListView - Equivalent to the task list display in frmMain.cs
 // Shows tasks grouped by date with the same visual style
 import React, { useState, useEffect } from 'react';
-import { useTasks } from '../hooks/useTasks';
+import { useTasks } from '@features/tasks/hooks/useTasks';
 import { Check, Calendar, List } from 'lucide-react';
 import AddTaskForm from './AddTaskForm';
 

@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { BookOpen, FileText, Bell, ArrowLeft, PlayCircle, FileText as FilePdf, Bookmark, CheckCircle2, Calendar, BadgeCheck } from 'lucide-react'
-import { Button } from '../../ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/tabs'
-import { Badge } from '../../ui/badge'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../ui/table'
-import { Card } from '../../ui/card'
-import { Progress } from '../../ui/progress'
+import { Button } from '@ui/button'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@ui/tabs'
+import { Badge } from '@ui/badge'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table'
+import { Card } from '@ui/card'
+import { Progress } from '@ui/progress'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,7 +14,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '../../ui/breadcrumb'
+} from '@ui/breadcrumb'
 
 export default function StudentCourseDetailPage() {
   // const { id: courseId } = useParams() // Unused

@@ -3,7 +3,7 @@ import { Outlet, useLocation, Link } from 'react-router-dom'
 import { Sparkles } from 'lucide-react'
 import Sidebar from './Sidebar'
 import TeacherSidebar from './TeacherSidebar'
-import { Button } from '../../../ui/button'
+import { Button } from '@ui/button'
 
 const MainLayout = ({ children }) => {
   const location = useLocation()

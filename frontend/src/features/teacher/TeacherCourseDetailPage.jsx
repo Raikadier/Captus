@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { BookOpen, Calendar as CalendarIcon, Users, FileText, PlusCircle, GitBranch, Megaphone } from 'lucide-react'
-import { Button } from '../../ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card'
+import { Button } from '@ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@ui/card'
 
 const tabs = ['Información', 'Estudiantes', 'Tareas', 'Anuncios']
 

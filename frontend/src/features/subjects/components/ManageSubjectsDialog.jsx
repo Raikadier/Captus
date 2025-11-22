@@ -1,6 +1,6 @@
 // Manage Subjects Dialog
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '@context/AuthContext';
 import apiClient from '../../../shared/api/client';
 import {
   Dialog,
@@ -9,11 +9,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '../../../ui/dialog';
-import { Button } from '../../../ui/button';
-import { Input } from '../../../ui/input';
-import { Label } from '../../../ui/label';
-import { ScrollArea } from '../../../ui/scroll-area';
+} from '@ui/dialog';
+import { Button } from '@ui/button';
+import { Input } from '@ui/input';
+import { Label } from '@ui/label';
+import { ScrollArea } from '@ui/scroll-area';
 import { BookOpen, Plus, Loader2, Trash2 } from 'lucide-react';
 
 const COLORS = [
