@@ -16,7 +16,7 @@ import {
 } from "../../ui/dialog"
 import { toast } from "sonner"
 
-export default function TeacherDiagramsPage() {
+export default function StudentDiagramsPage() {
   const { diagrams, loading, createDiagram, updateDiagram, deleteDiagram } = useDiagrams();
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingDiagram, setEditingDiagram] = useState(null);
@@ -68,15 +68,15 @@ export default function TeacherDiagramsPage() {
     <div className="p-6 space-y-6">
       <div className="bg-white rounded-xl shadow-sm p-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-            <GitBranch className="text-green-600" />
+          <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+            <GitBranch className="text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Diagramas</h1>
-            <p className="text-sm text-gray-600">Gestión de visualizaciones académicas</p>
+            <h1 className="text-2xl font-bold text-gray-900">Mis Diagramas</h1>
+            <p className="text-sm text-gray-600">Crea y gestiona tus propios diagramas de estudio</p>
           </div>
         </div>
-        <Button onClick={handleCreate} className="gap-2 bg-green-600 hover:bg-green-700">
+        <Button onClick={handleCreate} className="gap-2">
           <Plus className="w-4 h-4" />
           Nuevo Diagrama
         </Button>
@@ -84,7 +84,7 @@ export default function TeacherDiagramsPage() {
 
       {loading && diagrams.length === 0 ? (
          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
          </div>
       ) : diagrams.length === 0 ? (
         <Card className="border-dashed">
@@ -92,9 +92,9 @@ export default function TeacherDiagramsPage() {
             <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
               <Layout className="w-8 h-8 text-gray-400" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900">No hay diagramas todavía</h3>
+            <h3 className="text-lg font-semibold text-gray-900">No tienes diagramas aún</h3>
             <p className="text-sm text-gray-600 max-w-sm mt-2 mb-6">
-              Crea diagramas para explicar conceptos complejos visualmente a tus estudiantes.
+              Usa diagramas para visualizar tus ideas y mejorar tu estudio.
             </p>
             <Button onClick={handleCreate} variant="outline" className="gap-2">
               <Plus className="w-4 h-4" />
@@ -119,16 +119,16 @@ export default function TeacherDiagramsPage() {
                 </div>
                 <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                    <Button variant="secondary" size="sm" onClick={() => handleEdit(diagram)}>
-                     Ver detalles
+                     Ver y Editar
                    </Button>
                 </div>
               </CardContent>
               <CardFooter className="pt-4 border-t bg-gray-50/50 flex justify-between">
                  <span className="text-xs text-gray-500">
-                   Actualizado: {new Date(diagram.updatedAt).toLocaleDateString()}
+                   {new Date(diagram.updatedAt).toLocaleDateString()}
                  </span>
                  <div className="flex gap-2">
-                   <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50" onClick={() => handleEdit(diagram)}>
+                   <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:text-primary/80 hover:bg-primary/10" onClick={() => handleEdit(diagram)}>
                      <Pencil className="w-4 h-4" />
                    </Button>
                    <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => handleDeleteClick(diagram.id)}>
@@ -153,14 +153,14 @@ export default function TeacherDiagramsPage() {
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>¿Estás seguro?</DialogTitle>
+            <DialogTitle>¿Eliminar diagrama?</DialogTitle>
             <DialogDescription>
-              Esta acción no se puede deshacer. El diagrama se eliminará permanentemente.
+              Esta acción no se puede deshacer.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteId(null)}>Cancelar</Button>
-            <Button onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
+             <Button variant="outline" onClick={() => setDeleteId(null)}>Cancelar</Button>
+             <Button onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
               Eliminar
             </Button>
           </DialogFooter>
