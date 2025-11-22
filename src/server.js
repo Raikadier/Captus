@@ -20,6 +20,7 @@ import CommentLikeRoutes from './routes/CommentLikeRoutes.js';
 import SubjectRoutes from './routes/SubjectRoutes.js';
 import UserRoutes from './routes/UserRoutes.js';
 import DiagramRoutes from './routes/DiagramRoutes.js';
+import NotesRoutes from './routes/NotesRoutes.js';
 import aiRouter from './routes/ai.js';
 import { getSupabaseClient } from './lib/supabaseAdmin.js';
 
@@ -116,6 +117,7 @@ if (ENV_OK && supabaseAdmin) {
   app.use('/api/subjects', verifySupabaseToken, SubjectRoutes);
   app.use('/api/users', UserRoutes);
   app.use('/api/diagrams', verifySupabaseToken, DiagramRoutes);
+  app.use('/api/notes', verifySupabaseToken, NotesRoutes);
 }
 
 // Root route
@@ -150,7 +152,8 @@ app.get('/api', (req, res) => {
       '/api/project-comments',
       '/api/comment-likes',
       '/api/subjects',
-      '/api/users'
+      '/api/users',
+      '/api/notes'
     ]
   });
 });
