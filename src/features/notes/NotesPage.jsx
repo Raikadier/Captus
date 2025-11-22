@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Bell, MessageSquare, Pin, Edit, Trash2, Search as SearchIcon, Plus, FileText, X, Save, Sparkles } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -8,6 +8,8 @@ import { Input } from '../../ui/input'
 import { Badge } from '../../ui/badge'
 import { Textarea } from '../../ui/textarea'
 import { Label } from '../../ui/label'
+import { Switch } from '../../ui/switch'
+import apiClient from '../../shared/api/client'
 
 function getCurrentDate() {
   const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
@@ -29,68 +31,7 @@ function getCurrentDate() {
   return `${days[now.getDay()]}, ${now.getDate()} de ${months[now.getMonth()]} de ${now.getFullYear()}`
 }
 
-const initialNotes = [
-  {
-    id: 1,
-    title: 'Apuntes de Cálculo - Derivadas',
-    content:
-      'Definición de derivada: límite del cociente incremental. Reglas básicas: potencia, producto, cociente, cadena...',
-    subject: 'Matemáticas III',
-    color: 'blue',
-    pinned: true,
-    lastEdited: '2025-10-24',
-  },
-  {
-    id: 2,
-    title: 'Resumen: Romanticismo Español',
-    content:
-      'Características principales del Romanticismo: libertad creativa, sentimientos, naturaleza, rebeldía...',
-    subject: 'Literatura Española',
-    color: 'purple',
-    pinned: true,
-    lastEdited: '2025-10-23',
-  },
-  {
-    id: 3,
-    title: 'Ideas para proyecto final',
-    content:
-      'Posibles temas: Sistema de gestión académica, App de salud mental para estudiantes, Plataforma de tutorías...',
-    subject: 'Programación Web',
-    color: 'green',
-    pinned: false,
-    lastEdited: '2025-10-22',
-  },
-  {
-    id: 4,
-    title: 'Fórmulas de Química Orgánica',
-    content:
-      'Grupos funcionales: alcoholes (-OH), aldehídos (-CHO), cetonas (C=O), ácidos carboxílicos (-COOH)...',
-    subject: 'Química Orgánica',
-    color: 'orange',
-    pinned: false,
-    lastEdited: '2025-10-21',
-  },
-  {
-    id: 5,
-    title: 'Cronología Segunda Guerra Mundial',
-    content:
-      '1939: Invasión de Polonia. 1941: Ataque a Pearl Harbor. 1944: Desembarco de Normandía...',
-    subject: 'Historia Mundial',
-    color: 'red',
-    pinned: false,
-    lastEdited: '2025-10-20',
-  },
-  {
-    id: 6,
-    title: 'Conceptos de Filosofía Moderna',
-    content:
-      'Kant: Imperativo categórico, fenómeno vs. noúmeno. Descartes: Cogito ergo sum, dualismo mente-cuerpo...',
-    subject: 'Filosofía Moderna',
-    color: 'yellow',
-    pinned: false,
-    lastEdited: '2025-10-19',
-  },
-]
+const colorOptions = ['blue', 'purple', 'green', 'orange', 'red', 'yellow']
 
 const getColorClass = (color) => {
     const map = {
@@ -230,13 +171,15 @@ function CreateNoteModal({ onClose, onCreate }) {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [subject, setSubject] = useState('')
+  const [isPinned, setIsPinned] = useState(false)
 
   const handleCreate = () => {
     if (title.trim() && content.trim()) {
       onCreate({
         title,
         content,
-        subject,
+        subject: subject || null,
+        is_pinned: isPinned,
       })
       onClose()
     }
@@ -280,6 +223,14 @@ function CreateNoteModal({ onClose, onCreate }) {
                 className="mt-1"
               />
             </div>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="pinned"
+                checked={isPinned}
+                onCheckedChange={setIsPinned}
+              />
+              <Label htmlFor="pinned">Fijar nota</Label>
+            </div>
             <div>
               <Label>Contenido *</Label>
               <Textarea
@@ -309,22 +260,29 @@ function CreateNoteModal({ onClose, onCreate }) {
   )
 }
 
-function NoteCard({ note, index, onClick }) {
+function NoteCard({ note, index, onClick, onTogglePin }) {
   const colorClass = useMemo(() => getColorClass(note.color), [note.color])
+
+  const handlePinClick = (e) => {
+    e.stopPropagation()
+    onTogglePin(note.id)
+  }
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: index * 0.05 }}>
       <Card
-        className={`p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow border ${colorClass} cursor-pointer`}
+        className={`p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow border ${colorClass} cursor-pointer relative`}
         onClick={onClick}
       >
-        <div className="flex justify-between items-start mb-3">
+        <button
+          onClick={handlePinClick}
+          className="absolute top-2 right-2 p-1 rounded-full hover:bg-white/50 transition-colors"
+          title={note.pinned ? 'Desfijar nota' : 'Fijar nota'}
+        >
+          <Pin size={14} className={note.pinned ? 'text-green-600' : 'text-gray-400'} />
+        </button>
+        <div className="flex justify-between items-start mb-3 pr-8">
           <h3 className="font-semibold text-gray-900 text-base flex-1">{note.title}</h3>
-          {note.pinned && (
-            <motion.div initial={{ rotate: 0 }} animate={{ rotate: 45 }} transition={{ duration: 0.3 }}>
-              <Pin size={16} className="text-green-600 flex-shrink-0" />
-            </motion.div>
-          )}
         </div>
         <p className="text-gray-600 text-sm mb-3 line-clamp-3">{note.content}</p>
         <div className="flex justify-between items-center">
@@ -347,39 +305,109 @@ function NoteCard({ note, index, onClick }) {
 
 export default function NotesPage() {
   const [searchQuery, setSearchQuery] = useState('')
-  const [notes, setNotes] = useState(initialNotes)
+  const [notes, setNotes] = useState([])
   const [selectedNote, setSelectedNote] = useState(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  const handleSaveNote = (noteId, updates) => {
-    setNotes(notes.map((n) => (n.id === noteId ? { ...n, ...updates, lastEdited: 'Hoy' } : n)))
-    setSelectedNote(null)
-  }
+  useEffect(() => {
+    loadNotes()
+  }, [])
 
-  const handleDeleteNote = (noteId) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar esta nota?')) {
-      setNotes(notes.filter((n) => n.id !== noteId))
-      setSelectedNote(null)
+  const loadNotes = async () => {
+    try {
+      setLoading(true)
+      const response = await apiClient.get('/notes')
+      if (response.data.success) {
+        // Add color to notes for UI
+        const notesWithColor = response.data.data.map((note, index) => ({
+          ...note,
+          color: colorOptions[index % colorOptions.length]
+        }))
+        setNotes(notesWithColor)
+      } else {
+        setError(response.data.message || 'Error al cargar notas')
+      }
+    } catch (err) {
+      setError('Error al conectar con el servidor')
+      console.error('Error loading notes:', err)
+    } finally {
+      setLoading(false)
     }
   }
 
-  const handleTogglePin = (noteId) => {
-    setNotes(notes.map((n) => (n.id === noteId ? { ...n, pinned: !n.pinned } : n)))
-    // Update selected note if open
-    if (selectedNote && selectedNote.id === noteId) {
-      setSelectedNote(prev => ({ ...prev, pinned: !prev.pinned }))
+  const handleSaveNote = async (noteId, updates) => {
+    try {
+      const response = await apiClient.put(`/notes/${noteId}`, updates)
+      if (response.data.success) {
+        setNotes(notes.map((n) => (n.id === noteId ? { ...n, ...response.data.data } : n)))
+        setSelectedNote(null)
+      } else {
+        alert('Error al guardar la nota: ' + response.data.message)
+      }
+    } catch (err) {
+      alert('Error al guardar la nota')
+      console.error('Error saving note:', err)
     }
   }
 
-  const handleCreateNote = (newNote) => {
-    const note = {
-      id: Date.now(),
-      ...newNote,
-      color: 'blue', // Default color
-      pinned: false,
-      lastEdited: 'Hoy',
+  const handleDeleteNote = async (noteId) => {
+    setShowDeleteConfirm(noteId)
+  }
+
+  const confirmDeleteNote = async () => {
+    const noteId = showDeleteConfirm
+    setShowDeleteConfirm(null)
+    try {
+      const response = await apiClient.delete(`/notes/${noteId}`)
+      if (response.data.success) {
+        setNotes(notes.filter((n) => n.id !== noteId))
+        setSelectedNote(null)
+      } else {
+        alert('Error al eliminar la nota: ' + response.data.message)
+      }
+    } catch (err) {
+      alert('Error al eliminar la nota')
+      console.error('Error deleting note:', err)
     }
-    setNotes([...notes, note])
+  }
+
+  const handleTogglePin = async (noteId) => {
+    try {
+      const response = await apiClient.put(`/notes/${noteId}/toggle-pin`)
+      if (response.data.success) {
+        setNotes(notes.map((n) => (n.id === noteId ? { ...n, ...response.data.data } : n)))
+        // Update selected note if open
+        if (selectedNote && selectedNote.id === noteId) {
+          setSelectedNote(prev => ({ ...prev, ...response.data.data }))
+        }
+      } else {
+        alert('Error al cambiar el estado de fijación: ' + response.data.message)
+      }
+    } catch (err) {
+      alert('Error al cambiar el estado de fijación')
+      console.error('Error toggling pin:', err)
+    }
+  }
+
+  const handleCreateNote = async (newNote) => {
+    try {
+      const response = await apiClient.post('/notes', newNote)
+      if (response.data.success) {
+        const createdNote = {
+          ...response.data.data,
+          color: colorOptions[notes.length % colorOptions.length]
+        }
+        setNotes([...notes, createdNote])
+      } else {
+        alert('Error al crear la nota: ' + response.data.message)
+      }
+    } catch (err) {
+      alert('Error al crear la nota')
+      console.error('Error creating note:', err)
+    }
   }
 
   const pinnedNotes = useMemo(() => notes.filter((n) => n.pinned), [notes])
@@ -404,6 +432,30 @@ export default function NotesPage() {
     note.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (note.subject && note.subject.toLowerCase().includes(searchQuery.toLowerCase()))
   )
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#F6F7FB] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando notas...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#F6F7FB] flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">Error: {error}</p>
+          <Button onClick={loadNotes} className="bg-green-600 hover:bg-green-700">
+            Reintentar
+          </Button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-[#F6F7FB]">
@@ -446,7 +498,7 @@ export default function NotesPage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredPinnedNotes.map((note, index) => (
-                <NoteCard key={note.id} note={note} index={index} onClick={() => setSelectedNote(note)} />
+                <NoteCard key={note.id} note={note} index={index} onClick={() => setSelectedNote(note)} onTogglePin={handleTogglePin} />
               ))}
             </div>
           </div>
@@ -463,7 +515,7 @@ export default function NotesPage() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {regularNotes.map((note, index) => (
-                  <NoteCard key={note.id} note={note} index={index} onClick={() => setSelectedNote(note)} />
+                  <NoteCard key={note.id} note={note} index={index} onClick={() => setSelectedNote(note)} onTogglePin={handleTogglePin} />
                 ))}
               </div>
             )}
@@ -482,6 +534,43 @@ export default function NotesPage() {
       )}
 
       {showCreateModal && <CreateNoteModal onClose={() => setShowCreateModal(false)} onCreate={handleCreateNote} />}
+
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[85vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                    <Trash2 size={24} className="text-red-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">Eliminar Nota</h2>
+                    <p className="text-sm text-gray-500">Esta acción no se puede deshacer</p>
+                  </div>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => setShowDeleteConfirm(null)}>
+                  <X size={20} />
+                </Button>
+              </div>
+
+              <p className="text-gray-700 mb-6">
+                ¿Estás seguro de que quieres eliminar esta nota? Se perderá permanentemente.
+              </p>
+
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" onClick={() => setShowDeleteConfirm(null)}>
+                  Cancelar
+                </Button>
+                <Button onClick={confirmDeleteNote} className="bg-red-600 hover:bg-red-700">
+                  <Trash2 size={16} className="mr-2" />
+                  Eliminar
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
