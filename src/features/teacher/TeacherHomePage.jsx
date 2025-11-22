@@ -46,7 +46,7 @@ export default function TeacherHomePage() {
             <BookOpen className="text-green-600" size={32} />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Bienvenid@ {user?.name ? user.name.split(' ')[0] : 'Profesor'}</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Bienvenid@ {(user?.user_metadata?.name || user?.name || 'Profesor').split(' ')[0]}</h1>
             <p className="text-gray-600 mt-1">Revisa tus cursos y actividades académicas</p>
           </div>
         </div>
