@@ -8,15 +8,23 @@ const userController = new UserController();
 const supabaseAdmin = getSupabaseClient();
 const verifySupabaseToken = buildSupabaseAuthMiddleware(supabaseAdmin);
 
-// Protected routes (require token)
+// Rutas públicas
+// check-email se mantiene pública para validaciones de registro
+router.post("/check-email", userController.isEmailRegistered.bind(userController));
+
+// Rutas protegidas (requieren token)
 router.use(verifySupabaseToken);
 
-// Sync endpoint - used by Frontend after login/register
+// Endpoint de Sincronización (Tu nueva feature)
 router.post("/sync", userController.syncUser.bind(userController));
 
-// Profile management
-router.get("/profile", userController.getProfile.bind(userController)); // Current user
+// Gestión de Perfil
+router.get("/profile", userController.getProfile.bind(userController));
 router.get("/:id", userController.getProfile.bind(userController));
 router.put("/:id", userController.updateProfile.bind(userController));
+
+// Rutas preservadas de Main (útiles)
+router.put("/change-password", userController.changePassword.bind(userController));
+router.delete("/account", userController.deleteAccount.bind(userController));
 
 export default router;

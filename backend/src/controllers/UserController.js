@@ -72,4 +72,19 @@ export class UserController {
       res.status(400).json({ success: false, error: error.message });
     }
   }
+
+  async deleteAccount(req, res) {
+    const result = await userService.deleteAccount();
+    res.status(result.success ? 200 : 400).json(result);
+  }
+
+  async isEmailRegistered(req, res) {
+    const { email } = req.body;
+    try {
+      const result = await userService.isEmailRegistered(email);
+      res.status(200).json({ registered: result.data?.registered || false });
+    } catch (error) {
+      res.status(500).json({ registered: false, error: error.message });
+    }
+  }
 }

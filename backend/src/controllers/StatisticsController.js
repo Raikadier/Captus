@@ -42,4 +42,21 @@ export class StatisticsController {
     const result = await statisticsService.getAchievementsStats();
     res.status(result.success ? 200 : 401).json(result);
   }
+
+  async getStreakStats(req, res) {
+    // Create a simple streak stats response
+    const stats = await statisticsService.getByCurrentUser();
+    if (!stats) {
+      return res.status(404).json({ error: 'Statistics not found' });
+    }
+
+    const streakData = {
+      currentStreak: stats.racha || 0,
+      dailyGoal: stats.dailyGoal || 5,
+      lastCompletedDate: stats.lastRachaDate,
+      completionRate: 0 // Placeholder, could be calculated
+    };
+
+    res.status(200).json(streakData);
+  }
 }

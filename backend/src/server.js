@@ -5,7 +5,6 @@ import dotenv from 'dotenv';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
-import streakRoutes, { setStreakService } from './routes/streakRoutes.js';
 import TaskRoutes from './routes/TaskRoutes.js';
 import SubTaskRoutes from './routes/SubTaskRoutes.js';
 import StatisticsRoutes from './routes/StatisticsRoutes.js';
@@ -19,6 +18,7 @@ import ProjectMemberRoutes from './routes/ProjectMemberRoutes.js';
 import ProjectCommentRoutes from './routes/ProjectCommentRoutes.js';
 import CommentLikeRoutes from './routes/CommentLikeRoutes.js';
 import SubjectRoutes from './routes/SubjectRoutes.js';
+import UserRoutes from './routes/UserRoutes.js';
 import DiagramRoutes from './routes/DiagramRoutes.js';
 import aiRouter from './routes/ai.js';
 import { getSupabaseClient } from './lib/supabaseAdmin.js';
@@ -45,8 +45,6 @@ const ENV_OK = !!supabaseAdmin;
 
 if (!ENV_OK) {
   console.warn('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in environment variables.');
-} else {
-  setStreakService(supabaseAdmin);
 }
 
 const verifySupabaseToken = buildSupabaseAuthMiddleware(supabaseAdmin);
@@ -102,19 +100,6 @@ if (ENV_OK && supabaseAdmin) {
   app.use('/ai', verifySupabaseToken, aiRouter);
 }
 
-// API routes (minimal)
-app.use(
-  '/api/streaks',
-  (req, res, next) => {
-    if (!ENV_OK || !supabaseAdmin) {
-      return res.status(503).json({ error: 'Server misconfiguration: set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY' });
-    }
-    return next();
-  },
-  verifySupabaseToken,
-  streakRoutes
-);
-
 // Extended API routes
 if (ENV_OK && supabaseAdmin) {
   app.use('/api/tasks', verifySupabaseToken, TaskRoutes);
@@ -129,6 +114,7 @@ if (ENV_OK && supabaseAdmin) {
   app.use('/api/project-comments', verifySupabaseToken, ProjectCommentRoutes);
   app.use('/api/comment-likes', verifySupabaseToken, CommentLikeRoutes);
   app.use('/api/subjects', verifySupabaseToken, SubjectRoutes);
+  app.use('/api/users', UserRoutes);
   app.use('/api/diagrams', verifySupabaseToken, DiagramRoutes);
 }
 
@@ -152,7 +138,6 @@ app.get('/api', (req, res) => {
     docs: '/api-docs',
     endpoints: [
       '/api/health',
-      '/api/streaks',
       '/api/tasks',
       '/api/subtasks',
       '/api/statistics',
@@ -164,6 +149,7 @@ app.get('/api', (req, res) => {
       '/api/project-members',
       '/api/project-comments',
       '/api/comment-likes',
+      '/api/subjects',
       '/api/users'
     ]
   });

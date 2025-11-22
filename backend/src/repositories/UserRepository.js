@@ -3,19 +3,23 @@ import StatisticsRepository from "./StatisticsRepository.js";
 
 const mapFromDb = (row) => ({
   id_User: row.id,
-  userName: row.username,
+  userName: row.name || row.email?.split('@')[0], // Usar name o extraer de email
   email: row.email,
-  firstName: row.first_name,
-  lastName: row.last_name,
+  name: row.name,
+  carrer: row.carrer,
+  bio: row.bio,
   createdAt: row.created_at,
   updatedAt: row.updated_at,
 });
 
 const mapToDb = (entity) => ({
-  username: entity.userName,
+  id: entity.id_User, // Para upsert
   email: entity.email,
-  first_name: entity.firstName ?? null,
-  last_name: entity.lastName ?? null,
+  name: entity.name || entity.userName,
+  carrer: entity.carrer,
+  bio: entity.bio,
+  created_at: entity.createdAt || new Date(),
+  updated_at: entity.updatedAt || new Date(),
 });
 
 export default class UserRepository extends BaseRepository {
@@ -32,10 +36,10 @@ export default class UserRepository extends BaseRepository {
     try {
       if (!entity) return null;
 
-      // Inserta usuario en Supabase
+      // Upsert usuario (insertar si no existe, actualizar si existe)
       const { data, error } = await this.client
         .from(this.tableName)
-        .insert(mapToDb(entity))
+        .upsert(mapToDb(entity), { onConflict: 'id' })
         .select("*")
         .single();
 
@@ -46,14 +50,15 @@ export default class UserRepository extends BaseRepository {
 
       const user = mapFromDb(data);
 
-      // Crear estadísticas por defecto
-      const stats = this.statisticsRepository.defaultStatistics(user.id_User);
-      const statsCreated = await this.statisticsRepository.save(stats);
-      if (!statsCreated) {
-        // Si falla, eliminar usuario creado
-        await this.client.from(this.tableName).delete().eq("id", user.id_User);
-        console.error("Error al guardar estadísticas. Usuario eliminado.");
-        return null;
+      // Verificar si ya existen estadísticas, si no, crearlas
+      const existingStats = await this.statisticsRepository.getByUser(user.id_User);
+      if (!existingStats) {
+        const stats = this.statisticsRepository.defaultStatistics(user.id_User);
+        const statsCreated = await this.statisticsRepository.save(stats);
+        if (!statsCreated) {
+          console.error("Error al guardar estadísticas para usuario:", user.id_User);
+          // No eliminamos el usuario, solo logueamos el error
+        }
       }
 
       return user;
@@ -65,10 +70,11 @@ export default class UserRepository extends BaseRepository {
 
   async getByUsername(username) {
     try {
+      // Buscar por name o por email (username derivado)
       const { data, error } = await this.client
         .from(this.tableName)
         .select("*")
-        .eq("username", username)
+        .or(`name.eq.${username},email.eq.${username}`)
         .maybeSingle();
 
       if (error) {
