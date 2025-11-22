@@ -32,8 +32,28 @@ export const ThemeProvider = ({ children }) => {
   // Check compact view preference if used by other components (the guide mentions it)
   const [compactView, setCompactView] = useState(false);
 
+  // Font size preference
+  const [fontSize, setFontSize] = useState('medium');
+
+  useEffect(() => {
+    const savedFontSize = localStorage.getItem('fontSize') || 'medium';
+    setFontSize(savedFontSize);
+  }, []);
+
+  const changeFontSize = (size) => {
+    setFontSize(size);
+    localStorage.setItem('fontSize', size);
+  };
+
   return (
-    <ThemeContext.Provider value={{ darkMode, toggleTheme, compactView, setCompactView }}>
+    <ThemeContext.Provider value={{
+      darkMode,
+      toggleTheme,
+      compactView,
+      setCompactView,
+      fontSize,
+      changeFontSize
+    }}>
       {children}
     </ThemeContext.Provider>
   );

@@ -29,6 +29,7 @@ export const AuthProvider = ({ children }) => {
 
         if (sessionData?.session?.user) {
            setUser(sessionData.session.user);
+           // Token is handled by onAuthStateChange in supabase.js, but we can ensure it here too
            localStorage.setItem('token', sessionData.session.access_token);
         } else {
            setUser(null);
@@ -83,15 +84,65 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (email, password, name, role = 'student') => {
     try {
-      // Create user in Supabase Auth with role in metadata
+      // Validate password strength
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+      if (!passwordRegex.test(password)) {
+        return {
+          success: false,
+          error: 'La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número'
+        };
+      }
+
+      // First check if email is already registered in our users table
+      try {
+         // Note: apiClient handles base URL automatically
+         // However, for public endpoints without token, we might need care.
+         // But usually check-email is public. Let's assume apiClient works or use fetch if needed.
+         // Since we are in AuthContext and might not have token yet, fetch is safer for public routes unless apiClient handles it.
+         // Actually, our apiClient attaches token IF present.
+         const response = await fetch('/api/users/check-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email })
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.registered) {
+            return { success: false, error: 'Este email ya está registrado' };
+          }
+        }
+      } catch (checkError) {
+        console.warn('Could not check email registration:', checkError);
+        // Continue with registration anyway
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { name, role }
+          data: {
+            name: name,
+            role: role, // Explicitly pass role here
+            display_name: name,
+            full_name: name
+          }
         }
       });
-      if (error) throw error;
+
+      if (error) {
+        // Handle specific Supabase errors
+        if (error.message && (
+          error.message.includes('already registered') ||
+          error.message.includes('already been registered') ||
+          error.message.includes('User already registered')
+        )) {
+          return { success: false, error: 'Este email ya está registrado' };
+        }
+        throw error;
+      }
 
       // If we have a session immediately (no email confirm required), sync to backend
       if (data.session) {
@@ -108,7 +159,17 @@ export const AuthProvider = ({ children }) => {
       return { success: true, requiresEmailConfirmation };
     } catch (err) {
       console.error('Registration error:', err);
-      return { success: false, error: err.message || 'Registration failed' };
+
+      // Handle specific error messages
+      if (err.message && (
+        err.message.includes('already registered') ||
+        err.message.includes('already been registered') ||
+        err.message.includes('User already registered')
+      )) {
+        return { success: false, error: 'Este email ya está registrado' };
+      }
+
+      return { success: false, error: err.message || 'Error en el registro' };
     }
   };
 

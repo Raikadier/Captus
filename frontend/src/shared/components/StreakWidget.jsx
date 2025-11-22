@@ -37,8 +37,8 @@ const StreakWidget = () => {
 
   const fetchStreakData = async () => {
     try {
-      // Use the stats endpoint as requested in the plan
-      const response = await apiClient.get('/streaks/stats');
+      // Use the statistics endpoint for streak data
+      const response = await apiClient.get('/statistics/streak-stats');
       const data = response?.data;
       if (data) {
         setStreakData(data);
