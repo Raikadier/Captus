@@ -91,18 +91,37 @@ export class CategoryService {
     }
   }
 
-  async save(category) {
+  async save(category, userOverride = null) {
     try {
       if (!category) {
         return new OperationResult(false, "La categoría no puede ser nula.");
       }
 
-      const existingCategory = await this.getByName(category.name);
-      if (existingCategory.success && existingCategory.data) {
-        return new OperationResult(false, "Ya existe una categoría con ese nombre.");
+      // Usar userOverride si se proporciona, de lo contrario usar this.currentUser
+      const currentUser = userOverride || this.currentUser;
+
+      if (!currentUser) {
+        return new OperationResult(false, "Usuario no autenticado.");
       }
 
-      const savedCategory = await categoryRepository.save(category);
+      // Asignar automáticamente el usuario autenticado
+      const categoryWithUser = {
+        ...category,
+        id_User: currentUser.id
+      };
+
+      // Verificar si ya existe una categoría con el mismo nombre para este usuario
+      const userCategories = await this.getAll();
+      if (userCategories.success) {
+        const nameExists = userCategories.data.some(cat =>
+          cat.name.toLowerCase() === category.name.toLowerCase()
+        );
+        if (nameExists) {
+          return new OperationResult(false, "Ya existe una categoría con ese nombre.");
+        }
+      }
+
+      const savedCategory = await categoryRepository.save(categoryWithUser);
       if (savedCategory) {
         return new OperationResult(true, "Categoría guardada exitosamente.", savedCategory);
       } else {
@@ -113,7 +132,7 @@ export class CategoryService {
     }
   }
 
-  async update(category) {
+  async update(category, userOverride = null) {
     try {
       if (!category) {
         return new OperationResult(false, "La categoría no puede ser nula.");
@@ -127,6 +146,12 @@ export class CategoryService {
       const existingCategory = await this.getById(category.id_Category);
       if (!existingCategory.success || !existingCategory.data) {
         return new OperationResult(false, "Categoría no encontrada.");
+      }
+
+      // Verificar que el usuario tenga permisos sobre esta categoría
+      const currentUser = userOverride || this.currentUser;
+      if (existingCategory.data.id_User !== currentUser?.id) {
+        return new OperationResult(false, "No tienes permisos para actualizar esta categoría.");
       }
 
       const updated = await categoryRepository.update(category);
