@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../shared/api/supabase';
-// import apiClient from '../shared/api/client'; // Removed unused import
+import apiClient from '../shared/api/client';
 
 const AuthContext = createContext();
 
@@ -65,6 +65,15 @@ export const AuthProvider = ({ children }) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
+
+      // Sync user to backend (ensures public.users has the latest role/info)
+      try {
+        await apiClient.post('/users/sync');
+      } catch (syncError) {
+        console.error('Backend sync failed:', syncError);
+        // We don't block login if sync fails, but we log it
+      }
+
       return { success: true, data };
     } catch (err) {
       console.error('Login error:', err);
@@ -83,6 +92,15 @@ export const AuthProvider = ({ children }) => {
         }
       });
       if (error) throw error;
+
+      // If we have a session immediately (no email confirm required), sync to backend
+      if (data.session) {
+        try {
+          await apiClient.post('/users/sync');
+        } catch (syncError) {
+          console.error('Backend sync failed during registration:', syncError);
+        }
+      }
 
       // If email confirmation is enabled in Supabase, session might be null
       const requiresEmailConfirmation = !data.session;
