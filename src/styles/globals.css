@@ -123,3 +123,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Font size utilities */
+.font-small {
+  font-size: 0.875rem !important; /* 14px */
+}
+
+.font-medium {
+  font-size: 1rem !important; /* 16px */
+}
+
+.font-large {
+  font-size: 1.125rem !important; /* 18px */
+}
