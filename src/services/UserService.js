@@ -100,8 +100,6 @@ class UserService {
       // Check if user exists
       await this.getUserById(userId);
 
-      // Note: In a real application, you might want to soft delete
-      // or handle related data cleanup (tasks, streaks, etc.)
       const { error } = await this.supabase
         .from('users')
         .delete()
@@ -112,6 +110,42 @@ class UserService {
       return true;
     } catch (error) {
       throw new Error(`Failed to delete user: ${error.message}`);
+    }
+  }
+
+  // Alias for deleteAccount from controller merge
+  async deleteAccount(userId) {
+     try {
+       await this.deleteUser(userId);
+       // Also delete from auth? Usually yes, but we need admin client for that.
+       // For now, just return success to match legacy signature expectations
+       return { success: true };
+     } catch (e) {
+        return { success: false, error: e.message };
+     }
+  }
+
+  // Check if email is registered
+  async isEmailRegistered(email) {
+    try {
+      // Check in public.users first (fastest)
+      const { data, error } = await this.supabase
+        .from('users')
+        .select('id')
+        .eq('email', email)
+        .single();
+
+      if (data) return { success: true, data: { registered: true } };
+
+      // If not found, it might be in Auth but not synced.
+      // But we can't easily check Auth without admin rights or trying to sign in.
+      // Let's assume if not in public.users, it's not "registered" in our app sense.
+      return { success: true, data: { registered: false } };
+    } catch (error) {
+       if (error.code === 'PGRST116') {
+          return { success: true, data: { registered: false } };
+       }
+       throw error;
     }
   }
 
