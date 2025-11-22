@@ -73,6 +73,14 @@ export class UserController {
     }
   }
 
+  async changePassword(req, res) {
+    const { currentPassword, newPassword } = req.body;
+    // Note: Authentication check is done in middleware, but method itself validates strength.
+    const result = await userService.changePassword(currentPassword, newPassword);
+    // result is OperationResult { success, message, data }
+    res.status(result.success ? 200 : 400).json(result);
+  }
+
   async deleteAccount(req, res) {
     try {
       const userId = req.user?.id;

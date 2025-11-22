@@ -1,5 +1,6 @@
 // User service - migrated from C# BLL\UserLogic.cs
 import User from '../models/UserModels.js';
+import { OperationResult } from '../shared/OperationResult.js';
 
 class UserService {
   constructor(supabase) {
@@ -146,6 +147,25 @@ class UserService {
           return { success: true, data: { registered: false } };
        }
        throw error;
+    }
+  }
+
+  // Change password validation (ported from Harold branch)
+  async changePassword(currentPassword, newPassword) {
+    try {
+      // Validar nueva contraseña
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+      if (!passwordRegex.test(newPassword)) {
+        return new OperationResult(false, "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.");
+      }
+
+      // Para Supabase, el cambio de contraseña se maneja desde el cliente
+      // Aquí solo validamos y retornamos éxito
+      // El cliente debe usar supabase.auth.updateUser()
+
+      return new OperationResult(true, "Contraseña validada correctamente. Use el cliente para actualizar.");
+    } catch (error) {
+      return new OperationResult(false, `Error al cambiar contraseña: ${error.message}`);
     }
   }
 
