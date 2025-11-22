@@ -1,5 +1,5 @@
 // User service - migrated from C# BLL\UserLogic.cs
-import User from '../models/user.js';
+import User from '../models/UserModels.js';
 
 class UserService {
   constructor(supabase) {

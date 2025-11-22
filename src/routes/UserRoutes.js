@@ -8,17 +8,15 @@ const userController = new UserController();
 const supabaseAdmin = getSupabaseClient();
 const verifySupabaseToken = buildSupabaseAuthMiddleware(supabaseAdmin);
 
-// Rutas públicas
-router.post("/login", userController.login.bind(userController));
-router.post("/register", userController.register.bind(userController));
-
-// Rutas protegidas (requieren token)
+// Protected routes (require token)
 router.use(verifySupabaseToken);
-router.use(userController.injectUser);
 
-router.get("/all", userController.getProfile.bind(userController));
+// Sync endpoint - used by Frontend after login/register
+router.post("/sync", userController.syncUser.bind(userController));
+
+// Profile management
+router.get("/profile", userController.getProfile.bind(userController)); // Current user
 router.get("/:id", userController.getProfile.bind(userController));
 router.put("/:id", userController.updateProfile.bind(userController));
-router.delete("/:id", userController.getProfile.bind(userController));
 
 export default router;
