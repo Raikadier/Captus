@@ -30,6 +30,7 @@ export const AuthProvider = ({ children }) => {
         if (sessionData?.session?.user) {
            setUser(sessionData.session.user);
            // Token is handled by onAuthStateChange in supabase.js, but we can ensure it here too
+           
            localStorage.setItem('token', sessionData.session.access_token);
         } else {
            setUser(null);
@@ -82,7 +83,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (email, password, name) => {
+  const register = async (email, password, name, role = 'student') => {
     try {
       // Validate password strength
       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
@@ -95,7 +96,12 @@ export const AuthProvider = ({ children }) => {
 
       // First check if email is already registered in our users table
       try {
-        const response = await fetch('/api/users/check-email', {
+         // Note: apiClient handles base URL automatically
+         // However, for public endpoints without token, we might need care.
+         // But usually check-email is public. Let's assume apiClient works or use fetch if needed.
+         // Since we are in AuthContext and might not have token yet, fetch is safer for public routes unless apiClient handles it.
+         // Actually, our apiClient attaches token IF present.
+         const response = await fetch('/api/users/check-email', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -120,6 +126,7 @@ export const AuthProvider = ({ children }) => {
         options: {
           data: {
             name: name,
+            role: role, // Explicitly pass role here
             display_name: name,
             full_name: name
           }
