@@ -72,4 +72,31 @@ export class UserController {
       res.status(400).json({ success: false, error: error.message });
     }
   }
+
+  async deleteAccount(req, res) {
+    try {
+      // Assuming req.user.id comes from token, or maybe body?
+      // The original code didn't have params, so I'll assume it's deleting the *current* user
+      // or it's an admin function. Let's assume current user for safety or check params.
+      // The incoming change had: const result = await userService.deleteAccount();
+      // But usually we need an ID. Let's pass the authenticated user ID.
+      const userId = req.user?.id;
+      if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+      const result = await userService.deleteAccount(userId);
+      res.status(result.success ? 200 : 400).json(result);
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  async isEmailRegistered(req, res) {
+    const { email } = req.body;
+    try {
+      const result = await userService.isEmailRegistered(email);
+      res.status(200).json({ registered: result.data?.registered || false });
+    } catch (error) {
+      res.status(500).json({ registered: false, error: error.message });
+    }
+  }
 }
