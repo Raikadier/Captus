@@ -84,11 +84,11 @@ const Sidebar = ({ onCollapseChange }) => {
             className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} mb-6 p-3 bg-sidebar-accent/50 rounded-xl transition-all duration-200`}
           >
             <div className="relative w-10 h-10 rounded-full overflow-hidden bg-primary flex items-center justify-center flex-shrink-0 shadow-md">
-              <span className="text-primary-foreground font-semibold">{user?.name ? user.name.charAt(0).toUpperCase() : 'U'}</span>
+              <span className="text-primary-foreground font-semibold">{(user?.user_metadata?.name || user?.name || 'U').charAt(0).toUpperCase()}</span>
             </div>
             {!isCollapsed && (
               <div className="transition-opacity duration-200">
-                <p className={`font-medium text-sidebar-foreground whitespace-nowrap`}>{user?.name ? user.name.split(' ')[0] : 'Usuario'}</p>
+                <p className={`font-medium text-sidebar-foreground whitespace-nowrap`}>{(user?.user_metadata?.name || user?.name || 'Usuario').split(' ')[0]}</p>
                 <p className={`text-xs text-muted-foreground whitespace-nowrap`}>Estudiante</p>
               </div>
             )}
