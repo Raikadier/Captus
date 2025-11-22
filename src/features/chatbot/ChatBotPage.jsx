@@ -7,18 +7,9 @@ import { useAuth } from '../../context/AuthContext';
 
 const ChatBotPage = () => {
   const { user } = useAuth();
-  const [conversations, setConversations] = useState([
-    { id: 1, title: 'Nueva conversación', lastMessage: '¡Hola! Soy Captus AI...', timestamp: new Date() },
-  ]);
-  const [activeConversation, setActiveConversation] = useState(1);
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      type: 'bot',
-      content: '¡Hola! Soy Captus AI, tu asistente personal de productividad académica. ¿En qué puedo ayudarte hoy?',
-      timestamp: new Date(),
-    },
-  ]);
+  const [conversations, setConversations] = useState([]);
+  const [activeConversation, setActiveConversation] = useState(null);
+  const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
@@ -31,14 +22,81 @@ const ChatBotPage = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Fetch conversations on mount
+  useEffect(() => {
+    if (user) {
+      fetchConversations();
+    }
+  }, [user]);
+
+  // Fetch messages when active conversation changes
+  useEffect(() => {
+    if (activeConversation) {
+      fetchMessages(activeConversation);
+    } else {
+      setMessages([]);
+    }
+  }, [activeConversation]);
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
+  const getAuthHeaders = () => ({
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+  });
+
+  const fetchConversations = async () => {
+    try {
+      const response = await fetch(`${API_URL}/ai/conversations`, {
+        headers: getAuthHeaders()
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setConversations(data);
+        // Automatically select the most recent conversation if available
+        if (data.length > 0 && !activeConversation) {
+          setActiveConversation(data[0].id);
+        } else if (data.length === 0) {
+           // If no conversations, prepare the UI for a new one, but don't select an ID yet
+           setActiveConversation(null);
+           setMessages([{
+             id: 'intro',
+             type: 'bot',
+             content: '¡Hola! Soy Captus AI, tu asistente personal de productividad académica. ¿En qué puedo ayudarte hoy?',
+             timestamp: new Date(),
+           }]);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching conversations:', error);
+    }
+  };
+
+  const fetchMessages = async (conversationId) => {
+    try {
+      const response = await fetch(`${API_URL}/ai/conversations/${conversationId}/messages`, {
+        headers: getAuthHeaders()
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const formattedMessages = data.map(msg => ({
+          id: msg.id,
+          type: msg.role,
+          content: msg.content,
+          timestamp: new Date(msg.createdAt)
+        }));
+        setMessages(formattedMessages);
+      }
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    }
+  };
+
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
     if (!user) {
-       // Fallback if user is not loaded, though AuthGuard should handle this
        const errorMessage = {
         id: Date.now() + 1,
         type: 'bot',
@@ -50,7 +108,7 @@ const ChatBotPage = () => {
     }
 
     const userMessage = {
-      id: Date.now(),
+      id: 'temp-user-' + Date.now(),
       type: 'user',
       content: inputMessage.trim(),
       timestamp: new Date(),
@@ -63,16 +121,10 @@ const ChatBotPage = () => {
     try {
       const response = await fetch(`${API_URL}/ai/chat`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // Add authorization header if needed, though the backend might rely on the body userId for now or token in cookie
-          // However, the middleware typically expects Bearer token.
-          // Let's assume we need to send the token if available in localStorage or via Supabase session
-          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           message: userMessage.content,
-          userId: user.id // UUID from AuthContext
+          conversationId: activeConversation // Send current ID (null if new)
         }),
       });
 
@@ -82,17 +134,27 @@ const ChatBotPage = () => {
 
       const data = await response.json();
 
-      // The backend returns { result: "string response" }
-      const botResponseContent = data.result;
+      // If we started a new conversation, update the state
+      if (!activeConversation && data.conversationId) {
+        setActiveConversation(data.conversationId);
+        // Refresh conversations list to show the new title
+        fetchConversations();
+      }
 
+      // Backend returns the AI result. We add it to the list.
+      // (In a real-time app we might fetch the new message from DB,
+      // but here we just append the result for immediate feedback)
       const botResponse = {
-        id: Date.now() + 1,
+        id: 'temp-bot-' + Date.now(),
         type: 'bot',
-        content: botResponseContent,
+        content: data.result,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, botResponse]);
-      setIsLoading(false);
+
+      // Also refresh the message list to get real IDs and timestamps eventually?
+      // Maybe not necessary for every message to avoid flickering, but good practice if we want exact consistency.
+      // For now, we just append.
 
     } catch (error) {
       console.error('Error sending message:', error);
@@ -103,6 +165,7 @@ const ChatBotPage = () => {
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);
+    } finally {
       setIsLoading(false);
     }
   };
@@ -115,14 +178,7 @@ const ChatBotPage = () => {
   };
 
   const handleNewConversation = () => {
-    const newConv = {
-      id: Date.now(),
-      title: 'Nueva conversación',
-      lastMessage: '',
-      timestamp: new Date(),
-    };
-    setConversations((prev) => [newConv, ...prev]);
-    setActiveConversation(newConv.id);
+    setActiveConversation(null);
     setMessages([
       {
         id: Date.now(),
@@ -163,8 +219,11 @@ const ChatBotPage = () => {
                     activeConversation === conv.id ? 'bg-white shadow-sm' : 'hover:bg-gray-100'
                   }`}
                 >
-                  <p className="font-medium text-gray-900 text-sm truncate">{conv.title}</p>
-                  <p className="text-xs text-gray-500 truncate mt-1">{conv.lastMessage}</p>
+                  <p className="font-medium text-gray-900 text-sm truncate">{conv.title || 'Nueva conversación'}</p>
+                  <p className="text-xs text-gray-500 truncate mt-1">
+                     {/* We don't fetch last message in the list api yet, maybe add it later or just show date */}
+                     {new Date(conv.updatedAt).toLocaleDateString()}
+                  </p>
                 </button>
               ))}
             </div>

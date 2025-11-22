@@ -166,6 +166,16 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
+        <Route
+              path="/diagrams"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <StudentDiagramsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+        />
         {/* Rutas docente */}
         <Route
           path="/teacher/home"
