@@ -15,6 +15,7 @@ import SettingsPage from './features/settings/SettingsPage';
 import StatsPage from './features/stats/StatsPage';
 import StudentCoursesPage from './features/courses/StudentCoursesPage';
 import StudentCourseDetailPage from './features/courses/StudentCourseDetailPage';
+import StudentDiagramsPage from './features/student/StudentDiagramsPage';
 import TeacherHomePage from './features/teacher/TeacherHomePage';
 import TeacherCoursesPage from './features/teacher/TeacherCoursesPage';
 import TeacherCourseDetailPage from './features/teacher/TeacherCourseDetailPage';
