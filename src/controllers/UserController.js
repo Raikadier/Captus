@@ -75,11 +75,6 @@ export class UserController {
 
   async deleteAccount(req, res) {
     try {
-      // Assuming req.user.id comes from token, or maybe body?
-      // The original code didn't have params, so I'll assume it's deleting the *current* user
-      // or it's an admin function. Let's assume current user for safety or check params.
-      // The incoming change had: const result = await userService.deleteAccount();
-      // But usually we need an ID. Let's pass the authenticated user ID.
       const userId = req.user?.id;
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 

@@ -19,4 +19,8 @@ router.get("/profile", userController.getProfile.bind(userController)); // Curre
 router.get("/:id", userController.getProfile.bind(userController));
 router.put("/:id", userController.updateProfile.bind(userController));
 
+// Legacy/Teammate routes preserved
+router.delete("/account", userController.deleteAccount.bind(userController));
+router.post("/check-email", userController.isEmailRegistered.bind(userController));
+
 export default router;

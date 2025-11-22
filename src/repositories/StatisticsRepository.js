@@ -1,36 +1,36 @@
 import BaseRepository from "./BaseRepository.js";
 
 const mapFromDb = (row) => ({
-  id_Statistics: row.id,
-  id_User: row.user_id,
-  startDate: row.start_date,
-  endDate: row.end_date,
-  lastRachaDate: row.last_racha_date,
+  id_Statistics: row.id_Statistics,
+  id_User: row.id_User,
+  startDate: row.startDate,
+  endDate: row.endDate,
+  lastRachaDate: row.lastRachaDate,
   racha: row.racha,
-  totalTasks: row.total_tasks,
-  completedTasks: row.completed_tasks,
-  dailyGoal: row.daily_goal,
-  bestStreak: row.best_streak,
-  favoriteCategory: row.favorite_category,
+  totalTasks: row.totalTasks,
+  completedTasks: row.completedTasks,
+  dailyGoal: row.dailyGoal,
+  bestStreak: row.bestStreak,
+  favoriteCategory: row.favoriteCategory,
 });
 
 const mapToDb = (entity) => ({
-  user_id: entity.id_User,
-  start_date: entity.startDate ?? null,
-  end_date: entity.endDate ?? null,
-  last_racha_date: entity.lastRachaDate ?? null,
+  id_User: entity.id_User,
+  startDate: entity.startDate ?? null,
+  endDate: entity.endDate ?? null,
+  lastRachaDate: entity.lastRachaDate ?? null,
   racha: entity.racha ?? 0,
-  total_tasks: entity.totalTasks ?? 0,
-  completed_tasks: entity.completedTasks ?? 0,
-  daily_goal: entity.dailyGoal ?? 5,
-  best_streak: entity.bestStreak ?? 0,
-  favorite_category: entity.favoriteCategory ?? null,
+  totalTasks: entity.totalTasks ?? 0,
+  completedTasks: entity.completedTasks ?? 0,
+  dailyGoal: entity.dailyGoal ?? 5,
+  bestStreak: entity.bestStreak ?? 0,
+  favoriteCategory: entity.favoriteCategory ?? null,
 });
 
 export default class StatisticsRepository extends BaseRepository {
   constructor() {
     super("statistics", {
-      primaryKey: "id",
+      primaryKey: "id_Statistics",
       mapFromDb,
       mapToDb,
     });
@@ -41,7 +41,7 @@ export default class StatisticsRepository extends BaseRepository {
     const { data, error } = await this.client
       .from(this.tableName)
       .select("*")
-      .eq("user_id", userId)
+      .eq("id_User", userId)
       .maybeSingle();
 
     if (error) {
@@ -57,7 +57,7 @@ export default class StatisticsRepository extends BaseRepository {
     const result = await this.client
       .from(this.tableName)
       .update(mapToDb(statistics))
-      .eq("user_id", statistics.id_User)
+      .eq("id_User", statistics.id_User)
       .select("*")
       .maybeSingle();
 
@@ -70,7 +70,7 @@ export default class StatisticsRepository extends BaseRepository {
 
   async delete(userId) {
     if (!userId) return false;
-    const { error } = await this.client.from(this.tableName).delete().eq("user_id", userId);
+    const { error } = await this.client.from(this.tableName).delete().eq("id_User", userId);
     if (error) {
       throw new Error(error.message);
     }
