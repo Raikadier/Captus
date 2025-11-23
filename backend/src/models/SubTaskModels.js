@@ -8,8 +8,7 @@ export default class SubTask {
     endDate,
     id_Priority,
     state = false,
-    id_Task,
-    id_User,
+    id_Task = null,
   }) {
     this.id_SubTask = id_SubTask;
     this.title = title;
@@ -20,6 +19,5 @@ export default class SubTask {
     this.id_Priority = id_Priority;
     this.state = state;
     this.id_Task = id_Task;
-    this.id_User = id_User;
   }
 }
