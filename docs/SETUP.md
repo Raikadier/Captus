@@ -58,6 +58,10 @@ SUPABASE_SERVICE_ROLE_KEY=tu_service_role_key
 PORT=4000
 FRONTEND_URL=http://localhost:5173
 NODE_ENV=development
+
+# Gmail configuration for email notifications (opcional)
+GMAIL_USER=tu-email@gmail.com
+GMAIL_APP_PASSWORD=tu-app-password
 ```
 
 #### **Frontend (`frontend/.env`):**
@@ -73,6 +77,9 @@ NODE_ENV=development
 2. Crea un nuevo proyecto
 3. Ve a Settings > API
 4. Copia la URL y las keys necesarias
+
+### **3. Configurar Notificaciones por Email (Opcional)**
+Para activar las notificaciones por email de eventos, configura Gmail siguiendo la guía en [`docs/GMAIL_SETUP.md`](GMAIL_SETUP.md).
 
 ---
 
