@@ -35,6 +35,6 @@ export default defineConfig({
     emptyOutDir: true,
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom', '@radix-ui/react-dialog'],
+    include: ['react', 'react-dom', 'react-router-dom', '@radix-ui/react-dialog', 'mermaid'],
   },
 });
