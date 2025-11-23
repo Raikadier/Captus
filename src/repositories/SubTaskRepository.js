@@ -1,33 +1,31 @@
 import BaseRepository from "./BaseRepository.js";
 
 const mapFromDb = (row) => ({
-  id_SubTask: row.id,
+  id_SubTask: row.id_SubTask,
   title: row.title,
   description: row.description,
-  creationDate: row.created_at,
-  endDate: row.due_date,
-  id_Priority: row.priority_id,
-  id_Category: row.category_id,
-  state: row.completed,
-  id_Task: row.parent_task_id,
-  id_User: row.user_id,
+  creationDate: row.creationDate,
+  endDate: row.endDate,
+  id_Priority: row.id_Priority,
+  id_Category: row.id_Category,
+  state: row.state,
+  id_Task: row.id_Task,
 });
 
 const mapToDb = (entity) => ({
   title: entity.title,
   description: entity.description ?? null,
-  due_date: entity.endDate ?? null,
-  priority_id: entity.id_Priority ?? null,
-  category_id: entity.id_Category ?? null,
-  completed: entity.state ?? false,
-  user_id: entity.id_User,
-  parent_task_id: entity.id_Task,
+  endDate: entity.endDate ?? null,
+  id_Priority: entity.id_Priority ?? null,
+  id_Category: entity.id_Category ?? null,
+  state: entity.state ?? false,
+  id_Task: entity.id_Task ?? null,
 });
 
 class SubTaskRepository extends BaseRepository {
   constructor() {
-    super("tasks", {
-      primaryKey: "id",
+    super("subTask", {
+      primaryKey: "id_SubTask",
       mapFromDb,
       mapToDb,
     });
@@ -42,8 +40,8 @@ class SubTaskRepository extends BaseRepository {
     const { data, error } = await this.client
       .from(this.tableName)
       .select("*")
-      .eq("parent_task_id", taskId)
-      .order("created_at", { ascending: true });
+      .eq("id_Task", taskId)
+      .order("creationDate", { ascending: true });
 
     if (error) {
       throw new Error(error.message);
@@ -63,7 +61,7 @@ class SubTaskRepository extends BaseRepository {
 
   async delete(id) {
     if (!id) return false;
-    const { error } = await this.client.from(this.tableName).delete().eq("id", id);
+    const { error } = await this.client.from(this.tableName).delete().eq("id_SubTask", id);
     if (error) {
       throw new Error(error.message);
     }
@@ -74,8 +72,8 @@ class SubTaskRepository extends BaseRepository {
     if (!taskId) return false;
     const { error } = await this.client
       .from(this.tableName)
-      .update({ completed: true })
-      .eq("parent_task_id", taskId);
+      .update({ state: true })
+      .eq("id_Task", taskId);
     if (error) {
       throw new Error(error.message);
     }
