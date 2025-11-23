@@ -26,6 +26,7 @@ import TeacherDiagramsPage from './features/teacher/TeacherDiagramsPage';
 import TeacherReviewsPage from './features/teacher/TeacherReviewsPage';
 import TeacherEditTaskPage from './features/teacher/TeacherEditTaskPage';
 import TeacherCalendarPage from './features/teacher/TeacherCalendarPage';
+import Loading from './ui/loading';
 import { Toaster } from 'sonner';
 
  // Protected Route component
@@ -38,11 +39,7 @@ import { Toaster } from 'sonner';
    }
  
    if (loading) {
-     return (
-       <div className="min-h-screen flex items-center justify-center">
-         <div className="text-xl">Cargando...</div>
-       </div>
-     );
+     return <Loading message="Cargando..." />;
    }
  
    return isAuthenticated ? children : <Navigate to="/" />;

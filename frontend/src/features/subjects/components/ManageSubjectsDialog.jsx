@@ -14,6 +14,7 @@ import { Button } from '../../../ui/button';
 import { Input } from '../../../ui/input';
 import { Label } from '../../../ui/label';
 import { ScrollArea } from '../../../ui/scroll-area';
+import Loading from '../../../ui/loading';
 import { BookOpen, Plus, Loader2, Trash2 } from 'lucide-react';
 
 const COLORS = [
@@ -173,7 +174,7 @@ export function ManageSubjectsDialog({ trigger, onUpdate }) {
             <h3 className="font-medium text-sm mb-3">Materias Activas ({subjects.length})</h3>
             <ScrollArea className="flex-1 pr-4">
               {loading ? (
-                <div className="text-center py-8 text-muted-foreground">Cargando...</div>
+                <Loading message="Cargando..." fullScreen={false} />
               ) : subjects.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground border-dashed border-2 rounded-lg">
                   No hay materias registradas.

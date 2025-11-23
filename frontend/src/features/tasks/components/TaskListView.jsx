@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTasks } from '../hooks/useTasks';
 import { Check, Calendar, List } from 'lucide-react';
+import Loading from '../../../ui/loading';
 import AddTaskForm from './AddTaskForm';
 
 const TaskListView = () => {
@@ -71,11 +72,7 @@ const TaskListView = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-xl text-gray-600">Cargando tareas...</div>
-      </div>
-    );
+    return <Loading message="Cargando tareas..." fullScreen={false} />;
   }
 
   if (error) {

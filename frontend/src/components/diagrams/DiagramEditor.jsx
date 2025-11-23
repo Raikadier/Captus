@@ -4,6 +4,7 @@ import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
 import Editor from '@monaco-editor/react';
+import Loading from '../../ui/loading';
 import MermaidRenderer from './MermaidRenderer';
 
 const defaultCode = `graph TD
@@ -100,7 +101,7 @@ export default function DiagramEditor({ open, onOpenChange, initialData, onSave 
                       scrollBeyondLastLine: false,
                       wordWrap: 'on',
                     }}
-                    loading={<div className="p-4 text-sm text-gray-500">Cargando editor...</div>}
+                    loading={<Loading message="Cargando editor..." fullScreen={false} />}
                   />
                </div>
             </div>

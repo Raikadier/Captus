@@ -63,7 +63,7 @@ export class DiagramService {
         }
 
         // Verify ownership
-        const existing = await diagramRepository.findById(id);
+        const existing = await diagramRepository.getById(id);
         if (!existing) {
             return new OperationResult(false, "Diagrama no encontrado.");
         }
@@ -98,7 +98,7 @@ export class DiagramService {
           }
 
           // Verify ownership
-          const existing = await diagramRepository.findById(id);
+          const existing = await diagramRepository.getById(id);
           if (!existing) {
               return new OperationResult(false, "Diagrama no encontrado.");
           }

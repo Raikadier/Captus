@@ -7,6 +7,7 @@ import { Input } from '../../ui/input'
 import { Textarea } from '../../ui/textarea'
 import { Label } from '../../ui/label'
 import { Switch } from '../../ui/switch'
+import Loading from '../../ui/loading'
 import { toast } from 'sonner'
 import { ArrowLeft } from 'lucide-react'
 
@@ -81,65 +82,49 @@ export default function TeacherEditTaskPage() {
       }
   }
 
-  if (loading) return <div className="p-6">Cargando...</div>
+  if (loading) return <Loading message="Cargando..." />
 
   return (
-    <div className="p-6 max-w-3xl mx-auto space-y-6">
-        <div className="flex items-center gap-4 mb-6">
-            <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-                <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <h1 className="text-2xl font-bold">{isEditing ? 'Editar Tarea' : 'Crear Nueva Tarea'}</h1>
+    <div className="p-6 space-y-6">
+      <div className="flex items-center gap-3 bg-white rounded-xl shadow-sm p-6">
+        <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+          <ClipboardList className="text-primary" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Editar tarea #{id}</h1>
+          <p className="text-sm text-gray-600">Actualiza la información de la tarea</p>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm space-y-6">
-            <div className="space-y-2">
-                <Label>Título de la Tarea</Label>
-                <Input
-                    value={formData.title}
-                    onChange={e => setFormData({...formData, title: e.target.value})}
-                    placeholder="Ej: Ensayo sobre Historia"
-                />
-            </div>
-
-            <div className="space-y-2">
-                <Label>Descripción e Instrucciones</Label>
-                <Textarea
-                    value={formData.description}
-                    onChange={e => setFormData({...formData, description: e.target.value})}
-                    placeholder="Detalla lo que deben realizar los estudiantes..."
-                    className="h-32"
-                />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                    <Label>Fecha de Vencimiento</Label>
-                    <div className="block">
-                         <Input
-                            type="datetime-local"
-                            value={formData.due_date ? new Date(formData.due_date).toISOString().slice(0, 16) : ''}
-                            onChange={e => setFormData({...formData, due_date: new Date(e.target.value)})}
-                         />
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-2 pt-8">
-                     <input
-                        type="checkbox"
-                        id="isGroup"
-                        className="w-5 h-5 text-green-600 rounded focus:ring-green-500"
-                        checked={formData.is_group_assignment}
-                        onChange={e => setFormData({...formData, is_group_assignment: e.target.checked})}
-                     />
-                     <Label htmlFor="isGroup" className="cursor-pointer">Es una tarea grupal</Label>
-                </div>
-            </div>
-
-            <div className="pt-4 flex justify-end gap-3">
-                <Button variant="outline" onClick={() => navigate(-1)}>Cancelar</Button>
-                <Button onClick={handleSubmit}>{isEditing ? 'Guardar Cambios' : 'Crear Tarea'}</Button>
-            </div>
+      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <Button type="button" variant="ghost" onClick={() => navigate('/teacher/tasks')}>
+            <ArrowLeft className="w-4 h-4 mr-2" /> Volver
+          </Button>
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">Título</label>
+          <Input value={formData.title} onChange={handleChange('title')} required />
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">Descripción</label>
+          <textarea
+            value={formData.description}
+            onChange={handleChange('description')}
+            rows={4}
+            className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">Fecha límite</label>
+          <Input type="date" value={formData.dueDate} onChange={handleChange('dueDate')} />
+        </div>
+        <div className="flex gap-2">
+          <Button type="button" variant="outline" onClick={() => navigate('/teacher/tasks')}>
+            Cancelar
+          </Button>
+          <Button type="submit" className="bg-primary hover:bg-primary/90">
+            Guardar cambios
+          </Button>
         </div>
     </div>
   )

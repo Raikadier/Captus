@@ -7,6 +7,7 @@ import { Input } from '../../ui/input'
 import { Textarea } from '../../ui/textarea'
 import { Card, CardContent } from '../../ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../ui/dialog'
+import Loading from '../../ui/loading'
 import { toast } from 'sonner'
 import { ArrowLeft, ExternalLink, CheckCircle, Clock } from 'lucide-react'
 
@@ -70,14 +71,23 @@ export default function TeacherReviewsPage() {
       setIsGradeOpen(true)
   }
 
-  if (loading) return <div className="p-6">Cargando...</div>
+  if (loading) return <Loading message="Cargando..." />
 
   return (
     <div className="p-6 space-y-6">
-       <div className="flex items-center gap-4 mb-6">
-            <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-                <ArrowLeft className="w-5 h-5" />
-            </Button>
+      <div className="bg-white rounded-xl shadow-sm p-6 flex items-center gap-3">
+        <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+          <ListChecks className="text-primary" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Revisiones pendientes</h1>
+          <p className="text-sm text-gray-600">Evalúa las entregas de tus estudiantes</p>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        {mockReviews.map((review) => (
+          <div key={review.id} className="p-4 bg-white rounded-xl shadow-sm border border-gray-200 flex items-center justify-between">
             <div>
                 <h1 className="text-2xl font-bold">Revisiones: {assignment?.title}</h1>
                 <p className="text-gray-500">Total entregas: {submissions.length}</p>
