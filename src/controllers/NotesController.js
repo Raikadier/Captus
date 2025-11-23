@@ -1,4 +1,5 @@
 import { NotesService } from "../services/NotesService.js";
+import NotificationService from '../services/NotificationService.js';
 
 const notesService = new NotesService();
 
@@ -25,6 +26,18 @@ export class NotesController {
 
   async create(req, res) {
     const result = await notesService.create(req.body);
+
+    if (result.success) {
+      await NotificationService.notify({
+        user_id: req.user.id,
+        title: 'Nota Creada',
+        body: `Has creado una nueva nota.`,
+        event_type: 'note_created',
+        entity_id: result.data.id,
+        is_auto: true
+      });
+    }
+
     res.status(result.success ? 201 : 400).json(result);
   }
 
