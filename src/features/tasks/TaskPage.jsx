@@ -14,6 +14,7 @@ import { Badge } from '../../ui/badge';
 import { Button } from '../../ui/button';
 import { Card } from '../../ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../../ui/dialog';
+import Loading from '../../ui/loading';
 import './TaskTabs.css';
 
 const TaskPage = () => {
@@ -144,11 +145,7 @@ const TaskPage = () => {
   });
 
   if (loading && tasks.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Cargando tareas...</div>
-      </div>
-    );
+    return <Loading message="Cargando tareas..." />;
   }
 
   return (
