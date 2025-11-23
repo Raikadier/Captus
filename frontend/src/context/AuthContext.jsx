@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../shared/api/supabase';
+import apiClient from '../shared/api/client';
 
 const AuthContext = createContext();
 
@@ -29,6 +30,7 @@ export const AuthProvider = ({ children }) => {
         if (sessionData?.session?.user) {
            setUser(sessionData.session.user);
            // Token is handled by onAuthStateChange in supabase.js, but we can ensure it here too
+           
            localStorage.setItem('token', sessionData.session.access_token);
         } else {
            setUser(null);
@@ -66,21 +68,12 @@ export const AuthProvider = ({ children }) => {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
 
-      // After successful login, sync user with backend
+      // Sync user to backend (ensures public.users has the latest role/info)
       try {
-        const response = await fetch('/api/users/profile', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${data.session.access_token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (!response.ok) {
-          console.warn('Failed to sync user with backend:', response.status);
-        }
+        await apiClient.post('/users/sync');
       } catch (syncError) {
-        console.warn('Error syncing user:', syncError);
+        console.error('Backend sync failed:', syncError);
+        // We don't block login if sync fails, but we log it
       }
 
       return { success: true, data };
@@ -90,7 +83,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (email, password, name) => {
+  const register = async (email, password, name, role = 'student') => {
     try {
       // Validate password strength
       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
@@ -103,7 +96,12 @@ export const AuthProvider = ({ children }) => {
 
       // First check if email is already registered in our users table
       try {
-        const response = await fetch('/api/users/check-email', {
+         // Note: apiClient handles base URL automatically
+         // However, for public endpoints without token, we might need care.
+         // But usually check-email is public. Let's assume apiClient works or use fetch if needed.
+         // Since we are in AuthContext and might not have token yet, fetch is safer for public routes unless apiClient handles it.
+         // Actually, our apiClient attaches token IF present.
+         const response = await fetch('/api/users/check-email', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -128,6 +126,7 @@ export const AuthProvider = ({ children }) => {
         options: {
           data: {
             name: name,
+            role: role, // Explicitly pass role here
             display_name: name,
             full_name: name
           }
@@ -144,6 +143,15 @@ export const AuthProvider = ({ children }) => {
           return { success: false, error: 'Este email ya está registrado' };
         }
         throw error;
+      }
+
+      // If we have a session immediately (no email confirm required), sync to backend
+      if (data.session) {
+        try {
+          await apiClient.post('/users/sync');
+        } catch (syncError) {
+          console.error('Backend sync failed during registration:', syncError);
+        }
       }
 
       // If email confirmation is enabled in Supabase, session might be null

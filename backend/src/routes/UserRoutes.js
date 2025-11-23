@@ -9,19 +9,26 @@ const supabaseAdmin = getSupabaseClient();
 const verifySupabaseToken = buildSupabaseAuthMiddleware(supabaseAdmin);
 
 // Rutas públicas
-router.post("/login", userController.login.bind(userController));
-router.post("/register", userController.register.bind(userController));
+// check-email se mantiene pública para validaciones de registro
 router.post("/check-email", userController.isEmailRegistered.bind(userController));
 
 // Rutas protegidas (requieren token)
 router.use(verifySupabaseToken);
-router.use(userController.injectUser);
 
+// Endpoint de Sincronización (Tu nueva feature)
+router.post("/sync", userController.syncUser.bind(userController));
+
+// Gestión de Perfil
 router.get("/profile", userController.getProfile.bind(userController));
-router.get("/all", userController.getProfile.bind(userController));
 router.get("/:id", userController.getProfile.bind(userController));
 router.put("/:id", userController.updateProfile.bind(userController));
+
+// Rutas preservadas de Main (útiles)
 router.put("/change-password", userController.changePassword.bind(userController));
 router.delete("/account", userController.deleteAccount.bind(userController));
+
+// Legacy/Teammate routes preserved
+router.delete("/account", userController.deleteAccount.bind(userController));
+router.post("/check-email", userController.isEmailRegistered.bind(userController));
 
 export default router;

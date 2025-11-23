@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext'
-import './Sidebar.css'
 import {
   BookOpen,
   Home,
@@ -17,8 +16,6 @@ import {
   ChevronLeft,
   ChevronRight,
   GitBranch,
-  ChevronDown,
-  Tag,
 } from 'lucide-react'
 
 const Sidebar = ({ onCollapseChange }) => {
@@ -26,22 +23,11 @@ const Sidebar = ({ onCollapseChange }) => {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [isCollapsed, setIsCollapsed] = useState(false)
-  const [tasksDropdownOpen, setTasksDropdownOpen] = useState(false)
 
   const menuItems = [
     { path: '/home', icon: Home, label: 'Inicio' },
     { path: '/courses', icon: BookOpen, label: 'Cursos' },
-    {
-      type: 'dropdown',
-      icon: CheckSquare,
-      label: 'Tareas',
-      isOpen: tasksDropdownOpen,
-      onToggle: () => setTasksDropdownOpen(!tasksDropdownOpen),
-      subItems: [
-        { path: '/tasks', icon: CheckSquare, label: 'Mis Tareas' },
-        { path: '/tasks?tab=categories', icon: Tag, label: 'Categorías' }
-      ]
-    },
+    { path: '/tasks', icon: CheckSquare, label: 'Tareas' },
     { path: '/diagrams', icon: GitBranch, label: 'Diagramas' },
     { path: '/calendar', icon: CalendarIcon, label: 'Calendario' },
     { path: '/notes', icon: StickyNote, label: 'Notas' },
@@ -59,17 +45,7 @@ const Sidebar = ({ onCollapseChange }) => {
     }
   }
 
-  const isActive = (path) => {
-    if (path === '/tasks') {
-      // "Mis Tareas" está activo si estamos en /tasks sin tab=categories
-      return location.pathname === '/tasks' && !location.search.includes('tab=categories')
-    }
-    if (path === '/tasks?tab=categories') {
-      // "Categorías" está activo si estamos en /tasks con tab=categories
-      return location.pathname === '/tasks' && location.search.includes('tab=categories')
-    }
-    return location.pathname === path
-  }
+  const isActive = (path) => location.pathname === path
 
   const handleLogout = async () => {
     await logout()
@@ -78,7 +54,7 @@ const Sidebar = ({ onCollapseChange }) => {
 
   return (
     <div
-      className={`fixed inset-y-0 left-0 bg-sidebar border-r border-sidebar-border z-10 flex flex-col transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] slide-in-animation sidebar-shadow ${
+      className={`fixed inset-y-0 left-0 bg-sidebar border-r border-sidebar-border z-10 flex flex-col transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] animate-in slide-in-from-left-10 duration-500 ${
         isCollapsed ? 'w-20' : 'w-60'
       }`}
     >
@@ -107,107 +83,42 @@ const Sidebar = ({ onCollapseChange }) => {
           <div
             className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} mb-6 p-3 bg-sidebar-accent/50 rounded-xl transition-all duration-200`}
           >
-            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-primary flex items-center justify-center flex-shrink-0 shadow-md avatar-glow">
-              <span className="text-primary-foreground font-semibold">{user?.name ? user.name.charAt(0).toUpperCase() : 'U'}</span>
+            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-primary flex items-center justify-center flex-shrink-0 shadow-md">
+              <span className="text-primary-foreground font-semibold">{(user?.user_metadata?.name || user?.name || 'U').charAt(0).toUpperCase()}</span>
             </div>
             {!isCollapsed && (
               <div className="transition-opacity duration-200">
-                <p className={`font-medium text-sidebar-foreground whitespace-nowrap`}>{user?.name ? user.name.split(' ')[0] : 'Usuario'}</p>
+                <p className={`font-medium text-sidebar-foreground whitespace-nowrap`}>{(user?.user_metadata?.name || user?.name || 'Usuario').split(' ')[0]}</p>
                 <p className={`text-xs text-muted-foreground whitespace-nowrap`}>Estudiante</p>
               </div>
             )}
           </div>
 
           <nav className="space-y-1">
-            {menuItems.map((item, index) => {
-              if (item.type === 'dropdown') {
-                const DropdownIcon = item.icon
-                const hasActiveSubItem = item.subItems.some(subItem => isActive(subItem.path))
-
-                return (
-                  <div key={`dropdown-${index}`}>
-                    <button
-                      onClick={item.onToggle}
-                      className={`sidebar-menu-item ripple-effect flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} px-3 py-2.5 rounded-xl transition-all duration-200 active:scale-95 w-full ${
-                        hasActiveSubItem
-                          ? 'active bg-sidebar-accent text-primary font-medium shadow-sm'
-                          : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'
-                      }`}
-                      title={isCollapsed ? item.label : ''}
-                    >
-                      <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'}`}>
-                        <span className={hasActiveSubItem ? 'text-primary' : 'text-muted-foreground'}>
-                          <DropdownIcon size={18} />
-                        </span>
-                        {!isCollapsed && (
-                          <span className="font-medium text-sm whitespace-nowrap transition-opacity duration-200">
-                            {item.label}
-                          </span>
-                        )}
-                      </div>
-                      {!isCollapsed && (
-                        <ChevronDown
-                          size={16}
-                          className={`text-muted-foreground chevron-rotate ${item.isOpen ? 'rotated' : ''}`}
-                        />
-                      )}
-                    </button>
-
-                    {/* Submenu */}
-                    {item.isOpen && !isCollapsed && (
-                      <div className="dropdown-submenu open ml-6 mt-1 space-y-1">
-                        {item.subItems.map((subItem) => {
-                          const SubIcon = subItem.icon
-                          const subActive = isActive(subItem.path)
-                          return (
-                            <Link
-                              key={subItem.path}
-                              to={subItem.path}
-                              className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 active:scale-95 ${
-                                subActive
-                                  ? 'bg-sidebar-accent/80 text-primary font-medium'
-                                  : 'text-muted-foreground hover:bg-sidebar-accent/40 hover:text-sidebar-foreground'
-                              }`}
-                            >
-                              <span className={subActive ? 'text-primary' : 'text-muted-foreground'}>
-                                <SubIcon size={16} />
-                              </span>
-                              <span className="font-medium text-sm whitespace-nowrap">
-                                {subItem.label}
-                              </span>
-                            </Link>
-                          )
-                        })}
-                      </div>
-                    )}
-                  </div>
-                )
-              } else {
-                // Regular menu item
-                const RegularIcon = item.icon
-                const active = isActive(item.path)
-                return (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    className={`sidebar-menu-item ripple-effect flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} px-3 py-2.5 rounded-xl transition-all duration-200 active:scale-95 ${
-                      active
-                        ? 'active bg-sidebar-accent text-primary font-medium shadow-sm'
-                        : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'
-                    }`}
-                    title={isCollapsed ? item.label : ''}
-                  >
-                    <span className={active ? 'text-primary' : 'text-muted-foreground'}>
-                      <RegularIcon size={18} />
+            {menuItems.map((item) => {
+              const Icon = item.icon
+              const active = isActive(item.path)
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} px-3 py-2.5 rounded-xl transition-all duration-200 active:scale-95 ${
+                    active
+                      ? 'bg-sidebar-accent text-primary font-medium shadow-sm'
+                      : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'
+                  }`}
+                  title={isCollapsed ? item.label : ''}
+                >
+                  <span className={active ? 'text-primary' : 'text-muted-foreground'}>
+                    <Icon size={18} />
+                  </span>
+                  {!isCollapsed && (
+                    <span className="font-medium text-sm whitespace-nowrap transition-opacity duration-200">
+                      {item.label}
                     </span>
-                    {!isCollapsed && (
-                      <span className="font-medium text-sm whitespace-nowrap transition-opacity duration-200">
-                        {item.label}
-                      </span>
-                    )}
-                  </Link>
-                )
-              }
+                  )}
+                </Link>
+              )
             })}
           </nav>
         </div>
