@@ -389,9 +389,9 @@ export default function SettingsPage() {
 
 
   return (
-    <div className={`${darkMode ? 'bg-gray-900' : 'bg-[#F6F7FB]'}`}>
+    <div className={`${darkMode ? 'bg-background' : 'bg-[#F6F7FB]'}`}>
       <div className={`max-w-7xl mx-auto ${compactView ? 'p-4' : 'p-8'} ${compactView ? 'pb-24' : 'pb-8'}`}>
-        <header className={`sticky top-0 ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-sm ${compactView ? 'p-4' : 'p-6'} mb-6 z-10 animate-in slide-in-from-top duration-300`}>
+        <header className={`sticky top-0 ${darkMode ? 'bg-card' : 'bg-white'} rounded-xl shadow-sm ${compactView ? 'p-4' : 'p-6'} mb-6 z-10 animate-in slide-in-from-top duration-300`}>
           <div className="flex justify-between items-center">
             <div>
               <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>⚙️ Configuración</h1>
@@ -402,7 +402,7 @@ export default function SettingsPage() {
 
         <div className={`grid grid-cols-1 lg:grid-cols-3 ${compactView ? 'gap-4' : 'gap-6'}`}>
           <div className="lg:col-span-1 animate-in slide-in-from-left duration-500">
-            <Card className={`${compactView ? 'p-3' : 'p-4'} ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
+            <Card className={`${compactView ? 'p-3' : 'p-4'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
               <nav className={compactView ? 'space-y-1' : 'space-y-2'}>
                 <SettingsMenuItem
                   icon={<User size={18} />}
@@ -436,7 +436,7 @@ export default function SettingsPage() {
 
             {/* PERFIL SECTION */}
             {activeSection === 'perfil' && (
-              <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
+              <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
                 <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} ${compactView ? 'mb-4' : 'mb-6'}`}>
                   Información Personal
                 </h2>
@@ -595,7 +595,7 @@ export default function SettingsPage() {
 
             {/* SEGURIDAD SECTION */}
             {activeSection === 'seguridad' && (
-              <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
+              <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
                 <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} ${compactView ? 'mb-4' : 'mb-6'}`}>
                   Cambiar Contraseña
                 </h2>
@@ -669,7 +669,7 @@ export default function SettingsPage() {
 
             {/* APARIENCIA SECTION */}
             {activeSection === 'apariencia' && (
-              <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
+              <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
                 <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} ${compactView ? 'mb-4' : 'mb-6'}`}>
                   Personalización de la Interfaz
                 </h2>
@@ -727,7 +727,7 @@ export default function SettingsPage() {
 
             {/* PRIVACIDAD SECTION */}
             {activeSection === 'privacidad' && (
-              <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
+              <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
                 <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} ${compactView ? 'mb-4' : 'mb-6'}`}>
                   Gestión de Datos
                 </h2>
@@ -752,7 +752,7 @@ export default function SettingsPage() {
 
             {/* Delete Account Modal */}
             <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
-              <DialogContent className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'} max-w-md`}>
+              <DialogContent className={`${darkMode ? 'bg-card border-gray-700' : 'bg-white'} max-w-md`}>
                 <DialogHeader>
                   <DialogTitle className={`text-xl font-bold ${darkMode ? 'text-red-400' : 'text-red-600'}`}>
                     ⚠️ Eliminar Cuenta

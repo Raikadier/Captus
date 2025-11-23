@@ -62,12 +62,12 @@
 
 .dark {
   /* Base Colors - Dark Mode */
-  --background: oklch(0.12 0 0);
+  --background: oklch(0.21 0.04 265); /* Bluish dark (Gray 900) */
   --foreground: oklch(0.985 0 0);
 
-  --card: oklch(0.16 0 0);
+  --card: oklch(0.28 0.04 260); /* Slightly lighter bluish dark (Gray 800) */
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.16 0 0);
+  --popover: oklch(0.28 0.04 260);
   --popover-foreground: oklch(0.985 0 0);
 
   /* Brand Colors - Dark Mode */
@@ -96,7 +96,7 @@
   --chart-4: oklch(0.35 0.15 145);
   --chart-5: oklch(0.25 0.15 145);
 
-  --sidebar: oklch(0.14 0 0);
+  --sidebar: oklch(0.21 0.04 265); /* Matches background */
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.65 0.15 145);
   --sidebar-primary-foreground: oklch(0.145 0 0);
