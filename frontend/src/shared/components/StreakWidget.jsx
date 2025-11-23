@@ -1,6 +1,7 @@
 // StreakWidget - Widget mejorado con animación y mejor diseño
 import React, { useState, useEffect } from 'react';
 import { Flame, Target, Calendar } from 'lucide-react';
+import Loading from '../../ui/loading';
 import apiClient from '../api/client';
 
 const StreakWidget = () => {
@@ -66,16 +67,16 @@ const StreakWidget = () => {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <div className="text-center text-gray-500">Cargando racha...</div>
+      <div className="bg-card rounded-xl shadow-sm p-6">
+        <Loading message="Cargando racha..." fullScreen={false} />
       </div>
     );
   }
 
   if (!streakData) {
     return (
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <div className="text-center text-gray-500">No se pudo cargar la información de racha</div>
+      <div className="bg-card rounded-xl shadow-sm p-6">
+        <div className="text-center text-muted-foreground">No se pudo cargar la información de racha</div>
       </div>
     );
   }
@@ -84,13 +85,13 @@ const StreakWidget = () => {
     new Date(streakData.lastCompletedDate).toDateString() === new Date().toDateString();
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6">
+    <div className="bg-card rounded-xl shadow-sm p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-bold text-gray-800 flex items-center">
+        <h3 className="text-lg font-bold text-foreground flex items-center">
           <Flame className="mr-2 text-orange-500" size={20} />
           Mi Racha
         </h3>
-        <div className="flex items-center text-sm text-gray-600">
+        <div className="flex items-center text-sm text-muted-foreground">
           <Target size={16} className="mr-1" />
           Meta: {streakData.dailyGoal} tareas/día
         </div>
@@ -99,11 +100,11 @@ const StreakWidget = () => {
       {/* Streak counter */}
       <div className="text-center mb-4">
         <div className={`text-6xl font-bold mb-2 ${
-          animatedStreak > 0 ? 'text-orange-500' : 'text-gray-400'
+          animatedStreak > 0 ? 'text-orange-500' : 'text-muted-foreground'
         }`}>
           {animatedStreak}
         </div>
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-muted-foreground">
           {animatedStreak === 1 ? 'día consecutivo' : 'días consecutivos'}
         </div>
       </div>
@@ -116,7 +117,7 @@ const StreakWidget = () => {
             ¡Racha activa!
           </div>
         ) : (
-          <div className="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-sm">
+          <div className="inline-flex items-center px-3 py-1 rounded-full bg-muted text-muted-foreground text-sm">
             <Calendar size={14} className="mr-1" />
             Completa tareas hoy para mantener la racha
           </div>
@@ -134,7 +135,7 @@ const StreakWidget = () => {
 
       {/* Last completed date */}
       {streakData.lastCompletedDate && (
-        <div className="text-center text-xs text-gray-500 mt-2">
+        <div className="text-center text-xs text-muted-foreground mt-2">
           Última: {new Date(streakData.lastCompletedDate).toLocaleDateString('es-ES')}
         </div>
       )}

@@ -1,27 +1,67 @@
-import React, { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { BookOpen, Calendar as CalendarIcon, Users, FileText, PlusCircle, GitBranch, Megaphone } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { useCourses } from '../../hooks/useCourses'
+import { useEnrollments } from '../../hooks/useEnrollments'
+import { useAssignments } from '../../hooks/useAssignments'
 import { Button } from '../../ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card'
-
-const tabs = ['Información', 'Estudiantes', 'Tareas', 'Anuncios']
-
-const mockStudents = [
-  { id: 1, name: 'María Gómez', email: 'maria@example.com' },
-  { id: 2, name: 'Juan Pérez', email: 'juan@example.com' },
-]
-
-const mockTasks = [
-  { id: 1, title: 'Ensayo cap. 2', dueDate: '2025-11-22', status: 'Pendiente' },
-  { id: 2, title: 'Quiz módulo 3', dueDate: '2025-11-25', status: 'En progreso' },
-]
-
-const mockAnnouncements = [{ id: 1, title: 'Recordatorio', body: 'Entrega parcial el 22/11', type: 'Urgente' }]
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../ui/tabs'
+import { Plus, Users, FileText, ClipboardList } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../ui/dialog'
+import { Input } from '../../ui/input'
+import Loading from '../../ui/loading'
+import { toast } from 'sonner'
 
 export default function TeacherCourseDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState('Información')
+  const { getCourse } = useCourses()
+  const { getStudents, addStudentManually } = useEnrollments()
+  const { getAssignments } = useAssignments()
+
+  const [course, setCourse] = useState(null)
+  const [students, setStudents] = useState([])
+  const [assignments, setAssignments] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  // Add Student State
+  const [emailToAdd, setEmailToAdd] = useState('')
+  const [isAddStudentOpen, setIsAddStudentOpen] = useState(false)
+
+  const loadData = async () => {
+      try {
+        const c = await getCourse(id)
+        setCourse(c)
+        const s = await getStudents(id)
+        setStudents(s)
+        const a = await getAssignments(id)
+        setAssignments(a)
+      } catch (err) {
+        console.error(err)
+        // toast.error('Error cargando datos del curso')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+  useEffect(() => {
+    loadData()
+  }, [id])
+
+  const handleAddStudent = async () => {
+      try {
+          await addStudentManually(id, emailToAdd)
+          toast.success('Estudiante agregado')
+          setEmailToAdd('')
+          setIsAddStudentOpen(false)
+          loadData() // Refresh list
+      } catch (error) {
+          toast.error(error.message)
+      }
+  }
+
+  if (loading) return <Loading message="Cargando..." />
+  if (!course) return <div className="p-6">Curso no encontrado</div>
 
   return (
     <div className="p-6 space-y-6">
@@ -31,48 +71,51 @@ export default function TeacherCourseDetailPage() {
             <BookOpen className="text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Curso #{id}</h1>
-            <p className="text-sm text-gray-600">Detalle del curso y sus recursos</p>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => navigate(`/teacher/courses/${id}/assignments/new`)}>
-            <PlusCircle className="w-4 h-4 mr-2" />
-            Crear Tarea
-          </Button>
-          <Button variant="ghost">
-            <Megaphone className="w-4 h-4 mr-2" />
-            Enviar anuncio
-          </Button>
-        </div>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Secciones</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-2 mb-4 flex-wrap">
-            {tabs.map((tab) => (
-              <Button
-                key={tab}
-                variant={activeTab === tab ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setActiveTab(tab)}
-                className="active:scale-95"
-              >
-                {tab}
-              </Button>
-            ))}
-          </div>
-
-          {activeTab === 'Información' && (
-            <div className="space-y-3 text-gray-700">
-              <p><strong>Profesor:</strong> Nombre del profesor</p>
-              <p><strong>Semestre:</strong> 2025-II</p>
-              <p><strong>Código:</strong> CUR-{id}</p>
+            <h1 className="text-3xl font-bold text-gray-900">{course.title}</h1>
+            <p className="text-gray-600 mt-2">{course.description}</p>
+            <div className="mt-4 inline-flex items-center gap-2 bg-green-50 px-3 py-1 rounded-full border border-green-200">
+                <span className="text-sm font-medium text-green-800">Código de Invitación:</span>
+                <span className="font-mono font-bold text-green-900">{course.invite_code}</span>
             </div>
-          )}
+          </div>
+          <Button onClick={() => navigate(`/teacher/tasks/new/edit?courseId=${id}`)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Crear Tarea
+          </Button>
+       </div>
+
+       <Tabs defaultValue="assignments">
+           <TabsList>
+               <TabsTrigger value="assignments" className="flex gap-2"><FileText className="w-4 h-4"/> Tareas</TabsTrigger>
+               <TabsTrigger value="students" className="flex gap-2"><Users className="w-4 h-4"/> Estudiantes</TabsTrigger>
+           </TabsList>
+
+           <TabsContent value="assignments" className="mt-6 space-y-4">
+               {assignments.map(assign => (
+                   <Card key={assign.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`/teacher/reviews/${assign.id}`)}>
+                       <CardHeader className="flex flex-row items-center justify-between pb-2">
+                           <CardTitle className="text-lg font-bold">{assign.title}</CardTitle>
+                           <Button variant="outline" size="sm" onClick={(e) => {
+                               e.stopPropagation()
+                               navigate(`/teacher/tasks/${assign.id}/edit`)
+                           }}>
+                               Editar
+                           </Button>
+                       </CardHeader>
+                       <CardContent>
+                           <p className="text-sm text-gray-500 mb-2">{assign.description}</p>
+                           <div className="flex items-center gap-4 text-sm">
+                               <span className="bg-gray-100 px-2 py-1 rounded">Vence: {new Date(assign.due_date).toLocaleDateString()}</span>
+                               <span className="text-blue-600 font-medium flex items-center gap-1">
+                                   <ClipboardList className="w-4 h-4" />
+                                   Revisar Entregas
+                               </span>
+                           </div>
+                       </CardContent>
+                   </Card>
+               ))}
+               {assignments.length === 0 && <p className="text-gray-500 p-4">No hay tareas creadas.</p>}
+           </TabsContent>
 
           {activeTab === 'Estudiantes' && (
             <div className="space-y-3">

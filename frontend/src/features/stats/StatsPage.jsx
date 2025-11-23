@@ -4,6 +4,7 @@ import { Bell, MessageSquare, TrendingUp, CheckSquare, Target, Award, Settings }
 import { Button } from '../../ui/button'
 import { Card } from '../../ui/card'
 import apiClient from '../../shared/api/client'
+import Loading from '../../ui/loading'
 import { ManageSubjectsDialog } from '../subjects/components/ManageSubjectsDialog'
 
 function getCurrentDate() {
@@ -121,18 +122,18 @@ export default function StatsPage() {
   const strokeDasharray = `${(completionPercent / 100) * circumference} ${circumference}`;
 
   if (loading) {
-     return <div className="min-h-screen flex items-center justify-center bg-[#F6F7FB]">Cargando estadísticas...</div>;
+     return <Loading message="Cargando estadísticas..." />;
   }
 
   return (
-    <div className="min-h-screen bg-[#F6F7FB]">
+    <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto p-8">
         {/* Header */}
-        <header className="sticky top-0 bg-white rounded-xl shadow-sm p-6 mb-6 z-10">
+        <header className="sticky top-0 bg-card rounded-xl shadow-sm p-6 mb-6 z-10 border border-border">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">📊 Mis Estadísticas</h1>
-              <p className="text-gray-600 mt-1">{getCurrentDate()}</p>
+              <h1 className="text-2xl font-bold text-foreground">📊 Mis Estadísticas</h1>
+              <p className="text-muted-foreground mt-1">{getCurrentDate()}</p>
             </div>
             <ManageSubjectsDialog
               onUpdate={fetchStats}
@@ -176,8 +177,8 @@ export default function StatsPage() {
 
         {/* Progress by Subject */}
         {stats.subjects && stats.subjects.length > 0 ? (
-          <Card className="p-6 bg-white rounded-xl shadow-sm mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Progreso por Materia</h2>
+          <Card className="p-6 bg-card rounded-xl shadow-sm mb-6 border border-border">
+            <h2 className="text-xl font-semibold text-foreground mb-6">Progreso por Materia</h2>
             <div className="space-y-6">
               {stats.subjects.map((subject) => (
                 <SubjectProgress key={subject.id || subject.name} subject={subject} />
@@ -185,16 +186,16 @@ export default function StatsPage() {
             </div>
           </Card>
         ) : (
-           <Card className="p-6 bg-white rounded-xl shadow-sm mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">Materias</h2>
-              <p className="text-gray-500">No hay materias registradas aún. ¡Agrega algunas para ver tu progreso académico!</p>
+           <Card className="p-6 bg-card rounded-xl shadow-sm mb-6 border border-border">
+              <h2 className="text-xl font-semibold text-foreground mb-2">Materias</h2>
+              <p className="text-muted-foreground">No hay materias registradas aún. ¡Agrega algunas para ver tu progreso académico!</p>
            </Card>
         )}
 
         {/* Charts mock (no external libs) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="p-6 bg-white rounded-xl shadow-sm">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Completación de Tareas</h2>
+          <Card className="p-6 bg-card rounded-xl shadow-sm border border-border">
+            <h2 className="text-xl font-semibold text-foreground mb-4">Completación de Tareas</h2>
             <div className="flex items-center justify-center h-64">
               <div className="relative w-48 h-48">
                 <svg className="transform -rotate-90 w-48 h-48">
@@ -211,15 +212,15 @@ export default function StatsPage() {
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center flex-col">
-                  <span className="text-4xl font-bold text-gray-900">{completionPercent}%</span>
-                  <span className="text-sm text-gray-500">Completado</span>
+                  <span className="text-4xl font-bold text-foreground">{completionPercent}%</span>
+                  <span className="text-sm text-muted-foreground">Completado</span>
                 </div>
               </div>
             </div>
           </Card>
 
-          <Card className="p-6 bg-white rounded-xl shadow-sm">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Rendimiento Mensual</h2>
+          <Card className="p-6 bg-card rounded-xl shadow-sm border border-border">
+            <h2 className="text-xl font-semibold text-foreground mb-4">Rendimiento Mensual</h2>
             <div className="space-y-4">
               {/* Mock data for monthly performance as backend doesn't support this granularity yet */}
               <MonthBar month="Septiembre" color="bg-blue-600" value={75} label="7.5" />

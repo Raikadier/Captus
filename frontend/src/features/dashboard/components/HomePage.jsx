@@ -72,8 +72,6 @@ const HomePage = () => {
   const [userName, setUserName] = useState('')
   const navigate = useNavigate()
   const { user } = useAuth()
-  // Mock darkMode, in real app use context
-  const darkMode = false
   const unreadCount = 3
 
   useEffect(() => {
@@ -84,16 +82,14 @@ const HomePage = () => {
   }, [user])
 
   return (
-    <div className={`p-8 ${darkMode ? 'bg-gray-900' : ''}`}>
-      <header className={`sticky top-0 rounded-xl shadow-sm p-6 mb-6 z-10 animate-in slide-in-from-top duration-300 ${
-        darkMode ? 'bg-gray-800' : 'bg-white'
-      }`}>
+    <div className="p-8 bg-background">
+      <header className="sticky top-0 rounded-xl shadow-sm p-6 mb-6 z-10 animate-in slide-in-from-top duration-300 bg-card">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+            <h1 className="text-2xl font-bold text-foreground">
               👋 Bienvenid@ {userName ? userName : 'Estudiante'}
             </h1>
-            <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
+            <p className="text-muted-foreground mt-1">
               {getCurrentDate()}
             </p>
           </div>
@@ -125,11 +121,9 @@ const HomePage = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-3 space-y-6">
-          <Card className={`p-6 rounded-xl shadow-sm animate-in fade-in slide-in-from-bottom duration-500 ${
-            darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'
-          }`}>
+          <Card className="p-6 rounded-xl shadow-sm animate-in fade-in slide-in-from-bottom duration-500 bg-card">
             <div className="flex justify-between items-center mb-4">
-              <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              <h2 className="text-xl font-semibold text-foreground">
                 Tareas Pendientes
               </h2>
               <Link to="/tasks">
@@ -151,13 +145,13 @@ const HomePage = () => {
                   onClick={() => navigate(`/tasks/${task.id}`)}
                 >
                   <div className="flex items-center gap-3 mb-1">
-                    <h3 className={`text-base font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                    <h3 className="text-base font-semibold text-foreground">
                       {task.title}
                     </h3>
                     <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-800">{task.priority}</span>
                     <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-800">{task.status}</span>
                   </div>
-                  <div className={`flex items-center gap-4 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center">
                       <CalendarIcon size={14} className="mr-1.5 text-primary" />
                       {new Date(task.dueDate).toLocaleDateString('es-ES', {
@@ -176,11 +170,9 @@ const HomePage = () => {
             </div>
           </Card>
 
-          <Card className={`p-6 rounded-xl shadow-sm animate-in fade-in slide-in-from-bottom duration-500 delay-200 ${
-            darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white'
-          }`}>
+          <Card className="p-6 rounded-xl shadow-sm animate-in fade-in slide-in-from-bottom duration-500 delay-200 bg-card">
             <div className="flex justify-between items-center mb-4">
-              <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              <h2 className="text-xl font-semibold text-foreground">
                 Resumen General
               </h2>
             </div>

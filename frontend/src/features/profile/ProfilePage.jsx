@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { User, Mail, Calendar, Edit3, Save, X, Sparkles } from 'lucide-react';
 import { Button } from '../../ui/button'
 import { Input } from '../../ui/input'
+import Loading from '../../ui/loading'
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -127,15 +128,11 @@ const ProfilePage = () => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Cargando perfil...</div>
-      </div>
-    );
+    return <Loading message="Cargando perfil..." />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-primary text-white p-6 shadow-lg">
         <div className="max-w-4xl mx-auto">
@@ -145,7 +142,7 @@ const ProfilePage = () => {
       </div>
 
       <div className="max-w-4xl mx-auto p-6">
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="bg-card rounded-lg shadow-lg overflow-hidden border border-border">
           {/* Profile Header */}
           <div className="bg-gradient-to-r from-primary to-primary/80 p-8 text-white">
             <div className="flex items-center space-x-6">
@@ -168,7 +165,7 @@ const ProfilePage = () => {
           {/* Profile Content */}
           <div className="p-8">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-semibold text-gray-900">Información Personal</h3>
+              <h3 className="text-xl font-semibold text-foreground">Información Personal</h3>
               {!isEditing ? (
                 <button
                   onClick={() => setIsEditing(true)}
@@ -201,7 +198,7 @@ const ProfilePage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* First Name Field */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Nombre
                 </label>
                 {isEditing ? (
@@ -209,19 +206,19 @@ const ProfilePage = () => {
                     type="text"
                     value={formData.firstName}
                     onChange={(e) => handleInputChange('firstName', e.target.value)}
-                    className="w-full"
+                    className="w-full bg-background border-border text-foreground"
                   />
                 ) : (
-                  <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
-                    <User className="h-5 w-5 text-gray-400" />
-                    <span className="text-gray-900">{user.firstName}</span>
+                  <div className="flex items-center space-x-2 p-3 bg-muted rounded-md">
+                    <User className="h-5 w-5 text-muted-foreground" />
+                    <span className="text-foreground">{user.firstName}</span>
                   </div>
                 )}
               </div>
 
               {/* Last Name Field */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Apellido
                 </label>
                 {isEditing ? (
@@ -229,19 +226,19 @@ const ProfilePage = () => {
                     type="text"
                     value={formData.lastName}
                     onChange={(e) => handleInputChange('lastName', e.target.value)}
-                    className="w-full"
+                    className="w-full bg-background border-border text-foreground"
                   />
                 ) : (
-                  <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
-                    <User className="h-5 w-5 text-gray-400" />
-                    <span className="text-gray-900">{user.lastName}</span>
+                  <div className="flex items-center space-x-2 p-3 bg-muted rounded-md">
+                    <User className="h-5 w-5 text-muted-foreground" />
+                    <span className="text-foreground">{user.lastName}</span>
                   </div>
                 )}
               </div>
 
               {/* Email Field */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Correo Electrónico
                 </label>
                 {isEditing ? (
@@ -249,12 +246,12 @@ const ProfilePage = () => {
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
-                    className="w-full"
+                    className="w-full bg-background border-border text-foreground"
                   />
                 ) : (
-                  <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
-                    <Mail className="h-5 w-5 text-gray-400" />
-                    <span className="text-gray-900">{user.email}</span>
+                  <div className="flex items-center space-x-2 p-3 bg-muted rounded-md">
+                    <Mail className="h-5 w-5 text-muted-foreground" />
+                    <span className="text-foreground">{user.email}</span>
                   </div>
                 )}
               </div>
@@ -262,7 +259,7 @@ const ProfilePage = () => {
 
               {/* Career Field */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Carrera
                 </label>
                 {isEditing ? (
@@ -271,19 +268,19 @@ const ProfilePage = () => {
                     value={formData.career}
                     onChange={(e) => handleInputChange('career', e.target.value)}
                     placeholder="Ej: Ingeniería de Sistemas"
-                    className="w-full"
+                    className="w-full bg-background border-border text-foreground"
                   />
                 ) : (
-                  <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
-                    <User className="h-5 w-5 text-gray-400" />
-                    <span className="text-gray-900">{user.carrer || 'No especificada'}</span>
+                  <div className="flex items-center space-x-2 p-3 bg-muted rounded-md">
+                    <User className="h-5 w-5 text-muted-foreground" />
+                    <span className="text-foreground">{user.carrer || 'No especificada'}</span>
                   </div>
                 )}
               </div>
 
               {/* Bio Field - Full Width */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Biografía
                 </label>
                 {isEditing ? (
@@ -295,20 +292,20 @@ const ProfilePage = () => {
                     rows={3}
                   />
                 ) : (
-                  <div className="p-3 bg-gray-50 rounded-md">
-                    <span className="text-gray-900">{user.bio || 'Sin biografía'}</span>
+                  <div className="p-3 bg-muted rounded-md">
+                    <span className="text-foreground">{user.bio || 'Sin biografía'}</span>
                   </div>
                 )}
               </div>
 
               {/* Registration Date */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Fecha de Registro
                 </label>
-                <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
-                  <Calendar className="h-5 w-5 text-gray-400" />
-                  <span className="text-gray-900">
+                <div className="flex items-center space-x-2 p-3 bg-muted rounded-md">
+                  <Calendar className="h-5 w-5 text-muted-foreground" />
+                  <span className="text-foreground">
                     {new Date(user.created_at).toLocaleDateString('es-ES', {
                       year: 'numeric',
                       month: 'long',
@@ -320,8 +317,8 @@ const ProfilePage = () => {
             </div>
 
             {/* Account Statistics */}
-            <div className="mt-8 pt-6 border-t border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Estadísticas de Cuenta</h3>
+            <div className="mt-8 pt-6 border-t border-border">
+              <h3 className="text-xl font-semibold text-foreground mb-4">Estadísticas de Cuenta</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-primary/10 p-4 rounded-lg">
                   <div className="text-2xl font-bold text-primary">0</div>

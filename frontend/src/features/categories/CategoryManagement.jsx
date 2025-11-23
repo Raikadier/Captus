@@ -6,6 +6,7 @@ import { Card } from '../../ui/card';
 import { Badge } from '../../ui/badge';
 import { Progress } from '../../ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../../ui/dialog';
+import Loading from '../../ui/loading';
 import apiClient from '../../shared/api/client';
 import { toast } from 'sonner';
 
@@ -160,7 +161,7 @@ const CategoryManagement = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-lg text-gray-600">Cargando categorías...</div>
+        <Loading message="Cargando categorías..." fullScreen={false} />
       </div>
     );
   }
