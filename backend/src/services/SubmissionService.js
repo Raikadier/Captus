@@ -1,7 +1,8 @@
 import SubmissionRepository from '../repositories/SubmissionRepository.js';
 import AssignmentRepository from '../repositories/AssignmentRepository.js';
 import CourseRepository from '../repositories/CourseRepository.js';
-import EnrollmentRepository from '../repositories/EnrollmentRepository.js'; // Needed for checks
+import EnrollmentRepository from '../repositories/EnrollmentRepository.js';
+import AcademicGroupRepository from '../repositories/AcademicGroupRepository.js';
 import { requireSupabaseClient } from '../lib/supabaseAdmin.js';
 
 export default class SubmissionService {
@@ -10,6 +11,7 @@ export default class SubmissionService {
     this.assignmentRepo = new AssignmentRepository();
     this.courseRepo = new CourseRepository();
     this.enrollmentRepo = new EnrollmentRepository();
+    this.groupRepo = new AcademicGroupRepository();
   }
 
   async submitAssignment(data, studentId) {
@@ -22,14 +24,22 @@ export default class SubmissionService {
     const isEnrolled = await this.enrollmentRepo.isEnrolled(assignment.course_id, studentId);
     if (!isEnrolled) throw new Error('No estás inscrito en este curso');
 
-    // Check duplicates
+    // Check duplicates and Group Logic
     if (assignment.is_group_assignment) {
         if (!group_id) throw new Error('Esta tarea es grupal, se requiere ID de grupo');
-        // Check if group has already submitted
+
+        const { data: membership, error } = await requireSupabaseClient()
+            .from('course_group_members')
+            .select('id')
+            .eq('group_id', group_id)
+            .eq('student_id', studentId)
+            .single();
+
+        if (error || !membership) throw new Error('No perteneces al grupo indicado');
+
         const existing = await this.repo.findByGroup(group_id, assignment_id);
         if (existing) throw new Error('El grupo ya ha realizado una entrega');
 
-        // TODO: Validate student belongs to group (need GroupRepo for that, assuming handled in controller or here later)
     } else {
         const existing = await this.repo.findByStudent(studentId, assignment_id);
         if (existing) throw new Error('Ya has realizado una entrega para esta tarea');
@@ -38,16 +48,70 @@ export default class SubmissionService {
     const submissionData = {
       assignment_id,
       file_url,
-      student_id: assignment.is_group_assignment ? null : studentId, // Or track uploader even for groups
+      student_id: assignment.is_group_assignment ? null : studentId,
       group_id: assignment.is_group_assignment ? group_id : null,
       submitted_at: new Date()
     };
 
-    // If group assignment, maybe we want to store who uploaded it?
-    // Schema allows student_id to be null. Let's store uploader anyway if useful?
-    // Prompt says: "student_id FK (null si es entrega grupal)". So I will follow strict instructions.
+    const newSubmission = await this.repo.save(submissionData);
 
-    return await this.repo.save(submissionData);
+    // Check if ALL students/groups have submitted
+    await this._checkAllSubmitted(assignment);
+
+    return newSubmission;
+  }
+
+  async _checkAllSubmitted(assignment) {
+      // 1. Get total expected entities (Students or Groups)
+      let totalExpected = 0;
+      let totalSubmitted = 0;
+
+      const client = requireSupabaseClient();
+
+      if (assignment.is_group_assignment) {
+          // Count groups in course
+          const { count } = await client
+            .from('course_groups')
+            .select('*', { count: 'exact', head: true })
+            .eq('course_id', assignment.course_id);
+          totalExpected = count;
+
+          // Count submissions for this assignment (one per group)
+          const { count: subCount } = await client
+            .from('assignment_submissions')
+            .select('*', { count: 'exact', head: true })
+            .eq('assignment_id', assignment.id);
+          totalSubmitted = subCount;
+
+      } else {
+          // Count students in course
+          const { count } = await client
+             .from('course_enrollments')
+             .select('*', { count: 'exact', head: true })
+             .eq('course_id', assignment.course_id);
+          totalExpected = count;
+
+          // Count submissions
+          const { count: subCount } = await client
+             .from('assignment_submissions')
+             .select('*', { count: 'exact', head: true })
+             .eq('assignment_id', assignment.id);
+          totalSubmitted = subCount;
+      }
+
+      if (totalExpected > 0 && totalSubmitted >= totalExpected) {
+          // Notify Teacher
+          const course = await this.courseRepo.getById(assignment.course_id);
+          if (course) {
+              await client.from('notifications').insert({
+                  user_id: course.teacher_id,
+                  title: 'Todas las entregas completadas',
+                  body: `Todos los estudiantes/grupos han entregado la tarea: ${assignment.title}`,
+                  type: 'academic',
+                  related_task: null
+              });
+          }
+      }
   }
 
   async getSubmissions(assignmentId, userId, role) {
@@ -59,8 +123,28 @@ export default class SubmissionService {
         if (course.teacher_id !== userId) throw new Error('No autorizado');
         return await this.repo.findByAssignment(assignmentId);
     } else {
-        // Student can only see their own submission
-        return await this.repo.findByStudent(userId, assignmentId);
+        // Student View
+        if (!assignment.is_group_assignment) {
+            return await this.repo.findByStudent(userId, assignmentId);
+        } else {
+            const { data: groups, error } = await requireSupabaseClient()
+                .from('course_group_members')
+                .select(`
+                    group_id,
+                    group:group_id ( course_id )
+                `)
+                .eq('student_id', userId);
+
+            if (error) throw new Error(error.message);
+
+            const validGroup = groups.find(g => g.group && g.group.course_id === assignment.course_id);
+
+            if (!validGroup) {
+                return null;
+            }
+
+            return await this.repo.findByGroup(validGroup.group_id, assignmentId);
+        }
     }
   }
 
@@ -79,7 +163,6 @@ export default class SubmissionService {
       graded: true
     });
 
-    // Notify student(s)
     await this._notifyGrade(updated, assignment);
 
     return updated;
@@ -92,13 +175,14 @@ export default class SubmissionService {
     if (submission.student_id) {
         userIds.push(submission.student_id);
     } else if (submission.group_id) {
-        // Fetch group members
         const { data: members } = await client
             .from('course_group_members')
             .select('student_id')
             .eq('group_id', submission.group_id);
 
-        userIds = members.map(m => m.student_id);
+        if (members) {
+            userIds = members.map(m => m.student_id);
+        }
     }
 
     if (userIds.length === 0) return;
@@ -107,8 +191,8 @@ export default class SubmissionService {
         user_id: uid,
         title: `Calificación: ${assignment.title}`,
         body: `Tu tarea ha sido calificada con: ${submission.grade}`,
-        type: 'academic', // Using the new type we unlocked
-        related_task: null // Same UUID issue
+        type: 'academic',
+        related_task: null
     }));
 
     await client.from('notifications').insert(notifications);

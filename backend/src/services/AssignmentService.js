@@ -21,7 +21,8 @@ export default class AssignmentService {
     const assignment = await this.repo.save(data);
 
     // Notify students
-    await this._notifyCourseStudents(course_id, `Nueva tarea: ${title}`, `El profesor ha creado una nueva tarea en ${course.title}`, assignment.id);
+    // NOTE: Passing null for relatedTask because assignment.id is Int, and notifications.related_task is UUID.
+    await this._notifyCourseStudents(course_id, `Nueva tarea: ${title}`, `El profesor ha creado una nueva tarea en ${course.title}`, null);
 
     return assignment;
   }
@@ -43,8 +44,6 @@ export default class AssignmentService {
     const assignment = await this.repo.getById(id);
     if (!assignment) throw new Error('Tarea no encontrada');
 
-    // Re-use access check logic or assume getting it implies access if they know ID?
-    // Better to check.
     if (role === 'teacher') {
          const course = await this.courseRepo.getById(assignment.course_id);
          if (course.teacher_id !== userId) throw new Error('No autorizado');
@@ -84,16 +83,7 @@ export default class AssignmentService {
       title,
       body,
       type: 'task',
-      related_task: relatedTask ? relatedTask : null // Note: type is UUID, might need casting if assignmentId is int.
-      // The current schema says 'related_task uuid'.
-      // But assignments use serial integer IDs.
-      // Problem: Types mismatch.
-      // Solution: The existing 'notifications' table uses uuid for related_task.
-      // I can't put an integer there easily without changing the column type.
-      // Or I leave it null for academic assignments to avoid breaking it.
-      // Or I cast integer to string if the column was text... but it is uuid.
-      // Decision: Leave related_task null for now to avoid SQL error "invalid input syntax for type uuid".
-      // We can rely on frontend navigating to context based on notification type and fetching latest.
+      related_task: relatedTask // Will be null for academic assignments
     }));
 
     // Insert notifications

@@ -4,6 +4,7 @@ import { useCourses } from '../../hooks/useCourses'
 import { useAssignments } from '../../hooks/useAssignments'
 import { useCourseGroups } from '../../hooks/useCourseGroups'
 import { useSubmissions } from '../../hooks/useSubmissions'
+import { useAuth } from '../../context/AuthContext'
 import { Button } from '../../ui/button'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../ui/card'
@@ -16,6 +17,7 @@ import { FileText, Users, Clock, Upload, CheckCircle } from 'lucide-react'
 export default function StudentCourseDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { user } = useAuth()
   const { getCourse } = useCourses()
   const { getAssignments } = useAssignments()
   const { getGroups, createGroup, addMember } = useCourseGroups()
@@ -67,16 +69,28 @@ export default function StudentCourseDetailPage() {
 
   const handleSubmit = async () => {
       if (!fileUrl) return toast.error('Debes ingresar una URL del archivo');
+
+      let groupId = null;
+      if (selectedAssignment.is_group_assignment) {
+          // Find if user is in any group of this course
+          // Logic: We have 'groups' loaded. Each group has 'members'.
+          // We find the group where one member has student_id == user.id
+
+          const myGroup = groups.find(g =>
+              g.members && g.members.some(m => m.student_id === user.id)
+          );
+
+          if (!myGroup) {
+              return toast.error('Debes pertenecer a un grupo para entregar esta tarea');
+          }
+          groupId = myGroup.id;
+      }
+
       try {
           await submitAssignment({
               assignment_id: selectedAssignment.id,
               file_url: fileUrl,
-              group_id: selectedAssignment.is_group_assignment ? null : null // TODO: Handle group selection if needed
-              // Note: For group assignment, backend expects group_id if Student is part of one.
-              // Logic to pick group is complex. For now, assume Individual or we need to fetch student's group first.
-              // Prompt said: "Si la tarea es grupal, solo un estudiante entrega".
-              // We need to know which group the student belongs to in this course.
-              // Let's implement a quick check in `handleSubmit`.
+              group_id: groupId
           });
           toast.success('Tarea entregada');
           setSelectedAssignment(null);
