@@ -27,6 +27,7 @@ import EnrollmentRoutes from './routes/EnrollmentRoutes.js';
 import AssignmentRoutes from './routes/AssignmentRoutes.js';
 import SubmissionRoutes from './routes/SubmissionRoutes.js';
 import AcademicGroupRoutes from './routes/AcademicGroupRoutes.js';
+import NotificationRoutes from './routes/NotificationRoutes.js';
 import aiRouter from './routes/ai.js';
 import { getSupabaseClient } from './lib/supabaseAdmin.js';
 
@@ -130,6 +131,7 @@ if (ENV_OK && supabaseAdmin) {
   app.use('/api/assignments', AssignmentRoutes);
   app.use('/api/submissions', SubmissionRoutes);
   app.use('/api/groups', AcademicGroupRoutes);
+  app.use('/api/notifications', NotificationRoutes);
 }
 
 // Root route
