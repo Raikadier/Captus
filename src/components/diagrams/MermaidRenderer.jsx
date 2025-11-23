@@ -4,12 +4,13 @@ import { Button } from '../../ui/button';
 import { Download, FileImage, FileText } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 
+// Initialize mermaid once
 mermaid.initialize({
   startOnLoad: false,
   theme: 'default',
   securityLevel: 'loose',
-  fontFamily: 'arial',
-  logLevel: 5, // Reduce logging
+  fontFamily: 'arial, sans-serif',
+  logLevel: 5, // Error only
 });
 
 export default function MermaidRenderer({ code, allowExport = false }) {
@@ -20,48 +21,63 @@ export default function MermaidRenderer({ code, allowExport = false }) {
 
   useEffect(() => {
     let isMounted = true;
+    const currentContainer = containerRef.current;
 
     const renderDiagram = async () => {
+      // Clear previous content immediately
+      if (currentContainer) {
+        currentContainer.innerHTML = '';
+      }
+      setSvgContent('');
+      setError(null);
+
       if (!code || !code.trim()) return;
 
       try {
-        setError(null);
-        const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
-
-        // Clear previous content
-        if (containerRef.current) {
-           containerRef.current.innerHTML = '';
-        }
-
-        // Check if mermaid is properly initialized
-        if (!mermaid || typeof mermaid.render !== 'function') {
-          console.warn('Mermaid not properly initialized');
+        // 1. Validate syntax first
+        try {
+          await mermaid.parse(code);
+        } catch (parseError) {
+          console.error("Mermaid parse error:", parseError);
+          if (isMounted) setError(`Error de sintaxis: ${parseError.message}`);
           return;
         }
 
+        // 2. Generate unique ID
+        const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
+
+        // 3. Render
+        // Note: mermaid.render returns { svg } object in v10+
         const { svg } = await mermaid.render(id, code);
 
         if (isMounted && svg) {
           setSvgContent(svg);
-          if (containerRef.current) {
-            containerRef.current.innerHTML = svg;
+          // Manually inject to ensure it works
+          if (currentContainer) {
+            currentContainer.innerHTML = svg;
+            // Force accessibility and visibility
+            const svgEl = currentContainer.querySelector('svg');
+            if (svgEl) {
+               svgEl.style.maxWidth = '100%';
+               svgEl.style.height = 'auto';
+               svgEl.removeAttribute('width'); // Let CSS handle width
+               svgEl.removeAttribute('height'); // Let CSS handle height
+            }
           }
+        } else if (isMounted) {
+            setError("No se pudo generar la imagen del diagrama.");
         }
+
       } catch (err) {
-        // Silently handle mermaid errors to avoid UI disruption
-        console.warn('Mermaid render warning (non-critical):', err.message);
+        console.error('Mermaid render fatal error:', err);
         if (isMounted) {
-          setError(null);
-          // Clear any partial content that might have been rendered
-          if (containerRef.current) {
-            containerRef.current.innerHTML = '';
-          }
+          setError(err.message || 'Error desconocido al renderizar diagrama');
         }
       }
     };
 
-    // Small delay to ensure mermaid is fully loaded
-    const timeoutId = setTimeout(renderDiagram, 100);
+    // Use a small timeout to allow DOM to settle, especially in modals
+    const timeoutId = setTimeout(renderDiagram, 50);
 
     return () => {
       isMounted = false;
@@ -82,7 +98,7 @@ export default function MermaidRenderer({ code, allowExport = false }) {
       const ctx = canvas.getContext('2d');
       const img = new Image();
 
-      // Get exact dimensions from SVG
+      // Get exact dimensions from SVG or container
       const svgRect = svgElement.getBoundingClientRect();
       const width = svgRect.width || 800;
       const height = svgRect.height || 600;
@@ -108,11 +124,10 @@ export default function MermaidRenderer({ code, allowExport = false }) {
           downloadLink.click();
           document.body.removeChild(downloadLink);
         } else if (format === 'pdf') {
-           // Use jsPDF
            const pdf = new jsPDF({
              orientation: width > height ? 'l' : 'p',
              unit: 'px',
-             format: [width + 40, height + 40] // Add some padding
+             format: [width + 40, height + 40]
            });
            ctx.fillStyle = 'white';
            ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -146,25 +161,23 @@ export default function MermaidRenderer({ code, allowExport = false }) {
       URL.revokeObjectURL(url);
   }
 
-  // If there's an error or no valid content, show a simple message
-  if (error || !svgContent) {
-    return (
-      <div className="flex flex-col gap-2 w-full">
-        <div className="w-full bg-gray-50 rounded-lg min-h-[100px] flex items-center justify-center p-4">
-          <span className="text-sm text-gray-500">Diagrama no disponible</span>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-col gap-2 w-full">
-      <div
-        ref={containerRef}
-        className="w-full overflow-x-auto bg-white rounded-lg min-h-[100px] flex items-center justify-center p-4"
-      />
+    <div className="flex flex-col gap-2 w-full h-full">
+      {error ? (
+        <div className="w-full bg-red-50 border border-red-200 rounded-lg min-h-[100px] flex items-center justify-center p-4">
+          <span className="text-sm text-red-600 text-center">
+            {error}
+          </span>
+        </div>
+      ) : (
+        <div
+          ref={containerRef}
+          className="mermaid-container w-full overflow-auto bg-white rounded-lg min-h-[100px] flex items-center justify-center p-4"
+          // We use innerHTML manually in useEffect, but keeping a stable container
+        />
+      )}
 
-      {allowExport && svgContent && (
+      {allowExport && svgContent && !error && (
         <div className="flex gap-2 justify-end mt-2">
            <Button variant="outline" size="sm" onClick={() => downloadImage('png')} disabled={isExporting}>
              <FileImage className="w-4 h-4 mr-1" /> PNG
