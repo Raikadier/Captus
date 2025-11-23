@@ -17,23 +17,33 @@ export default class AcademicGroupService {
       const course = await this.courseRepo.getById(course_id);
       if (course.teacher_id !== userId) throw new Error('No autorizado');
     } else {
-      // Students can create groups? Usually teacher only or both.
-      // Prompt says: "Crear grupo ... GET /course/:id/groups".
-      // Prompt D) Groups inside a course -> created_by (uuid).
-      // Assuming students can create groups if enrolled, or just teachers.
-      // Let's assume teachers manage structure, or students form teams.
-      // Since `created_by` is there, maybe students can.
-      // Let's allow students if enrolled.
       const isEnrolled = await this.enrollmentRepo.isEnrolled(course_id, userId);
       if (!isEnrolled && role !== 'teacher') throw new Error('No autorizado');
     }
 
-    return await this.repo.save({
+    // 1. Create Group
+    const group = await this.repo.save({
       course_id,
       name,
       description,
       created_by: userId
     });
+
+    // 2. Add Creator as Member (if they are a student)
+    // Teachers usually don't join groups as members, they supervise.
+    // Logic: If creator is 'student' role (passed in arg) or simply if they are enrolled?
+    // Let's assume if it's a student creating it, they join it.
+    // If teacher creates it, they don't join.
+
+    // We can rely on the passed `role` or check enrollment.
+    // Safer: Check if `userId` is enrolled as student.
+    const isEnrolled = await this.enrollmentRepo.isEnrolled(course_id, userId);
+
+    if (isEnrolled) {
+        await this.repo.addMember(group.id, userId);
+    }
+
+    return group;
   }
 
   async addMember(groupId, studentId, requesterId, role) {
@@ -47,8 +57,6 @@ export default class AcademicGroupService {
     if (role === 'teacher') {
        if (course.teacher_id !== requesterId) throw new Error('No autorizado');
     } else {
-       // Student must be the creator of the group? or just in the course?
-       // Let's say group creator or maybe open join.
        // Strict: Group creator.
        if (group.created_by !== requesterId) throw new Error('Solo el creador del grupo puede agregar miembros');
     }
