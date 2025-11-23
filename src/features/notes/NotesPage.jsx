@@ -68,7 +68,7 @@ function NoteDetailModal({ note, onClose, onSave, onDelete, onTogglePin }) {
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto">
+      <div className="bg-card rounded-xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto border border-border">
         <div className="p-6">
           <div className="flex justify-between items-start mb-6">
             <div className="flex items-center gap-3">
@@ -76,8 +76,8 @@ function NoteDetailModal({ note, onClose, onSave, onDelete, onTogglePin }) {
                 <FileText size={24} className="text-gray-700" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">Detalle de Nota</h2>
-                <p className="text-sm text-gray-500">
+                <h2 className="text-xl font-bold text-foreground">Detalle de Nota</h2>
+                <p className="text-sm text-muted-foreground">
                   Editado: {note.lastEdited.includes('-') ?
                     new Date(note.lastEdited).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
                     : note.lastEdited}
@@ -96,7 +96,7 @@ function NoteDetailModal({ note, onClose, onSave, onDelete, onTogglePin }) {
                 <Input
                   value={editedTitle}
                   onChange={(e) => setEditedTitle(e.target.value)}
-                  className="mt-1"
+                  className="mt-1 bg-background border-border text-foreground"
                 />
               </div>
               <div>
@@ -104,7 +104,7 @@ function NoteDetailModal({ note, onClose, onSave, onDelete, onTogglePin }) {
                 <Input
                   value={editedSubject}
                   onChange={(e) => setEditedSubject(e.target.value)}
-                  className="mt-1"
+                  className="mt-1 bg-background border-border text-foreground"
                   placeholder="Opcional"
                 />
               </div>
@@ -113,7 +113,7 @@ function NoteDetailModal({ note, onClose, onSave, onDelete, onTogglePin }) {
                 <Textarea
                   value={editedContent}
                   onChange={(e) => setEditedContent(e.target.value)}
-                  className="mt-1 min-h-[300px]"
+                  className="mt-1 min-h-[300px] bg-background border-border text-foreground"
                 />
               </div>
               <div className="flex gap-2 justify-end pt-4">
@@ -129,16 +129,16 @@ function NoteDetailModal({ note, onClose, onSave, onDelete, onTogglePin }) {
           ) : (
             <>
               <div className="mb-4">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">{note.title}</h3>
+                <h3 className="text-2xl font-bold text-foreground mb-2">{note.title}</h3>
                 {note.subject && (
-                  <span className="inline-block text-sm font-medium text-gray-700 bg-gray-100 px-3 py-1 rounded-md">
+                  <span className="inline-block text-sm font-medium text-card-foreground bg-muted px-3 py-1 rounded-md">
                     {note.subject}
                   </span>
                 )}
               </div>
 
               <div className="prose max-w-none mb-6">
-                <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">{note.content}</p>
+                <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">{note.content}</p>
               </div>
 
               <div className="flex gap-2 pt-4 border-t">
@@ -187,7 +187,7 @@ function CreateNoteModal({ onClose, onCreate }) {
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto">
+      <div className="bg-card rounded-xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto border border-border">
         <div className="p-6">
           <div className="flex justify-between items-start mb-6">
             <div className="flex items-center gap-3">
@@ -195,8 +195,8 @@ function CreateNoteModal({ onClose, onCreate }) {
                 <Plus size={24} className="text-green-600" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">Nueva Nota</h2>
-                <p className="text-sm text-gray-500">Crea una nueva nota para tus estudios</p>
+                <h2 className="text-xl font-bold text-foreground">Nueva Nota</h2>
+                <p className="text-sm text-muted-foreground">Crea una nueva nota para tus estudios</p>
               </div>
             </div>
             <Button variant="ghost" size="icon" onClick={onClose}>
@@ -211,7 +211,7 @@ function CreateNoteModal({ onClose, onCreate }) {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Título de la nota"
-                className="mt-1"
+                className="mt-1 bg-background border-border text-foreground"
               />
             </div>
             <div>
@@ -220,7 +220,7 @@ function CreateNoteModal({ onClose, onCreate }) {
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder="Opcional"
-                className="mt-1"
+                className="mt-1 bg-background border-border text-foreground"
               />
             </div>
             <div className="flex items-center space-x-2">
@@ -237,7 +237,7 @@ function CreateNoteModal({ onClose, onCreate }) {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Escribe el contenido de tu nota aquí..."
-                className="mt-1 min-h-[300px]"
+                className="mt-1 min-h-[300px] bg-background border-border text-foreground"
               />
             </div>
             <div className="flex gap-2 justify-end pt-4">
@@ -292,7 +292,7 @@ function NoteCard({ note, index, onClick, onTogglePin }) {
             </Badge>
           ) : (<div></div>)}
         </div>
-        <p className="text-xs text-gray-400 mt-2">
+        <p className="text-xs text-gray-500 mt-2">
           Editado:{' '}
           {note.lastEdited.includes('-') ?
             new Date(note.lastEdited).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
@@ -458,14 +458,14 @@ export default function NotesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F6F7FB]">
+    <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto p-8">
         {/* Header */}
-        <header className="sticky top-0 bg-white rounded-xl shadow-sm p-6 mb-6 z-10">
+        <header className="sticky top-0 bg-card rounded-xl shadow-sm p-6 mb-6 z-10 border border-border">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">📝 Mis Notas</h1>
-              <p className="text-gray-600 mt-1">{getCurrentDate()}</p>
+              <h1 className="text-2xl font-bold text-foreground">📝 Mis Notas</h1>
+              <p className="text-muted-foreground mt-1">{getCurrentDate()}</p>
             </div>
             <div className="flex items-center space-x-4">
               <Button className="bg-green-600 hover:bg-green-700" onClick={() => setShowCreateModal(true)}>
@@ -479,12 +479,12 @@ export default function NotesPage() {
         {/* Search */}
         <div className="mb-6">
           <div className="relative">
-            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
             <Input
               placeholder="Buscar notas..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-white"
+              className="pl-10 bg-card border-border text-foreground"
             />
           </div>
         </div>
@@ -492,7 +492,7 @@ export default function NotesPage() {
         {/* Pinned Notes */}
         {filteredPinnedNotes.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center">
               <Pin size={18} className="mr-2 text-green-600" />
               Notas Fijadas
             </h2>
@@ -506,11 +506,11 @@ export default function NotesPage() {
 
         {/* Regular Notes */}
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Todas las Notas</h2>
+          <h2 className="text-lg font-semibold text-foreground mb-4">Todas las Notas</h2>
           <AnimatePresence>
             {regularNotes.length === 0 && filteredPinnedNotes.length === 0 ? (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-12 bg-white rounded-xl">
-                <p className="text-gray-500">No se encontraron notas</p>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-12 bg-card rounded-xl border border-border">
+                <p className="text-muted-foreground">No se encontraron notas</p>
               </motion.div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -537,7 +537,7 @@ export default function NotesPage() {
 
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[85vh] overflow-y-auto">
+          <div className="bg-card rounded-xl shadow-2xl w-full max-w-md max-h-[85vh] overflow-y-auto border border-border">
             <div className="p-6">
               <div className="flex justify-between items-start mb-6">
                 <div className="flex items-center gap-3">
@@ -545,8 +545,8 @@ export default function NotesPage() {
                     <Trash2 size={24} className="text-red-600" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900">Eliminar Nota</h2>
-                    <p className="text-sm text-gray-500">Esta acción no se puede deshacer</p>
+                    <h2 className="text-xl font-bold text-foreground">Eliminar Nota</h2>
+                    <p className="text-sm text-muted-foreground">Esta acción no se puede deshacer</p>
                   </div>
                 </div>
                 <Button variant="ghost" size="icon" onClick={() => setShowDeleteConfirm(null)}>
@@ -554,7 +554,7 @@ export default function NotesPage() {
                 </Button>
               </div>
 
-              <p className="text-gray-700 mb-6">
+              <p className="text-muted-foreground mb-6">
                 ¿Estás seguro de que quieres eliminar esta nota? Se perderá permanentemente.
               </p>
 

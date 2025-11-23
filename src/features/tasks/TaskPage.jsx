@@ -152,15 +152,15 @@ const TaskPage = () => {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-8 bg-background">
       {/* Header */}
-      <header className="sticky top-0 bg-white rounded-xl shadow-sm p-6 mb-6 z-10">
+      <header className="sticky top-0 bg-card rounded-xl shadow-sm p-6 mb-6 z-10">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-foreground">
               {activeTab === 'tasks' ? 'Mis Tareas' : 'Categorías'}
             </h1>
-            <p className="text-gray-600 mt-1">
+            <p className="text-muted-foreground mt-1">
               {activeTab === 'tasks'
                 ? 'Gestiona tus tareas y mantén tu racha de productividad'
                 : 'Organiza tus tareas con categorías personalizadas'
@@ -179,7 +179,7 @@ const TaskPage = () => {
           </div>
 
           {/* Actions Bar */}
-          <Card className="p-6 bg-white rounded-xl shadow-sm mb-6">
+          <Card className="p-6 bg-card rounded-xl shadow-sm mb-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-4">
                 <Button onClick={() => setShowTaskForm(true)} className="bg-green-600 hover:bg-green-700">
@@ -188,15 +188,15 @@ const TaskPage = () => {
                 </Button>
                 <Button
                   variant="outline"
-                  className="border-gray-300 bg-white"
+                  className="border-input bg-background"
                   onClick={() => setShowFilters((v) => !v)}
                   title="Filtros"
                 >
-                  <Filter size={18} className="mr-2 text-gray-500" />
+                  <Filter size={18} className="mr-2 text-muted-foreground" />
                   Filtros
                 </Button>
               </div>
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-muted-foreground">
                 {filteredTasks.length} de {tasks.length} tareas
               </div>
             </div>
@@ -204,28 +204,28 @@ const TaskPage = () => {
             {/* Search */}
             <div className="mt-4">
               <div className="relative">
-                <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
                 <Input
                   placeholder="Buscar tareas..."
                   value={filters.searchText}
                   onChange={(e) => handleFilterChange('searchText', e.target.value)}
-                  className="pl-10 bg-white"
+                  className="pl-10 bg-background"
                 />
               </div>
             </div>
 
             {/* Advanced Filters */}
             {showFilters && (
-              <div className="mt-4 pt-4 border-t border-gray-200">
+              <div className="mt-4 pt-4 border-t border-border">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">
                       Categoría
                     </label>
                     <select
                       value={filters.categoryId}
                       onChange={(e) => handleFilterChange('categoryId', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-white"
+                      className="w-full px-3 py-2 border border-input rounded-lg focus:ring-green-500 focus:border-green-500 bg-background text-foreground"
                     >
                       <option value="">Todas las categorías</option>
                       {categories.map((category) => (
@@ -237,13 +237,13 @@ const TaskPage = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">
                       Prioridad
                     </label>
                     <select
                       value={filters.priorityId}
                       onChange={(e) => handleFilterChange('priorityId', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-white"
+                      className="w-full px-3 py-2 border border-input rounded-lg focus:ring-green-500 focus:border-green-500 bg-background text-foreground"
                     >
                       <option value="">Todas las prioridades</option>
                       {priorities.map((priority) => (
@@ -255,13 +255,13 @@ const TaskPage = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">
                       Estado
                     </label>
                     <select
                       value={filters.completed}
                       onChange={(e) => handleFilterChange('completed', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-white"
+                      className="w-full px-3 py-2 border border-input rounded-lg focus:ring-green-500 focus:border-green-500 bg-background text-foreground"
                     >
                       <option value="">Todos</option>
                       <option value="false">Pendientes</option>
@@ -270,7 +270,7 @@ const TaskPage = () => {
                   </div>
 
                   <div className="flex md:items-end">
-                    <Button variant="ghost" onClick={clearFilters} className="text-gray-700">
+                    <Button variant="ghost" onClick={clearFilters} className="text-muted-foreground">
                       Limpiar filtros
                     </Button>
                   </div>
@@ -303,16 +303,16 @@ const TaskPage = () => {
 
       {/* Main Tabs */}
       <Tabs defaultValue={activeTab} className="w-full">
-        <TabsList className="task-main-tabs bg-white mb-6 rounded-xl p-1 shadow-sm">
+        <TabsList className="task-main-tabs bg-card mb-6 rounded-xl p-1 shadow-sm">
           <TabsTrigger
             value="tasks"
-            className="tab-trigger px-6 py-2.5 rounded-lg font-medium"
+            className="tab-trigger px-6 py-2.5 rounded-lg font-medium data-[state=active]:bg-background data-[state=active]:text-foreground"
           >
             <span className="tab-icon">📝</span> Mis Tareas
           </TabsTrigger>
           <TabsTrigger
             value="categories"
-            className="tab-trigger px-6 py-2.5 rounded-lg font-medium"
+            className="tab-trigger px-6 py-2.5 rounded-lg font-medium data-[state=active]:bg-background data-[state=active]:text-foreground"
           >
             <span className="tab-icon">🏷️</span> Categorías
           </TabsTrigger>
@@ -322,7 +322,7 @@ const TaskPage = () => {
         <TabsContent value="tasks" className="tab-content space-y-6">
           {/* Sub-tabs for task status */}
           <Tabs defaultValue="todas" className="w-full">
-            <TabsList className="task-sub-tabs bg-gray-50 mb-4 rounded-lg p-1">
+            <TabsList className="task-sub-tabs bg-muted mb-4 rounded-lg p-1">
               <TabsTrigger
                 value="todas"
                 className="tab-trigger px-4 py-2 rounded-md text-sm font-medium"
@@ -352,11 +352,11 @@ const TaskPage = () => {
             <TabsContent value="todas">
               <div className="space-y-4">
                 {filteredTasks.length === 0 ? (
-                  <Card className="p-12 text-center bg-white rounded-xl shadow-sm">
-                    <div className="text-gray-500 text-lg mb-2">
+                  <Card className="p-12 text-center bg-card rounded-xl shadow-sm">
+                    <div className="text-muted-foreground text-lg mb-2">
                       {tasks.length === 0 ? 'No tienes tareas aún' : 'No se encontraron tareas con los filtros aplicados'}
                     </div>
-                    <p className="text-gray-400">
+                    <p className="text-muted-foreground">
                       {tasks.length === 0 ? 'Crea tu primera tarea para comenzar' : 'Prueba cambiando los filtros'}
                     </p>
                   </Card>
