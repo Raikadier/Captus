@@ -3,6 +3,7 @@ import AssignmentRepository from '../repositories/AssignmentRepository.js';
 import CourseRepository from '../repositories/CourseRepository.js';
 import EnrollmentRepository from '../repositories/EnrollmentRepository.js';
 import AcademicGroupRepository from '../repositories/AcademicGroupRepository.js';
+import NotificationService from './NotificationService.js';
 import { requireSupabaseClient } from '../lib/supabaseAdmin.js';
 
 export default class SubmissionService {
@@ -103,12 +104,13 @@ export default class SubmissionService {
           // Notify Teacher
           const course = await this.courseRepo.getById(assignment.course_id);
           if (course) {
-              await client.from('notifications').insert({
+              await NotificationService.notify({
                   user_id: course.teacher_id,
                   title: 'Todas las entregas completadas',
                   body: `Todos los estudiantes/grupos han entregado la tarea: ${assignment.title}`,
-                  type: 'academic',
-                  related_task: null
+                  event_type: 'all_submitted',
+                  entity_id: assignment.id,
+                  metadata: { course_id: assignment.course_id }
               });
           }
       }
@@ -187,14 +189,15 @@ export default class SubmissionService {
 
     if (userIds.length === 0) return;
 
-    const notifications = userIds.map(uid => ({
-        user_id: uid,
-        title: `Calificación: ${assignment.title}`,
-        body: `Tu tarea ha sido calificada con: ${submission.grade}`,
-        type: 'academic',
-        related_task: null
-    }));
-
-    await client.from('notifications').insert(notifications);
+    for (const uid of userIds) {
+        await NotificationService.notify({
+            user_id: uid,
+            title: `Calificación: ${assignment.title}`,
+            body: `Tu tarea ha sido calificada con: ${submission.grade}`,
+            event_type: 'submission_graded',
+            entity_id: submission.id,
+            metadata: { assignment_id: submission.assignment_id }
+        });
+    }
   }
 }

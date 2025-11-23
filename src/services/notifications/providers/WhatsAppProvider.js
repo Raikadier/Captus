@@ -1,11 +1,11 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-class WhatsAppProvider {
+export class WhatsAppProvider {
   constructor() {
     this.token = process.env.WA_TOKEN;
     this.phoneId = process.env.WA_PHONE_ID;
-    this.version = 'v17.0'; // Or whichever version is stable/used
+    this.version = 'v17.0';
   }
 
   async sendWhatsApp({ to, message }) {
