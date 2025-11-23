@@ -1,10 +1,10 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-class EmailProvider {
+export class EmailProvider {
   constructor() {
     this.apiKey = process.env.RESEND_API_KEY;
-    this.from = process.env.RESEND_FROM || 'Captus <noreply@captus.app>'; // Default if not set
+    this.from = process.env.RESEND_FROM || 'Captus <noreply@captus.app>';
   }
 
   async sendEmail({ to, subject, html, text }) {

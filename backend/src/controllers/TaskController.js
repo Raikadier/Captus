@@ -44,7 +44,7 @@ export class TaskController {
         title: 'Tarea Creada',
         body: `Has creado la tarea: "${result.data.title}"`,
         event_type: 'task_created',
-        entity_id: result.data.id_Task, // or result.data.id depending on response structure, defaulting to standard
+        entity_id: result.data.id || result.data.id_Task,
         is_auto: true
       });
     }
