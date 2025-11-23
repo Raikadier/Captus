@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { User, Mail, Calendar, Edit3, Save, X, Sparkles } from 'lucide-react';
 import { Button } from '../../ui/button'
 import { Input } from '../../ui/input'
+import Loading from '../../ui/loading'
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -127,11 +128,7 @@ const ProfilePage = () => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Cargando perfil...</div>
-      </div>
-    );
+    return <Loading message="Cargando perfil..." />;
   }
 
   return (

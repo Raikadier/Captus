@@ -16,6 +16,7 @@ import {
 import { useTheme } from '../../context/themeContext'
 import { useAuth } from '../../context/AuthContext'
 import { supabase } from '../../shared/api/supabase'
+import Loading from '../../ui/loading'
 import { toast } from 'sonner'
 
 function getCurrentDate() {
@@ -442,7 +443,7 @@ export default function SettingsPage() {
                 </h2>
                 {loading ? (
                   <div className="text-center py-8">
-                    <div className="text-xl">Cargando información del perfil...</div>
+                    <Loading message="Cargando información del perfil..." fullScreen={false} />
                   </div>
                 ) : error ? (
                   <div className="text-center py-8">

@@ -6,6 +6,7 @@ import { useCourses } from '../../hooks/useCourses'
 import { useEnrollments } from '../../hooks/useEnrollments'
 import { toast } from 'sonner'
 import { Input } from '../../ui/input'
+import Loading from '../../ui/loading'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../ui/dialog'
 
 export default function StudentCoursesPage() {
@@ -27,7 +28,7 @@ export default function StudentCoursesPage() {
       }
   }
 
-  if (loading) return <div className="p-6">Cargando cursos...</div>
+  if (loading) return <Loading message="Cargando cursos..." />
 
   return (
     <div className="p-6 space-y-6">
