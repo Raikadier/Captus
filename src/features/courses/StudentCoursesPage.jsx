@@ -1,44 +1,39 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { BookOpen, Clock, ChevronRight } from 'lucide-react'
+import { BookOpen, Clock, ChevronRight, Plus } from 'lucide-react'
 import { Button } from '../../ui/button'
-
-// Mock data
-const mockCourses = [
-  {
-    id: '1',
-    name: 'Cálculo Diferencial',
-    professor: 'Dr. Juan Pérez',
-    progress: 75,
-    lastUpdate: '2 días',
-    color: '#3b82f6',
-  },
-  {
-    id: '2',
-    name: 'Programación Avanzada',
-    professor: 'Ing. María García',
-    progress: 60,
-    lastUpdate: '1 día',
-    color: '#10b981',
-  },
-  {
-    id: '3',
-    name: 'Base de Datos',
-    professor: 'Dr. Carlos López',
-    progress: 90,
-    lastUpdate: '3 días',
-    color: '#8b5cf6',
-  },
-]
+import { useCourses } from '../../hooks/useCourses'
+import { useEnrollments } from '../../hooks/useEnrollments'
+import { toast } from 'sonner'
+import { Input } from '../../ui/input'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../ui/dialog'
 
 export default function StudentCoursesPage() {
   const navigate = useNavigate()
+  const { courses, loading, refresh } = useCourses()
+  const { joinByCode } = useEnrollments()
+  const [inviteCode, setInviteCode] = useState('')
+  const [isJoinDialogOpen, setIsJoinDialogOpen] = useState(false)
+
+  const handleJoin = async () => {
+      try {
+          await joinByCode(inviteCode);
+          toast.success('Inscripción exitosa');
+          setIsJoinDialogOpen(false);
+          setInviteCode('');
+          refresh();
+      } catch (error) {
+          toast.error(error.message || 'Error al inscribirse');
+      }
+  }
+
+  if (loading) return <div className="p-6">Cargando cursos...</div>
 
   return (
     <div className="p-6 space-y-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+        <div className="bg-white rounded-xl shadow-sm p-6 mb-6 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
               <BookOpen className="w-5 h-5 text-green-600" />
@@ -48,44 +43,68 @@ export default function StudentCoursesPage() {
               <p className="text-sm text-gray-600">Gestiona tus cursos inscritos</p>
             </div>
           </div>
+
+          <Dialog open={isJoinDialogOpen} onOpenChange={setIsJoinDialogOpen}>
+            <DialogTrigger asChild>
+                <Button className="gap-2">
+                    <Plus className="w-4 h-4" />
+                    Unirse a un curso
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Unirse mediante código</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium">Código de invitación</label>
+                        <Input
+                            placeholder="Ej: A1B2C3"
+                            value={inviteCode}
+                            onChange={(e) => setInviteCode(e.target.value)}
+                        />
+                    </div>
+                    <Button onClick={handleJoin} className="w-full">Unirse</Button>
+                </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
         {/* Courses Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockCourses.map((course) => (
+          {courses.length === 0 && (
+              <div className="col-span-3 text-center py-10 text-gray-500">
+                  No estás inscrito en ningún curso. ¡Únete a uno!
+              </div>
+          )}
+          {courses.map((course) => (
             <div
               key={course.id}
               className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow cursor-pointer hover:scale-[1.02] duration-200"
               onClick={() => navigate(`/courses/${course.id}`)}
             >
               <div
-                className="w-full h-32 rounded-lg mb-4"
-                style={{ backgroundColor: course.color }}
+                className="w-full h-32 rounded-lg mb-4 bg-blue-500" // Fallback color
+                style={{ backgroundColor: course.color || '#3b82f6' }}
               />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {course.name}
+                {course.title}
               </h3>
-              <p className="text-sm text-gray-600 mb-4">{course.professor}</p>
-
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Progreso</span>
-                  <span className="font-semibold text-gray-900">
-                    {course.progress}%
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-green-600 h-2 rounded-full transition-all"
-                    style={{ width: `${course.progress}%` }}
-                  />
-                </div>
-              </div>
+              {/* Note: Backend might not return teacher name directly in flat generic map,
+                  might need join or fix repo. Assuming repo returns joined object or similar.
+                  If not, we show what we have.
+                  The repo findByStudent joins 'courses:course_id (*)', so we have title/description.
+                  We might lack teacher name unless we join users.
+                  Let's check repo: It does `courses:course_id (*)`.
+                  It does NOT join teacher name.
+                  For now, we display description or nothing.
+              */}
+              <p className="text-sm text-gray-600 mb-4 line-clamp-2">{course.description}</p>
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1 text-sm text-gray-600">
                   <Clock className="w-4 h-4" />
-                  <span>Hace {course.lastUpdate}</span>
+                  <span>Inscrito: {new Date(course.enrolled_at).toLocaleDateString()}</span>
                 </div>
                 <Button
                   size="sm"
