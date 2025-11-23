@@ -27,6 +27,12 @@ export class StatisticsController {
     }
   }
 
+  // Simple stats for HomePage
+  async getHomePageStats(req, res) {
+    const result = await statisticsService.getHomePageStats();
+    res.status(result.success ? 200 : 500).json(result);
+  }
+
   async update(req, res) {
     const result = await statisticsService.update(req.body);
     res.status(result.success ? 200 : 400).json(result);

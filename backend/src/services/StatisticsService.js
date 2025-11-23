@@ -5,6 +5,7 @@ import { TaskService } from "./TaskService.js";
 import { SubjectService } from "./SubjectService.js";
 import { OperationResult } from "../shared/OperationResult.js";
 import { achievements, getMotivationalMessage } from "../shared/achievementsConfig.js";
+import { requireSupabaseClient } from "../lib/supabaseAdmin.js";
 
 const statisticsRepository = new StatisticsRepository();
 const userAchievementsRepository = new UserAchievementsRepository();
@@ -52,7 +53,48 @@ export class StatisticsService {
      } catch (error) {
        return new OperationResult(false, `Error fetching dashboard stats: ${error.message}`);
      }
-  }
+   }
+
+   // ✅ Simple Dashboard Stats for HomePage
+   async getHomePageStats() {
+     try {
+       if (!this.currentUser) return new OperationResult(false, "Usuario no autenticado");
+
+       const supabaseClient = requireSupabaseClient();
+
+       // Get total tasks efficiently
+       const { count: totalTasks, error: tasksError } = await supabaseClient
+         .from('tasks')
+         .select('*', { count: 'exact', head: true })
+         .eq('user_id', this.currentUser.id);
+
+       if (tasksError) {
+         console.error('Error counting tasks:', tasksError);
+         return new OperationResult(false, `Error obteniendo estadísticas del dashboard: ${tasksError.message}`);
+       }
+
+       // Get total notes directly from database
+       const { count: totalNotes, error: notesError } = await supabaseClient
+         .from('notes')
+         .select('*', { count: 'exact', head: true })
+         .eq('user_id', this.currentUser.id);
+
+       if (notesError) {
+         console.error('Error counting notes:', notesError);
+         return new OperationResult(false, `Error obteniendo estadísticas del dashboard: ${notesError.message}`);
+       }
+
+       return new OperationResult(true, "Estadísticas del dashboard obtenidas", {
+         totalTasks: totalTasks || 0,
+         totalNotes: totalNotes || 0,
+         // Próximos eventos y recordatorios activos serán implementados después
+         upcomingEvents: 0,
+         activeReminders: 0
+       });
+     } catch (error) {
+       return new OperationResult(false, `Error obteniendo estadísticas del dashboard: ${error.message}`);
+     }
+   }
 
   // ... [Rest of the existing methods remain unchanged, just re-exporting them below] ...
 

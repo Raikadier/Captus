@@ -5,6 +5,8 @@ import PriorityRepository from "../repositories/PriorityRepository.js";
 import CategoryRepository from "../repositories/CategoryRepository.js";
 import StatisticsRepository from "../repositories/StatisticsRepository.js";
 import { OperationResult } from "../shared/OperationResult.js";
+import { requireSupabaseClient } from "../lib/supabaseAdmin.js";
+import nodemailer from 'nodemailer';
 
 const taskRepository = new TaskRepository();
 const subTaskRepository = new SubTaskRepository();
@@ -69,6 +71,14 @@ export class TaskService {
         return new OperationResult(false, "Error al guardar la tarea.");
       }
 
+      // Load relations for email notification
+      await this.loadTaskRelations(savedTask);
+
+      // Send notification email (non-blocking)
+      this.sendTaskNotification(savedTask, 'created').catch(error => {
+        console.error('Error sending task creation notification:', error);
+      });
+
       return new OperationResult(true, "Tarea guardada exitosamente.", savedTask);
     } catch (error) {
       return new OperationResult(false, `Error al guardar la tarea: ${error.message}`);
@@ -92,10 +102,12 @@ export class TaskService {
         return new OperationResult(false, "Tarea no encontrada.");
       }
 
-      // Note: Subtasks functionality removed - no parent_task_id column exists
+      // Eliminar subtareas asociadas primero
+      await this.deleteSubTasksByParentTask(id);
+
       await taskRepository.delete(id);
 
-      return new OperationResult(true, "¡Tarea eliminada exitosamente! La tarea ha sido removida permanentemente de tu lista.");
+      return new OperationResult(true, "¡Tarea eliminada exitosamente! La tarea y todas sus subtareas han sido removidas permanentemente de tu lista.");
     } catch (error) {
       return new OperationResult(false, `Error al eliminar la tarea: ${error.message}`);
     }
@@ -138,12 +150,21 @@ export class TaskService {
     }
   }
 
-  async getTasksByUser(filter = null) {
+  async getTasksByUser(filter = null, limit = null) {
     try {
       if (!this.currentUser) return [];
 
-      const tasks = await taskRepository.getAllByUserId(this.currentUser.id);
-      return filter ? tasks.filter(filter) : tasks;
+      let tasks = await taskRepository.getAllByUserId(this.currentUser.id);
+
+      if (filter) {
+        tasks = tasks.filter(filter);
+      }
+
+      if (limit && limit > 0) {
+        tasks = tasks.slice(0, limit);
+      }
+
+      return tasks;
     } catch (error) {
       console.error("Error al obtener tareas del usuario:", error);
       return [];
@@ -153,9 +174,31 @@ export class TaskService {
   async getAll() {
     try {
       const tasks = await this.getTasksByUser();
+
+      // Load relations in parallel for better performance
+      const relationPromises = tasks.map(task => this.loadTaskRelations(task));
+      await Promise.all(relationPromises);
+
       return new OperationResult(true, "Tareas obtenidas exitosamente.", tasks);
     } catch (error) {
       return new OperationResult(false, `Error al obtener tareas: ${error.message}`);
+    }
+  }
+
+  async getPendingTasks(limit = 3) {
+    try {
+      if (!this.currentUser) return new OperationResult(false, "Usuario no autenticado");
+
+      // Get only incomplete tasks efficiently with limit
+      const tasks = await this.getTasksByUser((task) => !task.state, limit);
+
+      // Load relations in parallel for better performance
+      const relationPromises = tasks.map(task => this.loadTaskRelations(task));
+      await Promise.all(relationPromises);
+
+      return new OperationResult(true, "Tareas pendientes obtenidas exitosamente.", tasks);
+    } catch (error) {
+      return new OperationResult(false, `Error al obtener tareas pendientes: ${error.message}`);
     }
   }
 
@@ -222,9 +265,19 @@ export class TaskService {
 
       const updated = await taskRepository.update(task);
 
-      return updated
-        ? new OperationResult(true, "Tarea actualizada exitosamente.", updated)
-        : new OperationResult(false, "Error al actualizar la tarea.");
+      if (updated) {
+        // Load relations for email notification
+        await this.loadTaskRelations(updated);
+
+        // Send notification email (non-blocking)
+        this.sendTaskNotification(updated, 'updated').catch(error => {
+          console.error('Error sending task update notification:', error);
+        });
+
+        return new OperationResult(true, "Tarea actualizada exitosamente.", updated);
+      } else {
+        return new OperationResult(false, "Error al actualizar la tarea.");
+      }
     } catch (error) {
       return new OperationResult(false, `Error al actualizar tarea: ${error.message}`);
     }
@@ -260,11 +313,43 @@ export class TaskService {
         return new OperationResult(false, "Tarea no encontrada.");
       }
 
+      // Check if task is overdue
+      if (state && task.endDate) {
+        const now = new Date();
+        const dueDate = new Date(task.endDate);
+        if (dueDate < now) {
+          return new OperationResult(false, "No se puede completar una tarea que ha pasado su fecha límite.");
+        }
+      }
+
+      // Check if any subtasks are overdue (if trying to complete parent task)
+      if (state) {
+        const subTasks = await subTaskRepository.getAllByTaskId(taskId);
+        const hasOverdueSubTasks = subTasks.some(subTask => {
+          if (subTask.endDate) {
+            const now = new Date();
+            const subTaskDueDate = new Date(subTask.endDate);
+            return subTaskDueDate < now;
+          }
+          return false;
+        });
+
+        if (hasOverdueSubTasks) {
+          return new OperationResult(false, "No se puede completar una tarea que tiene subtareas vencidas.");
+        }
+      }
+
       task.state = state;
       const result = await this.update(task);
 
       if (state) {
         await this.updateStatisticsOnCompletion(task.id_User);
+
+        // Send completion notification email (non-blocking)
+        await this.loadTaskRelations(task);
+        this.sendTaskNotification(task, 'completed').catch(error => {
+          console.error('Error sending task completion notification:', error);
+        });
       }
 
       return result;
@@ -369,6 +454,59 @@ export class TaskService {
       }
     } catch (error) {
       console.error("Error cargando relaciones de tarea:", error);
+    }
+  }
+
+  // Email notification methods
+  async sendTaskNotification(task, action) {
+    try {
+      if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+        console.warn('Gmail credentials not configured for task notifications');
+        return;
+      }
+
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.GMAIL_USER,
+          pass: process.env.GMAIL_APP_PASSWORD,
+        },
+      });
+
+      const actionText = {
+        'created': 'creada',
+        'completed': 'completada',
+        'updated': 'actualizada'
+      }[action] || 'modificada';
+
+      const subject = `Tarea ${actionText}: ${task.title}`;
+      const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #16a34a;">Tarea ${actionText}</h2>
+          <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="margin: 0 0 10px 0; color: #1f2937;">${task.title}</h3>
+            ${task.description ? `<p style="margin: 5px 0; color: #4b5563;"><strong>Descripción:</strong> ${task.description}</p>` : ''}
+            ${task.endDate ? `<p style="margin: 5px 0; color: #4b5563;"><strong>Fecha límite:</strong> ${new Date(task.endDate).toLocaleDateString('es-ES')}</p>` : ''}
+            ${task.Category ? `<p style="margin: 5px 0; color: #4b5563;"><strong>Categoría:</strong> ${task.Category.name}</p>` : ''}
+            ${task.Priority ? `<p style="margin: 5px 0; color: #4b5563;"><strong>Prioridad:</strong> ${task.Priority.name}</p>` : ''}
+            <p style="margin: 10px 0; color: #16a34a; font-weight: bold;">Estado: ${task.state ? 'Completada ✅' : 'Pendiente ⏳'}</p>
+          </div>
+          <p style="color: #6b7280; font-size: 14px;">
+            Este es un recordatorio automático de Captus.
+          </p>
+        </div>
+      `;
+
+      await transporter.sendMail({
+        from: process.env.GMAIL_USER,
+        to: this.currentUser?.email,
+        subject,
+        html,
+      });
+
+      console.log(`Task notification email sent for ${action} task: ${task.title}`);
+    } catch (error) {
+      console.error('Error sending task notification:', error);
     }
   }
 }

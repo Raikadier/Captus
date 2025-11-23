@@ -3,8 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Bell, Calendar as CalendarIcon, CheckSquare, Sparkles, StickyNote, Clock } from 'lucide-react';
 import { Button } from '../../../ui/button';
 import { Card } from '../../../ui/card';
+import { Progress } from '../../../ui/progress';
 import NotificationsDropdown from './NotificationsDropdown';
 import { useAuth } from '../../../context/AuthContext';
+import apiClient from '../../../shared/api/client';
+import { useSubTasks } from '../../../hooks/useSubTasks';
 
 function getCurrentDate() {
   const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
@@ -67,9 +70,69 @@ function StatCard({ icon, label, value, bgColor }) {
   );
 }
 
+function TaskItem({ task, index, onClick }) {
+  const { progress, completedCount, totalCount } = useSubTasks(task.id);
+
+  return (
+    <div
+      className="p-4 border rounded-lg transition-all duration-200 cursor-pointer animate-in fade-in slide-in-from-left hover:scale-[1.02] hover:shadow-md border-border hover:border-green-500 bg-card"
+      style={{ animationDelay: `${index * 100}ms` }}
+      onClick={onClick}
+    >
+      <div className="flex items-center gap-3 mb-1">
+        <h3 className="text-base font-semibold text-foreground">
+          {task.title}
+        </h3>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-800">
+          {task.Priority?.name || 'Sin prioridad'}
+        </span>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-800">
+          {task.state ? 'Completada' : 'Pendiente'}
+        </span>
+      </div>
+
+      {/* Subtasks Progress */}
+      {totalCount > 0 && (
+        <div className="mb-2">
+          <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+            <span>Subtareas: {completedCount}/{totalCount}</span>
+            <span>{Math.round(progress)}%</span>
+          </div>
+          <Progress value={progress} className="h-1.5" />
+        </div>
+      )}
+
+      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+        <div className="flex items-center">
+          <CalendarIcon size={14} className="mr-1.5 text-green-600" />
+          {task.due_date ? new Date(task.due_date).toLocaleDateString('es-ES', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+          }) : 'Sin fecha'}
+        </div>
+        {task.subject && (
+          <div className="flex items-center">
+            <CheckSquare size={14} className="mr-1.5 text-green-600" />
+            {task.subject}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 const HomePage = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [userName, setUserName] = useState('')
+  const [pendingTasks, setPendingTasks] = useState([])
+  const [stats, setStats] = useState({
+    totalTasks: 0,
+    totalNotes: 0,
+    upcomingEvents: 0,
+    activeReminders: 0
+  })
+  const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
   const { user } = useAuth()
   const unreadCount = 3
@@ -79,7 +142,40 @@ const HomePage = () => {
     if (name) {
       setUserName(name.split(' ')[0]) // Solo el primer nombre
     }
+    loadData()
   }, [user])
+
+  const loadData = async () => {
+    try {
+      setLoading(true)
+
+      // Load both tasks and stats in parallel for better performance
+      const [tasksResponse, statsResponse] = await Promise.allSettled([
+        apiClient.get('/tasks/pending?limit=3'),
+        apiClient.get('/statistics/home-page')
+      ])
+
+      // Handle tasks response
+      if (tasksResponse.status === 'fulfilled' && tasksResponse.value.data.success) {
+        setPendingTasks(tasksResponse.value.data.data)
+      } else {
+        console.error('Error loading tasks:', tasksResponse.reason || tasksResponse.value?.data)
+        // Don't fail completely if tasks fail to load
+      }
+
+      // Handle stats response
+      if (statsResponse.status === 'fulfilled' && statsResponse.value.data.success) {
+        setStats(statsResponse.value.data.data)
+      } else {
+        console.error('Error loading stats:', statsResponse.reason || statsResponse.value?.data)
+        // Don't fail completely if stats fail to load
+      }
+    } catch (error) {
+      console.error('Error in loadData:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="p-8 bg-background">
@@ -135,38 +231,25 @@ const HomePage = () => {
               </Link>
             </div>
             <div className="space-y-4">
-              {mockTasks.map((task, index) => (
-                <div
-                  key={task.id}
-                  className={`p-4 border rounded-lg transition-all duration-200 cursor-pointer animate-in fade-in slide-in-from-left hover:scale-[1.02] hover:shadow-md ${
-                    darkMode ? 'border-gray-700 bg-gray-750 hover:border-primary' : 'border-gray-200 hover:border-primary'
-                  }`}
-                  style={{ animationDelay: `${index * 100}ms` }}
-                  onClick={() => navigate(`/tasks/${task.id}`)}
-                >
-                  <div className="flex items-center gap-3 mb-1">
-                    <h3 className="text-base font-semibold text-foreground">
-                      {task.title}
-                    </h3>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-800">{task.priority}</span>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-800">{task.status}</span>
-                  </div>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <div className="flex items-center">
-                      <CalendarIcon size={14} className="mr-1.5 text-primary" />
-                      {new Date(task.dueDate).toLocaleDateString('es-ES', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                      })}
-                    </div>
-                    <div className="flex items-center">
-                      <CheckSquare size={14} className="mr-1.5 text-primary" />
-                      {task.subject}
-                    </div>
-                  </div>
+              {loading ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+                  <p className="mt-2 text-gray-600">Cargando tareas...</p>
                 </div>
-              ))}
+              ) : pendingTasks.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-600">No tienes tareas pendientes</p>
+                  <Link to="/tasks">
+                    <Button className="mt-2 bg-green-600 hover:bg-green-700">
+                      Crear tarea
+                    </Button>
+                  </Link>
+                </div>
+              ) : (
+                pendingTasks.map((task, index) => (
+                  <TaskItem key={task.id} task={task} index={index} onClick={() => navigate(`/tasks/${task.id}`)} />
+                ))
+              )}
             </div>
           </Card>
 
@@ -177,31 +260,31 @@ const HomePage = () => {
               </h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <StatCard
-                icon={<CheckSquare className="text-primary" size={24} />}
-                label="Total de Tareas"
-                value="12"
-                bgColor="bg-primary/10"
-              />
-              <StatCard
-                icon={<CalendarIcon className="text-blue-600" size={24} />}
-                label="Próximos Eventos"
-                value="5"
-                bgColor="bg-blue-50"
-              />
-              <StatCard
-                icon={<StickyNote className="text-orange-600" size={24} />}
-                label="Notas Guardadas"
-                value="28"
-                bgColor="bg-orange-50"
-              />
-              <StatCard
-                icon={<Bell className="text-purple-600" size={24} />}
-                label="Recordatorios Activos"
-                value="7"
-                bgColor="bg-purple-50"
-              />
-            </div>
+               <StatCard
+                 icon={<CheckSquare className="text-green-600" size={24} />}
+                 label="Total de Tareas"
+                 value={loading ? "..." : stats.totalTasks.toString()}
+                 bgColor="bg-green-50"
+               />
+               <StatCard
+                 icon={<CalendarIcon className="text-blue-600" size={24} />}
+                 label="Próximos Eventos"
+                 value={loading ? "..." : stats.upcomingEvents.toString()}
+                 bgColor="bg-blue-50"
+               />
+               <StatCard
+                 icon={<StickyNote className="text-orange-600" size={24} />}
+                 label="Notas Guardadas"
+                 value={loading ? "..." : stats.totalNotes.toString()}
+                 bgColor="bg-orange-50"
+               />
+               <StatCard
+                 icon={<Bell className="text-purple-600" size={24} />}
+                 label="Recordatorios Activos"
+                 value={loading ? "..." : stats.activeReminders.toString()}
+                 bgColor="bg-purple-50"
+               />
+             </div>
           </Card>
         </div>
       </div>

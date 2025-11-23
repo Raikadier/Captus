@@ -20,7 +20,7 @@ export class SubTaskService {
     taskService.setCurrentUser(user); // También inyectar en TaskService
   }
 
-  validateSubTask(subTask) {
+  async validateSubTask(subTask) {
     if (!subTask) {
       return new OperationResult(false, "La subtarea no puede ser nula.");
     }
@@ -31,6 +31,26 @@ export class SubTaskService {
 
     if (!subTask.id_Task) {
       return new OperationResult(false, "La subtarea debe tener una tarea padre asignada.");
+    }
+
+    // Validar fecha límite si se proporciona
+    if (subTask.endDate) {
+      const endDate = new Date(subTask.endDate + 'T00:00:00'); // Ensure we compare dates only, not times
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Reset to start of today
+
+      if (endDate < today) {
+        return new OperationResult(false, "La fecha límite de la subtarea no puede ser anterior a hoy.");
+      }
+
+      // Validar que la fecha límite de la subtarea no exceda la fecha límite de la tarea padre
+      const parentTask = await taskRepository.getById(subTask.id_Task);
+      if (parentTask && parentTask.endDate) {
+        const parentEndDate = new Date(parentTask.endDate + 'T00:00:00');
+        if (endDate > parentEndDate) {
+          return new OperationResult(false, "La fecha límite de la subtarea no puede ser posterior a la fecha límite de la tarea padre.");
+        }
+      }
     }
 
     return new OperationResult(true);
@@ -49,7 +69,7 @@ export class SubTaskService {
 
   async save(subTask) {
     try {
-      const validation = this.validateSubTask(subTask);
+      const validation = await this.validateSubTask(subTask);
       if (!validation.success) return validation;
 
       // Validar que la tarea padre existe y pertenece al usuario actual
@@ -61,8 +81,6 @@ export class SubTaskService {
       if (parentTask.id_User !== this.currentUser?.id) {
         return new OperationResult(false, "La tarea padre no es accesible para este usuario.");
       }
-
-      subTask.id_User = this.currentUser?.id;
 
       // Establecer fecha de creación si no existe
       if (!subTask.creationDate) {
@@ -144,50 +162,114 @@ export class SubTaskService {
 
   async update(subTask) {
     try {
-      const validation = this.validateSubTask(subTask);
-      if (!validation.success) return validation;
+      console.log('SubTaskService.update - Starting update for subTask:', subTask.id_SubTask);
+
+      const validation = await this.validateSubTask(subTask);
+      if (!validation.success) {
+        console.log('SubTaskService.update - Validation failed:', validation.message);
+        return validation;
+      }
 
       const existingSubTask = await subTaskRepository.getById(subTask.id_SubTask);
       if (!existingSubTask) {
+        console.log('SubTaskService.update - SubTask not found:', subTask.id_SubTask);
         return new OperationResult(false, "Subtarea no encontrada.");
       }
+
+      console.log('SubTaskService.update - Existing subTask:', existingSubTask);
 
       // Verificar que pertenece al usuario actual
       const parentTask = await taskRepository.getById(existingSubTask.id_Task);
       if (parentTask.id_User !== this.currentUser?.id) {
+        console.log('SubTaskService.update - Access denied for user:', this.currentUser?.id);
         return new OperationResult(false, "Subtarea no accesible.");
+      }
+
+      console.log('SubTaskService.update - Parent task:', parentTask);
+
+      // Validar reglas de completado según estado de la tarea padre
+      if (parentTask.state) {
+        console.log('SubTaskService.update - Parent task is completed, blocking update');
+        // Si la tarea padre está completada, no permitir cambios en subtareas
+        return new OperationResult(false, "No se pueden modificar subtareas de una tarea ya completada.");
+      }
+
+      // Check if subtask is overdue
+      if (subTask.state && existingSubTask.endDate) {
+        const now = new Date();
+        const subTaskDueDate = new Date(existingSubTask.endDate);
+        if (subTaskDueDate < now) {
+          console.log('SubTaskService.update - SubTask is overdue, cannot complete');
+          return new OperationResult(false, "No se puede completar una subtarea que ha pasado su fecha límite.");
+        }
       }
 
       // No permitir desmarcar una subtarea completada
       if (!subTask.state && existingSubTask.state) {
+        console.log('SubTaskService.update - Cannot uncomplete a completed subTask');
         return new OperationResult(false, "No se puede desmarcar una subtarea completada.");
       }
 
+      console.log('SubTaskService.update - Updating subTask in repository');
       const updated = await subTaskRepository.update(subTask);
+      console.log('SubTaskService.update - Repository update result:', updated);
+
       if (updated) {
         // Verificar si todas las subtareas están completadas para completar la tarea padre
         await this.checkAndCompleteParentTask(subTask.id_Task);
 
-        return new OperationResult(true, "Subtarea actualizada exitosamente.");
+        return new OperationResult(true, "Subtarea actualizada exitosamente.", updated);
       } else {
         return new OperationResult(false, "Error al actualizar la subtarea.");
       }
     } catch (error) {
+      console.error('SubTaskService.update - Error:', error);
       return new OperationResult(false, `Error al actualizar subtarea: ${error.message}`);
     }
   }
 
   async checkAndCompleteParentTask(taskId) {
     try {
-      const subTasks = await subTaskRepository.getAllByTaskId(taskId);
-      const allCompleted = subTasks.every(subTask => subTask.state);
+      console.log('checkAndCompleteParentTask - Starting for taskId:', taskId);
 
-      if (allCompleted) {
+      const subTasks = await subTaskRepository.getAllByTaskId(taskId);
+      console.log('checkAndCompleteParentTask - SubTasks found:', subTasks.length);
+
+      const allCompleted = subTasks.every(subTask => subTask.state);
+      console.log('checkAndCompleteParentTask - All completed:', allCompleted, 'Total subtasks:', subTasks.length);
+
+      if (allCompleted && subTasks.length > 0) {
         const parentTask = await taskRepository.getById(taskId);
+        console.log('checkAndCompleteParentTask - Parent task:', parentTask?.title, 'State:', parentTask?.state);
+
         if (parentTask && !parentTask.state) {
-          parentTask.state = true;
-          await taskService.update(parentTask);
+          console.log('checkAndCompleteParentTask - Completing parent task');
+
+          // Create update object with required fields
+          const updateData = {
+            id_Task: parentTask.id_Task || parentTask.id,
+            state: true,
+            user_id: parentTask.id_User || parentTask.user_id,
+            due_date: parentTask.due_date || parentTask.endDate,
+            title: parentTask.title,
+            description: parentTask.description,
+            priority_id: parentTask.priority_id || parentTask.id_Priority,
+            category_id: parentTask.category_id || parentTask.id_Category
+          };
+
+          const updateResult = await taskService.update(updateData);
+          console.log('checkAndCompleteParentTask - Update result:', updateResult);
+
+          if (updateResult.success) {
+            console.log(`Tarea padre ${parentTask.title} completada automáticamente al completar todas las subtareas`);
+          } else {
+            console.error('checkAndCompleteParentTask - Failed to update parent task:', updateResult.message);
+          }
+        } else {
+          console.log('checkAndCompleteParentTask - Parent task already completed or not found');
         }
+      } else {
+        console.log('checkAndCompleteParentTask - Not all subtasks completed or no subtasks');
       }
     } catch (error) {
       console.error("Error verificando tarea padre:", error);
@@ -196,28 +278,47 @@ export class SubTaskService {
 
   async delete(id) {
     try {
+      console.log('SubTaskService.delete - Starting delete for subTask:', id);
+
       if (!id) {
+        console.log('SubTaskService.delete - Invalid ID');
         return new OperationResult(false, "ID de subtarea inválido.");
       }
 
       const existingSubTask = await subTaskRepository.getById(id);
+      console.log('SubTaskService.delete - Existing subTask:', existingSubTask);
+
       if (!existingSubTask) {
+        console.log('SubTaskService.delete - SubTask not found');
         return new OperationResult(false, "Subtarea no encontrada.");
       }
 
       // Verificar que pertenece al usuario actual
       const parentTask = await taskRepository.getById(existingSubTask.id_Task);
+      console.log('SubTaskService.delete - Parent task:', parentTask);
+
       if (parentTask.id_User !== this.currentUser?.id) {
+        console.log('SubTaskService.delete - Access denied for user:', this.currentUser?.id);
         return new OperationResult(false, "Subtarea no accesible.");
       }
 
+      // Check if parent task is completed
+      if (parentTask.state) {
+        console.log('SubTaskService.delete - Cannot delete subTask of completed parent task');
+        return new OperationResult(false, "No se pueden eliminar subtareas de una tarea ya completada.");
+      }
+
+      console.log('SubTaskService.delete - Deleting subTask from repository');
       const deleted = await subTaskRepository.delete(id);
+      console.log('SubTaskService.delete - Delete result:', deleted);
+
       if (deleted) {
         return new OperationResult(true, "Subtarea eliminada exitosamente.");
       } else {
         return new OperationResult(false, "Error al eliminar la subtarea.");
       }
     } catch (error) {
+      console.error('SubTaskService.delete - Error:', error);
       return new OperationResult(false, `Error al eliminar subtarea: ${error.message}`);
     }
   }

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Filter, Search as SearchIcon, Bell, Calendar as CalendarIcon, AlertTriangle } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { useTasks } from './hooks/useTasks';
+import { useSubTasks } from '../../hooks/useSubTasks';
 import TaskCard from './components/TaskCard';
 import TaskForm from './components/TaskForm';
 import StreakWidget from '../../shared/components/StreakWidget';
@@ -46,10 +47,15 @@ const TaskPage = () => {
     isOpen: false,
     task: null
   });
+  const [tasksWithSubTasks, setTasksWithSubTasks] = useState(new Set());
 
   useEffect(() => {
     fetchReferenceData();
   }, []);
+
+  useEffect(() => {
+    checkTasksWithSubTasks();
+  }, [tasks]);
 
   const fetchReferenceData = async () => {
     try {
@@ -62,6 +68,26 @@ const TaskPage = () => {
     } catch (error) {
       console.error('Error fetching reference data:', error);
     }
+  };
+
+  const checkTasksWithSubTasks = async () => {
+    if (tasks.length === 0) return;
+
+    const tasksWithSubs = new Set();
+
+    // Check each task for subtasks
+    for (const task of tasks) {
+      try {
+        const response = await apiClient.get(`/subtasks/task/${task.id}`);
+        if (response.data.success && response.data.data.length > 0) {
+          tasksWithSubs.add(task.id);
+        }
+      } catch (error) {
+        console.error(`Error checking subtasks for task ${task.id}:`, error);
+      }
+    }
+
+    setTasksWithSubTasks(tasksWithSubs);
   };
 
   const handleCreateTask = async (taskData) => {
@@ -138,8 +164,16 @@ const TaskPage = () => {
     if (filters.priorityId && task.priority_id !== parseInt(filters.priorityId)) {
       return false;
     }
-    if (filters.completed !== '' && task.completed !== (filters.completed === 'true')) {
-      return false;
+    if (filters.completed !== '') {
+      if (filters.completed === 'overdue') {
+        // Mostrar solo tareas vencidas (no completadas y con fecha límite pasada)
+        const isOverdue = task.due_date && new Date(task.due_date) < new Date() && !task.completed;
+        if (!isOverdue) return false;
+      } else {
+        // Filtro normal de completadas/pendientes
+        const isCompleted = filters.completed === 'true';
+        if (task.completed !== isCompleted) return false;
+      }
     }
     return true;
   });
@@ -263,6 +297,7 @@ const TaskPage = () => {
                       <option value="">Todos</option>
                       <option value="false">Pendientes</option>
                       <option value="true">Completadas</option>
+                      <option value="overdue">Expiradas</option>
                     </select>
                   </div>
 
@@ -333,10 +368,10 @@ const TaskPage = () => {
                 <span className="tab-icon">⏳</span> Pendientes
               </TabsTrigger>
               <TabsTrigger
-                value="en-progreso"
+                value="con-subtareas"
                 className="tab-trigger px-4 py-2 rounded-md text-sm font-medium"
               >
-                <span className="tab-icon">🚀</span> En Progreso
+                <span className="tab-icon">📋</span> Con Subtareas
               </TabsTrigger>
               <TabsTrigger
                 value="completada"
@@ -391,10 +426,13 @@ const TaskPage = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="en-progreso">
+            <TabsContent value="con-subtareas">
               <div className="space-y-4">
                 {filteredTasks
-                  .filter((t) => t.completed === false)
+                  .filter((task) => {
+                    // Mostrar solo tareas que tienen subtareas
+                    return tasksWithSubTasks.has(task.id);
+                  })
                   .map((task) => (
                     <TaskCard
                       key={task.id}
