@@ -40,8 +40,8 @@ export default function StudentCoursesPage() {
         {/* Header */}
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-green-600" />
+            <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+              <BookOpen className="w-5 h-5 text-primary" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Mis Cursos</h1>
@@ -76,7 +76,7 @@ export default function StudentCoursesPage() {
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
-                    className="bg-green-600 h-2 rounded-full transition-all"
+                    className="bg-primary h-2 rounded-full transition-all"
                     style={{ width: `${course.progress}%` }}
                   />
                 </div>
@@ -89,7 +89,7 @@ export default function StudentCoursesPage() {
                 </div>
                 <Button
                   size="sm"
-                  className="bg-green-600 hover:bg-green-700 text-white"
+                  className="bg-primary hover:bg-primary/90 text-white"
                   onClick={(e) => {
                     e.stopPropagation()
                     navigate(`/courses/${course.id}`)

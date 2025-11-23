@@ -27,8 +27,8 @@ export default function TeacherCourseDetailPage() {
     <div className="p-6 space-y-6">
       <div className="bg-white rounded-xl shadow-sm p-6 flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-            <BookOpen className="text-green-600" />
+          <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+            <BookOpen className="text-primary" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Curso #{id}</h1>
@@ -92,7 +92,7 @@ export default function TeacherCourseDetailPage() {
                   <div>
                     <p className="font-medium text-gray-900">{t.title}</p>
                     <p className="text-sm text-gray-600 flex items-center gap-2">
-                      <CalendarIcon className="w-4 h-4 text-green-600" /> {t.dueDate}
+                      <CalendarIcon className="w-4 h-4 text-primary" /> {t.dueDate}
                     </p>
                   </div>
                   <Button variant="ghost" size="sm" onClick={() => navigate(`/teacher/tasks/${t.id}/edit`)}>

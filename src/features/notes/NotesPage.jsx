@@ -120,7 +120,7 @@ function NoteDetailModal({ note, onClose, onSave, onDelete, onTogglePin }) {
                 <Button variant="outline" onClick={() => setIsEditing(false)}>
                   Cancelar
                 </Button>
-                <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
+                <Button onClick={handleSave} className="bg-primary hover:bg-primary/90">
                   <Save size={16} className="mr-2" />
                   Guardar Cambios
                 </Button>
@@ -145,7 +145,7 @@ function NoteDetailModal({ note, onClose, onSave, onDelete, onTogglePin }) {
                 <Button
                   variant="outline"
                   onClick={() => onTogglePin(note.id)}
-                  className={note.pinned ? 'text-green-600 border-green-600' : ''}
+                  className={note.pinned ? 'text-primary border-primary' : ''}
                 >
                   <Pin size={16} className="mr-2" />
                   {note.pinned ? 'Desfijar' : 'Fijar'}
@@ -191,8 +191,8 @@ function CreateNoteModal({ onClose, onCreate }) {
         <div className="p-6">
           <div className="flex justify-between items-start mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Plus size={24} className="text-green-600" />
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                <Plus size={24} className="text-primary" />
               </div>
               <div>
                 <h2 className="text-xl font-bold text-gray-900">Nueva Nota</h2>
@@ -247,7 +247,7 @@ function CreateNoteModal({ onClose, onCreate }) {
               <Button
                 onClick={handleCreate}
                 disabled={!title.trim() || !content.trim()}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-primary hover:bg-primary/90"
               >
                 <Save size={16} className="mr-2" />
                 Crear Nota
@@ -279,7 +279,7 @@ function NoteCard({ note, index, onClick, onTogglePin }) {
           className="absolute top-2 right-2 p-1 rounded-full hover:bg-white/50 transition-colors"
           title={note.pinned ? 'Desfijar nota' : 'Fijar nota'}
         >
-          <Pin size={14} className={note.pinned ? 'text-green-600' : 'text-gray-400'} />
+          <Pin size={14} className={note.pinned ? 'text-primary' : 'text-gray-400'} />
         </button>
         <div className="flex justify-between items-start mb-3 pr-8">
           <h3 className="font-semibold text-gray-900 text-base flex-1">{note.title}</h3>
@@ -437,7 +437,7 @@ export default function NotesPage() {
     return (
       <div className="min-h-screen bg-[#F6F7FB] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
           <p className="mt-4 text-gray-600">Cargando notas...</p>
         </div>
       </div>
@@ -449,7 +449,7 @@ export default function NotesPage() {
       <div className="min-h-screen bg-[#F6F7FB] flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 mb-4">Error: {error}</p>
-          <Button onClick={loadNotes} className="bg-green-600 hover:bg-green-700">
+          <Button onClick={loadNotes} className="bg-primary hover:bg-primary/90">
             Reintentar
           </Button>
         </div>
@@ -468,7 +468,7 @@ export default function NotesPage() {
               <p className="text-gray-600 mt-1">{getCurrentDate()}</p>
             </div>
             <div className="flex items-center space-x-4">
-              <Button className="bg-green-600 hover:bg-green-700" onClick={() => setShowCreateModal(true)}>
+              <Button className="bg-primary hover:bg-primary/90" onClick={() => setShowCreateModal(true)}>
                 <Plus size={16} className="mr-2" />
                 Nueva Nota
               </Button>
@@ -493,7 +493,7 @@ export default function NotesPage() {
         {filteredPinnedNotes.length > 0 && (
           <div className="mb-8">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-              <Pin size={18} className="mr-2 text-green-600" />
+              <Pin size={18} className="mr-2 text-primary" />
               Notas Fijadas
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

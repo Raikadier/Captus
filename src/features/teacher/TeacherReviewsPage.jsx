@@ -14,8 +14,8 @@ export default function TeacherReviewsPage() {
   return (
     <div className="p-6 space-y-6">
       <div className="bg-white rounded-xl shadow-sm p-6 flex items-center gap-3">
-        <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-          <ListChecks className="text-green-600" />
+        <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+          <ListChecks className="text-primary" />
         </div>
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Revisiones pendientes</h1>

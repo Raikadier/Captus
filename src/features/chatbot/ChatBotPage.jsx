@@ -203,7 +203,7 @@ const ChatBotPage = () => {
             <div className="p-4 border-b border-gray-200">
               <button
                 onClick={handleNewConversation}
-                className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
+                className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 <Plus size={18} />
                 <span className="font-medium">Nueva conversación</span>
@@ -242,7 +242,7 @@ const ChatBotPage = () => {
               <Menu size={20} />
             </button>
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-primary/70 to-primary rounded-lg flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -269,7 +269,7 @@ const ChatBotPage = () => {
                   {/* Avatar */}
                   <div
                     className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
-                      message.type === 'bot' ? 'bg-gradient-to-br from-green-400 to-emerald-600' : 'bg-green-600'
+                      message.type === 'bot' ? 'bg-gradient-to-br from-primary/70 to-primary' : 'bg-primary'
                     }`}
                   >
                     {message.type === 'bot' ? (
@@ -284,8 +284,8 @@ const ChatBotPage = () => {
                     <div
                       className={`inline-block max-w-[85%] ${
                         message.type === 'user'
-                          ? 'bg-green-600/10 border-l-4 border-green-600'
-                          : 'bg-card border-l-4 border-green-500'
+                          ? 'bg-primary/10 border-l-4 border-primary'
+                          : 'bg-card border-l-4 border-primary/50'
                       } rounded-xl p-4 shadow-sm`}
                     >
                       <p className="text-gray-900 text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
@@ -307,25 +307,25 @@ const ChatBotPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex items-start space-x-4 mb-6"
               >
-                <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center">
+                <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-primary/70 to-primary flex items-center justify-center">
                   <Sparkles className="w-5 h-5 text-white" />
                 </div>
-                <div className="bg-card border-l-4 border-green-500 rounded-xl p-4 shadow-sm">
+                <div className="bg-card border-l-4 border-primary/50 rounded-xl p-4 shadow-sm">
                   <div className="flex space-x-2">
                     <motion.div
                       animate={{ scale: [1, 1.2, 1] }}
                       transition={{ duration: 0.6, repeat: Number.POSITIVE_INFINITY }}
-                      className="w-2 h-2 bg-green-600 rounded-full"
+                      className="w-2 h-2 bg-primary rounded-full"
                     />
                     <motion.div
                       animate={{ scale: [1, 1.2, 1] }}
                       transition={{ duration: 0.6, repeat: Number.POSITIVE_INFINITY, delay: 0.2 }}
-                      className="w-2 h-2 bg-green-600 rounded-full"
+                      className="w-2 h-2 bg-primary rounded-full"
                     />
                     <motion.div
                       animate={{ scale: [1, 1.2, 1] }}
                       transition={{ duration: 0.6, repeat: Number.POSITIVE_INFINITY, delay: 0.4 }}
-                      className="w-2 h-2 bg-green-600 rounded-full"
+                      className="w-2 h-2 bg-primary rounded-full"
                     />
                   </div>
                 </div>
@@ -345,7 +345,7 @@ const ChatBotPage = () => {
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Escribe tu mensaje..."
-                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none shadow-sm transition-all duration-200"
+                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none shadow-sm transition-all duration-200"
                   rows="1"
                   disabled={isLoading}
                   style={{ minHeight: '48px', maxHeight: '200px' }}
@@ -354,7 +354,7 @@ const ChatBotPage = () => {
               <button
                 onClick={handleSendMessage}
                 disabled={!inputMessage.trim() || isLoading}
-                className="p-3 bg-green-600 text-white rounded-xl hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
+                className="p-3 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 <Send className="w-5 h-5" />
               </button>

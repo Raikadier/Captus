@@ -107,8 +107,8 @@ const HomePage = () => {
                 <Bell size={18} className="text-gray-500" />
                 {unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center">
-                    <span className="absolute inline-flex h-full w-full rounded-full bg-green-600 opacity-75 animate-ping" />
-                    <span className="relative inline-flex rounded-full h-4 w-4 bg-green-600 items-center justify-center text-[10px] text-white font-bold">
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-primary opacity-75 animate-ping" />
+                    <span className="relative inline-flex rounded-full h-4 w-4 bg-primary items-center justify-center text-[10px] text-white font-bold">
                       {unreadCount}
                     </span>
                   </span>
@@ -133,8 +133,8 @@ const HomePage = () => {
                 Tareas Pendientes
               </h2>
               <Link to="/tasks">
-                <Button variant="ghost" className={`text-green-600 hover:text-green-700 hover:bg-green-50 transition-all duration-200 hover:scale-105 ${
-                  darkMode ? 'text-green-400 hover:text-green-500 hover:bg-green-400' : ''
+                <Button variant="ghost" className={`text-primary hover:text-primary/90 hover:bg-primary/10 transition-all duration-200 hover:scale-105 ${
+                  darkMode ? 'text-primary hover:text-primary hover:bg-primary/20' : ''
                 }`}>
                   Ver todas
                 </Button>
@@ -145,7 +145,7 @@ const HomePage = () => {
                 <div
                   key={task.id}
                   className={`p-4 border rounded-lg transition-all duration-200 cursor-pointer animate-in fade-in slide-in-from-left hover:scale-[1.02] hover:shadow-md ${
-                    darkMode ? 'border-gray-700 bg-gray-750 hover:border-green-600' : 'border-gray-200 hover:border-green-500'
+                    darkMode ? 'border-gray-700 bg-gray-750 hover:border-primary' : 'border-gray-200 hover:border-primary'
                   }`}
                   style={{ animationDelay: `${index * 100}ms` }}
                   onClick={() => navigate(`/tasks/${task.id}`)}
@@ -159,7 +159,7 @@ const HomePage = () => {
                   </div>
                   <div className={`flex items-center gap-4 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                     <div className="flex items-center">
-                      <CalendarIcon size={14} className="mr-1.5 text-green-600" />
+                      <CalendarIcon size={14} className="mr-1.5 text-primary" />
                       {new Date(task.dueDate).toLocaleDateString('es-ES', {
                         day: 'numeric',
                         month: 'short',
@@ -167,7 +167,7 @@ const HomePage = () => {
                       })}
                     </div>
                     <div className="flex items-center">
-                      <CheckSquare size={14} className="mr-1.5 text-green-600" />
+                      <CheckSquare size={14} className="mr-1.5 text-primary" />
                       {task.subject}
                     </div>
                   </div>
@@ -186,10 +186,10 @@ const HomePage = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <StatCard
-                icon={<CheckSquare className="text-green-600" size={24} />}
+                icon={<CheckSquare className="text-primary" size={24} />}
                 label="Total de Tareas"
                 value="12"
-                bgColor="bg-green-50"
+                bgColor="bg-primary/10"
               />
               <StatCard
                 icon={<CalendarIcon className="text-blue-600" size={24} />}

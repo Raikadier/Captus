@@ -33,7 +33,7 @@ export default function TeacherHomePage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-green-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     )
   }
@@ -42,8 +42,8 @@ export default function TeacherHomePage() {
     <div className="p-6 space-y-6 animate-in fade-in duration-500">
       <div className="bg-white rounded-xl shadow-sm p-6">
         <div className="flex items-start space-x-4">
-          <div className="bg-green-100 p-3 rounded-xl">
-            <BookOpen className="text-green-600" size={32} />
+          <div className="bg-primary/10 p-3 rounded-xl">
+            <BookOpen className="text-primary" size={32} />
           </div>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Bienvenid@ {(user?.user_metadata?.name || user?.name || 'Profesor').split(' ')[0]}</h1>
@@ -58,7 +58,7 @@ export default function TeacherHomePage() {
         </CardHeader>
         <CardContent>
           <div className="flex gap-3 flex-wrap">
-            <Button className="bg-green-600 hover:bg-green-700 transition-all hover:scale-105 active:scale-95" onClick={() => navigate('/teacher/courses/new')}>
+            <Button className="bg-primary hover:bg-primary/90 transition-all hover:scale-105 active:scale-95" onClick={() => navigate('/teacher/courses/new')}>
               <PlusCircle size={18} className="mr-2" />
               Crear curso
             </Button>
@@ -82,7 +82,7 @@ export default function TeacherHomePage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center text-lg">
-              <BookOpen size={20} className="mr-2 text-green-600" />
+              <BookOpen size={20} className="mr-2 text-primary" />
               Mis Cursos
             </CardTitle>
           </CardHeader>
@@ -109,7 +109,7 @@ export default function TeacherHomePage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center text-lg">
-              <Calendar size={20} className="mr-2 text-green-600" />
+              <Calendar size={20} className="mr-2 text-primary" />
               Próximos Eventos
             </CardTitle>
           </CardHeader>
@@ -131,7 +131,7 @@ export default function TeacherHomePage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center text-lg">
-              <ListChecks size={20} className="mr-2 text-green-600" />
+              <ListChecks size={20} className="mr-2 text-primary" />
               Revisiones pendientes
             </CardTitle>
           </CardHeader>
