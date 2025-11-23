@@ -199,8 +199,8 @@ const HomePage = () => {
                 <Bell size={18} className="text-gray-500" />
                 {unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center">
-                    <span className="absolute inline-flex h-full w-full rounded-full bg-green-600 opacity-75 animate-ping" />
-                    <span className="relative inline-flex rounded-full h-4 w-4 bg-green-600 items-center justify-center text-[10px] text-white font-bold">
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-primary opacity-75 animate-ping" />
+                    <span className="relative inline-flex rounded-full h-4 w-4 bg-primary items-center justify-center text-[10px] text-white font-bold">
                       {unreadCount}
                     </span>
                   </span>
@@ -223,7 +223,9 @@ const HomePage = () => {
                 Tareas Pendientes
               </h2>
               <Link to="/tasks">
-                <Button variant="ghost" className="text-green-600 hover:text-green-700 hover:bg-green-50 transition-all duration-200 hover:scale-105 dark:hover:bg-green-900/20">
+                <Button variant="ghost" className={`text-primary hover:text-primary/90 hover:bg-primary/10 transition-all duration-200 hover:scale-105 ${
+                  darkMode ? 'text-primary hover:text-primary hover:bg-primary/20' : ''
+                }`}>
                   Ver todas
                 </Button>
               </Link>

@@ -81,8 +81,8 @@ const TeacherSidebar = ({ onCollapseChange }) => {
           <div
             className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} mb-6 p-3 bg-sidebar-accent/50 rounded-xl transition-all duration-200`}
           >
-            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-primary flex items-center justify-center flex-shrink-0 shadow-md">
-              <span className="text-primary-foreground font-semibold">{(user?.user_metadata?.name || user?.name || 'P').charAt(0).toUpperCase()}</span>
+            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-sidebar-primary flex items-center justify-center flex-shrink-0 shadow-md">
+              <span className="text-sidebar-primary-foreground font-semibold">{(user?.user_metadata?.name || user?.name || 'P').charAt(0).toUpperCase()}</span>
             </div>
             {!isCollapsed && (
               <div className="transition-opacity duration-200">

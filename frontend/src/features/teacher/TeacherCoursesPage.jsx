@@ -6,6 +6,7 @@ import { useCourses } from '../../hooks/useCourses'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../ui/dialog'
 import { Input } from '../../ui/input'
 import { Textarea } from '../../ui/textarea'
+import Loading from '../../ui/loading'
 import { toast } from 'sonner'
 
 export default function TeacherCoursesPage() {
@@ -27,13 +28,13 @@ export default function TeacherCoursesPage() {
       }
   }
 
-  if (loading) return <div className="p-6">Cargando cursos...</div>
+  if (loading) return <Loading message="Cargando cursos..." />
 
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between bg-white rounded-xl shadow-sm p-6">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-green-100 text-green-600 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
             <BookOpen className="w-6 h-6" />
           </div>
           <div>

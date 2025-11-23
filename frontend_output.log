@@ -1,0 +1,3 @@
+
+> captus-monorepo@0.1.0 frontend:dev
+> npm run dev --prefix ./frontend

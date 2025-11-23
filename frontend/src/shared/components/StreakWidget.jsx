@@ -1,6 +1,7 @@
 // StreakWidget - Widget mejorado con animación y mejor diseño
 import React, { useState, useEffect } from 'react';
 import { Flame, Target, Calendar } from 'lucide-react';
+import Loading from '../../ui/loading';
 import apiClient from '../api/client';
 
 const StreakWidget = () => {
@@ -67,7 +68,7 @@ const StreakWidget = () => {
   if (loading) {
     return (
       <div className="bg-card rounded-xl shadow-sm p-6">
-        <div className="text-center text-muted-foreground">Cargando racha...</div>
+        <Loading message="Cargando racha..." fullScreen={false} />
       </div>
     );
   }
@@ -111,7 +112,7 @@ const StreakWidget = () => {
       {/* Streak status */}
       <div className="text-center mb-4">
         {isStreakActive ? (
-          <div className="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm">
+          <div className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-sm">
             <Flame size={14} className="mr-1" />
             ¡Racha activa!
           </div>

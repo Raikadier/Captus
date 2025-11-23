@@ -15,6 +15,7 @@ import { Badge } from '../../ui/badge';
 import { Button } from '../../ui/button';
 import { Card } from '../../ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../../ui/dialog';
+import Loading from '../../ui/loading';
 import './TaskTabs.css';
 
 const TaskPage = () => {
@@ -178,11 +179,7 @@ const TaskPage = () => {
   });
 
   if (loading && tasks.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Cargando tareas...</div>
-      </div>
-    );
+    return <Loading message="Cargando tareas..." />;
   }
 
   return (
@@ -216,7 +213,7 @@ const TaskPage = () => {
           <Card className="p-6 bg-card rounded-xl shadow-sm mb-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-4">
-                <Button onClick={() => setShowTaskForm(true)} className="bg-green-600 hover:bg-green-700">
+                <Button onClick={() => setShowTaskForm(true)} className="bg-primary hover:bg-primary/90">
                   <Plus size={18} className="mr-2" />
                   Nueva Tarea
                 </Button>
@@ -259,7 +256,7 @@ const TaskPage = () => {
                     <select
                       value={filters.categoryId}
                       onChange={(e) => handleFilterChange('categoryId', e.target.value)}
-                      className="w-full px-3 py-2 border border-input rounded-lg focus:ring-green-500 focus:border-green-500 bg-background text-foreground"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary bg-white"
                     >
                       <option value="">Todas las categorías</option>
                       {categories.map((category) => (
@@ -277,7 +274,7 @@ const TaskPage = () => {
                     <select
                       value={filters.priorityId}
                       onChange={(e) => handleFilterChange('priorityId', e.target.value)}
-                      className="w-full px-3 py-2 border border-input rounded-lg focus:ring-green-500 focus:border-green-500 bg-background text-foreground"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary bg-white"
                     >
                       <option value="">Todas las prioridades</option>
                       {priorities.map((priority) => (
@@ -295,7 +292,7 @@ const TaskPage = () => {
                     <select
                       value={filters.completed}
                       onChange={(e) => handleFilterChange('completed', e.target.value)}
-                      className="w-full px-3 py-2 border border-input rounded-lg focus:ring-green-500 focus:border-green-500 bg-background text-foreground"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary bg-white"
                     >
                       <option value="">Todos</option>
                       <option value="false">Pendientes</option>

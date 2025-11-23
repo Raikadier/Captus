@@ -18,8 +18,8 @@ export default function TeacherReviewSubmissionPage() {
   return (
     <div className="p-6 space-y-6">
       <div className="bg-white rounded-xl shadow-sm p-6 flex items-center gap-3">
-        <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-          <FileText className="text-green-600" />
+        <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+          <FileText className="text-primary" />
         </div>
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Revisión de entrega</h1>
@@ -34,7 +34,7 @@ export default function TeacherReviewSubmissionPage() {
         <CardContent className="space-y-4">
           <p className="text-sm text-gray-700 whitespace-pre-wrap">{submission.content}</p>
           <div className="flex gap-3">
-            <Button className="bg-green-600 hover:bg-green-700" onClick={() => navigate('/teacher/tasks')}>
+            <Button className="bg-primary hover:bg-primary/90" onClick={() => navigate('/teacher/tasks')}>
               <Check className="w-4 h-4 mr-2" />
               Aprobar
             </Button>

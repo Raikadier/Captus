@@ -197,8 +197,8 @@ function CreateEventModal({ onClose, onCreate, selectedDate }) {
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Plus size={24} className="text-green-600" />
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                <Plus size={24} className="text-primary" />
               </div>
               <div>
                 <h2 className="text-xl font-bold text-foreground">Nuevo Evento</h2>
@@ -416,7 +416,7 @@ export default function CalendarPage() {
       case 'medium':
         return 'bg-yellow-100 text-yellow-800 border-yellow-200'
       case 'low':
-        return 'bg-green-100 text-green-800 border-green-200'
+        return 'bg-primary/10 text-primary border-primary/20'
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200'
     }
@@ -488,8 +488,10 @@ export default function CalendarPage() {
         {weekDays.map((day, index) => (
           <div key={index} className={`p-4 border-2 rounded-xl ${
             day.toDateString() === selectedDate.toDateString()
-              ? 'ring-2 ring-green-500 bg-green-50 border-green-200'
-              : 'border-border bg-card'
+              ? 'ring-2 ring-primary bg-primary/10 border-primary/20'
+              : darkMode
+                ? 'border-gray-700 bg-gray-750'
+                : 'border-gray-200'
           }`}>
             <div className="text-center mb-2 text-foreground">
               <div className="text-xs font-medium text-muted-foreground">
@@ -497,7 +499,7 @@ export default function CalendarPage() {
               </div>
               <div className={`text-2xl font-bold ${
                 day.toDateString() === new Date().toDateString()
-                  ? 'text-green-600'
+                  ? 'text-primary'
                   : ''
               }`}>
                 {day.getDate()}
@@ -690,7 +692,7 @@ export default function CalendarPage() {
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-xl text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 shadow-sm hover:shadow-md hover:scale-105 active:scale-95"
+            className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-xl text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 shadow-sm hover:shadow-md hover:scale-105 active:scale-95"
           >
             <Plus className="h-5 w-5 mr-2" />
             Nuevo Evento
@@ -704,8 +706,10 @@ export default function CalendarPage() {
               onClick={() => setView(v)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95 ${
                 view === v
-                  ? 'bg-green-50 text-green-600 shadow-sm'
-                  : 'text-muted-foreground hover:bg-muted'
+                  ? 'bg-primary/10 text-primary shadow-sm'
+                  : darkMode
+                    ? 'text-gray-400 hover:bg-gray-700'
+                    : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
               {v === 'month' ? 'Mes' : 'Semana'}
@@ -862,8 +866,10 @@ export default function CalendarPage() {
       {selectedDate && (
         <div className="rounded-xl shadow-sm p-6 bg-card border border-border">
           <div className="flex items-center space-x-3 mb-4">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-green-50">
-              <Clock className="w-6 h-6 text-green-600" />
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+              darkMode ? 'bg-primary/10' : 'bg-primary/10'
+            }`}>
+              <Clock className={`w-6 h-6 text-primary`} />
             </div>
             <div>
               <h3 className="text-xl font-bold text-foreground">
