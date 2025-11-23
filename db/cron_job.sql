@@ -1,3 +1,7 @@
+-- Enable required extensions
+CREATE EXTENSION IF NOT EXISTS pg_cron;
+CREATE EXTENSION IF NOT EXISTS pg_net;
+
 -- Scheduled function for checking deadlines
 -- This assumes pg_cron is enabled on the database
 -- and that the Edge Function is deployed at the specified URL.

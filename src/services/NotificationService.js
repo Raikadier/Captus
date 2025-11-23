@@ -15,11 +15,25 @@ export class NotificationService {
     this.repo = new NotificationRepository();
     this.prefsRepo = new NotificationPreferencesRepository();
     this.logRepo = new NotificationLogRepository();
-    this.assignmentRepo = new AssignmentRepository(); // Optional for pure notify, used in checkDeadlines
+    this.assignmentRepo = new AssignmentRepository();
     this.email = EmailProvider;
     this.whatsapp = WhatsAppProvider;
-    // Supabase client is accessed via repositories generally, but if needed directly:
-    // this.client = ...
+  }
+
+  _mapEventTypeToType(eventType) {
+    const mapping = {
+      'task_created': 'task',
+      'task_updated': 'task',
+      'note_created': 'system', // Or task/reminder depending on usage
+      'event_created': 'reminder',
+      'diagram_created': 'system',
+      'assignment_created': 'academic',
+      'assignment_updated': 'academic',
+      'all_submitted': 'academic',
+      'submission_graded': 'academic',
+      'deadline_3d': 'academic'
+    };
+    return mapping[eventType] || 'system'; // Default fallback
   }
 
   /**
@@ -39,11 +53,14 @@ export class NotificationService {
       }
 
       // 2. Create In-App Notification
+      // Map strict type for DB constraint
+      const dbType = this._mapEventTypeToType(event_type);
+
       const notificationPayload = {
         user_id,
         title,
         body,
-        type: event_type,
+        type: dbType,
         metadata,
         event_type,
         entity_id: String(entity_id),
@@ -71,7 +88,6 @@ export class NotificationService {
       let finalEmail = userEmail;
       if (emailEnabled && !finalEmail) {
         // Fallback to auth email if using repository pattern might require auth admin access
-        // The BaseRepository uses a client that presumably has admin rights if configured so
         const { data: userData } = await this.repo.client.auth.admin.getUserById(user_id);
         if (userData && userData.user) {
             finalEmail = userData.user.email;
