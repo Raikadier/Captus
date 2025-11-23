@@ -1,0 +1,9 @@
+
+> captus-monorepo@0.1.0 backend:dev
+> npm run dev --prefix ./backend
+
+
+> captus-backend@0.1.0 dev
+> nodemon src/server.js
+
+sh: 1: nodemon: not found
