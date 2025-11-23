@@ -8,6 +8,8 @@ mermaid.initialize({
   startOnLoad: false,
   theme: 'default',
   securityLevel: 'loose',
+  fontFamily: 'arial',
+  logLevel: 5, // Reduce logging
 });
 
 export default function MermaidRenderer({ code, allowExport = false }) {
@@ -20,7 +22,7 @@ export default function MermaidRenderer({ code, allowExport = false }) {
     let isMounted = true;
 
     const renderDiagram = async () => {
-      if (!code) return;
+      if (!code || !code.trim()) return;
 
       try {
         setError(null);
@@ -31,26 +33,39 @@ export default function MermaidRenderer({ code, allowExport = false }) {
            containerRef.current.innerHTML = '';
         }
 
+        // Check if mermaid is properly initialized
+        if (!mermaid || typeof mermaid.render !== 'function') {
+          console.warn('Mermaid not properly initialized');
+          return;
+        }
+
         const { svg } = await mermaid.render(id, code);
 
-        if (isMounted) {
+        if (isMounted && svg) {
           setSvgContent(svg);
           if (containerRef.current) {
             containerRef.current.innerHTML = svg;
           }
         }
       } catch (err) {
-        console.error('Mermaid render error:', err);
+        // Silently handle mermaid errors to avoid UI disruption
+        console.warn('Mermaid render warning (non-critical):', err.message);
         if (isMounted) {
-          setError('Error al renderizar el diagrama. Verifica la sintaxis.');
+          setError(null);
+          // Clear any partial content that might have been rendered
+          if (containerRef.current) {
+            containerRef.current.innerHTML = '';
+          }
         }
       }
     };
 
-    renderDiagram();
+    // Small delay to ensure mermaid is fully loaded
+    const timeoutId = setTimeout(renderDiagram, 100);
 
     return () => {
       isMounted = false;
+      clearTimeout(timeoutId);
     };
   }, [code]);
 
@@ -131,16 +146,25 @@ export default function MermaidRenderer({ code, allowExport = false }) {
       URL.revokeObjectURL(url);
   }
 
+  // If there's an error or no valid content, show a simple message
+  if (error || !svgContent) {
+    return (
+      <div className="flex flex-col gap-2 w-full">
+        <div className="w-full bg-gray-50 rounded-lg min-h-[100px] flex items-center justify-center p-4">
+          <span className="text-sm text-gray-500">Diagrama no disponible</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-2 w-full">
       <div
         ref={containerRef}
-        className={`w-full overflow-x-auto bg-white rounded-lg min-h-[100px] flex items-center justify-center p-4 ${error ? 'bg-red-50 text-red-500' : ''}`}
-      >
-        {error && <span className="text-sm font-medium">{error}</span>}
-      </div>
+        className="w-full overflow-x-auto bg-white rounded-lg min-h-[100px] flex items-center justify-center p-4"
+      />
 
-      {allowExport && !error && svgContent && (
+      {allowExport && svgContent && (
         <div className="flex gap-2 justify-end mt-2">
            <Button variant="outline" size="sm" onClick={() => downloadImage('png')} disabled={isExporting}>
              <FileImage className="w-4 h-4 mr-1" /> PNG

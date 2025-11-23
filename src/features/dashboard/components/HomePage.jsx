@@ -3,9 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Bell, Calendar as CalendarIcon, CheckSquare, Sparkles, StickyNote, Clock } from 'lucide-react';
 import { Button } from '../../../ui/button';
 import { Card } from '../../../ui/card';
+import { Progress } from '../../../ui/progress';
 import NotificationsDropdown from './NotificationsDropdown';
 import { useAuth } from '../../../context/AuthContext';
 import apiClient from '../../../shared/api/client';
+import { useSubTasks } from '../../../hooks/useSubTasks';
 
 function getCurrentDate() {
   const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
@@ -65,6 +67,58 @@ function StatCard({ icon, label, value, bgColor }) {
         </div>
       </div>
     </Card>
+  );
+}
+
+function TaskItem({ task, index, onClick }) {
+  const { progress, completedCount, totalCount } = useSubTasks(task.id);
+
+  return (
+    <div
+      className="p-4 border rounded-lg transition-all duration-200 cursor-pointer animate-in fade-in slide-in-from-left hover:scale-[1.02] hover:shadow-md border-border hover:border-green-500 bg-card"
+      style={{ animationDelay: `${index * 100}ms` }}
+      onClick={onClick}
+    >
+      <div className="flex items-center gap-3 mb-1">
+        <h3 className="text-base font-semibold text-foreground">
+          {task.title}
+        </h3>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-800">
+          {task.Priority?.name || 'Sin prioridad'}
+        </span>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-800">
+          {task.state ? 'Completada' : 'Pendiente'}
+        </span>
+      </div>
+
+      {/* Subtasks Progress */}
+      {totalCount > 0 && (
+        <div className="mb-2">
+          <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+            <span>Subtareas: {completedCount}/{totalCount}</span>
+            <span>{Math.round(progress)}%</span>
+          </div>
+          <Progress value={progress} className="h-1.5" />
+        </div>
+      )}
+
+      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+        <div className="flex items-center">
+          <CalendarIcon size={14} className="mr-1.5 text-green-600" />
+          {task.due_date ? new Date(task.due_date).toLocaleDateString('es-ES', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+          }) : 'Sin fecha'}
+        </div>
+        {task.subject && (
+          <div className="flex items-center">
+            <CheckSquare size={14} className="mr-1.5 text-green-600" />
+            {task.subject}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -191,41 +245,8 @@ const HomePage = () => {
                 </div>
               ) : (
                 pendingTasks.map((task, index) => (
-                <div
-                  key={task.id}
-                  className="p-4 border rounded-lg transition-all duration-200 cursor-pointer animate-in fade-in slide-in-from-left hover:scale-[1.02] hover:shadow-md border-border hover:border-green-500 bg-card"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                  onClick={() => navigate(`/tasks/${task.id}`)}
-                >
-                  <div className="flex items-center gap-3 mb-1">
-                    <h3 className="text-base font-semibold text-foreground">
-                      {task.title}
-                    </h3>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-800">
-                      {task.Priority?.name || 'Sin prioridad'}
-                    </span>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-800">
-                      {task.state ? 'Completada' : 'Pendiente'}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <div className="flex items-center">
-                      <CalendarIcon size={14} className="mr-1.5 text-green-600" />
-                      {task.due_date ? new Date(task.due_date).toLocaleDateString('es-ES', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                      }) : 'Sin fecha'}
-                    </div>
-                    {task.subject && (
-                      <div className="flex items-center">
-                        <CheckSquare size={14} className="mr-1.5 text-green-600" />
-                        {task.subject}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))
+                  <TaskItem key={task.id} task={task} index={index} onClick={() => navigate(`/tasks/${task.id}`)} />
+                ))
               )}
             </div>
           </Card>
