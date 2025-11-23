@@ -17,9 +17,9 @@ const TaskCard = ({
   const isOverdue = task.due_date && new Date(task.due_date) < new Date() && !task.completed;
 
   return (
-    <div className={`bg-white border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow ${
+    <div className={`bg-card border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow ${
       task.completed ? 'opacity-75' : ''
-    } ${isOverdue ? 'border-red-200 bg-red-50' : 'border-gray-200'}`}>
+    } ${isOverdue ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-border'}`}>
       <div className="flex items-start justify-between">
         <div className="flex items-start space-x-3 flex-1">
           <button
@@ -30,20 +30,20 @@ const TaskCard = ({
             {task.completed ? (
               <CheckCircle className="h-5 w-5 text-green-500" />
             ) : (
-              <Circle className="h-5 w-5 text-gray-400 hover:text-green-500" />
+              <Circle className="h-5 w-5 text-muted-foreground hover:text-green-500" />
             )}
           </button>
 
           <div className="flex-1 min-w-0">
             <h3 className={`text-lg font-medium ${
-              task.completed ? 'line-through text-gray-500' : 'text-gray-900'
+              task.completed ? 'line-through text-muted-foreground' : 'text-foreground'
             }`}>
               {task.title}
             </h3>
 
             {task.description && (
               <p className={`mt-1 text-sm ${
-                task.completed ? 'line-through text-gray-400' : 'text-gray-600'
+                task.completed ? 'line-through text-muted-foreground' : 'text-muted-foreground'
               }`}>
                 {task.description}
               </p>
