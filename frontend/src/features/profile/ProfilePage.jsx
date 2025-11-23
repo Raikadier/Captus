@@ -134,24 +134,24 @@ const ProfilePage = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-green-600 text-white p-6 shadow-lg">
+      <div className="bg-primary text-white p-6 shadow-lg">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-2xl font-bold">Mi Perfil</h1>
-          <p className="text-green-100 mt-1">Gestiona tu información personal</p>
+          <p className="text-white/90 mt-1">Gestiona tu información personal</p>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto p-6">
         <div className="bg-card rounded-lg shadow-lg overflow-hidden border border-border">
           {/* Profile Header */}
-          <div className="bg-gradient-to-r from-green-500 to-green-600 p-8 text-white">
+          <div className="bg-gradient-to-r from-primary to-primary/80 p-8 text-white">
             <div className="flex items-center space-x-6">
               <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center">
                 <User size={48} />
               </div>
               <div>
                 <h2 className="text-3xl font-bold">{user.fullName}</h2>
-                <p className="text-green-100 mt-1">{user.email}</p>
+                <p className="text-white/90 mt-1">{user.email}</p>
                 <div className="flex items-center space-x-4 mt-3 text-sm">
                   <div className="flex items-center space-x-1">
                     <Calendar size={16} />
@@ -169,7 +169,7 @@ const ProfilePage = () => {
               {!isEditing ? (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="inline-flex items-center px-4 py-2 border border-border rounded-md shadow-sm text-sm font-medium text-foreground bg-card hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                 >
                   <Edit3 className="h-4 w-4 mr-2" />
                   Editar
@@ -179,14 +179,14 @@ const ProfilePage = () => {
                   <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50"
                   >
                     <Save className="h-4 w-4 mr-2" />
                     {saving ? 'Guardando...' : 'Guardar'}
                   </button>
                   <button
                     onClick={handleCancel}
-                    className="inline-flex items-center px-4 py-2 border border-border rounded-md shadow-sm text-sm font-medium text-foreground bg-card hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                   >
                     <X className="h-4 w-4 mr-2" />
                     Cancelar
@@ -288,7 +288,7 @@ const ProfilePage = () => {
                     value={formData.bio}
                     onChange={(e) => handleInputChange('bio', e.target.value)}
                     placeholder="Cuéntanos un poco sobre ti..."
-                    className="w-full px-3 py-2 border border-border bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary resize-none"
                     rows={3}
                   />
                 ) : (
@@ -320,9 +320,9 @@ const ProfilePage = () => {
             <div className="mt-8 pt-6 border-t border-border">
               <h3 className="text-xl font-semibold text-foreground mb-4">Estadísticas de Cuenta</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">0</div>
-                  <div className="text-sm text-green-700">Tareas Completadas</div>
+                <div className="bg-primary/10 p-4 rounded-lg">
+                  <div className="text-2xl font-bold text-primary">0</div>
+                  <div className="text-sm text-primary/80">Tareas Completadas</div>
                 </div>
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <div className="text-2xl font-bold text-blue-600">0</div>

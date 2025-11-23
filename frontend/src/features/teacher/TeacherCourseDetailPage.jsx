@@ -65,8 +65,11 @@ export default function TeacherCourseDetailPage() {
 
   return (
     <div className="p-6 space-y-6">
-       {/* Header */}
-       <div className="bg-white rounded-xl shadow-sm p-6 flex justify-between items-start">
+      <div className="bg-white rounded-xl shadow-sm p-6 flex items-start justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+            <BookOpen className="text-primary" />
+          </div>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">{course.title}</h1>
             <p className="text-gray-600 mt-2">{course.description}</p>
@@ -114,65 +117,48 @@ export default function TeacherCourseDetailPage() {
                {assignments.length === 0 && <p className="text-gray-500 p-4">No hay tareas creadas.</p>}
            </TabsContent>
 
-           <TabsContent value="students" className="mt-6">
-               <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                   <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-                       <h3 className="font-semibold">Lista de Estudiantes ({students.length})</h3>
-                       <Dialog open={isAddStudentOpen} onOpenChange={setIsAddStudentOpen}>
-                           <DialogTrigger asChild>
-                               <Button variant="outline" size="sm">
-                                   <Plus className="w-4 h-4 mr-2" /> Agregar manualmente
-                               </Button>
-                           </DialogTrigger>
-                           <DialogContent>
-                               <DialogHeader>
-                                   <DialogTitle>Agregar Estudiante</DialogTitle>
-                               </DialogHeader>
-                               <div className="space-y-4 py-4">
-                                   <div className="space-y-2">
-                                       <label className="text-sm font-medium">Email del Estudiante</label>
-                                       <Input
-                                            placeholder="estudiante@ejemplo.com"
-                                            value={emailToAdd}
-                                            onChange={e => setEmailToAdd(e.target.value)}
-                                       />
-                                   </div>
-                                   <Button onClick={handleAddStudent} className="w-full">Agregar al Curso</Button>
-                               </div>
-                           </DialogContent>
-                       </Dialog>
-                   </div>
-                   <table className="w-full text-sm text-left">
-                       <thead className="bg-gray-50 text-gray-700">
-                           <tr>
-                               <th className="px-6 py-3">Nombre/Email</th>
-                               <th className="px-6 py-3">Fecha Inscripción</th>
-                           </tr>
-                       </thead>
-                       <tbody>
-                           {students.map(student => (
-                               <tr key={student.id} className="border-b hover:bg-gray-50">
-                                   <td className="px-6 py-4 font-medium text-gray-900">
-                                       {student.name || student.email}
-                                       <div className="text-xs text-gray-500">{student.email}</div>
-                                   </td>
-                                   <td className="px-6 py-4">
-                                       {new Date(student.enrolled_at).toLocaleDateString()}
-                                   </td>
-                               </tr>
-                           ))}
-                           {students.length === 0 && (
-                               <tr>
-                                   <td colSpan={2} className="px-6 py-8 text-center text-gray-500">
-                                       Aún no hay estudiantes inscritos. Comparte el código <b>{course.invite_code}</b>.
-                                   </td>
-                               </tr>
-                           )}
-                       </tbody>
-                   </table>
-               </div>
-           </TabsContent>
-       </Tabs>
+          {activeTab === 'Estudiantes' && (
+            <div className="space-y-3">
+              {mockStudents.map((s) => (
+                <div key={s.id} className="p-3 border border-gray-200 rounded-lg">
+                  <p className="font-medium text-gray-900">{s.name}</p>
+                  <p className="text-sm text-gray-600">{s.email}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeTab === 'Tareas' && (
+            <div className="space-y-3">
+              {mockTasks.map((t) => (
+                <div key={t.id} className="p-3 border border-gray-200 rounded-lg flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-gray-900">{t.title}</p>
+                    <p className="text-sm text-gray-600 flex items-center gap-2">
+                      <CalendarIcon className="w-4 h-4 text-primary" /> {t.dueDate}
+                    </p>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => navigate(`/teacher/tasks/${t.id}/edit`)}>
+                    Editar
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeTab === 'Anuncios' && (
+            <div className="space-y-3">
+              {mockAnnouncements.map((a) => (
+                <div key={a.id} className="p-3 border border-gray-200 rounded-lg">
+                  <p className="font-medium text-gray-900">{a.title}</p>
+                  <p className="text-sm text-gray-600">{a.body}</p>
+                  <span className="text-xs px-2 py-1 rounded-full bg-red-50 text-red-700 inline-block mt-2">{a.type}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

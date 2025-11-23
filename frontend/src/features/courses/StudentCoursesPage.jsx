@@ -36,8 +36,8 @@ export default function StudentCoursesPage() {
         {/* Header */}
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-green-600" />
+            <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+              <BookOpen className="w-5 h-5 text-primary" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Mis Cursos</h1>
@@ -91,16 +91,22 @@ export default function StudentCoursesPage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 {course.title}
               </h3>
-              {/* Note: Backend might not return teacher name directly in flat generic map,
-                  might need join or fix repo. Assuming repo returns joined object or similar.
-                  If not, we show what we have.
-                  The repo findByStudent joins 'courses:course_id (*)', so we have title/description.
-                  We might lack teacher name unless we join users.
-                  Let's check repo: It does `courses:course_id (*)`.
-                  It does NOT join teacher name.
-                  For now, we display description or nothing.
-              */}
-              <p className="text-sm text-gray-600 mb-4 line-clamp-2">{course.description}</p>
+              <p className="text-sm text-gray-600 mb-4">{course.professor}</p>
+
+              <div className="space-y-2 mb-4">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Progreso</span>
+                  <span className="font-semibold text-gray-900">
+                    {course.progress}%
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-primary h-2 rounded-full transition-all"
+                    style={{ width: `${course.progress}%` }}
+                  />
+                </div>
+              </div>
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1 text-sm text-gray-600">
@@ -109,7 +115,7 @@ export default function StudentCoursesPage() {
                 </div>
                 <Button
                   size="sm"
-                  className="bg-green-600 hover:bg-green-700 text-white"
+                  className="bg-primary hover:bg-primary/90 text-white"
                   onClick={(e) => {
                     e.stopPropagation()
                     navigate(`/courses/${course.id}`)

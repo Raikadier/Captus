@@ -112,7 +112,7 @@ const StreakWidget = () => {
       {/* Streak status */}
       <div className="text-center mb-4">
         {isStreakActive ? (
-          <div className="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm">
+          <div className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-sm">
             <Flame size={14} className="mr-1" />
             ¡Racha activa!
           </div>

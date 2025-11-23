@@ -18,52 +18,51 @@ import { FileText, Users, Clock, Upload, CheckCircle } from 'lucide-react'
 export default function StudentCourseDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { user } = useAuth()
-  const { getCourse } = useCourses()
-  const { getAssignments } = useAssignments()
-  const { getGroups, createGroup, addMember } = useCourseGroups()
-  const { submitAssignment, getSubmissions } = useSubmissions()
+  const [activeTab, setActiveTab] = useState('overview')
 
-  const [course, setCourse] = useState(null)
-  const [assignments, setAssignments] = useState([])
-  const [groups, setGroups] = useState([])
-  const [submissions, setSubmissions] = useState({}) // Map assignmentId -> submission
-  const [loading, setLoading] = useState(true)
+  // Mock data
+  const course = {
+    name: 'Cálculo Diferencial',
+    professor: 'Dr. Juan Pérez',
+    color: '#3b82f6',
+  }
 
-  // Modals state
-  const [selectedAssignment, setSelectedAssignment] = useState(null)
-  const [fileUrl, setFileUrl] = useState('')
+  const contentItems = [
+    { id: 1, title: 'Introducción al Cálculo', type: 'Video', viewed: true, duration: '15 min' },
+    { id: 2, title: 'Límites - Teoría', type: 'PDF', viewed: true, pages: 12 },
+    { id: 3, title: 'Ejercicios de Límites', type: 'Apunte', viewed: false, pages: 5 },
+    { id: 4, title: 'Quiz: Límites Básicos', type: 'Quiz', viewed: false, questions: 10 },
+    { id: 5, title: 'Continuidad de Funciones', type: 'Video', viewed: false, duration: '20 min' },
+  ]
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const c = await getCourse(id)
-        setCourse(c)
-        const a = await getAssignments(id)
-        setAssignments(a)
-        const g = await getGroups(id)
-        setGroups(g)
+  const assignments = [
+    { id: 1, name: 'Taller 1: Límites', dueDate: '2025-01-20', status: 'entregada', grade: 95 },
+    { id: 2, name: 'Taller 2: Continuidad', dueDate: '2025-01-25', status: 'entregada', grade: 88 },
+    { id: 3, name: 'Taller 3: Derivadas', dueDate: '2025-02-01', status: 'pendiente', grade: null },
+    { id: 4, name: 'Parcial 1', dueDate: '2025-01-15', status: 'atrasada', grade: null },
+  ]
 
-        // Load submissions for all assignments to check status
-        const subsMap = {}
-        for (let assign of a) {
-            try {
-               const sub = await getSubmissions(assign.id);
-               // If it's a list (Student view returns list but usually 1 per student), take first
-               if (Array.isArray(sub) && sub.length > 0) subsMap[assign.id] = sub[0];
-               else if (!Array.isArray(sub) && sub) subsMap[assign.id] = sub;
-            } catch (e) {
-                // Ignore error if no submission
-            }
-        }
-        setSubmissions(subsMap)
+  const announcements = [
+    { id: 1, title: 'Cambio de horario para el parcial', date: '2025-01-18', type: 'Urgente', content: 'El parcial se realizará el viernes a las 2 PM' },
+    { id: 2, title: 'Nuevo material disponible', date: '2025-01-17', type: 'General', content: 'Se ha publicado el material de derivadas' },
+    { id: 3, title: 'Recordatorio: Taller 3', date: '2025-01-16', type: 'Recordatorio', content: 'El taller 3 vence este viernes' },
+  ]
 
-      } catch (err) {
-        console.error(err)
-        toast.error('Error cargando detalles del curso')
-      } finally {
-        setLoading(false)
-      }
+  const students = [
+    { id: 1, name: 'Ana García', status: 'activo', progress: 85 },
+    { id: 2, name: 'Carlos Mendoza', status: 'activo', progress: 92 },
+    { id: 3, name: 'Laura Pérez', status: 'activo', progress: 78 },
+    { id: 4, name: 'Miguel Torres', status: 'retirado', progress: 45 },
+    { id: 5, name: 'Sofia Ramirez', status: 'activo', progress: 95 },
+  ]
+
+  const getTypeIcon = (type) => {
+    switch (type) {
+      case 'Video': return <PlayCircle className="w-4 h-4 text-blue-600" />
+      case 'PDF': return <FilePdf className="w-4 h-4 text-red-600" />
+      case 'Apunte': return <Bookmark className="w-4 h-4 text-primary" />
+      case 'Quiz': return <CheckCircle2 className="w-4 h-4 text-purple-600" />
+      default: return <FileText className="w-4 h-4 text-gray-600" />
     }
     loadData()
   }, [id])
@@ -103,113 +102,243 @@ export default function StudentCourseDetailPage() {
       }
   }
 
-  if (loading) return <Loading message="Cargando..." />
-  if (!course) return <div className="p-6">Curso no encontrado</div>
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case 'entregada':
+        return <Badge className="bg-primary/10 text-primary hover:bg-primary/20">Entregada</Badge>
+      case 'pendiente':
+        return <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100">Pendiente</Badge>
+      case 'atrasada':
+        return <Badge className="bg-red-100 text-red-700 hover:bg-red-100">Atrasada</Badge>
+      default:
+        return null
+    }
+  }
+
+  const getAnnouncementBadge = (type) => {
+    switch (type) {
+      case 'Urgente':
+        return <Badge className="bg-red-100 text-red-700 hover:bg-red-100">Urgente</Badge>
+      case 'Recordatorio':
+        return <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100">Recordatorio</Badge>
+      case 'General':
+        return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">General</Badge>
+      default:
+        return null
+    }
+  }
 
   return (
     <div className="p-6 space-y-6">
-       <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">{course.title}</h1>
-          <p className="text-gray-600 mt-2">{course.description}</p>
-       </div>
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+                <Link to="/home">Inicio</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+                <Link to="/courses">Cursos</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{course.name}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
-       <Tabs defaultValue="assignments">
-         <TabsList>
-           <TabsTrigger value="assignments" className="flex gap-2"><FileText className="w-4 h-4"/> Tareas</TabsTrigger>
-           <TabsTrigger value="groups" className="flex gap-2"><Users className="w-4 h-4"/> Grupos</TabsTrigger>
-         </TabsList>
+      {/* Header with course info */}
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate('/courses')}
+          className="mb-4"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Volver a cursos
+        </Button>
 
-         <TabsContent value="assignments" className="mt-6 space-y-4">
-            {assignments.length === 0 && <p className="text-gray-500">No hay tareas asignadas.</p>}
-            {assignments.map(assign => {
-                const submission = submissions[assign.id];
-                const isSubmitted = !!submission;
-                const isGraded = submission?.graded;
+        <div className="flex items-center gap-4">
+          <div
+            className="w-16 h-16 rounded-lg"
+            style={{ backgroundColor: course.color }}
+          />
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">{course.name}</h1>
+            <p className="text-sm text-gray-600">{course.professor}</p>
+          </div>
+        </div>
+      </div>
 
-                return (
-                    <Card key={assign.id}>
-                        <CardHeader>
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <CardTitle>{assign.title}</CardTitle>
-                                    <CardDescription>{assign.is_group_assignment ? 'Grupal' : 'Individual'} • Vence: {new Date(assign.due_date).toLocaleDateString()}</CardDescription>
-                                </div>
-                                <div>
-                                    {isGraded ? (
-                                        <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-bold">
-                                            Nota: {submission.grade}
-                                        </span>
-                                    ) : isSubmitted ? (
-                                        <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                                            <CheckCircle className="w-3 h-3"/> Entregado
-                                        </span>
-                                    ) : (
-                                        <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Pendiente</span>
-                                    )}
-                                </div>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="mb-4 text-sm">{assign.description}</p>
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="bg-white border mb-6">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="content">Contenido</TabsTrigger>
+          <TabsTrigger value="assignments">Tareas</TabsTrigger>
+          <TabsTrigger value="announcements">Anuncios</TabsTrigger>
+          <TabsTrigger value="students">Estudiantes</TabsTrigger>
+        </TabsList>
 
-                            {!isSubmitted && (
-                                <Dialog>
-                                    <DialogTrigger asChild>
-                                        <Button size="sm" onClick={() => setSelectedAssignment(assign)}>
-                                            <Upload className="w-4 h-4 mr-2"/> Entregar Tarea
-                                        </Button>
-                                    </DialogTrigger>
-                                    <DialogContent>
-                                        <DialogHeader>
-                                            <DialogTitle>Entregar: {assign.title}</DialogTitle>
-                                        </DialogHeader>
-                                        <div className="space-y-4 py-4">
-                                            <div className="space-y-2">
-                                                <Label>URL del Archivo (Drive, Dropbox, etc)</Label>
-                                                <Input value={fileUrl} onChange={e => setFileUrl(e.target.value)} placeholder="https://..." />
-                                            </div>
-                                            <Button onClick={handleSubmit} className="w-full">Confirmar Entrega</Button>
-                                        </div>
-                                    </DialogContent>
-                                </Dialog>
-                            )}
-                            {isSubmitted && (
-                                <div className="text-sm bg-gray-50 p-3 rounded">
-                                    <p className="font-medium">Tu entrega:</p>
-                                    <a href={submission.file_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline break-all">
-                                        {submission.file_url}
-                                    </a>
-                                    {submission.feedback && (
-                                        <div className="mt-2 pt-2 border-t border-gray-200">
-                                            <p className="font-medium text-gray-700">Retroalimentación:</p>
-                                            <p className="text-gray-600">{submission.feedback}</p>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-                )
-            })}
-         </TabsContent>
+        <TabsContent value="overview">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Próximas clases */}
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="font-semibold text-gray-900 mb-4">Próximas Clases</h3>
+              <div className="space-y-3">
+                <div className="p-3 bg-blue-50 rounded-lg">
+                  <p className="text-sm font-medium text-gray-900">Límites y Continuidad</p>
+                  <p className="text-xs text-gray-600">Lunes 10:00 AM</p>
+                </div>
+              </div>
+            </div>
 
-         <TabsContent value="groups" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {groups.map(group => (
-                    <Card key={group.id}>
-                        <CardHeader>
-                            <CardTitle>{group.name}</CardTitle>
-                            <CardDescription>{group.description}</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <h4 className="text-sm font-medium mb-2">Miembros:</h4>
-                            <ul className="list-disc list-inside text-sm text-gray-600">
-                                {group.members?.map(m => (
-                                    <li key={m.student_id}>Estudiante ID: {m.student_id.slice(0,8)}...</li>
-                                ))}
-                            </ul>
-                        </CardContent>
-                    </Card>
+            {/* Últimas publicaciones */}
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="font-semibold text-gray-900 mb-4">Últimas Publicaciones</h3>
+              <div className="space-y-3">
+                <div className="p-3 bg-primary/10 rounded-lg">
+                  <p className="text-sm font-medium text-gray-900">Material de Derivadas</p>
+                  <p className="text-xs text-gray-600">Hace 2 días</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Tareas pendientes */}
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="font-semibold text-gray-900 mb-4">Tareas Pendientes</h3>
+              <div className="space-y-3">
+                <div className="p-3 bg-red-50 rounded-lg">
+                  <p className="text-sm font-medium text-gray-900">Taller 3</p>
+                  <p className="text-xs text-gray-600">Vence en 2 días</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="content">
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Material del Curso</h2>
+            <div className="space-y-2">
+              {contentItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                  onClick={() => console.log('[v0] Open content', item.id)}
+                >
+                  <div className="flex items-center gap-3">
+                    {getTypeIcon(item.type)}
+                    <div>
+                      <p className="font-medium text-gray-900">{item.title}</p>
+                      <p className="text-xs text-gray-600">
+                        {item.type} • {item.type === 'Video' ? item.duration : `${item.pages} páginas`}
+                      </p>
+                    </div>
+                  </div>
+                  {item.viewed ? (
+                    <Badge className="bg-primary/10 text-primary hover:bg-primary/20">
+                      <BadgeCheck className="w-3 h-3 mr-1" />
+                      Visto
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline">No visto</Badge>
+                  )}
+                </div>
+              ))}
+            </div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="assignments">
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Tareas del Curso</h2>
+            <div className="space-y-3">
+              {assignments.map((assignment) => (
+                <div
+                  key={assignment.id}
+                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-900">{assignment.name}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Calendar className="w-3 h-3 text-gray-500" />
+                      <p className="text-xs text-gray-600">Entrega: {assignment.dueDate}</p>
+                      {assignment.grade && (
+                        <span className="text-xs text-gray-600 ml-2">• Nota: {assignment.grade}/100</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {getStatusBadge(assignment.status)}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => console.log('[v0] Ver tarea', assignment.id)}
+                    >
+                      Ver detalles
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="announcements">
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Anuncios del Curso</h2>
+            <div className="space-y-4">
+              {announcements.map((announcement) => (
+                <div key={announcement.id} className="border-b border-gray-200 pb-4 last:border-0 last:pb-0">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Bell className="w-4 h-4 text-gray-600" />
+                      <h3 className="font-semibold text-gray-900">{announcement.title}</h3>
+                    </div>
+                    {getAnnouncementBadge(announcement.type)}
+                  </div>
+                  <p className="text-sm text-gray-700 mb-2">{announcement.content}</p>
+                  <p className="text-xs text-gray-500">{announcement.date}</p>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="students">
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Estudiantes Inscritos</h2>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nombre</TableHead>
+                  <TableHead>Estado</TableHead>
+                  <TableHead>Progreso</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {students.map((student) => (
+                  <TableRow key={student.id}>
+                    <TableCell className="font-medium">{student.name}</TableCell>
+                    <TableCell>
+                      {student.status === 'activo' ? (
+                        <Badge className="bg-primary/10 text-primary hover:bg-primary/20">Activo</Badge>
+                      ) : (
+                        <Badge className="bg-gray-100 text-gray-700 hover:bg-gray-100">Retirado</Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Progress value={student.progress} className="w-24" />
+                        <span className="text-sm text-gray-600">{student.progress}%</span>
+                      </div>
+                    </TableCell>
+                  </TableRow>
                 ))}
                 {groups.length === 0 && <p className="text-gray-500">No hay grupos formados.</p>}
             </div>

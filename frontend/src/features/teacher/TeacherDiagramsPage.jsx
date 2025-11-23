@@ -68,15 +68,15 @@ export default function TeacherDiagramsPage() {
     <div className="p-6 space-y-6">
       <div className="bg-white rounded-xl shadow-sm p-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-            <GitBranch className="text-green-600" />
+          <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+            <GitBranch className="text-primary" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Diagramas</h1>
             <p className="text-sm text-gray-600">Gestión de visualizaciones académicas</p>
           </div>
         </div>
-        <Button onClick={handleCreate} className="gap-2 bg-green-600 hover:bg-green-700">
+        <Button onClick={handleCreate} className="gap-2 bg-primary hover:bg-primary/90">
           <Plus className="w-4 h-4" />
           Nuevo Diagrama
         </Button>
@@ -84,7 +84,7 @@ export default function TeacherDiagramsPage() {
 
       {loading && diagrams.length === 0 ? (
          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
          </div>
       ) : diagrams.length === 0 ? (
         <Card className="border-dashed">
