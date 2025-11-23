@@ -62,4 +62,10 @@ export class TaskController {
     const result = await taskService.deleteByCategory(parseInt(categoryId));
     res.status(result.success ? 200 : 400).json(result);
   }
+
+  async getPending(req, res) {
+    const limit = parseInt(req.query.limit) || 3;
+    const result = await taskService.getPendingTasks(limit);
+    res.status(result.success ? 200 : 400).json(result);
+  }
 }
