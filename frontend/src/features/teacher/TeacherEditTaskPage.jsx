@@ -22,8 +22,8 @@ export default function TeacherEditTaskPage() {
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center gap-3 bg-white rounded-xl shadow-sm p-6">
-        <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-          <ClipboardList className="text-green-600" />
+        <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+          <ClipboardList className="text-primary" />
         </div>
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Editar tarea #{id}</h1>
@@ -47,7 +47,7 @@ export default function TeacherEditTaskPage() {
             value={formData.description}
             onChange={handleChange('description')}
             rows={4}
-            className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/30 transition-all"
+            className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
           />
         </div>
         <div className="space-y-2">
@@ -58,7 +58,7 @@ export default function TeacherEditTaskPage() {
           <Button type="button" variant="outline" onClick={() => navigate('/teacher/tasks')}>
             Cancelar
           </Button>
-          <Button type="submit" className="bg-green-600 hover:bg-green-700">
+          <Button type="submit" className="bg-primary hover:bg-primary/90">
             Guardar cambios
           </Button>
         </div>

@@ -15,7 +15,7 @@ export default function TeacherCoursesPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between bg-white rounded-xl shadow-sm p-6">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-green-100 text-green-600 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
             <BookOpen className="w-6 h-6" />
           </div>
           <div>

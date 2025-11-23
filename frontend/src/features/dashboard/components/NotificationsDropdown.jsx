@@ -68,7 +68,7 @@ export default function NotificationsDropdown({ isOpen, onClose }) {
         <div className="flex items-center justify-between">
           <h3 className="font-semibold text-gray-900">Notificaciones</h3>
           {unreadCount > 0 && (
-            <span className="px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700 rounded-full">
+            <span className="px-2 py-0.5 text-xs font-medium bg-primary/10 text-primary rounded-full">
               {unreadCount} nuevas
             </span>
           )}
@@ -102,7 +102,7 @@ export default function NotificationsDropdown({ isOpen, onClose }) {
               {/* Mark as read icon (appears on hover) */}
               {!notification.read && (
                 <button className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <CheckCircle size={16} className="text-gray-400 hover:text-green-600" />
+                  <CheckCircle size={16} className="text-gray-400 hover:text-primary" />
                 </button>
               )}
             </div>
@@ -114,7 +114,7 @@ export default function NotificationsDropdown({ isOpen, onClose }) {
       <div className="p-3 border-t border-gray-200">
         <Button
           variant="ghost"
-          className="w-full text-sm text-green-600 hover:text-green-700 hover:bg-green-50"
+          className="w-full text-sm text-primary hover:text-primary/90 hover:bg-primary/10"
           onClick={handleViewAll}
         >
           Ver todas las notificaciones →

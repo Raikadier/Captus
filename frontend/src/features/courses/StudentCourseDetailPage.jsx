@@ -61,7 +61,7 @@ export default function StudentCourseDetailPage() {
     switch (type) {
       case 'Video': return <PlayCircle className="w-4 h-4 text-blue-600" />
       case 'PDF': return <FilePdf className="w-4 h-4 text-red-600" />
-      case 'Apunte': return <Bookmark className="w-4 h-4 text-green-600" />
+      case 'Apunte': return <Bookmark className="w-4 h-4 text-primary" />
       case 'Quiz': return <CheckCircle2 className="w-4 h-4 text-purple-600" />
       default: return <FileText className="w-4 h-4 text-gray-600" />
     }
@@ -70,7 +70,7 @@ export default function StudentCourseDetailPage() {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'entregada':
-        return <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Entregada</Badge>
+        return <Badge className="bg-primary/10 text-primary hover:bg-primary/20">Entregada</Badge>
       case 'pendiente':
         return <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100">Pendiente</Badge>
       case 'atrasada':
@@ -166,7 +166,7 @@ export default function StudentCourseDetailPage() {
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h3 className="font-semibold text-gray-900 mb-4">Últimas Publicaciones</h3>
               <div className="space-y-3">
-                <div className="p-3 bg-green-50 rounded-lg">
+                <div className="p-3 bg-primary/10 rounded-lg">
                   <p className="text-sm font-medium text-gray-900">Material de Derivadas</p>
                   <p className="text-xs text-gray-600">Hace 2 días</p>
                 </div>
@@ -206,7 +206,7 @@ export default function StudentCourseDetailPage() {
                     </div>
                   </div>
                   {item.viewed ? (
-                    <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
+                    <Badge className="bg-primary/10 text-primary hover:bg-primary/20">
                       <BadgeCheck className="w-3 h-3 mr-1" />
                       Visto
                     </Badge>
@@ -292,7 +292,7 @@ export default function StudentCourseDetailPage() {
                     <TableCell className="font-medium">{student.name}</TableCell>
                     <TableCell>
                       {student.status === 'activo' ? (
-                        <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Activo</Badge>
+                        <Badge className="bg-primary/10 text-primary hover:bg-primary/20">Activo</Badge>
                       ) : (
                         <Badge className="bg-gray-100 text-gray-700 hover:bg-gray-100">Retirado</Badge>
                       )}

@@ -69,7 +69,7 @@ const LoginForm = () => {
         {/* Header */}
         <div className="text-center">
           <div className="flex justify-center mb-4">
-            <div className="bg-green-600 p-3 rounded-xl">
+            <div className="bg-primary p-3 rounded-xl">
               <BookOpen className="h-8 w-8 text-white" />
             </div>
           </div>
@@ -113,12 +113,12 @@ const LoginForm = () => {
                     onClick={() => setUserRole('student')}
                     className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
                       userRole === 'student'
-                        ? 'border-green-600 bg-green-50'
+                        ? 'border-primary bg-primary/10'
                         : 'border-gray-200 bg-white hover:border-gray-300'
                     }`}
                   >
-                    <GraduationCap className={`h-6 w-6 ${userRole === 'student' ? 'text-green-600' : 'text-gray-400'}`} />
-                    <span className={`text-sm font-medium ${userRole === 'student' ? 'text-green-600' : 'text-gray-700'}`}>
+                    <GraduationCap className={`h-6 w-6 ${userRole === 'student' ? 'text-primary' : 'text-gray-400'}`} />
+                    <span className={`text-sm font-medium ${userRole === 'student' ? 'text-primary' : 'text-gray-700'}`}>
                       Estudiante
                     </span>
                   </button>
@@ -127,12 +127,12 @@ const LoginForm = () => {
                     onClick={() => setUserRole('teacher')}
                     className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
                       userRole === 'teacher'
-                        ? 'border-green-600 bg-green-50'
+                        ? 'border-primary bg-primary/10'
                         : 'border-gray-200 bg-white hover:border-gray-300'
                     }`}
                   >
-                    <User className={`h-6 w-6 ${userRole === 'teacher' ? 'text-green-600' : 'text-gray-400'}`} />
-                    <span className={`text-sm font-medium ${userRole === 'teacher' ? 'text-green-600' : 'text-gray-700'}`}>
+                    <User className={`h-6 w-6 ${userRole === 'teacher' ? 'text-primary' : 'text-gray-400'}`} />
+                    <span className={`text-sm font-medium ${userRole === 'teacher' ? 'text-primary' : 'text-gray-700'}`}>
                       Profesor
                     </span>
                   </button>
@@ -192,15 +192,15 @@ const LoginForm = () => {
             )}
 
             {successMessage && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                <p className="text-green-600 text-sm">{successMessage}</p>
+              <div className="bg-primary/10 border border-primary/20 rounded-lg p-3">
+                <p className="text-primary text-sm">{successMessage}</p>
               </div>
             )}
 
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-green-600 hover:bg-green-700"
+              className="w-full bg-primary hover:bg-primary/90"
             >
               {loading ? 'Cargando...' : (isRegistering ? 'Crear cuenta' : 'Iniciar sesión')}
             </Button>
@@ -210,7 +210,7 @@ const LoginForm = () => {
             <button
               type="button"
               onClick={() => setIsRegistering(!isRegistering)}
-              className="text-green-600 hover:text-green-500 text-sm font-medium"
+              className="text-primary hover:text-primary/80 text-sm font-medium"
             >
               {isRegistering
                 ? '¿Ya tienes cuenta? Inicia sesión'

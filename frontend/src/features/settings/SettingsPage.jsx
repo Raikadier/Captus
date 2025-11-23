@@ -51,7 +51,7 @@ function SettingsMenuItem({
       onClick={onClick}
       className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-colors ${
         active
-          ? 'bg-green-50 text-green-600'
+          ? 'bg-primary/10 text-primary'
           : darkMode
             ? 'text-gray-300 hover:bg-gray-700'
             : 'text-gray-700 hover:bg-gray-50'
@@ -59,7 +59,7 @@ function SettingsMenuItem({
       type="button"
     >
       <div className="flex items-center space-x-3">
-        <span className={active ? 'text-green-600' : darkMode ? 'text-gray-400' : 'text-gray-500'}>{icon}</span>
+        <span className={active ? 'text-primary' : darkMode ? 'text-gray-400' : 'text-gray-500'}>{icon}</span>
         <span className="font-medium text-sm">{label}</span>
       </div>
       <ChevronRight size={16} className="text-gray-400" />
@@ -68,7 +68,7 @@ function SettingsMenuItem({
 }
 
 export default function SettingsPage() {
-  const { darkMode, toggleTheme, compactView, setCompactView, fontSize, changeFontSize } = useTheme()
+  const { darkMode, toggleTheme, compactView, setCompactView, fontSize, changeFontSize, accentColor, changeAccentColor } = useTheme()
   const { user } = useAuth()
 
   const [activeSection, setActiveSection] = useState('perfil')
@@ -384,7 +384,13 @@ export default function SettingsPage() {
   // Security settings
   const [showPassword, setShowPassword] = useState(false)
 
-
+  const colors = [
+    { name: 'green', bg: 'bg-green-600', border: 'border-green-700' },
+    { name: 'blue', bg: 'bg-blue-600', border: 'border-blue-700' },
+    { name: 'purple', bg: 'bg-purple-600', border: 'border-purple-700' },
+    { name: 'orange', bg: 'bg-orange-600', border: 'border-orange-700' },
+    { name: 'pink', bg: 'bg-pink-600', border: 'border-pink-700' },
+  ];
 
 
 
@@ -454,8 +460,8 @@ export default function SettingsPage() {
                 ) : (
                   <div className={compactView ? 'space-y-3' : 'space-y-4'}>
                     <div className="flex items-center space-x-4">
-                      <div className={`${compactView ? 'w-16 h-16' : 'w-20 h-20'} rounded-full overflow-hidden bg-green-600 flex items-center justify-center`}>
-                        <span className={`text-white ${compactView ? 'text-xl' : 'text-2xl'} font-semibold`}>MG</span>
+                    <div className={`${compactView ? 'w-16 h-16' : 'w-20 h-20'} rounded-full overflow-hidden bg-primary flex items-center justify-center`}>
+                      <span className={`text-primary-foreground ${compactView ? 'text-xl' : 'text-2xl'} font-semibold`}>MG</span>
                       </div>
                       <div>
                         <Button variant="outline" size="sm">
@@ -474,7 +480,7 @@ export default function SettingsPage() {
                           value={formData.firstName}
                           onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
                           placeholder="Tu nombre"
-                          className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600`}
+                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
                         />
                       </div>
                       <div>
@@ -487,7 +493,7 @@ export default function SettingsPage() {
                           value={formData.lastName}
                           onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
                           placeholder="Tu apellido"
-                          className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600`}
+                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
                         />
                       </div>
                     </div>
@@ -500,7 +506,7 @@ export default function SettingsPage() {
                         type="email"
                         value={formData.email}
                         disabled
-                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 opacity-60 cursor-not-allowed`}
+                      className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary opacity-60 cursor-not-allowed`}
                       />
                     </div>
                     <div>
@@ -513,7 +519,7 @@ export default function SettingsPage() {
                         value={formData.career}
                         onChange={(e) => setFormData(prev => ({ ...prev, career: e.target.value }))}
                         placeholder="Ej: Ingeniería de Sistemas"
-                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600`}
+                      className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
                       />
                     </div>
                     <div>
@@ -526,14 +532,14 @@ export default function SettingsPage() {
                         value={formData.bio}
                         onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
                         placeholder="Cuéntanos un poco sobre ti..."
-                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600`}
+                      className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
                       />
                     </div>
                     <div className={compactView ? 'mt-4' : 'mt-6'}>
                       <Button
                         onClick={handleSave}
                         disabled={saving}
-                        className="bg-green-600 hover:bg-green-700 disabled:opacity-50"
+                      className="bg-primary hover:bg-primary/90 disabled:opacity-50"
                       >
                         {saving ? 'Guardando...' : 'Guardar Cambios'}
                       </Button>
@@ -544,22 +550,20 @@ export default function SettingsPage() {
                       <div className={`mt-6 text-center ${compactView ? 'py-3' : 'py-4'}`}>
                         <div className={`inline-flex items-center gap-3 px-6 py-3 rounded-full border-2 ${
                           darkMode
-                            ? 'bg-gradient-to-r from-green-900/20 to-blue-900/20 border-green-600/30'
-                            : 'bg-gradient-to-r from-green-50 to-blue-50 border-green-200'
+                            ? 'bg-gradient-to-r from-primary/20 to-blue-900/20 border-primary/30'
+                            : 'bg-gradient-to-r from-primary/10 to-blue-50 border-primary/20'
                         } backdrop-blur-sm`}>
                           <div className="flex items-center gap-2">
-                            <div className={`w-2 h-2 rounded-full ${
-                              darkMode ? 'bg-green-400' : 'bg-green-500'
-                            } animate-pulse`}></div>
+                            <div className={`w-2 h-2 rounded-full bg-primary animate-pulse`}></div>
                             <span className={`text-sm font-medium ${
-                              darkMode ? 'text-green-300' : 'text-green-700'
+                              darkMode ? 'text-primary/80' : 'text-primary'
                             }`}>
                               Miembro desde
                             </span>
                           </div>
                           <div className={`px-3 py-1 rounded-lg ${
                             darkMode ? 'bg-gray-800/50' : 'bg-white/70'
-                          } border border-green-200/50`}>
+                          } border border-primary/20`}>
                             <span className={`font-bold ${
                               darkMode ? 'text-white' : 'text-gray-800'
                             }`}>
@@ -611,7 +615,7 @@ export default function SettingsPage() {
                         value={passwordData.currentPassword}
                         onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
                         placeholder="Ingresa tu contraseña actual"
-                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} pr-10 border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600`}
+                          className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} pr-10 border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
                       />
                       <button
                         type="button"
@@ -632,7 +636,7 @@ export default function SettingsPage() {
                       value={passwordData.newPassword}
                       onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
                       placeholder="Ingresa tu nueva contraseña"
-                      className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600`}
+                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
                     />
                   </div>
                   <div>
@@ -645,7 +649,7 @@ export default function SettingsPage() {
                       value={passwordData.confirmPassword}
                       onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
                       placeholder="Confirma tu nueva contraseña"
-                      className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600`}
+                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
                     />
                   </div>
                   <div className={`p-3 ${darkMode ? 'bg-blue-900/20 border-blue-600/30' : 'bg-blue-50 border-blue-200'} border rounded-lg`}>
@@ -658,7 +662,7 @@ export default function SettingsPage() {
                   <Button
                     onClick={handleChangePassword}
                     disabled={changingPassword}
-                    className="bg-green-600 hover:bg-green-700 disabled:opacity-50"
+                      className="bg-primary hover:bg-primary/90 disabled:opacity-50"
                   >
                     {changingPassword ? 'Cambiando...' : 'Actualizar Contraseña'}
                   </Button>
@@ -697,7 +701,7 @@ export default function SettingsPage() {
                         variant={fontSize === 'small' ? 'default' : 'outline'}
                         size="sm"
                         onClick={() => changeFontSize('small')}
-                        className={fontSize === 'small' ? 'bg-green-600 hover:bg-green-700' : ''}
+                        className={fontSize === 'small' ? 'bg-primary hover:bg-primary/90' : ''}
                       >
                         Pequeña
                       </Button>
@@ -705,7 +709,7 @@ export default function SettingsPage() {
                         variant={fontSize === 'medium' ? 'default' : 'outline'}
                         size="sm"
                         onClick={() => changeFontSize('medium')}
-                        className={fontSize === 'medium' ? 'bg-green-600 hover:bg-green-700' : ''}
+                        className={fontSize === 'medium' ? 'bg-primary hover:bg-primary/90' : ''}
                       >
                         Media
                       </Button>
@@ -713,10 +717,30 @@ export default function SettingsPage() {
                         variant={fontSize === 'large' ? 'default' : 'outline'}
                         size="sm"
                         onClick={() => changeFontSize('large')}
-                        className={fontSize === 'large' ? 'bg-green-600 hover:bg-green-700' : ''}
+                        className={fontSize === 'large' ? 'bg-primary hover:bg-primary/90' : ''}
                       >
                         Grande
                       </Button>
+                    </div>
+                  </div>
+                  <div className={compactView ? 'py-2' : 'py-3'}>
+                    <Label className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-3 block`}>
+                      Color de acento
+                    </Label>
+                    <div className="flex gap-2">
+                      {colors.map((color) => (
+                        <button
+                          key={color.name}
+                          onClick={() => changeAccentColor(color.name)}
+                          className={`w-10 h-10 rounded-full ${color.bg} flex items-center justify-center transition-all ${
+                            accentColor === color.name
+                              ? `border-2 ${darkMode ? 'border-white' : 'border-gray-900'} ring-2 ${darkMode ? 'ring-gray-700' : 'ring-gray-200'}`
+                              : 'hover:scale-110'
+                          }`}
+                        >
+                          {accentColor === color.name && <Check size={20} className="text-white" />}
+                        </button>
+                      ))}
                     </div>
                   </div>
                 </div>

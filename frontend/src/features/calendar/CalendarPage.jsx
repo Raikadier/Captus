@@ -33,8 +33,8 @@ function CreateEventModal({ onClose, onCreate, selectedDate }) {
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Plus size={24} className="text-green-600" />
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                <Plus size={24} className="text-primary" />
               </div>
               <div>
                 <h2 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Nuevo Evento</h2>
@@ -106,7 +106,7 @@ function CreateEventModal({ onClose, onCreate, selectedDate }) {
               <Button
                 onClick={handleCreate}
                 disabled={!title.trim() || !date}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-primary hover:bg-primary/90"
               >
                 Crear Evento
               </Button>
@@ -193,7 +193,7 @@ export default function CalendarPage() {
       case 'medium':
         return 'bg-yellow-100 text-yellow-800 border-yellow-200'
       case 'low':
-        return 'bg-green-100 text-green-800 border-green-200'
+        return 'bg-primary/10 text-primary border-primary/20'
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200'
     }
@@ -242,7 +242,7 @@ export default function CalendarPage() {
         {weekDays.map((day, index) => (
           <div key={index} className={`p-4 border-2 rounded-xl ${
             day.toDateString() === selectedDate.toDateString()
-              ? 'ring-2 ring-green-500 bg-green-50 border-green-200'
+              ? 'ring-2 ring-primary bg-primary/10 border-primary/20'
               : darkMode
                 ? 'border-gray-700 bg-gray-750'
                 : 'border-gray-200'
@@ -253,7 +253,7 @@ export default function CalendarPage() {
               </div>
               <div className={`text-2xl font-bold ${
                 day.toDateString() === new Date().toDateString()
-                  ? 'text-green-600'
+                  ? 'text-primary'
                   : ''
               }`}>
                 {day.getDate()}
@@ -326,7 +326,7 @@ export default function CalendarPage() {
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-xl text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 shadow-sm hover:shadow-md hover:scale-105 active:scale-95"
+            className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-xl text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 shadow-sm hover:shadow-md hover:scale-105 active:scale-95"
           >
             <Plus className="h-5 w-5 mr-2" />
             Nuevo Evento
@@ -340,7 +340,7 @@ export default function CalendarPage() {
               onClick={() => setView(v)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95 ${
                 view === v
-                  ? 'bg-green-50 text-green-600 shadow-sm'
+                  ? 'bg-primary/10 text-primary shadow-sm'
                   : darkMode
                     ? 'text-gray-400 hover:bg-gray-700'
                     : 'text-gray-600 hover:bg-gray-50'
@@ -399,11 +399,11 @@ export default function CalendarPage() {
                 key={index}
                 className={`min-h-32 p-3 border-2 rounded-xl hover:shadow-md cursor-pointer transition-all duration-200 ${
                   date && date.toDateString() === selectedDate.toDateString()
-                    ? 'ring-2 ring-green-500 bg-green-50 border-green-200'
+                    ? 'ring-2 ring-primary bg-primary/10 border-primary/20'
                     : date
                       ? darkMode
-                        ? 'border-gray-700 hover:border-green-500 bg-gray-750'
-                        : 'border-gray-200 hover:border-green-200'
+                        ? 'border-gray-700 hover:border-primary bg-gray-750'
+                        : 'border-gray-200 hover:border-primary'
                       : 'border-transparent'
                 }`}
                 onClick={() => date && handleDayClick(date)}
@@ -413,7 +413,7 @@ export default function CalendarPage() {
                     <div
                       className={`text-sm font-semibold mb-2 ${
                         date.toDateString() === new Date().toDateString()
-                          ? 'w-7 h-7 bg-green-600 text-white rounded-full flex items-center justify-center'
+                          ? 'w-7 h-7 bg-primary text-white rounded-full flex items-center justify-center'
                           : darkMode
                             ? 'text-white'
                             : 'text-gray-900'
@@ -494,9 +494,9 @@ export default function CalendarPage() {
         }`}>
           <div className="flex items-center space-x-3 mb-4">
             <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-              darkMode ? 'bg-green-900/30' : 'bg-green-50'
+              darkMode ? 'bg-primary/10' : 'bg-primary/10'
             }`}>
-              <Clock className={`w-6 h-6 text-green-600`} />
+              <Clock className={`w-6 h-6 text-primary`} />
             </div>
             <div>
               <h3 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -521,7 +521,7 @@ export default function CalendarPage() {
                 <p className={darkMode ? 'text-gray-400' : 'text-gray-500'}>
                   No hay eventos para este día
                 </p>
-                <button className="mt-4 text-green-600 hover:text-green-700 font-medium text-sm">
+                <button className="mt-4 text-primary hover:text-primary/90 font-medium text-sm">
                   Agregar evento
                 </button>
               </div>
@@ -535,7 +535,7 @@ export default function CalendarPage() {
                     <h4 className={`font-semibold ${task.completed ? 'line-through' : ''}`}>{task.title}</h4>
                     <span
                       className={`px-3 py-1 text-xs rounded-full font-medium ${
-                        task.completed ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                        task.completed ? 'bg-primary/10 text-primary' : 'bg-gray-100 text-gray-800'
                       }`}
                     >
                       {task.completed ? 'Completada' : 'Pendiente'}
