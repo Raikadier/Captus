@@ -1,23 +1,22 @@
-import React, { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { BookOpen, FileText, Bell, ArrowLeft, PlayCircle, FileText as FilePdf, Bookmark, CheckCircle2, Calendar, BadgeCheck } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { useCourses } from '../../hooks/useCourses'
+import { useAssignments } from '../../hooks/useAssignments'
+import { useCourseGroups } from '../../hooks/useCourseGroups'
+import { useSubmissions } from '../../hooks/useSubmissions'
+import { useAuth } from '../../context/AuthContext'
 import { Button } from '../../ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/tabs'
-import { Badge } from '../../ui/badge'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../ui/table'
-import { Card } from '../../ui/card'
-import { Progress } from '../../ui/progress'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '../../ui/breadcrumb'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../ui/tabs'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../ui/card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../ui/dialog'
+import { Input } from '../../ui/input'
+import { Label } from '../../ui/label'
+import { toast } from 'sonner'
+import Loading from '../../ui/loading'
+import { FileText, Users, Clock, Upload, CheckCircle } from 'lucide-react'
 
 export default function StudentCourseDetailPage() {
-  // const { id: courseId } = useParams() // Unused
+  const { id } = useParams()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('overview')
 
@@ -65,6 +64,42 @@ export default function StudentCourseDetailPage() {
       case 'Quiz': return <CheckCircle2 className="w-4 h-4 text-purple-600" />
       default: return <FileText className="w-4 h-4 text-gray-600" />
     }
+    loadData()
+  }, [id])
+
+  const handleSubmit = async () => {
+      if (!fileUrl) return toast.error('Debes ingresar una URL del archivo');
+
+      let groupId = null;
+      if (selectedAssignment.is_group_assignment) {
+          // Find if user is in any group of this course
+          // Logic: We have 'groups' loaded. Each group has 'members'.
+          // We find the group where one member has student_id == user.id
+
+          const myGroup = groups.find(g =>
+              g.members && g.members.some(m => m.student_id === user.id)
+          );
+
+          if (!myGroup) {
+              return toast.error('Debes pertenecer a un grupo para entregar esta tarea');
+          }
+          groupId = myGroup.id;
+      }
+
+      try {
+          await submitAssignment({
+              assignment_id: selectedAssignment.id,
+              file_url: fileUrl,
+              group_id: groupId
+          });
+          toast.success('Tarea entregada');
+          setSelectedAssignment(null);
+          // Reload submissions
+          const sub = await getSubmissions(selectedAssignment.id);
+          setSubmissions(prev => ({ ...prev, [selectedAssignment.id]: Array.isArray(sub) ? sub[0] : sub }));
+      } catch (error) {
+          toast.error(error.message);
+      }
   }
 
   const getStatusBadge = (status) => {
@@ -305,11 +340,10 @@ export default function StudentCourseDetailPage() {
                     </TableCell>
                   </TableRow>
                 ))}
-              </TableBody>
-            </Table>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                {groups.length === 0 && <p className="text-gray-500">No hay grupos formados.</p>}
+            </div>
+         </TabsContent>
+       </Tabs>
     </div>
   )
 }

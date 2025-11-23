@@ -1,23 +1,88 @@
-import React, { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { ClipboardList, ArrowLeft } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useAssignments } from '../../hooks/useAssignments'
+import { useCourses } from '../../hooks/useCourses'
 import { Button } from '../../ui/button'
 import { Input } from '../../ui/input'
+import { Textarea } from '../../ui/textarea'
+import { Label } from '../../ui/label'
+import { Switch } from '../../ui/switch'
+import Loading from '../../ui/loading'
+import { toast } from 'sonner'
+import { ArrowLeft } from 'lucide-react'
 
 export default function TeacherEditTaskPage() {
   const { id } = useParams()
+  const [searchParams] = useSearchParams()
   const navigate = useNavigate()
+  const { getAssignment, createAssignment, updateAssignment } = useAssignments()
+  const { getCourse } = useCourses()
+
+  const [loading, setLoading] = useState(true)
+  const [isEditing, setIsEditing] = useState(false)
+
   const [formData, setFormData] = useState({
-    title: 'Título de la tarea',
-    description: 'Descripción de la tarea',
-    dueDate: '2025-11-25',
+      title: '',
+      description: '',
+      due_date: new Date(),
+      is_group_assignment: false,
+      course_id: null
   })
 
-  const handleChange = (field) => (e) => setFormData({ ...formData, [field]: e.target.value })
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    navigate('/teacher/tasks')
+  useEffect(() => {
+      const init = async () => {
+          try {
+              if (id === 'new') {
+                  // Create Mode
+                  const courseId = searchParams.get('courseId')
+                  if (!courseId) {
+                      toast.error('Falta el ID del curso')
+                      navigate('/teacher/courses')
+                      return
+                  }
+                  setFormData(prev => ({ ...prev, course_id: parseInt(courseId) }))
+                  setIsEditing(false)
+              } else {
+                  // Edit Mode
+                  const assignment = await getAssignment(id)
+                  if (assignment && assignment.id) {
+                      setIsEditing(true)
+                      setFormData({
+                          ...assignment,
+                          due_date: new Date(assignment.due_date)
+                      })
+                  }
+              }
+          } catch (e) {
+              console.error(e)
+              toast.error('Error cargando la tarea')
+              navigate(-1)
+          } finally {
+              setLoading(false)
+          }
+      }
+      init()
+  }, [id, searchParams])
+
+  const handleSubmit = async () => {
+      try {
+          if (!formData.title) return toast.error('El título es obligatorio');
+
+          if (isEditing) {
+              await updateAssignment(id, formData);
+              toast.success('Tarea actualizada');
+              navigate(-1);
+          } else {
+              await createAssignment(formData);
+              toast.success('Tarea creada');
+              navigate(`/teacher/courses/${formData.course_id}`);
+          }
+      } catch (error) {
+          toast.error(error.message);
+      }
   }
+
+  if (loading) return <Loading message="Cargando..." />
 
   return (
     <div className="p-6 space-y-6">
@@ -29,7 +94,6 @@ export default function TeacherEditTaskPage() {
           <h1 className="text-2xl font-bold text-gray-900">Editar tarea #{id}</h1>
           <p className="text-sm text-gray-600">Actualiza la información de la tarea</p>
         </div>
-      </div>
 
       <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-4">
         <div className="flex items-center gap-2">
@@ -62,7 +126,6 @@ export default function TeacherEditTaskPage() {
             Guardar cambios
           </Button>
         </div>
-      </form>
     </div>
   )
 }

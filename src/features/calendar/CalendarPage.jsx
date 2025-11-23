@@ -29,7 +29,7 @@ function CreateEventModal({ onClose, onCreate, selectedDate }) {
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-      <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-300`}>
+      <div className="bg-card rounded-xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-300 border border-border">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-3">
@@ -37,8 +37,8 @@ function CreateEventModal({ onClose, onCreate, selectedDate }) {
                 <Plus size={24} className="text-primary" />
               </div>
               <div>
-                <h2 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Nuevo Evento</h2>
-                <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Crea un evento en tu calendario</p>
+                <h2 className="text-xl font-bold text-foreground">Nuevo Evento</h2>
+                <p className="text-sm text-muted-foreground">Crea un evento en tu calendario</p>
               </div>
             </div>
             <Button variant="ghost" size="icon" onClick={onClose}>
@@ -48,20 +48,20 @@ function CreateEventModal({ onClose, onCreate, selectedDate }) {
 
           <div className="space-y-4">
             <div>
-              <Label className={darkMode ? 'text-gray-300' : ''}>Título *</Label>
+              <Label>Título *</Label>
               <Input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Título del evento"
-                className={`mt-1 ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : ''}`}
+                className="mt-1 bg-background border-border text-foreground"
               />
             </div>
             <div>
-              <Label className={darkMode ? 'text-gray-300' : ''}>Tipo</Label>
+              <Label>Tipo</Label>
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value)}
-                className={`w-full mt-1 px-3 py-2 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'}`}
+                className="w-full mt-1 px-3 py-2 rounded-lg border border-border bg-background text-foreground"
               >
                 <option>Reunión</option>
                 <option>Examen</option>
@@ -71,31 +71,31 @@ function CreateEventModal({ onClose, onCreate, selectedDate }) {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className={darkMode ? 'text-gray-300' : ''}>Fecha *</Label>
+                <Label>Fecha *</Label>
                 <Input
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className={`mt-1 ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : ''}`}
+                  className="mt-1 bg-background border-border text-foreground"
                 />
               </div>
               <div>
-                <Label className={darkMode ? 'text-gray-300' : ''}>Hora</Label>
+                <Label>Hora</Label>
                 <Input
                   type="time"
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
-                  className={`mt-1 ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : ''}`}
+                  className="mt-1 bg-background border-border text-foreground"
                 />
               </div>
             </div>
             <div>
-              <Label className={darkMode ? 'text-gray-300' : ''}>Descripción</Label>
+              <Label>Descripción</Label>
               <Textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Describe tu evento..."
-                className={`mt-1 ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : ''}`}
+                className="mt-1 bg-background border-border text-foreground"
                 rows={3}
               />
             </div>
@@ -247,8 +247,8 @@ export default function CalendarPage() {
                 ? 'border-gray-700 bg-gray-750'
                 : 'border-gray-200'
           }`}>
-            <div className={`text-center mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              <div className="text-xs font-medium text-gray-500">
+            <div className="text-center mb-2 text-foreground">
+              <div className="text-xs font-medium text-muted-foreground">
                 {day.toLocaleDateString('es-ES', { weekday: 'short' })}
               </div>
               <div className={`text-2xl font-bold ${
@@ -280,8 +280,8 @@ export default function CalendarPage() {
     // const dayTasks = getTasksForDate(selectedDate) // Unused variable
 
     return (
-      <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl p-6`}>
-        <h3 className={`text-xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+      <div className="bg-card rounded-xl p-6 border border-border">
+        <h3 className="text-xl font-bold mb-4 text-foreground">
           {selectedDate.toLocaleDateString('es-ES', {
             weekday: 'long',
             day: 'numeric',
@@ -291,8 +291,8 @@ export default function CalendarPage() {
         </h3>
         <div className="space-y-2">
           {hours.map((hour) => (
-            <div key={hour} className={`flex border-b ${darkMode ? 'border-gray-700' : 'border-gray-100'} py-2`}>
-              <div className={`w-20 text-sm font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            <div key={hour} className="flex border-b border-border py-2">
+              <div className="w-20 text-sm font-medium text-muted-foreground">
                 {hour.toString().padStart(2, '0')}:00
               </div>
               <div className="flex-1">
@@ -312,15 +312,13 @@ export default function CalendarPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className={`rounded-xl shadow-sm p-6 mb-6 animate-in slide-in-from-top duration-300 ${
-        darkMode ? 'bg-gray-800' : 'bg-white'
-      }`}>
+      <div className="rounded-xl shadow-sm p-6 mb-6 animate-in slide-in-from-top duration-300 bg-card border border-border">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+            <h1 className="text-2xl font-bold text-foreground">
               Calendario
             </h1>
-            <p className={`mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            <p className="mt-1 text-muted-foreground">
               Organiza tus eventos y tareas
             </p>
           </div>
@@ -353,30 +351,24 @@ export default function CalendarPage() {
       </div>
 
       {view === 'month' && (
-        <div className={`rounded-xl shadow-sm p-6 mb-6 animate-in fade-in duration-500 ${
-          darkMode ? 'bg-gray-800' : 'bg-white'
-        }`}>
+        <div className="rounded-xl shadow-sm p-6 mb-6 animate-in fade-in duration-500 bg-card border border-border">
           <div className="flex items-center justify-between mb-6">
             <button
               onClick={() => navigateMonth(-1)}
-              className={`p-2 rounded-lg transition-colors ${
-                darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
-              }`}
+              className="p-2 rounded-lg transition-colors hover:bg-muted"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronLeft className="w-5 h-5 text-foreground" />
             </button>
 
-            <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+            <h2 className="text-2xl font-bold text-foreground">
               {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
             </h2>
 
             <button
               onClick={() => navigateMonth(1)}
-              className={`p-2 rounded-lg transition-colors ${
-                darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
-              }`}
+              className="p-2 rounded-lg transition-colors hover:bg-muted"
             >
-              <ChevronRight className="w-5 h-5" />
+              <ChevronRight className="w-5 h-5 text-foreground" />
             </button>
           </div>
 
@@ -384,9 +376,7 @@ export default function CalendarPage() {
             {dayNames.map((day) => (
               <div
                 key={day}
-                className={`p-3 text-center font-semibold rounded-lg ${
-                  darkMode ? 'bg-gray-750 text-gray-400' : 'bg-gray-50 text-gray-600'
-                }`}
+                className="p-3 text-center font-semibold rounded-lg bg-muted text-muted-foreground"
               >
                 {day}
               </div>
@@ -436,7 +426,7 @@ export default function CalendarPage() {
                           </div>
                         ))}
                       {getTasksForDate(date).length > 2 && (
-                        <div className="text-xs text-gray-500 font-medium">+{getTasksForDate(date).length - 2} más</div>
+                        <div className="text-xs text-muted-foreground font-medium">+{getTasksForDate(date).length - 2} más</div>
                       )}
                     </div>
                   </>
@@ -448,9 +438,7 @@ export default function CalendarPage() {
       )}
 
       {view === 'week' && (
-        <div className={`rounded-xl shadow-sm p-6 mb-6 ${
-          darkMode ? 'bg-gray-800' : 'bg-white'
-        }`}>
+        <div className="rounded-xl shadow-sm p-6 mb-6 bg-card border border-border">
           <div className="flex items-center justify-between mb-6">
             <button
               onClick={() => {
@@ -475,11 +463,9 @@ export default function CalendarPage() {
                 newDate.setDate(newDate.getDate() + 7)
                 setCurrentDate(newDate)
               }}
-              className={`p-2 rounded-lg transition-colors ${
-                darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
-              }`}
+              className="p-2 rounded-lg transition-colors hover:bg-muted"
             >
-              <ChevronRight className="w-5 h-5" />
+              <ChevronRight className="w-5 h-5 text-foreground" />
             </button>
           </div>
           {renderWeekView()}
@@ -489,9 +475,7 @@ export default function CalendarPage() {
       {view === 'day' && renderDayView()}
 
       {selectedDate && (
-        <div className={`rounded-xl shadow-sm p-6 ${
-          darkMode ? 'bg-gray-800' : 'bg-white'
-        }`}>
+        <div className="rounded-xl shadow-sm p-6 bg-card border border-border">
           <div className="flex items-center space-x-3 mb-4">
             <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
               darkMode ? 'bg-primary/10' : 'bg-primary/10'
@@ -499,14 +483,14 @@ export default function CalendarPage() {
               <Clock className={`w-6 h-6 text-primary`} />
             </div>
             <div>
-              <h3 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              <h3 className="text-xl font-bold text-foreground">
                 {selectedDate.toLocaleDateString('es-ES', {
                   weekday: 'long',
                   day: 'numeric',
                   month: 'long',
                 })}
               </h3>
-              <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              <p className="text-sm text-muted-foreground">
                 {getTasksForDate(selectedDate).length} eventos programados
               </p>
             </div>
@@ -515,10 +499,8 @@ export default function CalendarPage() {
           <div className="space-y-3">
             {getTasksForDate(selectedDate).length === 0 ? (
               <div className="text-center py-12">
-                <Calendar className={`w-12 h-12 mx-auto mb-3 ${
-                  darkMode ? 'text-gray-600' : 'text-gray-300'
-                }`} />
-                <p className={darkMode ? 'text-gray-400' : 'text-gray-500'}>
+                <Calendar className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
+                <p className="text-muted-foreground">
                   No hay eventos para este día
                 </p>
                 <button className="mt-4 text-primary hover:text-primary/90 font-medium text-sm">
