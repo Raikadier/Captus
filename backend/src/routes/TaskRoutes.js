@@ -14,6 +14,7 @@ router.use(taskController.injectUser);
 
 // Rutas de tareas
 router.get("/", taskController.getAll.bind(taskController));
+router.get("/pending", taskController.getPending.bind(taskController));
 router.get("/:id", taskController.getById.bind(taskController));
 router.post("/", taskController.create.bind(taskController));
 router.put("/:id", taskController.update.bind(taskController));

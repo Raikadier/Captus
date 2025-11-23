@@ -14,6 +14,7 @@ router.use(statisticsController.injectUser);
 
 // Rutas de estadísticas
 router.get("/", statisticsController.getByUser.bind(statisticsController));
+router.get("/home-page", statisticsController.getHomePageStats.bind(statisticsController));
 router.get("/streak-stats", statisticsController.getStreakStats.bind(statisticsController));
 router.put("/", statisticsController.update.bind(statisticsController));
 router.post("/check-achievements", statisticsController.checkAchievements.bind(statisticsController));

@@ -5,6 +5,7 @@ import PriorityRepository from "../repositories/PriorityRepository.js";
 import CategoryRepository from "../repositories/CategoryRepository.js";
 import StatisticsRepository from "../repositories/StatisticsRepository.js";
 import { OperationResult } from "../shared/OperationResult.js";
+import { requireSupabaseClient } from "../lib/supabaseAdmin.js";
 
 const taskRepository = new TaskRepository();
 const subTaskRepository = new SubTaskRepository();
@@ -138,12 +139,21 @@ export class TaskService {
     }
   }
 
-  async getTasksByUser(filter = null) {
+  async getTasksByUser(filter = null, limit = null) {
     try {
       if (!this.currentUser) return [];
 
-      const tasks = await taskRepository.getAllByUserId(this.currentUser.id);
-      return filter ? tasks.filter(filter) : tasks;
+      let tasks = await taskRepository.getAllByUserId(this.currentUser.id);
+
+      if (filter) {
+        tasks = tasks.filter(filter);
+      }
+
+      if (limit && limit > 0) {
+        tasks = tasks.slice(0, limit);
+      }
+
+      return tasks;
     } catch (error) {
       console.error("Error al obtener tareas del usuario:", error);
       return [];
@@ -153,9 +163,31 @@ export class TaskService {
   async getAll() {
     try {
       const tasks = await this.getTasksByUser();
+
+      // Load relations in parallel for better performance
+      const relationPromises = tasks.map(task => this.loadTaskRelations(task));
+      await Promise.all(relationPromises);
+
       return new OperationResult(true, "Tareas obtenidas exitosamente.", tasks);
     } catch (error) {
       return new OperationResult(false, `Error al obtener tareas: ${error.message}`);
+    }
+  }
+
+  async getPendingTasks(limit = 3) {
+    try {
+      if (!this.currentUser) return new OperationResult(false, "Usuario no autenticado");
+
+      // Get only incomplete tasks efficiently with limit
+      const tasks = await this.getTasksByUser((task) => !task.state, limit);
+
+      // Load relations in parallel for better performance
+      const relationPromises = tasks.map(task => this.loadTaskRelations(task));
+      await Promise.all(relationPromises);
+
+      return new OperationResult(true, "Tareas pendientes obtenidas exitosamente.", tasks);
+    } catch (error) {
+      return new OperationResult(false, `Error al obtener tareas pendientes: ${error.message}`);
     }
   }
 
