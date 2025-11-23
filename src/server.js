@@ -21,6 +21,7 @@ import SubjectRoutes from './routes/SubjectRoutes.js';
 import UserRoutes from './routes/UserRoutes.js';
 import DiagramRoutes from './routes/DiagramRoutes.js';
 import NotesRoutes from './routes/NotesRoutes.js';
+import EventsRoutes from './routes/EventsRoutes.js';
 import CourseRoutes from './routes/CourseRoutes.js';
 import EnrollmentRoutes from './routes/EnrollmentRoutes.js';
 import AssignmentRoutes from './routes/AssignmentRoutes.js';
@@ -123,6 +124,7 @@ if (ENV_OK && supabaseAdmin) {
   app.use('/api/users', UserRoutes);
   app.use('/api/diagrams', verifySupabaseToken, DiagramRoutes);
   app.use('/api/notes', verifySupabaseToken, NotesRoutes);
+  app.use('/api/events', verifySupabaseToken, EventsRoutes);
   app.use('/api/courses', CourseRoutes); // Middleware internal to routes
   app.use('/api/enrollments', EnrollmentRoutes);
   app.use('/api/assignments', AssignmentRoutes);
@@ -163,7 +165,8 @@ app.get('/api', (req, res) => {
       '/api/comment-likes',
       '/api/subjects',
       '/api/users',
-      '/api/notes'
+      '/api/notes',
+      '/api/events'
     ]
   });
 });
