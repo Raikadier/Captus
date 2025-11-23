@@ -7,6 +7,7 @@ import { Input } from '../../ui/input'
 import { Textarea } from '../../ui/textarea'
 import { Label } from '../../ui/label'
 import { Switch } from '../../ui/switch'
+import Loading from '../../ui/loading'
 import { toast } from 'sonner'
 import { ArrowLeft } from 'lucide-react'
 
@@ -81,7 +82,7 @@ export default function TeacherEditTaskPage() {
       }
   }
 
-  if (loading) return <div className="p-6">Cargando...</div>
+  if (loading) return <Loading message="Cargando..." />
 
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">

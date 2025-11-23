@@ -4,6 +4,7 @@ import { Bell, MessageSquare, TrendingUp, CheckSquare, Target, Award, Settings }
 import { Button } from '../../ui/button'
 import { Card } from '../../ui/card'
 import apiClient from '../../shared/api/client'
+import Loading from '../../ui/loading'
 import { ManageSubjectsDialog } from '../subjects/components/ManageSubjectsDialog'
 
 function getCurrentDate() {
@@ -121,7 +122,7 @@ export default function StatsPage() {
   const strokeDasharray = `${(completionPercent / 100) * circumference} ${circumference}`;
 
   if (loading) {
-     return <div className="min-h-screen flex items-center justify-center bg-[#F6F7FB]">Cargando estadísticas...</div>;
+     return <Loading message="Cargando estadísticas..." />;
   }
 
   return (

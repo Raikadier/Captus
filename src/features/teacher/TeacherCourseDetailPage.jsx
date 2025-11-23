@@ -9,6 +9,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../ui/tabs'
 import { Plus, Users, FileText, ClipboardList } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../ui/dialog'
 import { Input } from '../../ui/input'
+import Loading from '../../ui/loading'
 import { toast } from 'sonner'
 
 export default function TeacherCourseDetailPage() {
@@ -59,7 +60,7 @@ export default function TeacherCourseDetailPage() {
       }
   }
 
-  if (loading) return <div className="p-6">Cargando...</div>
+  if (loading) return <Loading message="Cargando..." />
   if (!course) return <div className="p-6">Curso no encontrado</div>
 
   return (

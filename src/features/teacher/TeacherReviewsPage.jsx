@@ -7,6 +7,7 @@ import { Input } from '../../ui/input'
 import { Textarea } from '../../ui/textarea'
 import { Card, CardContent } from '../../ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../ui/dialog'
+import Loading from '../../ui/loading'
 import { toast } from 'sonner'
 import { ArrowLeft, ExternalLink, CheckCircle, Clock } from 'lucide-react'
 
@@ -70,7 +71,7 @@ export default function TeacherReviewsPage() {
       setIsGradeOpen(true)
   }
 
-  if (loading) return <div className="p-6">Cargando...</div>
+  if (loading) return <Loading message="Cargando..." />
 
   return (
     <div className="p-6 space-y-6">
