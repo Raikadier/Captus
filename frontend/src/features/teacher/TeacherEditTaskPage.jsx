@@ -1,68 +1,146 @@
-import React, { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { ClipboardList, ArrowLeft } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useAssignments } from '../../hooks/useAssignments'
+import { useCourses } from '../../hooks/useCourses'
 import { Button } from '../../ui/button'
 import { Input } from '../../ui/input'
+import { Textarea } from '../../ui/textarea'
+import { Label } from '../../ui/label'
+import { Switch } from '../../ui/switch'
+import { toast } from 'sonner'
+import { ArrowLeft } from 'lucide-react'
 
 export default function TeacherEditTaskPage() {
   const { id } = useParams()
+  const [searchParams] = useSearchParams()
   const navigate = useNavigate()
+  const { getAssignment, createAssignment, updateAssignment } = useAssignments()
+  const { getCourse } = useCourses()
+
+  const [loading, setLoading] = useState(true)
+  const [isEditing, setIsEditing] = useState(false)
+
   const [formData, setFormData] = useState({
-    title: 'Título de la tarea',
-    description: 'Descripción de la tarea',
-    dueDate: '2025-11-25',
+      title: '',
+      description: '',
+      due_date: new Date(),
+      is_group_assignment: false,
+      course_id: null
   })
 
-  const handleChange = (field) => (e) => setFormData({ ...formData, [field]: e.target.value })
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    navigate('/teacher/tasks')
+  useEffect(() => {
+      const init = async () => {
+          try {
+              if (id === 'new') {
+                  // Create Mode
+                  const courseId = searchParams.get('courseId')
+                  if (!courseId) {
+                      toast.error('Falta el ID del curso')
+                      navigate('/teacher/courses')
+                      return
+                  }
+                  setFormData(prev => ({ ...prev, course_id: parseInt(courseId) }))
+                  setIsEditing(false)
+              } else {
+                  // Edit Mode
+                  const assignment = await getAssignment(id)
+                  if (assignment && assignment.id) {
+                      setIsEditing(true)
+                      setFormData({
+                          ...assignment,
+                          due_date: new Date(assignment.due_date)
+                      })
+                  }
+              }
+          } catch (e) {
+              console.error(e)
+              toast.error('Error cargando la tarea')
+              navigate(-1)
+          } finally {
+              setLoading(false)
+          }
+      }
+      init()
+  }, [id, searchParams])
+
+  const handleSubmit = async () => {
+      try {
+          if (!formData.title) return toast.error('El título es obligatorio');
+
+          if (isEditing) {
+              await updateAssignment(id, formData);
+              toast.success('Tarea actualizada');
+              navigate(-1);
+          } else {
+              await createAssignment(formData);
+              toast.success('Tarea creada');
+              navigate(`/teacher/courses/${formData.course_id}`);
+          }
+      } catch (error) {
+          toast.error(error.message);
+      }
   }
 
-  return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center gap-3 bg-white rounded-xl shadow-sm p-6">
-        <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-          <ClipboardList className="text-green-600" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Editar tarea #{id}</h1>
-          <p className="text-sm text-gray-600">Actualiza la información de la tarea</p>
-        </div>
-      </div>
+  if (loading) return <div className="p-6">Cargando...</div>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-4">
-        <div className="flex items-center gap-2">
-          <Button type="button" variant="ghost" onClick={() => navigate('/teacher/tasks')}>
-            <ArrowLeft className="w-4 h-4 mr-2" /> Volver
-          </Button>
+  return (
+    <div className="p-6 max-w-3xl mx-auto space-y-6">
+        <div className="flex items-center gap-4 mb-6">
+            <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+                <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <h1 className="text-2xl font-bold">{isEditing ? 'Editar Tarea' : 'Crear Nueva Tarea'}</h1>
         </div>
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Título</label>
-          <Input value={formData.title} onChange={handleChange('title')} required />
+
+        <div className="bg-white p-6 rounded-xl shadow-sm space-y-6">
+            <div className="space-y-2">
+                <Label>Título de la Tarea</Label>
+                <Input
+                    value={formData.title}
+                    onChange={e => setFormData({...formData, title: e.target.value})}
+                    placeholder="Ej: Ensayo sobre Historia"
+                />
+            </div>
+
+            <div className="space-y-2">
+                <Label>Descripción e Instrucciones</Label>
+                <Textarea
+                    value={formData.description}
+                    onChange={e => setFormData({...formData, description: e.target.value})}
+                    placeholder="Detalla lo que deben realizar los estudiantes..."
+                    className="h-32"
+                />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                    <Label>Fecha de Vencimiento</Label>
+                    <div className="block">
+                         <Input
+                            type="datetime-local"
+                            value={formData.due_date ? new Date(formData.due_date).toISOString().slice(0, 16) : ''}
+                            onChange={e => setFormData({...formData, due_date: new Date(e.target.value)})}
+                         />
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-2 pt-8">
+                     <input
+                        type="checkbox"
+                        id="isGroup"
+                        className="w-5 h-5 text-green-600 rounded focus:ring-green-500"
+                        checked={formData.is_group_assignment}
+                        onChange={e => setFormData({...formData, is_group_assignment: e.target.checked})}
+                     />
+                     <Label htmlFor="isGroup" className="cursor-pointer">Es una tarea grupal</Label>
+                </div>
+            </div>
+
+            <div className="pt-4 flex justify-end gap-3">
+                <Button variant="outline" onClick={() => navigate(-1)}>Cancelar</Button>
+                <Button onClick={handleSubmit}>{isEditing ? 'Guardar Cambios' : 'Crear Tarea'}</Button>
+            </div>
         </div>
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Descripción</label>
-          <textarea
-            value={formData.description}
-            onChange={handleChange('description')}
-            rows={4}
-            className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/30 transition-all"
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Fecha límite</label>
-          <Input type="date" value={formData.dueDate} onChange={handleChange('dueDate')} />
-        </div>
-        <div className="flex gap-2">
-          <Button type="button" variant="outline" onClick={() => navigate('/teacher/tasks')}>
-            Cancelar
-          </Button>
-          <Button type="submit" className="bg-green-600 hover:bg-green-700">
-            Guardar cambios
-          </Button>
-        </div>
-      </form>
     </div>
   )
 }
