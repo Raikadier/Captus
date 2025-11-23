@@ -1,6 +1,7 @@
 // StreakWidget - Widget mejorado con animación y mejor diseño
 import React, { useState, useEffect } from 'react';
 import { Flame, Target, Calendar } from 'lucide-react';
+import Loading from '../../ui/loading';
 import apiClient from '../api/client';
 
 const StreakWidget = () => {
@@ -67,7 +68,7 @@ const StreakWidget = () => {
   if (loading) {
     return (
       <div className="bg-card rounded-xl shadow-sm p-6">
-        <div className="text-center text-muted-foreground">Cargando racha...</div>
+        <Loading message="Cargando racha..." fullScreen={false} />
       </div>
     );
   }

@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '../../ui/input'
 import { Label } from '../../ui/label'
 import { toast } from 'sonner'
+import Loading from '../../ui/loading'
 import { FileText, Users, Clock, Upload, CheckCircle } from 'lucide-react'
 
 export default function StudentCourseDetailPage() {
@@ -102,7 +103,7 @@ export default function StudentCourseDetailPage() {
       }
   }
 
-  if (loading) return <div className="p-6">Cargando...</div>
+  if (loading) return <Loading message="Cargando..." />
   if (!course) return <div className="p-6">Curso no encontrado</div>
 
   return (
