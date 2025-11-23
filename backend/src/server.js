@@ -21,6 +21,11 @@ import SubjectRoutes from './routes/SubjectRoutes.js';
 import UserRoutes from './routes/UserRoutes.js';
 import DiagramRoutes from './routes/DiagramRoutes.js';
 import NotesRoutes from './routes/NotesRoutes.js';
+import CourseRoutes from './routes/CourseRoutes.js';
+import EnrollmentRoutes from './routes/EnrollmentRoutes.js';
+import AssignmentRoutes from './routes/AssignmentRoutes.js';
+import SubmissionRoutes from './routes/SubmissionRoutes.js';
+import AcademicGroupRoutes from './routes/AcademicGroupRoutes.js';
 import aiRouter from './routes/ai.js';
 import { getSupabaseClient } from './lib/supabaseAdmin.js';
 
@@ -118,6 +123,11 @@ if (ENV_OK && supabaseAdmin) {
   app.use('/api/users', UserRoutes);
   app.use('/api/diagrams', verifySupabaseToken, DiagramRoutes);
   app.use('/api/notes', verifySupabaseToken, NotesRoutes);
+  app.use('/api/courses', CourseRoutes); // Middleware internal to routes
+  app.use('/api/enrollments', EnrollmentRoutes);
+  app.use('/api/assignments', AssignmentRoutes);
+  app.use('/api/submissions', SubmissionRoutes);
+  app.use('/api/groups', AcademicGroupRoutes);
 }
 
 // Root route
