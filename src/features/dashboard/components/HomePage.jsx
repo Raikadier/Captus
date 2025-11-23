@@ -77,8 +77,9 @@ const HomePage = () => {
   const unreadCount = 3
 
   useEffect(() => {
-    if (user?.user_metadata?.name) {
-      setUserName(user.user_metadata.name.split(' ')[0]) // Solo el primer nombre
+    const name = user?.user_metadata?.name || user?.name;
+    if (name) {
+      setUserName(name.split(' ')[0]) // Solo el primer nombre
     }
   }, [user])
 
@@ -90,7 +91,7 @@ const HomePage = () => {
         <div className="flex justify-between items-center">
           <div>
             <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              👋 ¡Hola{userName ? `, ${userName}` : ''}! Bienvenido a Captus
+              👋 Bienvenid@ {userName ? userName : 'Estudiante'}
             </h1>
             <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
               {getCurrentDate()}

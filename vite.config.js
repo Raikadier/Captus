@@ -17,6 +17,8 @@ export default defineConfig({
       '@features': path.resolve(__dirname, './src/features'),
       '@ui': path.resolve(__dirname, './src/ui'),
       '@public': path.resolve(__dirname, './public'),
+      'react': path.resolve(__dirname, './node_modules/react'),
+      'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
     },
   },
   server: {
