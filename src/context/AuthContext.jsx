@@ -14,6 +14,7 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Initialize session/user on app start and subscribe to auth changes
@@ -28,16 +29,21 @@ export const AuthProvider = ({ children }) => {
         if (!mounted) return;
 
         if (sessionData?.session?.user) {
+           setSession(sessionData.session);
            setUser(sessionData.session.user);
            // Token is handled by onAuthStateChange in supabase.js, but we can ensure it here too
            
            localStorage.setItem('token', sessionData.session.access_token);
         } else {
+           setSession(null);
            setUser(null);
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
-        if (mounted) setUser(null);
+        if (mounted) {
+          setSession(null);
+          setUser(null);
+        }
       } finally {
         if (mounted) setLoading(false);
       }
@@ -47,6 +53,7 @@ export const AuthProvider = ({ children }) => {
 
     // Subscribe to auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session);
       if (session?.user) {
         setUser(session.user);
       } else {
@@ -177,6 +184,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await supabase.auth.signOut();
+      setSession(null);
       setUser(null);
       // localStorage clearing is handled by supabase.js onAuthStateChange
     } catch (error) {
@@ -192,6 +200,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const value = {
+    session,
     user,
     loading,
     isAuthenticated: !!user,

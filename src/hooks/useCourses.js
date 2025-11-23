@@ -13,7 +13,10 @@ export function useCourses() {
   const role = user?.user_metadata?.role || 'student';
 
   const fetchCourses = async () => {
-    if (!session?.access_token) return;
+    if (!session?.access_token) {
+      setLoading(false);
+      return;
+    }
 
     setLoading(true);
     try {
