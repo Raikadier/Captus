@@ -1,16 +1,29 @@
 import BaseRepository from "./BaseRepository.js";
 
 const mapFromDb = (row) => ({
-  id_Category: row.id,
+  id: row.id,
   name: row.name,
   id_User: row.user_id,
   createdAt: row.created_at,
+  // Legacy support
+  id_Category: row.id,
 });
 
-const mapToDb = (entity) => ({
-  name: entity.name,
-  user_id: entity.id_User ?? null,
-});
+const mapToDb = (entity) => {
+  const result = {};
+
+  // Solo incluir campos que estén definidos y no sean null
+  if (entity.name !== undefined && entity.name !== null) {
+    result.name = entity.name;
+  }
+
+  // Solo incluir user_id si está definido (para creación, no para actualización)
+  if (entity.id_User !== undefined && entity.id_User !== null) {
+    result.user_id = entity.id_User;
+  }
+
+  return result;
+};
 
 class CategoryRepository extends BaseRepository {
   constructor() {

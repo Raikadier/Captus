@@ -6,6 +6,7 @@ import { X, RefreshCw } from 'lucide-react';
 
 const AddTaskForm = ({ onClose, onTaskAdded }) => {
   const { createTask, categories, priorities, loading } = useTasks();
+  const [error, setError] = useState('');
 
   // Random title suggestions (equivalent to TitleTaskRandom array)
   const titleSuggestions = [
@@ -38,12 +39,16 @@ const AddTaskForm = ({ onClose, onTaskAdded }) => {
     "Resumen del tema para estudiar..."
   ];
 
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    due_date: new Date().toISOString().split('T')[0],
-    priority_id: 1,
-    category_id: 1
+  const [formData, setFormData] = useState(() => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return {
+      title: '',
+      description: '',
+      due_date: tomorrow.toISOString().split('T')[0],
+      priority_id: 1,
+      category_id: 6
+    };
   });
 
   const [placeholders, setPlaceholders] = useState({
@@ -69,6 +74,18 @@ const AddTaskForm = ({ onClose, onTaskAdded }) => {
   }, []);
 
   const handleInputChange = (field, value) => {
+    if (field === 'due_date') {
+      const selectedDate = new Date(value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (selectedDate < today) {
+        setError('La fecha límite no puede ser anterior a hoy. Selecciona una fecha actual o futura.');
+      } else {
+        setError('');
+      }
+    }
+
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -138,6 +155,11 @@ const AddTaskForm = ({ onClose, onTaskAdded }) => {
     // Validate required fields
     if (!formData.title.trim() || formData.title === placeholders.title) {
       alert('El título es obligatorio');
+      return;
+    }
+
+    if (error) {
+      alert(error);
       return;
     }
 
@@ -224,10 +246,11 @@ const AddTaskForm = ({ onClose, onTaskAdded }) => {
             <input
               type="date"
               value={formData.due_date}
-              onChange={(e) => handleInputChange('due_date', e.target.value)}
+              onInput={(e) => handleInputChange('due_date', e.target.value)}
               className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
               style={{ fontFamily: 'Segoe UI', fontSize: '12px' }}
             />
+            {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
           </div>
 
           {/* Quick date buttons */}

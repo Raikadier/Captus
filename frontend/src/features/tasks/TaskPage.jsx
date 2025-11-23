@@ -1,18 +1,25 @@
 // TaskPage - Diseño como la plantilla con mejor UI
-import React, { useState, useEffect, useMemo } from 'react';
-import { Plus, Filter, Search as SearchIcon, Bell, Calendar as CalendarIcon } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Filter, Search as SearchIcon, Bell, Calendar as CalendarIcon, AlertTriangle } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import { useTasks } from './hooks/useTasks';
 import TaskCard from './components/TaskCard';
 import TaskForm from './components/TaskForm';
 import StreakWidget from '../../shared/components/StreakWidget';
+import CategoryManagement from '../categories/CategoryManagement';
 import apiClient from '../../shared/api/client';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../ui/tabs';
 import { Input } from '../../ui/input';
 import { Badge } from '../../ui/badge';
 import { Button } from '../../ui/button';
 import { Card } from '../../ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../../ui/dialog';
+import './TaskTabs.css';
 
 const TaskPage = () => {
+  const [searchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') === 'categories' ? 'categories' : 'tasks';
+
   const {
     tasks,
     loading,
@@ -20,8 +27,7 @@ const TaskPage = () => {
     createTask,
     updateTask,
     deleteTask,
-    toggleTaskCompletion,
-    refetch
+    toggleTaskCompletion
   } = useTasks();
 
   const [categories, setCategories] = useState([]);
@@ -35,6 +41,10 @@ const TaskPage = () => {
     completed: ''
   });
   const [showFilters, setShowFilters] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState({
+    isOpen: false,
+    task: null
+  });
 
   useEffect(() => {
     fetchReferenceData();
@@ -46,8 +56,8 @@ const TaskPage = () => {
         apiClient.get('/categories'),
         apiClient.get('/priorities')
       ]);
-      setCategories(categoriesRes.data);
-      setPriorities(prioritiesRes.data);
+      setCategories(categoriesRes.data?.data || categoriesRes.data || []);
+      setPriorities(prioritiesRes.data?.data || prioritiesRes.data || []);
     } catch (error) {
       console.error('Error fetching reference data:', error);
     }
@@ -71,14 +81,27 @@ const TaskPage = () => {
     }
   };
 
-  const handleDeleteTask = async (taskId) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar esta tarea?')) {
+  const handleDeleteTask = (taskId) => {
+    const task = tasks.find(t => t.id === taskId);
+    setDeleteDialog({
+      isOpen: true,
+      task: task
+    });
+  };
+
+  const confirmDeleteTask = async () => {
+    if (deleteDialog.task) {
       try {
-        await deleteTask(taskId);
+        await deleteTask(deleteDialog.task.id);
+        setDeleteDialog({ isOpen: false, task: null });
       } catch (error) {
         console.error('Error deleting task:', error);
       }
     }
+  };
+
+  const cancelDeleteTask = () => {
+    setDeleteDialog({ isOpen: false, task: null });
   };
 
   const handleEditTask = (task) => {
@@ -134,120 +157,132 @@ const TaskPage = () => {
       <header className="sticky top-0 bg-white rounded-xl shadow-sm p-6 mb-6 z-10">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Mis Tareas</h1>
-            <p className="text-gray-600 mt-1">Gestiona tus tareas y mantén tu racha de productividad</p>
+            <h1 className="text-2xl font-bold text-gray-900">
+              {activeTab === 'tasks' ? 'Mis Tareas' : 'Categorías'}
+            </h1>
+            <p className="text-gray-600 mt-1">
+              {activeTab === 'tasks'
+                ? 'Gestiona tus tareas y mantén tu racha de productividad'
+                : 'Organiza tus tareas con categorías personalizadas'
+              }
+            </p>
           </div>
         </div>
       </header>
 
-      {/* Streak Widget */}
-      <div className="mb-6">
-        <StreakWidget />
-      </div>
-
-      {/* Actions Bar */}
-      <Card className="p-6 bg-white rounded-xl shadow-sm mb-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            <Button onClick={() => setShowTaskForm(true)} className="bg-green-600 hover:bg-green-700">
-              <Plus size={18} className="mr-2" />
-              Nueva Tarea
-            </Button>
-            <Button
-              variant="outline"
-              className="border-gray-300 bg-white"
-              onClick={() => setShowFilters((v) => !v)}
-              title="Filtros"
-            >
-              <Filter size={18} className="mr-2 text-gray-500" />
-              Filtros
-            </Button>
+      {/* Show Streak Widget and Task Controls only in tasks tab */}
+      {activeTab === 'tasks' && (
+        <>
+          {/* Streak Widget */}
+          <div className="mb-6">
+            <StreakWidget />
           </div>
-          <div className="text-sm text-gray-500">
-            {filteredTasks.length} de {tasks.length} tareas
-          </div>
-        </div>
 
-        {/* Search */}
-        <div className="mt-4">
-          <div className="relative">
-            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-            <Input
-              placeholder="Buscar tareas..."
-              value={filters.searchText}
-              onChange={(e) => handleFilterChange('searchText', e.target.value)}
-              className="pl-10 bg-white"
-            />
-          </div>
-        </div>
-
-        {/* Advanced Filters */}
-        {showFilters && (
-          <div className="mt-4 pt-4 border-t border-gray-200">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Categoría
-                </label>
-                <select
-                  value={filters.categoryId}
-                  onChange={(e) => handleFilterChange('categoryId', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-white"
+          {/* Actions Bar */}
+          <Card className="p-6 bg-white rounded-xl shadow-sm mb-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-4">
+                <Button onClick={() => setShowTaskForm(true)} className="bg-green-600 hover:bg-green-700">
+                  <Plus size={18} className="mr-2" />
+                  Nueva Tarea
+                </Button>
+                <Button
+                  variant="outline"
+                  className="border-gray-300 bg-white"
+                  onClick={() => setShowFilters((v) => !v)}
+                  title="Filtros"
                 >
-                  <option value="">Todas las categorías</option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Prioridad
-                </label>
-                <select
-                  value={filters.priorityId}
-                  onChange={(e) => handleFilterChange('priorityId', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-white"
-                >
-                  <option value="">Todas las prioridades</option>
-                  {priorities.map((priority) => (
-                    <option key={priority.id} value={priority.id}>
-                      {priority.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Estado
-                </label>
-                <select
-                  value={filters.completed}
-                  onChange={(e) => handleFilterChange('completed', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-white"
-                >
-                  <option value="">Todos</option>
-                  <option value="false">Pendientes</option>
-                  <option value="true">Completadas</option>
-                </select>
-              </div>
-
-              <div className="flex md:items-end">
-                <Button variant="ghost" onClick={clearFilters} className="text-gray-700">
-                  Limpiar filtros
+                  <Filter size={18} className="mr-2 text-gray-500" />
+                  Filtros
                 </Button>
               </div>
+              <div className="text-sm text-gray-500">
+                {filteredTasks.length} de {tasks.length} tareas
+              </div>
             </div>
-          </div>
-        )}
-      </Card>
 
-      {/* Task Form */}
-      {(showTaskForm || editingTask) && (
+            {/* Search */}
+            <div className="mt-4">
+              <div className="relative">
+                <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                <Input
+                  placeholder="Buscar tareas..."
+                  value={filters.searchText}
+                  onChange={(e) => handleFilterChange('searchText', e.target.value)}
+                  className="pl-10 bg-white"
+                />
+              </div>
+            </div>
+
+            {/* Advanced Filters */}
+            {showFilters && (
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Categoría
+                    </label>
+                    <select
+                      value={filters.categoryId}
+                      onChange={(e) => handleFilterChange('categoryId', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-white"
+                    >
+                      <option value="">Todas las categorías</option>
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Prioridad
+                    </label>
+                    <select
+                      value={filters.priorityId}
+                      onChange={(e) => handleFilterChange('priorityId', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-white"
+                    >
+                      <option value="">Todas las prioridades</option>
+                      {priorities.map((priority) => (
+                        <option key={priority.id} value={priority.id}>
+                          {priority.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Estado
+                    </label>
+                    <select
+                      value={filters.completed}
+                      onChange={(e) => handleFilterChange('completed', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-white"
+                    >
+                      <option value="">Todos</option>
+                      <option value="false">Pendientes</option>
+                      <option value="true">Completadas</option>
+                    </select>
+                  </div>
+
+                  <div className="flex md:items-end">
+                    <Button variant="ghost" onClick={clearFilters} className="text-gray-700">
+                      Limpiar filtros
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </Card>
+        </>
+      )}
+
+      {/* Task Form - Only show in tasks tab */}
+      {activeTab === 'tasks' && (showTaskForm || editingTask) && (
         <div className="mb-6">
           <TaskForm
             task={editingTask}
@@ -266,98 +301,169 @@ const TaskPage = () => {
         </div>
       )}
 
-      {/* Tabs */}
-      <Tabs defaultValue="todas" className="w-full">
-        <TabsList className="bg-white mb-6 rounded-xl">
-          <TabsTrigger value="todas">Todas</TabsTrigger>
-          <TabsTrigger value="pendiente">Pendientes</TabsTrigger>
-          <TabsTrigger value="en-progreso">En Progreso</TabsTrigger>
-          <TabsTrigger value="completada">Completadas</TabsTrigger>
+      {/* Main Tabs */}
+      <Tabs defaultValue={activeTab} className="w-full">
+        <TabsList className="task-main-tabs bg-white mb-6 rounded-xl p-1 shadow-sm">
+          <TabsTrigger
+            value="tasks"
+            className="tab-trigger px-6 py-2.5 rounded-lg font-medium"
+          >
+            <span className="tab-icon">📝</span> Mis Tareas
+          </TabsTrigger>
+          <TabsTrigger
+            value="categories"
+            className="tab-trigger px-6 py-2.5 rounded-lg font-medium"
+          >
+            <span className="tab-icon">🏷️</span> Categorías
+          </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="todas">
-          {/* Tasks List */}
-          <div className="space-y-4">
-            {filteredTasks.length === 0 ? (
-              <Card className="p-12 text-center bg-white rounded-xl shadow-sm">
-                <div className="text-gray-500 text-lg mb-2">
-                  {tasks.length === 0 ? 'No tienes tareas aún' : 'No se encontraron tareas con los filtros aplicados'}
-                </div>
-                <p className="text-gray-400">
-                  {tasks.length === 0 ? 'Crea tu primera tarea para comenzar' : 'Prueba cambiando los filtros'}
-                </p>
-              </Card>
-            ) : (
-              filteredTasks.map((task) => (
-                <TaskCard
-                  key={task.id}
-                  task={task}
-                  categories={categories}
-                  priorities={priorities}
-                  onToggleComplete={(taskId) => toggleTaskCompletion(taskId)}
-                  onEdit={handleEditTask}
-                  onDelete={handleDeleteTask}
-                />
-              ))
-            )}
-          </div>
+        {/* Tasks Tab */}
+        <TabsContent value="tasks" className="tab-content space-y-6">
+          {/* Sub-tabs for task status */}
+          <Tabs defaultValue="todas" className="w-full">
+            <TabsList className="task-sub-tabs bg-gray-50 mb-4 rounded-lg p-1">
+              <TabsTrigger
+                value="todas"
+                className="tab-trigger px-4 py-2 rounded-md text-sm font-medium"
+              >
+                <span className="tab-icon">📋</span> Todas
+              </TabsTrigger>
+              <TabsTrigger
+                value="pendiente"
+                className="tab-trigger px-4 py-2 rounded-md text-sm font-medium"
+              >
+                <span className="tab-icon">⏳</span> Pendientes
+              </TabsTrigger>
+              <TabsTrigger
+                value="en-progreso"
+                className="tab-trigger px-4 py-2 rounded-md text-sm font-medium"
+              >
+                <span className="tab-icon">🚀</span> En Progreso
+              </TabsTrigger>
+              <TabsTrigger
+                value="completada"
+                className="tab-trigger px-4 py-2 rounded-md text-sm font-medium"
+              >
+                <span className="tab-icon">✅</span> Completadas
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="todas">
+              <div className="space-y-4">
+                {filteredTasks.length === 0 ? (
+                  <Card className="p-12 text-center bg-white rounded-xl shadow-sm">
+                    <div className="text-gray-500 text-lg mb-2">
+                      {tasks.length === 0 ? 'No tienes tareas aún' : 'No se encontraron tareas con los filtros aplicados'}
+                    </div>
+                    <p className="text-gray-400">
+                      {tasks.length === 0 ? 'Crea tu primera tarea para comenzar' : 'Prueba cambiando los filtros'}
+                    </p>
+                  </Card>
+                ) : (
+                  filteredTasks.map((task) => (
+                    <TaskCard
+                      key={task.id}
+                      task={task}
+                      categories={categories}
+                      priorities={priorities}
+                      onToggleComplete={(taskId) => toggleTaskCompletion(taskId)}
+                      onEdit={handleEditTask}
+                      onDelete={handleDeleteTask}
+                    />
+                  ))
+                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="pendiente">
+              <div className="space-y-4">
+                {filteredTasks
+                  .filter((t) => t.completed === false)
+                  .map((task) => (
+                    <TaskCard
+                      key={task.id}
+                      task={task}
+                      categories={categories}
+                      priorities={priorities}
+                      onToggleComplete={(taskId) => toggleTaskCompletion(taskId)}
+                      onEdit={handleEditTask}
+                      onDelete={handleDeleteTask}
+                    />
+                  ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="en-progreso">
+              <div className="space-y-4">
+                {filteredTasks
+                  .filter((t) => t.completed === false)
+                  .map((task) => (
+                    <TaskCard
+                      key={task.id}
+                      task={task}
+                      categories={categories}
+                      priorities={priorities}
+                      onToggleComplete={(taskId) => toggleTaskCompletion(taskId)}
+                      onEdit={handleEditTask}
+                      onDelete={handleDeleteTask}
+                    />
+                  ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="completada">
+              <div className="space-y-4">
+                {filteredTasks
+                  .filter((t) => t.completed === true)
+                  .map((task) => (
+                    <TaskCard
+                      key={task.id}
+                      task={task}
+                      categories={categories}
+                      priorities={priorities}
+                      onToggleComplete={(taskId) => toggleTaskCompletion(taskId)}
+                      onEdit={handleEditTask}
+                      onDelete={handleDeleteTask}
+                    />
+                  ))}
+              </div>
+            </TabsContent>
+          </Tabs>
         </TabsContent>
 
-        <TabsContent value="pendiente">
-          <div className="space-y-4">
-            {filteredTasks
-              .filter((t) => t.completed === false)
-              .map((task) => (
-                <TaskCard
-                  key={task.id}
-                  task={task}
-                  categories={categories}
-                  priorities={priorities}
-                  onToggleComplete={(taskId) => toggleTaskCompletion(taskId)}
-                  onEdit={handleEditTask}
-                  onDelete={handleDeleteTask}
-                />
-              ))}
-          </div>
-        </TabsContent>
-
-        {/* Until we have a separate status field, treat "En Progreso" as pendientes (no completadas). */}
-        <TabsContent value="en-progreso">
-          <div className="space-y-4">
-            {filteredTasks
-              .filter((t) => t.completed === false)
-              .map((task) => (
-                <TaskCard
-                  key={task.id}
-                  task={task}
-                  categories={categories}
-                  priorities={priorities}
-                  onToggleComplete={(taskId) => toggleTaskCompletion(taskId)}
-                  onEdit={handleEditTask}
-                  onDelete={handleDeleteTask}
-                />
-              ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="completada">
-          <div className="space-y-4">
-            {filteredTasks
-              .filter((t) => t.completed === true)
-              .map((task) => (
-                <TaskCard
-                  key={task.id}
-                  task={task}
-                  categories={categories}
-                  priorities={priorities}
-                  onToggleComplete={(taskId) => toggleTaskCompletion(taskId)}
-                  onEdit={handleEditTask}
-                  onDelete={handleDeleteTask}
-                />
-              ))}
-          </div>
+        {/* Categories Tab */}
+        <TabsContent value="categories" className="tab-content">
+          <CategoryManagement />
         </TabsContent>
       </Tabs>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialog.isOpen} onOpenChange={(open) => !open && cancelDeleteTask()}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <AlertTriangle className="h-5 w-5" />
+              Confirmar Eliminación
+            </DialogTitle>
+            <DialogDescription className="text-left">
+              ¿Estás seguro de que quieres eliminar la tarea <strong>"{deleteDialog.task?.title}"</strong>?
+              <br /><br />
+              <span className="text-red-600 font-medium">
+                ⚠️ Esta acción no se puede deshacer y la tarea será removida permanentemente de tu lista.
+              </span>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={cancelDeleteTask}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={confirmDeleteTask}>
+              Eliminar Tarea
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
