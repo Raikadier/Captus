@@ -9,7 +9,7 @@ import { Label } from '../../ui/label'
 import { Switch } from '../../ui/switch'
 import Loading from '../../ui/loading'
 import { toast } from 'sonner'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, ClipboardList } from 'lucide-react'
 
 export default function TeacherEditTaskPage() {
   const { id } = useParams()
@@ -24,7 +24,7 @@ export default function TeacherEditTaskPage() {
   const [formData, setFormData] = useState({
       title: '',
       description: '',
-      due_date: new Date(),
+      due_date: new Date().toISOString().split('T')[0], // Format YYYY-MM-DD
       is_group_assignment: false,
       course_id: null
   })
@@ -49,7 +49,8 @@ export default function TeacherEditTaskPage() {
                       setIsEditing(true)
                       setFormData({
                           ...assignment,
-                          due_date: new Date(assignment.due_date)
+                          // Format date safely
+                          due_date: assignment.due_date ? new Date(assignment.due_date).toISOString().split('T')[0] : ''
                       })
                   }
               }
@@ -64,7 +65,23 @@ export default function TeacherEditTaskPage() {
       init()
   }, [id, searchParams])
 
-  const handleSubmit = async () => {
+  const handleChange = (field) => (e) => {
+      const value = e.target.value
+      setFormData(prev => ({
+          ...prev,
+          [field]: value
+      }))
+  }
+
+  const handleSwitchChange = (checked) => {
+      setFormData(prev => ({
+          ...prev,
+          is_group_assignment: checked
+      }))
+  }
+
+  const handleSubmit = async (e) => {
+      e.preventDefault()
       try {
           if (!formData.title) return toast.error('El título es obligatorio');
 
@@ -91,41 +108,62 @@ export default function TeacherEditTaskPage() {
           <ClipboardList className="text-primary" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Editar tarea #{id}</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{isEditing ? `Editar tarea #${id}` : 'Crear Nueva Tarea'}</h1>
           <p className="text-sm text-gray-600">Actualiza la información de la tarea</p>
         </div>
+      </div>
 
       <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-4">
-        <div className="flex items-center gap-2">
-          <Button type="button" variant="ghost" onClick={() => navigate('/teacher/tasks')}>
+        <div className="flex items-center gap-2 mb-4">
+          <Button type="button" variant="ghost" onClick={() => navigate(-1)}>
             <ArrowLeft className="w-4 h-4 mr-2" /> Volver
           </Button>
         </div>
+
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Título</label>
-          <Input value={formData.title} onChange={handleChange('title')} required />
+          <Label className="text-sm font-medium text-gray-700">Título</Label>
+          <Input
+            value={formData.title}
+            onChange={handleChange('title')}
+            required
+            placeholder="Ej: Taller de Cálculo"
+          />
         </div>
+
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Descripción</label>
-          <textarea
+          <Label className="text-sm font-medium text-gray-700">Descripción</Label>
+          <Textarea
             value={formData.description}
             onChange={handleChange('description')}
             rows={4}
+            placeholder="Instrucciones para la tarea..."
             className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
           />
         </div>
+
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Fecha límite</label>
-          <Input type="date" value={formData.dueDate} onChange={handleChange('dueDate')} />
+          <Label className="text-sm font-medium text-gray-700">Fecha límite</Label>
+          <Input
+            type="date"
+            value={formData.due_date}
+            onChange={handleChange('due_date')}
+          />
         </div>
-        <div className="flex gap-2">
-          <Button type="button" variant="outline" onClick={() => navigate('/teacher/tasks')}>
+
+        <div className="flex items-center space-x-2">
+             <Switch id="group-mode" checked={formData.is_group_assignment} onCheckedChange={handleSwitchChange} />
+             <Label htmlFor="group-mode">Es una tarea grupal?</Label>
+        </div>
+
+        <div className="flex gap-2 pt-4">
+          <Button type="button" variant="outline" onClick={() => navigate(-1)}>
             Cancelar
           </Button>
           <Button type="submit" className="bg-primary hover:bg-primary/90">
-            Guardar cambios
+            {isEditing ? 'Guardar cambios' : 'Crear Tarea'}
           </Button>
         </div>
+      </form>
     </div>
   )
 }

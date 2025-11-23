@@ -9,15 +9,10 @@ import { Card, CardContent } from '../../ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../ui/dialog'
 import Loading from '../../ui/loading'
 import { toast } from 'sonner'
-import { ArrowLeft, ExternalLink, CheckCircle, Clock } from 'lucide-react'
+import { ArrowLeft, ExternalLink, CheckCircle, Clock, ListChecks } from 'lucide-react'
 
 export default function TeacherReviewsPage() {
   const { studentId } = useParams()
-  // studentId param name in router is confusing.
-  // Route is `/teacher/reviews/:studentId`.
-  // But usually we review an Assignment, not a student globally?
-  // In `TeacherCourseDetailPage`, I linked to `/teacher/reviews/${assign.id}`.
-  // So `studentId` here actually holds `assignmentId`.
   const assignmentId = studentId;
 
   const navigate = useNavigate()
@@ -33,6 +28,12 @@ export default function TeacherReviewsPage() {
   const [grade, setGrade] = useState('')
   const [feedback, setFeedback] = useState('')
   const [isGradeOpen, setIsGradeOpen] = useState(false)
+
+  // Mock Data
+  const mockReviews = [
+    { id: 'm1', studentName: 'Carlos Mock', submittedAt: '2025-01-20T10:00:00', grade: 85, graded: true, feedback: 'Buen trabajo' },
+    { id: 'm2', studentName: 'Ana Mock', submittedAt: '2025-01-21T11:30:00', grade: null, graded: false, feedback: '' }
+  ]
 
   const loadData = async () => {
       try {
@@ -55,6 +56,13 @@ export default function TeacherReviewsPage() {
   const handleGrade = async () => {
       try {
           if (!grade) return toast.error('Ingresa una nota');
+
+          if (selectedSubmission.is_mock) {
+              toast.success('Calificación simulada guardada (Mock)');
+              setIsGradeOpen(false);
+              return;
+          }
+
           await gradeSubmission(selectedSubmission.id, { grade, feedback });
           toast.success('Calificación guardada');
           setIsGradeOpen(false);
@@ -73,36 +81,46 @@ export default function TeacherReviewsPage() {
 
   if (loading) return <Loading message="Cargando..." />
 
+  // Combine Real and Mock
+  const displayedSubmissions = [
+      ...submissions,
+      ...mockReviews.map(m => ({
+          id: m.id,
+          student: { name: m.studentName },
+          submitted_at: m.submittedAt,
+          grade: m.grade,
+          graded: m.graded,
+          feedback: m.feedback,
+          file_url: '#',
+          is_mock: true
+      }))
+  ]
+
   return (
     <div className="p-6 space-y-6">
       <div className="bg-white rounded-xl shadow-sm p-6 flex items-center gap-3">
+        <Button variant="ghost" onClick={() => navigate(-1)} className="mr-2">
+            <ArrowLeft className="w-4 h-4" />
+        </Button>
         <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
           <ListChecks className="text-primary" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Revisiones pendientes</h1>
-          <p className="text-sm text-gray-600">Evalúa las entregas de tus estudiantes</p>
+          <h1 className="text-2xl font-bold text-gray-900">Revisiones: {assignment?.title || 'Cargando...'}</h1>
+          <p className="text-sm text-gray-600">Total entregas: {displayedSubmissions.length}</p>
         </div>
       </div>
 
-      <div className="space-y-3">
-        {mockReviews.map((review) => (
-          <div key={review.id} className="p-4 bg-white rounded-xl shadow-sm border border-gray-200 flex items-center justify-between">
-            <div>
-                <h1 className="text-2xl font-bold">Revisiones: {assignment?.title}</h1>
-                <p className="text-gray-500">Total entregas: {submissions.length}</p>
-            </div>
-       </div>
-
        <div className="grid grid-cols-1 gap-4">
-           {submissions.map(sub => (
+           {displayedSubmissions.map(sub => (
                <Card key={sub.id} className="hover:shadow-sm transition-shadow">
                    <CardContent className="p-4 flex items-center justify-between">
                        <div className="flex items-center gap-4">
                            <div className={`w-2 h-12 rounded-full ${sub.graded ? 'bg-green-500' : 'bg-yellow-500'}`} />
                            <div>
-                               <h3 className="font-bold text-gray-900">
+                               <h3 className="font-bold text-gray-900 flex items-center gap-2">
                                    {sub.student?.name || sub.student?.email || (sub.group ? `Grupo: ${sub.group.name}` : 'Desconocido')}
+                                   {sub.is_mock && <span className="text-xs text-gray-400 font-normal">(Mock)</span>}
                                </h3>
                                <div className="text-sm text-gray-500 flex items-center gap-2">
                                    <Clock className="w-3 h-3" />
@@ -158,7 +176,7 @@ export default function TeacherReviewsPage() {
                    </CardContent>
                </Card>
            ))}
-           {submissions.length === 0 && (
+           {displayedSubmissions.length === 0 && (
                <div className="text-center py-12 text-gray-500 bg-white rounded-xl border border-dashed border-gray-300">
                    No hay entregas para esta tarea aún.
                </div>
