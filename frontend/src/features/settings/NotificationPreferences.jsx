@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
-import api from '../../lib/api'
+import apiClient from '../../shared/api/client'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../ui/card'
 import { Label } from '../../ui/label'
 import { Switch } from '../../ui/switch'
@@ -26,7 +26,8 @@ export default function NotificationPreferences() {
 
   const fetchPreferences = async () => {
     try {
-      const { data } = await api.get('/notifications/preferences')
+      const response = await apiClient.get('/notifications/preferences')
+      const data = response.data
       setPrefs({
         email_enabled: data.email_enabled,
         whatsapp_enabled: data.whatsapp_enabled,
@@ -45,7 +46,7 @@ export default function NotificationPreferences() {
     e.preventDefault()
     setSaving(true)
     try {
-      await api.put('/notifications/preferences', prefs)
+      await apiClient.put('/notifications/preferences', prefs)
       toast.success('Preferencias actualizadas correctamente')
     } catch (error) {
       console.error('Error updating preferences', error)

@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
-
-const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000/api';
+import apiClient from '../shared/api/client';
 
 export function useSubmissions() {
   const { session } = useAuth();
@@ -11,13 +10,8 @@ export function useSubmissions() {
   const getSubmissions = useCallback(async (assignmentId) => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/submissions/assignment/${assignmentId}`, {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`
-        }
-      });
-      if (!response.ok) throw new Error('Error fetching submissions');
-      return await response.json();
+      const response = await apiClient.get(`/submissions/assignment/${assignmentId}`);
+      return response.data;
     } catch (err) {
       setError(err.message);
       throw err;
@@ -30,19 +24,13 @@ export function useSubmissions() {
     // data: { assignment_id, file_url, group_id }
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/submissions/submit`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        },
-        body: JSON.stringify(data)
-      });
-      if (!response.ok) {
-          const resJson = await response.json();
-          throw new Error(resJson.error || 'Error submitting assignment');
-      }
-      return await response.json();
+      const response = await apiClient.post('/submissions/submit', data);
+      return response.data;
+    } catch (err) {
+        // apiClient throws on error, but we want to catch it to rethrow or handle specific errors if needed
+        // The original code was throwing `resJson.error`. apiClient error might have `error.response.data.error`.
+        const message = err.response?.data?.error || err.message || 'Error submitting assignment';
+        throw new Error(message);
     } finally {
       setLoading(false);
     }
@@ -52,16 +40,11 @@ export function useSubmissions() {
     // gradeData: { grade, feedback }
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/submissions/grade/${submissionId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        },
-        body: JSON.stringify(gradeData)
-      });
-      if (!response.ok) throw new Error('Error grading submission');
-      return await response.json();
+      const response = await apiClient.put(`/submissions/grade/${submissionId}`, gradeData);
+      return response.data;
+    } catch (err) {
+      const message = err.response?.data?.error || err.message || 'Error grading submission';
+      throw new Error(message);
     } finally {
       setLoading(false);
     }
