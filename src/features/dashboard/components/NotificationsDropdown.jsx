@@ -4,7 +4,7 @@ import { ScrollArea } from '../../../ui/scroll-area'
 import { Button } from '../../../ui/button'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../../context/AuthContext'
-import api from '../../../lib/api'
+import apiClient from '../../../shared/api/client'
 
 export default function NotificationsDropdown({ isOpen, onClose }) {
   const dropdownRef = useRef(null)
@@ -32,8 +32,9 @@ export default function NotificationsDropdown({ isOpen, onClose }) {
     if (!user) return
     setLoading(true)
     try {
-      const { data } = await api.get('/notifications')
-      setNotifications(data)
+      const response = await apiClient.get('/notifications')
+      const data = response.data
+      setNotifications(Array.isArray(data) ? data : data.data || [])
     } catch (error) {
       console.error('Error loading notifications', error)
     } finally {
@@ -44,7 +45,7 @@ export default function NotificationsDropdown({ isOpen, onClose }) {
   const handleMarkAsRead = async (e, id) => {
     e.stopPropagation()
     try {
-      await api.put(`/notifications/${id}/read`)
+      await apiClient.put(`/notifications/${id}/read`)
       setNotifications((prev) =>
         prev.map(n => n.id === id ? { ...n, read: true } : n)
       )

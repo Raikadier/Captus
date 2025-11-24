@@ -31,9 +31,6 @@ export const AuthProvider = ({ children }) => {
         if (sessionData?.session?.user) {
            setSession(sessionData.session);
            setUser(sessionData.session.user);
-           // Token is handled by onAuthStateChange in supabase.js, but we can ensure it here too
-           
-           localStorage.setItem('token', sessionData.session.access_token);
         } else {
            setSession(null);
            setUser(null);
@@ -59,9 +56,6 @@ export const AuthProvider = ({ children }) => {
       } else {
         setUser(null);
       }
-
-      // Note: Token management (localStorage) is centralized in shared/api/supabase.js
-      // so we don't need to duplicate it here, just react to user state.
     });
 
     return () => {
@@ -69,6 +63,11 @@ export const AuthProvider = ({ children }) => {
       subscription?.unsubscribe();
     };
   }, []);
+
+  const getToken = async () => {
+    const { data } = await supabase.auth.getSession();
+    return data?.session?.access_token || null;
+  };
 
   const login = async (email, password) => {
     try {
@@ -103,28 +102,18 @@ export const AuthProvider = ({ children }) => {
 
       // First check if email is already registered in our users table
       try {
-         // Note: apiClient handles base URL automatically
-         // However, for public endpoints without token, we might need care.
-         // But usually check-email is public. Let's assume apiClient works or use fetch if needed.
-         // Since we are in AuthContext and might not have token yet, fetch is safer for public routes unless apiClient handles it.
-         // Actually, our apiClient attaches token IF present.
-         const response = await fetch('/api/users/check-email', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email })
-        });
+         // Using apiClient to check email existence (needs to be safe for unauthenticated calls if it's a public endpoint, or we handle the error)
+         // Assuming /users/check-email is public or handles missing auth gracefully if needed.
+         // But apiClient adds token if available. During registration, we might not have a token yet.
+         // If we don't have a token, apiClient just doesn't add the header, which is fine for public endpoints.
+         const response = await apiClient.post('/users/check-email', { email });
 
-        if (response.ok) {
-          const result = await response.json();
-          if (result.registered) {
+         if (response.data && response.data.registered) {
             return { success: false, error: 'Este email ya está registrado' };
-          }
-        }
+         }
       } catch (checkError) {
+        // If check fails (e.g. 404 or 500), we proceed with registration attempt or handle specific errors.
         console.warn('Could not check email registration:', checkError);
-        // Continue with registration anyway
       }
 
       const { data, error } = await supabase.auth.signUp({
@@ -186,7 +175,6 @@ export const AuthProvider = ({ children }) => {
       await supabase.auth.signOut();
       setSession(null);
       setUser(null);
-      // localStorage clearing is handled by supabase.js onAuthStateChange
     } catch (error) {
       console.error('Logout error:', error);
     }
@@ -204,6 +192,7 @@ export const AuthProvider = ({ children }) => {
     user,
     loading,
     isAuthenticated: !!user,
+    getToken,
     login,
     register,
     logout,

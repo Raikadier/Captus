@@ -16,6 +16,7 @@ import {
 import { useTheme } from '../../context/themeContext'
 import { useAuth } from '../../context/AuthContext'
 import { supabase } from '../../shared/api/supabase'
+import apiClient from '../../shared/api/client'
 import Loading from '../../ui/loading'
 import { toast } from 'sonner'
 
@@ -125,8 +126,6 @@ export default function SettingsPage() {
         return
       }
 
-      const token = sessionData.session.access_token
-
       // Combine first and last name
       const fullName = `${formData.firstName} ${formData.lastName}`.trim()
 
@@ -138,40 +137,30 @@ export default function SettingsPage() {
 
       console.log('Updating profile:', updateData)
 
-      // Make API call to update profile
+      // Make API call to update profile using apiClient
       const userId = sessionData.session.user.id
-      const response = await fetch(`/api/users/${userId}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updateData)
-      })
+      const response = await apiClient.put(`/users/${userId}`, updateData)
 
-      if (response.ok) {
-        const result = await response.json()
-        console.log('Profile updated successfully:', result)
+      // apiClient.put returns { data: responseData }
+      // Assuming backend response shape. If success, it returns JSON.
+      console.log('Profile updated successfully:', response.data)
 
-        // Update local state
-        setUserData(prev => ({
-          ...prev,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          name: fullName,
-          carrer: formData.career,
-          bio: formData.bio
-        }))
+      // Update local state
+      setUserData(prev => ({
+        ...prev,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        name: fullName,
+        carrer: formData.career,
+        bio: formData.bio
+      }))
 
-        toast.success('Perfil actualizado exitosamente')
-      } else {
-        const errorData = await response.json()
-        console.error('Failed to update profile:', response.status, errorData)
-        toast.error(`Error al actualizar perfil: ${errorData.message || 'Error desconocido'}`)
-      }
+      toast.success('Perfil actualizado exitosamente')
+
     } catch (error) {
       console.error('Error updating profile:', error)
-      toast.error('Error al actualizar el perfil')
+      const message = error.response?.data?.message || 'Error al actualizar el perfil'
+      toast.error(message)
     } finally {
       setSaving(false)
     }
@@ -249,50 +238,25 @@ export default function SettingsPage() {
     setCountdownActive(false)
 
     try {
-      // Get the current session to obtain the access token
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+      // Llamar al endpoint de eliminación de cuenta usando apiClient
+      const response = await apiClient.delete('/users/account')
 
-      if (sessionError || !sessionData?.session?.access_token) {
-        console.error('No valid session found:', sessionError)
-        toast.error('Sesión expirada. Por favor, inicia sesión nuevamente.')
-        setShowDeleteModal(false)
-        return
-      }
+      console.log('Account deleted successfully:', response.data)
 
-      const token = sessionData.session.access_token
+      toast.success('Cuenta eliminada exitosamente. Redirigiendo...')
 
-      // Llamar al endpoint de eliminación de cuenta
-      const response = await fetch('/api/users/account', {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      })
+      // Cerrar sesión en Supabase
+      await supabase.auth.signOut()
 
-      if (response.ok) {
-        const result = await response.json()
-        console.log('Account deleted successfully:', result)
+      // Redirigir al login después de un breve delay
+      setTimeout(() => {
+        window.location.href = '/'
+      }, 2000)
 
-        toast.success('Cuenta eliminada exitosamente. Redirigiendo...')
-
-        // Cerrar sesión en Supabase
-        await supabase.auth.signOut()
-
-        // Redirigir al login después de un breve delay
-        setTimeout(() => {
-          window.location.href = '/'
-        }, 2000)
-
-      } else {
-        const errorData = await response.json()
-        console.error('Failed to delete account:', response.status, errorData)
-        toast.error(`Error al eliminar cuenta: ${errorData.message || 'Error desconocido'}`)
-        setShowDeleteModal(false)
-      }
     } catch (error) {
       console.error('Error deleting account:', error)
-      toast.error('Error de conexión al eliminar cuenta')
+      const message = error.response?.data?.message || 'Error al eliminar cuenta'
+      toast.error(message)
       setShowDeleteModal(false)
     } finally {
       setDeletingAccount(false)
@@ -313,70 +277,46 @@ export default function SettingsPage() {
     try {
       console.log('Fetching user profile from settings...')
 
-      // Get the current session to obtain the access token
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+      // apiClient will handle token injection
+      const response = await apiClient.get('/users/profile')
 
-      if (sessionError || !sessionData?.session?.access_token) {
-        console.error('No valid session found:', sessionError)
-        setError('Sesión no válida. Por favor, inicia sesión nuevamente.')
-        setLoading(false)
-        return
-      }
+      console.log('Response data:', response.data)
+      const userDataResponse = response.data
 
-      const token = sessionData.session.access_token
-      console.log('Using token:', token.substring(0, 20) + '...')
+      if (userDataResponse.success && userDataResponse.data) {
+        const user = userDataResponse.data
+        console.log('User object:', user)
 
-      const response = await fetch('/api/users/profile', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+        // Split full name into first and last name
+        const nameParts = user.name ? user.name.split(' ') : ['', '']
+        const firstName = nameParts[0] || ''
+        const lastName = nameParts.slice(1).join(' ') || ''
+
+        const userWithSplitName = {
+          ...user,
+          firstName,
+          lastName,
+          fullName: user.name,
+          createdAt: user.createdAt || user.created_at
         }
-      })
-      console.log('Response status:', response.status)
 
-      if (response.ok) {
-        const userDataResponse = await response.json()
-        console.log('Raw response:', userDataResponse)
-
-        if (userDataResponse.success && userDataResponse.data) {
-          const user = userDataResponse.data
-          console.log('User object:', user)
-
-          // Split full name into first and last name
-          const nameParts = user.name ? user.name.split(' ') : ['', '']
-          const firstName = nameParts[0] || ''
-          const lastName = nameParts.slice(1).join(' ') || ''
-
-          const userWithSplitName = {
-            ...user,
-            firstName,
-            lastName,
-            fullName: user.name,
-            createdAt: user.createdAt || user.created_at
-          }
-
-          console.log('Setting user data:', userWithSplitName)
-          setUserData(userWithSplitName)
-          setFormData({
-            firstName,
-            lastName,
-            email: user.email || '',
-            career: user.carrer || '',
-            bio: user.bio || ''
-          })
-        } else {
-          console.error('No success or no data in response:', userDataResponse)
-          setError('No se pudieron cargar los datos del perfil')
-        }
+        console.log('Setting user data:', userWithSplitName)
+        setUserData(userWithSplitName)
+        setFormData({
+          firstName,
+          lastName,
+          email: user.email || '',
+          career: user.carrer || '',
+          bio: user.bio || ''
+        })
       } else {
-        const errorText = await response.text()
-        console.error('Failed to fetch user profile:', response.status, errorText)
-        setError(`Error al cargar perfil: ${response.status}`)
+        console.error('No success or no data in response:', userDataResponse)
+        setError('No se pudieron cargar los datos del perfil')
       }
+
     } catch (error) {
       console.error('Error fetching user profile:', error)
-      setError('Error de conexión al cargar perfil')
+      setError(error.message || 'Error de conexión al cargar perfil')
     } finally {
       setLoading(false)
     }

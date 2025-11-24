@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import apiClient from '../shared/api/client';
 
 export function useDiagrams() {
   const [diagrams, setDiagrams] = useState([]);
@@ -8,24 +8,18 @@ export function useDiagrams() {
   const [error, setError] = useState(null);
   const { user } = useAuth();
 
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem('token');
-    return {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    };
-  };
-
   const fetchDiagrams = useCallback(async () => {
     if (!user) return;
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:4000/api/diagrams', getAuthHeaders());
-      if (response.data.success) {
-        setDiagrams(response.data.data);
+      const response = await apiClient.get('/diagrams');
+      // apiClient.get returns { data: responseData }
+      // assuming responseData is { success: true, data: ... } based on previous usage
+      const result = response.data;
+      if (result.success) {
+        setDiagrams(result.data);
       } else {
-        setError(response.data.message);
+        setError(result.message);
       }
     } catch (err) {
       setError(err.response?.data?.message || err.message);
@@ -37,12 +31,13 @@ export function useDiagrams() {
   const createDiagram = async (data) => {
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:4000/api/diagrams', data, getAuthHeaders());
-      if (response.data.success) {
-        setDiagrams(prev => [response.data.data, ...prev]);
+      const response = await apiClient.post('/diagrams', data);
+      const result = response.data;
+      if (result.success) {
+        setDiagrams(prev => [result.data, ...prev]);
         return { success: true };
       }
-      return { success: false, error: response.data.message };
+      return { success: false, error: result.message };
     } catch (err) {
       return { success: false, error: err.response?.data?.message || err.message };
     } finally {
@@ -53,12 +48,13 @@ export function useDiagrams() {
   const updateDiagram = async (id, data) => {
     setLoading(true);
     try {
-      const response = await axios.put(`http://localhost:4000/api/diagrams/${id}`, data, getAuthHeaders());
-      if (response.data.success) {
-        setDiagrams(prev => prev.map(d => d.id === id ? response.data.data : d));
+      const response = await apiClient.put(`/diagrams/${id}`, data);
+      const result = response.data;
+      if (result.success) {
+        setDiagrams(prev => prev.map(d => d.id === id ? result.data : d));
         return { success: true };
       }
-      return { success: false, error: response.data.message };
+      return { success: false, error: result.message };
     } catch (err) {
       return { success: false, error: err.response?.data?.message || err.message };
     } finally {
@@ -69,12 +65,13 @@ export function useDiagrams() {
   const deleteDiagram = async (id) => {
     setLoading(true);
     try {
-      const response = await axios.delete(`http://localhost:4000/api/diagrams/${id}`, getAuthHeaders());
-      if (response.data.success) {
+      const response = await apiClient.delete(`/diagrams/${id}`);
+      const result = response.data;
+      if (result.success) {
         setDiagrams(prev => prev.filter(d => d.id !== id));
         return { success: true };
       }
-      return { success: false, error: response.data.message };
+      return { success: false, error: result.message };
     } catch (err) {
       return { success: false, error: err.response?.data?.message || err.message };
     } finally {
