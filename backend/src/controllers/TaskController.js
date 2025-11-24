@@ -1,4 +1,5 @@
 import { TaskService } from "../services/TaskService.js";
+import NotificationService from '../services/NotificationService.js';
 
 const taskService = new TaskService();
 
@@ -35,6 +36,19 @@ export class TaskController {
     console.log('🔍 BACKEND CREATE - Category ID:', req.body.category_id, 'Type:', typeof req.body.category_id);
     const result = await taskService.save(req.body, req.user);
     console.log('🔍 BACKEND CREATE - Service result:', JSON.stringify(result, null, 2));
+
+    if (result.success) {
+      // Auto-notification
+      await NotificationService.notify({
+        user_id: req.user.id,
+        title: 'Tarea Creada',
+        body: `Has creado la tarea: "${result.data.title}"`,
+        event_type: 'task_created',
+        entity_id: result.data.id || result.data.id_Task,
+        is_auto: true
+      });
+    }
+
     res.status(result.success ? 201 : 400).json(result);
   }
 
