@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
-
-const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000/api';
+import apiClient from '../shared/api/client';
 
 export function useCourseGroups() {
   const { session } = useAuth();
@@ -11,13 +10,8 @@ export function useCourseGroups() {
   const getGroups = useCallback(async (courseId) => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/groups/course/${courseId}`, {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`
-        }
-      });
-      if (!response.ok) throw new Error('Error fetching groups');
-      return await response.json();
+      const response = await apiClient.get(`/groups/course/${courseId}`);
+      return response.data;
     } catch (err) {
       setError(err.message);
       throw err;
@@ -30,16 +24,8 @@ export function useCourseGroups() {
     // data: { course_id, name, description }
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/groups`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        },
-        body: JSON.stringify(data)
-      });
-      if (!response.ok) throw new Error('Error creating group');
-      return await response.json();
+      const response = await apiClient.post('/groups', data);
+      return response.data;
     } finally {
       setLoading(false);
     }
@@ -48,19 +34,11 @@ export function useCourseGroups() {
   const addMember = async (groupId, studentId) => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/groups/add-member`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        },
-        body: JSON.stringify({ groupId, studentId })
-      });
-      if (!response.ok) {
-          const res = await response.json();
-          throw new Error(res.error || 'Error adding member');
-      }
-      return await response.json();
+      const response = await apiClient.post('/groups/add-member', { groupId, studentId });
+      return response.data;
+    } catch (err) {
+        const message = err.response?.data?.error || err.message || 'Error adding member';
+        throw new Error(message);
     } finally {
       setLoading(false);
     }
