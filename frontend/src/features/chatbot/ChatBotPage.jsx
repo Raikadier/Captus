@@ -52,11 +52,6 @@ const ChatBotPage = () => {
     scrollToBottom();
   }, [messages]);
 
-  const getAuthHeaders = () => ({
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-  });
-
   const fetchConversations = async () => {
     try {
       const response = await fetch(`${API_URL}/ai/conversations`, {
@@ -84,19 +79,15 @@ const ChatBotPage = () => {
 
   const fetchMessages = async (conversationId) => {
     try {
-      const response = await fetch(`${API_URL}/ai/conversations/${conversationId}/messages`, {
-        headers: getAuthHeaders()
-      });
-      if (response.ok) {
-        const data = await response.json();
-        const formattedMessages = data.map(msg => ({
-          id: msg.id,
-          type: msg.role,
-          content: msg.content,
-          timestamp: new Date(msg.createdAt)
-        }));
-        setMessages(formattedMessages);
-      }
+      const response = await apiClient.get(`/ai/conversations/${conversationId}/messages`);
+      const data = response.data;
+      const formattedMessages = data.map(msg => ({
+        id: msg.id,
+        type: msg.role,
+        content: msg.content,
+        timestamp: new Date(msg.createdAt)
+      }));
+      setMessages(formattedMessages);
     } catch (error) {
       console.error('Error fetching messages:', error);
     }

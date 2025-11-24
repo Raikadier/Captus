@@ -65,4 +65,14 @@ export class StatisticsController {
 
     res.status(200).json(streakData);
   }
+
+  // ✅ New method for /api/statistics/tasks
+  async getTaskStats(req, res) {
+    const result = await statisticsService.getTaskStatistics();
+    if (result.success) {
+      res.status(200).json(result.data);
+    } else {
+      res.status(500).json({ error: result.message });
+    }
+  }
 }
