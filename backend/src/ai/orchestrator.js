@@ -1,33 +1,8 @@
 import { together, MODEL_REASONING } from "./model.js";
 import { tools } from "./toolRegistry.js";
 
-// Convert tools object to OpenAI-compatible tool definitions
-const toolDefinitions = Object.entries(tools).map(([name, tool]) => ({
-  type: "function",
-  function: {
-    name,
-    description: tool.description,
-    parameters: {
-      type: "object",
-      // For simplicity in this custom implementation, we are trusting the LLM to infer params from description
-      // A more robust solution would have explicit JSON schemas in toolRegistry.
-      properties: {},
-    },
-  },
-}));
-
 export const orchestrator = async (objective, userId) => {
   const started = Date.now();
-
-  // Create a context string about available tools to guide the model
-  // since we are manually handling JSON output or using function calling if supported.
-  // Together.ai supports function calling, but let's stick to the robust JSON prompt
-  // or use the official tool_choice if preferred.
-  // Given the prompt requested "Together debe manejar tool calling", we can use the native API or prompt engineering.
-  // The previous implementation used JSON parsing. Let's improve it to be more robust but stick to the prompt-based approach
-  // if we want to ensure compatibility without strict schema definitions for every tool parameter.
-
-  // However, "Meta-Llama-3.1-70B-Instruct-Turbo" is excellent at JSON.
 
   const toolsList = Object.keys(tools).map(k => `- ${k}: ${tools[k].description}`).join("\n");
 
@@ -81,8 +56,12 @@ AI: { "tool": "create_task", "input": { "title": "comprar leche", "description":
         console.info("[AI/orchestrator] executing tool", { userId, tool: parsed.tool, ms: duration });
         const result = await tools[parsed.tool].handler(parsed.input);
 
-        // Return a human friendly summary of the action
-        return `He ejecutado la acción: ${parsed.tool}. Resultado: éxito.`;
+        // Return a structured response that the controller can use
+        return {
+          result: `He ejecutado la acción: ${parsed.tool}. Resultado: éxito.`,
+          actionPerformed: parsed.tool,
+          data: result.data // Optional: pass back data if needed
+        };
       }
     } catch (e) {
       console.warn("[AI/orchestrator] JSON parse error", e);
@@ -91,5 +70,8 @@ AI: { "tool": "create_task", "input": { "title": "comprar leche", "description":
   }
 
   console.info("[AI/orchestrator] no tool used", { userId, ms: duration });
+  // If no tool was used, return object to maintain consistent interface if controller expects it,
+  // or just string. But we must support legacy/string return for standard chat.
+  // Actually, let's keep it simple: if object, it's structured. If string, it's chat.
   return content;
 };
