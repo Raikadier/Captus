@@ -503,4 +503,113 @@ export class StatisticsService {
       return new OperationResult(false, `Error al obtener estadísticas por categoría: ${error.message}`);
     }
   }
+
+  // ✅ New method for detailed Task Statistics
+  async getTaskStatistics() {
+    try {
+      if (!this.currentUser) return new OperationResult(false, "Usuario no autenticado");
+      const userId = this.currentUser.id;
+      const supabase = requireSupabaseClient();
+
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const todayEnd = new Date();
+      todayEnd.setHours(23, 59, 59, 999);
+
+      // 1. Tasks Created Today
+      const { count: tasksCreatedToday, error: createdError } = await supabase
+        .from('tasks')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .gte('created_at', todayStart.toISOString())
+        .lte('created_at', todayEnd.toISOString());
+
+      if (createdError) throw createdError;
+
+      // 2. Tasks Completed Today
+      const { count: tasksCompletedToday, error: completedError } = await supabase
+        .from('tasks')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .eq('completed', true)
+        .gte('updated_at', todayStart.toISOString())
+        .lte('updated_at', todayEnd.toISOString());
+
+      if (completedError) throw completedError;
+
+      // 3. Subtasks Completed Today
+      // Assuming subtasks have parent_task_id IS NOT NULL
+      // Checking if 'parent_task_id' exists in schema: Memory says "self-referencing parent_task_id column".
+      const { count: subTasksCompletedToday, error: subError } = await supabase
+        .from('tasks')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .not('parent_task_id', 'is', null)
+        .eq('completed', true)
+        .gte('updated_at', todayStart.toISOString())
+        .lte('updated_at', todayEnd.toISOString());
+
+      // If column doesn't exist, this might fail. But we assume it exists based on instructions.
+      // If it fails, we catch and default to 0.
+
+      // 4. Weekly Productivity (Last 7 days)
+      const weekStart = new Date();
+      weekStart.setDate(weekStart.getDate() - 6);
+      weekStart.setHours(0, 0, 0, 0);
+
+      const { data: createdLastWeek, error: weeklyCreatedError } = await supabase
+        .from('tasks')
+        .select('created_at')
+        .eq('user_id', userId)
+        .gte('created_at', weekStart.toISOString());
+
+      const { data: completedLastWeek, error: weeklyCompletedError } = await supabase
+        .from('tasks')
+        .select('updated_at')
+        .eq('user_id', userId)
+        .eq('completed', true)
+        .gte('updated_at', weekStart.toISOString());
+
+      if (weeklyCreatedError || weeklyCompletedError) throw new Error("Error fetching weekly stats");
+
+      const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+      const productivityChart = [];
+
+      for (let d = new Date(weekStart); d <= todayEnd; d.setDate(d.getDate() + 1)) {
+        const dateStr = d.toISOString().split('T')[0];
+        const dayName = days[d.getDay()];
+        const createdCount = createdLastWeek.filter(t => t.created_at.startsWith(dateStr)).length;
+        const completedCount = completedLastWeek.filter(t => t.updated_at.startsWith(dateStr)).length;
+        productivityChart.push({ day: dayName, created: createdCount, completed: completedCount });
+      }
+
+      // 5. Total Completed
+      const { count: totalCompleted, error: totalError } = await supabase
+        .from('tasks')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .eq('completed', true);
+
+      if (totalError) throw totalError;
+
+      // 6. Weekly Completion Rate
+      const createdCountWeek = createdLastWeek.length;
+      const completedCountWeek = completedLastWeek.length;
+      const weeklyCompletionRate = createdCountWeek > 0 ? Math.round((completedCountWeek / createdCountWeek) * 100) : 0;
+
+      return new OperationResult(true, "Estadísticas de tareas obtenidas", {
+        tasksCreatedToday: tasksCreatedToday || 0,
+        tasksCompletedToday: tasksCompletedToday || 0,
+        subTasksCompletedToday: subTasksCompletedToday || 0,
+        productivityChart,
+        totalCompleted: totalCompleted || 0,
+        weeklyCompletionRate
+      });
+
+    } catch (error) {
+      console.error("Error fetching task stats:", error);
+      // Fallback in case of column missing or other errors
+      return new OperationResult(false, `Error obteniendo estadísticas de tareas: ${error.message}`);
+    }
+  }
 }

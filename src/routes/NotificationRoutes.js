@@ -1,8 +1,10 @@
 import express from 'express';
 import NotificationController from '../controllers/NotificationController.js';
-import { verifySupabaseToken } from '../middlewares/verifySupabaseToken.js';
+import buildSupabaseAuthMiddleware from '../middlewares/verifySupabaseToken.js';
 
 const router = express.Router();
+
+const verifySupabaseToken = buildSupabaseAuthMiddleware();
 
 // Protected routes
 router.use(verifySupabaseToken);
