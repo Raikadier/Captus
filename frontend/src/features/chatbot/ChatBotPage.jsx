@@ -5,6 +5,7 @@ import { Send, User, Sparkles, Plus, Menu } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { aiTaskService } from '../../services/aiTaskService';
+import apiClient from '../../shared/api/client';
 
 const ChatBotPage = () => {
   const { user } = useAuth();
@@ -15,9 +16,6 @@ const ChatBotPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
   const messagesEndRef = useRef(null);
-
-  // Access environment variable for API URL
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -43,32 +41,23 @@ const ChatBotPage = () => {
     scrollToBottom();
   }, [messages]);
 
-  const getAuthHeaders = () => ({
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-  });
-
   const fetchConversations = async () => {
     try {
-      const response = await fetch(`${API_URL}/ai/conversations`, {
-        headers: getAuthHeaders()
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setConversations(data);
-        // Automatically select the most recent conversation if available
-        if (data.length > 0 && !activeConversation) {
-          setActiveConversation(data[0].id);
-        } else if (data.length === 0) {
-           // If no conversations, prepare the UI for a new one, but don't select an ID yet
-           setActiveConversation(null);
-           setMessages([{
-             id: 'intro',
-             type: 'bot',
-             content: '¡Hola! Soy Captus AI, tu asistente personal de productividad académica. ¿En qué puedo ayudarte hoy?',
-             timestamp: new Date(),
-           }]);
-        }
+      const response = await apiClient.get('/ai/conversations');
+      const data = response.data;
+      setConversations(data);
+      // Automatically select the most recent conversation if available
+      if (data.length > 0 && !activeConversation) {
+        setActiveConversation(data[0].id);
+      } else if (data.length === 0) {
+          // If no conversations, prepare the UI for a new one, but don't select an ID yet
+          setActiveConversation(null);
+          setMessages([{
+            id: 'intro',
+            type: 'bot',
+            content: '¡Hola! Soy Captus AI, tu asistente personal de productividad académica. ¿En qué puedo ayudarte hoy?',
+            timestamp: new Date(),
+          }]);
       }
     } catch (error) {
       console.error('Error fetching conversations:', error);
@@ -77,19 +66,15 @@ const ChatBotPage = () => {
 
   const fetchMessages = async (conversationId) => {
     try {
-      const response = await fetch(`${API_URL}/ai/conversations/${conversationId}/messages`, {
-        headers: getAuthHeaders()
-      });
-      if (response.ok) {
-        const data = await response.json();
-        const formattedMessages = data.map(msg => ({
-          id: msg.id,
-          type: msg.role,
-          content: msg.content,
-          timestamp: new Date(msg.createdAt)
-        }));
-        setMessages(formattedMessages);
-      }
+      const response = await apiClient.get(`/ai/conversations/${conversationId}/messages`);
+      const data = response.data;
+      const formattedMessages = data.map(msg => ({
+        id: msg.id,
+        type: msg.role,
+        content: msg.content,
+        timestamp: new Date(msg.createdAt)
+      }));
+      setMessages(formattedMessages);
     } catch (error) {
       console.error('Error fetching messages:', error);
     }
@@ -215,7 +200,6 @@ const ChatBotPage = () => {
                 >
                   <p className="font-medium text-gray-900 text-sm truncate">{conv.title || 'Nueva conversación'}</p>
                   <p className="text-xs text-gray-500 truncate mt-1">
-                     {/* We don't fetch last message in the list api yet, maybe add it later or just show date */}
                      {new Date(conv.updatedAt).toLocaleDateString()}
                   </p>
                 </button>
