@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Bell, MessageSquare, TrendingUp, CheckSquare, Target, Award, Settings } from 'lucide-react'
+import { Bell, MessageSquare, TrendingUp, CheckSquare, Target, Award, Settings, PlusCircle, CheckCircle2, ListChecks } from 'lucide-react'
 import { Button } from '../../ui/button'
 import { Card } from '../../ui/card'
 import apiClient from '../../shared/api/client'
 import Loading from '../../ui/loading'
 import { ManageSubjectsDialog } from '../subjects/components/ManageSubjectsDialog'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
 function getCurrentDate() {
   const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
@@ -86,12 +87,27 @@ export default function StatsPage() {
     racha: 0, // Backend uses 'racha' or 'streak'
     subjects: []
   });
+  // New state for detailed task stats
+  const [taskStats, setTaskStats] = useState({
+    tasksCreatedToday: 0,
+    tasksCompletedToday: 0,
+    subTasksCompletedToday: 0,
+    productivityChart: [],
+    totalCompleted: 0,
+    weeklyCompletionRate: 0
+  });
+
   const [loading, setLoading] = useState(true);
 
   const fetchStats = async () => {
     try {
-      const response = await apiClient.get('/statistics');
-      const data = response.data?.data || response.data;
+      const [generalResponse, taskResponse] = await Promise.all([
+        apiClient.get('/statistics'),
+        apiClient.get('/statistics/tasks')
+      ]);
+
+      const data = generalResponse.data?.data || generalResponse.data;
+      const tData = taskResponse.data;
 
       if (data) {
         setStats({
@@ -101,6 +117,17 @@ export default function StatsPage() {
           studyHours: data.studyHours || 0,
           racha: data.racha || data.streak || 0,
           subjects: data.subjects || []
+        });
+      }
+
+      if (tData) {
+        setTaskStats({
+          tasksCreatedToday: tData.tasksCreatedToday || 0,
+          tasksCompletedToday: tData.tasksCompletedToday || 0,
+          subTasksCompletedToday: tData.subTasksCompletedToday || 0,
+          productivityChart: tData.productivityChart || [],
+          totalCompleted: tData.totalCompleted || 0,
+          weeklyCompletionRate: tData.weeklyCompletionRate || 0
         });
       }
     } catch (error) {
@@ -114,9 +141,8 @@ export default function StatsPage() {
     fetchStats();
   }, []);
 
-  const completionPercent = stats.totalTasks > 0
-    ? Math.round((stats.completedTasks / stats.totalTasks) * 100)
-    : 0;
+  // Use taskStats for completion percentage if available, otherwise fallback
+  const completionPercent = taskStats.weeklyCompletionRate;
 
   const circumference = 2 * Math.PI * 88;
   const strokeDasharray = `${(completionPercent / 100) * circumference} ${circumference}`;
@@ -147,7 +173,29 @@ export default function StatsPage() {
           </div>
         </header>
 
-        {/* Key Stats */}
+        {/* Daily Stats Row (New Requirement A) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+           <StatCard
+            icon={<PlusCircle className="text-blue-600" size={24} />}
+            label="Tareas Creadas Hoy"
+            value={taskStats.tasksCreatedToday}
+            bgColor="bg-blue-50"
+          />
+          <StatCard
+            icon={<CheckCircle2 className="text-green-600" size={24} />}
+            label="Tareas Completadas Hoy"
+            value={taskStats.tasksCompletedToday}
+            bgColor="bg-green-50"
+          />
+          <StatCard
+            icon={<ListChecks className="text-purple-600" size={24} />}
+            label="Subtareas Completadas"
+            value={taskStats.subTasksCompletedToday}
+            bgColor="bg-purple-50"
+          />
+        </div>
+
+        {/* Key Stats (Existing + Enhanced) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
           <StatCard
             icon={<TrendingUp className="text-green-600" size={28} />}
@@ -157,14 +205,14 @@ export default function StatsPage() {
           />
           <StatCard
             icon={<CheckSquare className="text-blue-600" size={28} />}
-            label="Tareas Completadas"
-            value={`${stats.completedTasks}/${stats.totalTasks}`}
+            label="Total Completadas"
+            value={taskStats.totalCompleted} // Using real total
             bgColor="bg-blue-50"
           />
           <StatCard
             icon={<Target className="text-orange-600" size={28} />}
-            label="Horas de Estudio"
-            value={`${stats.studyHours}h`}
+            label="Productividad Semanal"
+            value={`${taskStats.weeklyCompletionRate}%`} // Using real rate
             bgColor="bg-orange-50"
           />
           <StatCard
@@ -192,10 +240,30 @@ export default function StatsPage() {
            </Card>
         )}
 
-        {/* Charts mock (no external libs) */}
+        {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Weekly Productivity Chart (New Requirement B) */}
           <Card className="p-6 bg-card rounded-xl shadow-sm border border-border">
-            <h2 className="text-xl font-semibold text-foreground mb-4">Completación de Tareas</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-4">Productividad Semanal</h2>
+            <div className="h-64 w-full">
+               <ResponsiveContainer width="100%" height="100%">
+                 <BarChart data={taskStats.productivityChart}>
+                    <XAxis dataKey="day" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                    <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}`} />
+                    <Tooltip
+                      cursor={{fill: 'transparent'}}
+                      contentStyle={{ backgroundColor: 'var(--card)', borderRadius: '8px', border: '1px solid var(--border)' }}
+                    />
+                    <Bar dataKey="created" name="Creadas" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="completed" name="Completadas" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                 </BarChart>
+               </ResponsiveContainer>
+            </div>
+          </Card>
+
+          {/* Completion Circle */}
+          <Card className="p-6 bg-card rounded-xl shadow-sm border border-border">
+            <h2 className="text-xl font-semibold text-foreground mb-4">Tasa de Cumplimiento Semanal</h2>
             <div className="flex items-center justify-center h-64">
               <div className="relative w-48 h-48">
                 <svg className="transform -rotate-90 w-48 h-48">
@@ -213,19 +281,9 @@ export default function StatsPage() {
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center flex-col">
                   <span className="text-4xl font-bold text-foreground">{completionPercent}%</span>
-                  <span className="text-sm text-muted-foreground">Completado</span>
+                  <span className="text-sm text-muted-foreground">Esta Semana</span>
                 </div>
               </div>
-            </div>
-          </Card>
-
-          <Card className="p-6 bg-card rounded-xl shadow-sm border border-border">
-            <h2 className="text-xl font-semibold text-foreground mb-4">Rendimiento Mensual</h2>
-            <div className="space-y-4">
-              {/* Mock data for monthly performance as backend doesn't support this granularity yet */}
-              <MonthBar month="Septiembre" color="bg-blue-600" value={75} label="7.5" />
-              <MonthBar month="Octubre" color="bg-green-600" value={85} label="8.5" />
-              <MonthBar month="Noviembre" color="bg-green-600" value={90} label="9.0" />
             </div>
           </Card>
         </div>
