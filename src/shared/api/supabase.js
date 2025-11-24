@@ -10,20 +10,6 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Keep backend Authorization header in sync with current Supabase session
-supabase.auth.onAuthStateChange((event, session) => {
-  const accessToken = session?.access_token || null;
-
-  if (accessToken) {
-    localStorage.setItem('token', accessToken);
-  } else {
-    localStorage.removeItem('token');
-  }
-
-  // Optional: Log auth events for debugging
-  // console.log('Supabase Auth Event:', event);
-});
-
 // Helpers
 export async function getCurrentSession() {
   const { data, error } = await supabase.auth.getSession();

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-
-const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000/api';
+import apiClient from '../shared/api/client';
 
 export function useEnrollments() {
   const { session } = useAuth();
@@ -11,23 +10,12 @@ export function useEnrollments() {
   const joinByCode = async (code) => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/enrollments/join-by-code`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        },
-        body: JSON.stringify({ code })
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Error al unirse al curso');
-      }
-      return await response.json();
+      const response = await apiClient.post('/enrollments/join-by-code', { code });
+      return response.data;
     } catch (err) {
-      setError(err.message);
-      throw err;
+      const message = err.response?.data?.error || err.message || 'Error al unirse al curso';
+      setError(message);
+      throw new Error(message);
     } finally {
       setLoading(false);
     }
@@ -36,13 +24,8 @@ export function useEnrollments() {
   const getStudents = async (courseId) => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/enrollments/course/${courseId}/students`, {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`
-        }
-      });
-      if (!response.ok) throw new Error('Error obteniendo estudiantes');
-      return await response.json();
+      const response = await apiClient.get(`/enrollments/course/${courseId}/students`);
+      return response.data;
     } catch (err) {
         throw err;
     } finally {
@@ -53,22 +36,11 @@ export function useEnrollments() {
   const addStudentManually = async (courseId, email) => {
       setLoading(true);
       try {
-        const response = await fetch(`${API_URL}/enrollments/add-student`, {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session.access_token}`
-            },
-            body: JSON.stringify({ courseId, email })
-        });
-
-        if (!response.ok) {
-            const data = await response.json();
-            throw new Error(data.error || 'Error agregando estudiante');
-        }
-        return await response.json();
+        const response = await apiClient.post('/enrollments/add-student', { courseId, email });
+        return response.data;
       } catch (err) {
-          throw err;
+          const message = err.response?.data?.error || err.message || 'Error agregando estudiante';
+          throw new Error(message);
       } finally {
           setLoading(false);
       }

@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
-
-const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000/api';
+import apiClient from '../shared/api/client';
 
 export function useAssignments() {
   const { session } = useAuth();
@@ -11,31 +10,21 @@ export function useAssignments() {
   const getAssignments = useCallback(async (courseId) => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/assignments/course/${courseId}`, {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`
-        }
-      });
-      if (!response.ok) throw new Error('Error fetching assignments');
-      return await response.json();
+      const response = await apiClient.get(`/assignments/course/${courseId}`);
+      return response.data;
     } catch (err) {
       setError(err.message);
       throw err;
     } finally {
       setLoading(false);
     }
-  }, [session]);
+  }, [session]); // session dependency not strictly needed for apiClient but okay to keep if hook logic depends on auth state presence
 
   const getAssignment = useCallback(async (id) => {
       setLoading(true);
       try {
-        const response = await fetch(`${API_URL}/assignments/${id}`, {
-            headers: {
-            'Authorization': `Bearer ${session.access_token}`
-            }
-        });
-        if (!response.ok) throw new Error('Error fetching assignment');
-        return await response.json();
+        const response = await apiClient.get(`/assignments/${id}`);
+        return response.data;
       } finally {
           setLoading(false);
       }
@@ -44,16 +33,8 @@ export function useAssignments() {
   const createAssignment = async (data) => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/assignments`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        },
-        body: JSON.stringify(data)
-      });
-      if (!response.ok) throw new Error('Error creating assignment');
-      return await response.json();
+      const response = await apiClient.post('/assignments', data);
+      return response.data;
     } finally {
       setLoading(false);
     }
@@ -62,16 +43,8 @@ export function useAssignments() {
   const updateAssignment = async (id, data) => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/assignments/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        },
-        body: JSON.stringify(data)
-      });
-      if (!response.ok) throw new Error('Error updating assignment');
-      return await response.json();
+      const response = await apiClient.put(`/assignments/${id}`, data);
+      return response.data;
     } finally {
       setLoading(false);
     }
@@ -80,13 +53,7 @@ export function useAssignments() {
   const deleteAssignment = async (id) => {
       setLoading(true);
       try {
-        const response = await fetch(`${API_URL}/assignments/${id}`, {
-            method: 'DELETE',
-            headers: {
-            'Authorization': `Bearer ${session.access_token}`
-            }
-        });
-        if (!response.ok) throw new Error('Error deleting assignment');
+        await apiClient.delete(`/assignments/${id}`);
       } finally {
           setLoading(false);
       }
