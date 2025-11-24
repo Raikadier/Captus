@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, User, Sparkles, Plus, Menu } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
+import { aiTaskService } from '../../services/aiTaskService';
 
 const ChatBotPage = () => {
   const { user } = useAuth();
@@ -119,20 +120,8 @@ const ChatBotPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/ai/chat`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({
-          message: userMessage.content,
-          conversationId: activeConversation // Send current ID (null if new)
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      const data = await response.json();
+      // Use the service instead of direct fetch
+      const data = await aiTaskService.sendMessage(userMessage.content, activeConversation);
 
       // If we started a new conversation, update the state
       if (!activeConversation && data.conversationId) {
@@ -141,9 +130,18 @@ const ChatBotPage = () => {
         fetchConversations();
       }
 
+      // Check for tool action
+      if (data.actionPerformed) {
+        console.log('AI Performed action:', data.actionPerformed);
+        // Trigger a custom event for other components to listen to (e.g., Task List)
+        // This satisfies the "Update UI in real-time" requirement if components listen to it.
+        window.dispatchEvent(new CustomEvent('task-update', { detail: { action: data.actionPerformed } }));
+
+        // If we are showing tasks in this page (future), we would refresh here.
+        // Currently, the text response confirms the action.
+      }
+
       // Backend returns the AI result. We add it to the list.
-      // (In a real-time app we might fetch the new message from DB,
-      // but here we just append the result for immediate feedback)
       const botResponse = {
         id: 'temp-bot-' + Date.now(),
         type: 'bot',
@@ -151,10 +149,6 @@ const ChatBotPage = () => {
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, botResponse]);
-
-      // Also refresh the message list to get real IDs and timestamps eventually?
-      // Maybe not necessary for every message to avoid flickering, but good practice if we want exact consistency.
-      // For now, we just append.
 
     } catch (error) {
       console.error('Error sending message:', error);
