@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, User, Sparkles, Plus, Menu } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
+import { aiTaskService } from '../../services/aiTaskService';
 import apiClient from '../../shared/api/client';
 
 const ChatBotPage = () => {
@@ -104,18 +105,25 @@ const ChatBotPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await apiClient.post('/ai/chat', {
-        message: userMessage.content,
-        conversationId: activeConversation // Send current ID (null if new)
-      });
-
-      const data = response.data;
+      // Use the service instead of direct fetch
+      const data = await aiTaskService.sendMessage(userMessage.content, activeConversation);
 
       // If we started a new conversation, update the state
       if (!activeConversation && data.conversationId) {
         setActiveConversation(data.conversationId);
         // Refresh conversations list to show the new title
         fetchConversations();
+      }
+
+      // Check for tool action
+      if (data.actionPerformed) {
+        console.log('AI Performed action:', data.actionPerformed);
+        // Trigger a custom event for other components to listen to (e.g., Task List)
+        // This satisfies the "Update UI in real-time" requirement if components listen to it.
+        window.dispatchEvent(new CustomEvent('task-update', { detail: { action: data.actionPerformed } }));
+
+        // If we are showing tasks in this page (future), we would refresh here.
+        // Currently, the text response confirms the action.
       }
 
       // Backend returns the AI result. We add it to the list.

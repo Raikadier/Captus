@@ -82,7 +82,12 @@ AI: { "tool": "create_task", "input": { "title": "comprar leche", "description":
         const result = await tools[parsed.tool].handler(parsed.input);
 
         // Return a human friendly summary of the action
-        return `He ejecutado la acción: ${parsed.tool}. Resultado: éxito.`;
+        // We return an object to allow the frontend to trigger updates
+        return {
+          text: `He ejecutado la acción: ${parsed.tool}. Resultado: éxito.`,
+          toolUsed: parsed.tool,
+          toolResult: result // Optional: Pass data if needed, but not requested explicitly
+        };
       }
     } catch (e) {
       console.warn("[AI/orchestrator] JSON parse error", e);
@@ -91,5 +96,8 @@ AI: { "tool": "create_task", "input": { "title": "comprar leche", "description":
   }
 
   console.info("[AI/orchestrator] no tool used", { userId, ms: duration });
-  return content;
+  return {
+    text: content,
+    toolUsed: null
+  };
 };
