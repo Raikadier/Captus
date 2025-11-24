@@ -6,6 +6,7 @@ import { Card } from '../../../ui/card';
 import { Progress } from '../../../ui/progress';
 import NotificationsDropdown from './NotificationsDropdown';
 import { useAuth } from '../../../context/AuthContext';
+import { useTheme } from '../../../context/themeContext';
 import apiClient from '../../../shared/api/client';
 import { useSubTasks } from '../../../hooks/useSubTasks';
 
@@ -135,6 +136,7 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
   const { user } = useAuth()
+  const { darkMode, accentColor } = useTheme()
   const unreadCount = 3
 
   useEffect(() => {

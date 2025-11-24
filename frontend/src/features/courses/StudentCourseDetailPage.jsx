@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useCourses } from '../../hooks/useCourses'
 import { useAssignments } from '../../hooks/useAssignments'
 import { useCourseGroups } from '../../hooks/useCourseGroups'
@@ -11,18 +11,60 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../..
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../ui/dialog'
 import { Input } from '../../ui/input'
 import { Label } from '../../ui/label'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '../../ui/breadcrumb'
+import { Badge } from '../../ui/badge'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../ui/table'
+import { Progress } from '../../ui/progress'
 import { toast } from 'sonner'
 import Loading from '../../ui/loading'
-import { FileText, Users, Clock, Upload, CheckCircle } from 'lucide-react'
+import {
+  FileText,
+  Users,
+  Clock,
+  Upload,
+  CheckCircle,
+  ArrowLeft,
+  PlayCircle,
+  File as FilePdf,
+  Bookmark,
+  CheckCircle2,
+  Calendar,
+  Bell,
+  BadgeCheck
+} from 'lucide-react'
 
 export default function StudentCourseDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [activeTab, setActiveTab] = useState('overview')
 
-  // Mock data
-  const course = {
-    name: 'Cálculo Diferencial',
+  const { getCourse } = useCourses()
+  const { getAssignments } = useAssignments()
+  const { getGroups } = useCourseGroups()
+  const { getSubmissions, submitAssignment } = useSubmissions()
+
+  // Real Data State
+  const [realCourse, setRealCourse] = useState(null)
+  const [realAssignments, setRealAssignments] = useState([])
+  const [groups, setGroups] = useState([])
+  const [submissions, setSubmissions] = useState({})
+
+  // UI State
+  const [loading, setLoading] = useState(true)
+  const [fileUrl, setFileUrl] = useState('')
+  const [selectedAssignment, setSelectedAssignment] = useState(null)
+
+  // Mock Data
+  const mockCourse = {
+    name: 'Cálculo Diferencial (Mock)',
     professor: 'Dr. Juan Pérez',
     color: '#3b82f6',
   }
@@ -35,11 +77,11 @@ export default function StudentCourseDetailPage() {
     { id: 5, title: 'Continuidad de Funciones', type: 'Video', viewed: false, duration: '20 min' },
   ]
 
-  const assignments = [
-    { id: 1, name: 'Taller 1: Límites', dueDate: '2025-01-20', status: 'entregada', grade: 95 },
-    { id: 2, name: 'Taller 2: Continuidad', dueDate: '2025-01-25', status: 'entregada', grade: 88 },
-    { id: 3, name: 'Taller 3: Derivadas', dueDate: '2025-02-01', status: 'pendiente', grade: null },
-    { id: 4, name: 'Parcial 1', dueDate: '2025-01-15', status: 'atrasada', grade: null },
+  const mockAssignments = [
+    { id: 'm1', name: 'Taller 1: Límites', dueDate: '2025-01-20', status: 'entregada', grade: 95 },
+    { id: 'm2', name: 'Taller 2: Continuidad', dueDate: '2025-01-25', status: 'entregada', grade: 88 },
+    { id: 'm3', name: 'Taller 3: Derivadas', dueDate: '2025-02-01', status: 'pendiente', grade: null },
+    { id: 'm4', name: 'Parcial 1', dueDate: '2025-01-15', status: 'atrasada', grade: null },
   ]
 
   const announcements = [
@@ -48,13 +90,51 @@ export default function StudentCourseDetailPage() {
     { id: 3, title: 'Recordatorio: Taller 3', date: '2025-01-16', type: 'Recordatorio', content: 'El taller 3 vence este viernes' },
   ]
 
-  const students = [
+  const mockStudents = [
     { id: 1, name: 'Ana García', status: 'activo', progress: 85 },
     { id: 2, name: 'Carlos Mendoza', status: 'activo', progress: 92 },
     { id: 3, name: 'Laura Pérez', status: 'activo', progress: 78 },
     { id: 4, name: 'Miguel Torres', status: 'retirado', progress: 45 },
     { id: 5, name: 'Sofia Ramirez', status: 'activo', progress: 95 },
   ]
+
+  const loadData = async () => {
+    try {
+      setLoading(true)
+      const c = await getCourse(id)
+      setRealCourse(c)
+
+      const a = await getAssignments(id)
+      setRealAssignments(a || [])
+
+      const g = await getGroups(id)
+      setGroups(g || [])
+
+      // Load submissions for assignments
+      if (a && a.length > 0) {
+          const subs = {}
+          for (const assign of a) {
+             const sub = await getSubmissions(assign.id)
+             if (sub && sub.length > 0) {
+                 subs[assign.id] = sub[0] // Assuming one submission per student per assignment
+             }
+          }
+          setSubmissions(subs)
+      }
+
+    } catch (err) {
+      console.error(err)
+      // toast.error('Error cargando datos del curso')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (id) {
+        loadData()
+    }
+  }, [id])
 
   const getTypeIcon = (type) => {
     switch (type) {
@@ -64,18 +144,14 @@ export default function StudentCourseDetailPage() {
       case 'Quiz': return <CheckCircle2 className="w-4 h-4 text-purple-600" />
       default: return <FileText className="w-4 h-4 text-gray-600" />
     }
-    loadData()
-  }, [id])
+  }
 
   const handleSubmit = async () => {
       if (!fileUrl) return toast.error('Debes ingresar una URL del archivo');
+      if (!selectedAssignment) return;
 
       let groupId = null;
       if (selectedAssignment.is_group_assignment) {
-          // Find if user is in any group of this course
-          // Logic: We have 'groups' loaded. Each group has 'members'.
-          // We find the group where one member has student_id == user.id
-
           const myGroup = groups.find(g =>
               g.members && g.members.some(m => m.student_id === user.id)
           );
@@ -93,10 +169,9 @@ export default function StudentCourseDetailPage() {
               group_id: groupId
           });
           toast.success('Tarea entregada');
+          setFileUrl('');
           setSelectedAssignment(null);
-          // Reload submissions
-          const sub = await getSubmissions(selectedAssignment.id);
-          setSubmissions(prev => ({ ...prev, [selectedAssignment.id]: Array.isArray(sub) ? sub[0] : sub }));
+          loadData();
       } catch (error) {
           toast.error(error.message);
       }
@@ -111,7 +186,7 @@ export default function StudentCourseDetailPage() {
       case 'atrasada':
         return <Badge className="bg-red-100 text-red-700 hover:bg-red-100">Atrasada</Badge>
       default:
-        return null
+        return <Badge variant="outline">{status}</Badge>
     }
   }
 
@@ -127,6 +202,23 @@ export default function StudentCourseDetailPage() {
         return null
     }
   }
+
+  if (loading) return <Loading message="Cargando curso..." />
+
+  const displayCourse = realCourse || mockCourse
+
+  // Merge Assignments for display
+  const displayedAssignments = [
+      ...realAssignments.map(a => ({
+          id: a.id,
+          name: a.title,
+          dueDate: new Date(a.due_date).toLocaleDateString(),
+          status: submissions[a.id] ? 'entregada' : 'pendiente', // Simple logic
+          grade: submissions[a.id]?.grade,
+          is_group_assignment: a.is_group_assignment
+      })),
+      ...mockAssignments
+  ]
 
   return (
     <div className="p-6 space-y-6">
@@ -145,7 +237,7 @@ export default function StudentCourseDetailPage() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>{course.name}</BreadcrumbPage>
+            <BreadcrumbPage>{displayCourse.title || displayCourse.name}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -165,11 +257,11 @@ export default function StudentCourseDetailPage() {
         <div className="flex items-center gap-4">
           <div
             className="w-16 h-16 rounded-lg"
-            style={{ backgroundColor: course.color }}
+            style={{ backgroundColor: displayCourse.color || '#3b82f6' }}
           />
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{course.name}</h1>
-            <p className="text-sm text-gray-600">{course.professor}</p>
+            <h1 className="text-2xl font-bold text-gray-900">{displayCourse.title || displayCourse.name}</h1>
+            <p className="text-sm text-gray-600">{displayCourse.description || displayCourse.professor}</p>
           </div>
         </div>
       </div>
@@ -256,9 +348,12 @@ export default function StudentCourseDetailPage() {
 
         <TabsContent value="assignments">
           <Card className="p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Tareas del Curso</h2>
+            <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold text-gray-900">Tareas del Curso</h2>
+            </div>
+
             <div className="space-y-3">
-              {assignments.map((assignment) => (
+              {displayedAssignments.map((assignment) => (
                 <div
                   key={assignment.id}
                   className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
@@ -275,13 +370,46 @@ export default function StudentCourseDetailPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     {getStatusBadge(assignment.status)}
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => console.log('[v0] Ver tarea', assignment.id)}
-                    >
-                      Ver detalles
-                    </Button>
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setSelectedAssignment(assignment)}
+                            >
+                              {assignment.status === 'entregada' ? 'Ver entrega' : 'Entregar'}
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Entrega: {assignment.name}</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4 py-4">
+                                {assignment.status === 'entregada' ? (
+                                    <div className="text-center py-4">
+                                        <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-2" />
+                                        <p className="font-medium">Tarea entregada correctamente</p>
+                                        {assignment.grade && <p className="text-lg font-bold mt-2">Nota: {assignment.grade}</p>}
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="space-y-2">
+                                            <Label>URL del archivo (Google Drive, Dropbox, etc)</Label>
+                                            <Input
+                                                placeholder="https://..."
+                                                value={fileUrl}
+                                                onChange={(e) => setFileUrl(e.target.value)}
+                                            />
+                                        </div>
+                                        <Button className="w-full" onClick={handleSubmit}>
+                                            <Upload className="w-4 h-4 mr-2" />
+                                            Enviar Tarea
+                                        </Button>
+                                    </>
+                                )}
+                            </div>
+                        </DialogContent>
+                    </Dialog>
                   </div>
                 </div>
               ))}
@@ -322,7 +450,7 @@ export default function StudentCourseDetailPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {students.map((student) => (
+                {mockStudents.map((student) => (
                   <TableRow key={student.id}>
                     <TableCell className="font-medium">{student.name}</TableCell>
                     <TableCell>
@@ -340,10 +468,12 @@ export default function StudentCourseDetailPage() {
                     </TableCell>
                   </TableRow>
                 ))}
-                {groups.length === 0 && <p className="text-gray-500">No hay grupos formados.</p>}
-            </div>
-         </TabsContent>
-       </Tabs>
+              </TableBody>
+            </Table>
+            {groups.length === 0 && <p className="text-gray-500 mt-4">No hay grupos formados.</p>}
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

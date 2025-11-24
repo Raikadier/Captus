@@ -1,6 +1,7 @@
 import { EventsService } from "../services/EventsService.js";
 
 const eventsService = new EventsService();
+import NotificationService from '../services/NotificationService.js';
 
 export class EventsController {
   constructor() {
@@ -31,6 +32,18 @@ export class EventsController {
 
   async create(req, res) {
     const result = await eventsService.create(req.body);
+
+    if (result.success) {
+      await NotificationService.notify({
+        user_id: req.user.id,
+        title: 'Evento Creado',
+        body: `Evento "${result.data.title}" agendado.`,
+        event_type: 'event_created',
+        entity_id: result.data.id,
+        is_auto: true
+      });
+    }
+
     res.status(result.success ? 201 : 400).json(result);
   }
 

@@ -1,7 +1,7 @@
 import AssignmentRepository from '../repositories/AssignmentRepository.js';
 import EnrollmentRepository from '../repositories/EnrollmentRepository.js';
 import CourseRepository from '../repositories/CourseRepository.js';
-import { requireSupabaseClient } from '../lib/supabaseAdmin.js';
+import NotificationService from './NotificationService.js';
 
 export default class AssignmentService {
   constructor() {
@@ -21,8 +21,7 @@ export default class AssignmentService {
     const assignment = await this.repo.save(data);
 
     // Notify students
-    // NOTE: Passing null for relatedTask because assignment.id is Int, and notifications.related_task is UUID.
-    await this._notifyCourseStudents(course_id, `Nueva tarea: ${title}`, `El profesor ha creado una nueva tarea en ${course.title}`, null);
+    await this._notifyCourseStudents(course_id, `Nueva tarea: ${title}`, `El profesor ha creado una nueva tarea en ${course.title}`, assignment.id);
 
     return assignment;
   }
@@ -61,7 +60,12 @@ export default class AssignmentService {
 
     if (course.teacher_id !== teacherId) throw new Error('No autorizado');
 
-    return await this.repo.update(id, data);
+    const updated = await this.repo.update(id, data);
+
+    // Notify students of update
+    await this._notifyCourseStudents(assignment.course_id, 'Tarea Actualizada', `La tarea "${updated.title}" ha sido modificada.`, updated.id, 'assignment_updated');
+
+    return updated;
   }
 
   async deleteAssignment(id, teacherId) {
@@ -73,22 +77,20 @@ export default class AssignmentService {
     return await this.repo.delete(id);
   }
 
-  async _notifyCourseStudents(courseId, title, body, relatedTask = null) {
+  async _notifyCourseStudents(courseId, title, body, entityId, eventType = 'assignment_created') {
     const students = await this.enrollmentRepo.getCourseStudents(courseId);
 
     if (students.length === 0) return;
 
-    const notifications = students.map(s => ({
-      user_id: s.id,
-      title,
-      body,
-      type: 'task',
-      related_task: relatedTask // Will be null for academic assignments
-    }));
-
-    // Insert notifications
-    const client = requireSupabaseClient();
-    const { error } = await client.from('notifications').insert(notifications);
-    if (error) console.error('Error sending notifications:', error);
+    for (const s of students) {
+        await NotificationService.notify({
+            user_id: s.id,
+            title,
+            body,
+            event_type: eventType,
+            entity_id: entityId,
+            metadata: { course_id: courseId }
+        });
+    }
   }
 }

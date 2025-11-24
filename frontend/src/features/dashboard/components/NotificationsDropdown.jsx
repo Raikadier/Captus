@@ -1,44 +1,22 @@
-import React, { useEffect, useRef } from 'react'
-import { CheckCircle } from 'lucide-react'
+import React, { useEffect, useRef, useState } from 'react'
+import { CheckCircle, Loader2 } from 'lucide-react'
 import { ScrollArea } from '../../../ui/scroll-area'
 import { Button } from '../../../ui/button'
-
-const mockNotifications = [
-  {
-    id: 1,
-    title: 'Tarea próxima a vencer',
-    description: 'La tarea de Matemáticas vence mañana.',
-    time: 'Hace 2 horas',
-    read: false,
-  },
-  {
-    id: 2,
-    title: 'Nuevo anuncio del profesor',
-    description: 'Hay material nuevo disponible.',
-    time: 'Hace 5 horas',
-    read: true,
-  },
-  {
-    id: 3,
-    title: 'Evento del calendario',
-    description: 'Reunión de proyecto a las 4 PM.',
-    time: 'Ayer',
-    read: true,
-  },
-  {
-    id: 4,
-    title: 'Recordatorio de grupo',
-    description: 'Tienes una sesión de estudio grupal en 1 hora.',
-    time: 'Hace 30 minutos',
-    read: false,
-  },
-]
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../../context/AuthContext'
+import api from '../../../lib/api'
 
 export default function NotificationsDropdown({ isOpen, onClose }) {
   const dropdownRef = useRef(null)
+  const navigate = useNavigate()
+  const { user } = useAuth()
+  const [notifications, setNotifications] = useState([])
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (!isOpen) return
+
+    fetchNotifications()
 
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -50,13 +28,34 @@ export default function NotificationsDropdown({ isOpen, onClose }) {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [isOpen, onClose])
 
+  const fetchNotifications = async () => {
+    if (!user) return
+    setLoading(true)
+    try {
+      const { data } = await api.get('/notifications')
+      setNotifications(data)
+    } catch (error) {
+      console.error('Error loading notifications', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleMarkAsRead = async (e, id) => {
+    e.stopPropagation()
+    try {
+      await api.put(`/notifications/${id}/read`)
+      setNotifications((prev) =>
+        prev.map(n => n.id === id ? { ...n, read: true } : n)
+      )
+    } catch (error) {
+      console.error('Error marking as read', error)
+    }
+  }
+
   if (!isOpen) return null
 
-  const unreadCount = mockNotifications.filter((n) => !n.read).length
-
-  const handleViewAll = () => {
-    onClose()
-  }
+  const unreadCount = notifications.filter((n) => !n.read).length
 
   return (
     <div
@@ -77,37 +76,51 @@ export default function NotificationsDropdown({ isOpen, onClose }) {
 
       {/* Notifications List */}
       <ScrollArea className="h-[300px]">
-        <div className="p-2">
-          {mockNotifications.map((notification) => (
-            <div
-              key={notification.id}
-              className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer group"
-            >
-              {/* Unread indicator */}
-              <div className="flex-shrink-0 mt-1">
-                {!notification.read ? (
-                  <div className="w-2 h-2 bg-blue-500 rounded-full" />
-                ) : (
-                  <div className="w-2 h-2" />
+        {loading ? (
+          <div className="flex justify-center items-center h-full p-4">
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          </div>
+        ) : notifications.length === 0 ? (
+          <div className="p-4 text-center text-sm text-gray-500">
+            No tienes notificaciones
+          </div>
+        ) : (
+          <div className="p-2">
+            {notifications.map((notification) => (
+              <div
+                key={notification.id}
+                className={`flex items-start gap-3 p-3 rounded-lg transition-colors cursor-pointer group ${notification.read ? 'bg-white hover:bg-gray-50' : 'bg-blue-50 hover:bg-blue-100'}`}
+              >
+                {/* Unread indicator */}
+                <div className="flex-shrink-0 mt-1">
+                  {!notification.read ? (
+                    <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                  ) : (
+                    <div className="w-2 h-2" />
+                  )}
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm text-gray-900 mb-0.5">{notification.title}</p>
+                  <p className="text-sm text-gray-600 mb-1 line-clamp-2">{notification.body}</p>
+                  <p className="text-xs text-gray-500">{new Date(notification.created_at).toLocaleString()}</p>
+                </div>
+
+                {/* Mark as read icon (appears on hover) */}
+                {!notification.read && (
+                  <button
+                    onClick={(e) => handleMarkAsRead(e, notification.id)}
+                    className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                    title="Marcar como leída"
+                  >
+                    <CheckCircle size={16} className="text-gray-400 hover:text-primary" />
+                  </button>
                 )}
               </div>
-
-              {/* Content */}
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm text-gray-900 mb-0.5">{notification.title}</p>
-                <p className="text-sm text-gray-600 mb-1 line-clamp-2">{notification.description}</p>
-                <p className="text-xs text-gray-500">{notification.time}</p>
-              </div>
-
-              {/* Mark as read icon (appears on hover) */}
-              {!notification.read && (
-                <button className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <CheckCircle size={16} className="text-gray-400 hover:text-primary" />
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </ScrollArea>
 
       {/* Footer */}
@@ -115,7 +128,10 @@ export default function NotificationsDropdown({ isOpen, onClose }) {
         <Button
           variant="ghost"
           className="w-full text-sm text-primary hover:text-primary/90 hover:bg-primary/10"
-          onClick={handleViewAll}
+          onClick={() => {
+            onClose()
+            navigate('/notifications')
+          }}
         >
           Ver todas las notificaciones →
         </Button>
