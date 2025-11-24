@@ -5,6 +5,7 @@ import { User, Mail, Calendar, Edit3, Save, X, Sparkles } from 'lucide-react';
 import { Button } from '../../ui/button'
 import { Input } from '../../ui/input'
 import Loading from '../../ui/loading'
+import apiClient from '../../shared/api/client';
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -26,47 +27,40 @@ const ProfilePage = () => {
   const fetchUserProfile = async () => {
     try {
       console.log('Fetching user profile...');
-      const response = await fetch('/api/users/profile', {
-        credentials: 'include'
-      });
-      console.log('Response status:', response.status);
+      const response = await apiClient.get('/users/profile');
 
-      if (response.ok) {
-        const userData = await response.json();
-        console.log('User data received:', userData);
+      const userData = response.data;
+      console.log('User data received:', userData);
 
-        if (userData.success && userData.data) {
-          const user = userData.data;
-          console.log('User object:', user);
+      if (userData.success && userData.data) {
+        const user = userData.data;
+        console.log('User object:', user);
 
-          // Split full name into first and last name
-          const nameParts = user.name ? user.name.split(' ') : ['', ''];
-          const firstName = nameParts[0] || '';
-          const lastName = nameParts.slice(1).join(' ') || '';
+        // Split full name into first and last name
+        const nameParts = user.name ? user.name.split(' ') : ['', ''];
+        const firstName = nameParts[0] || '';
+        const lastName = nameParts.slice(1).join(' ') || '';
 
-          const userWithSplitName = {
-            ...user,
-            firstName,
-            lastName,
-            fullName: user.name
-          };
+        const userWithSplitName = {
+          ...user,
+          firstName,
+          lastName,
+          fullName: user.name
+        };
 
-          console.log('Setting user data:', userWithSplitName);
-          setUser(userWithSplitName);
-          setFormData({
-            firstName,
-            lastName,
-            email: user.email || '',
-            career: user.carrer || '', // Note: using 'carrer' as per user's table
-            bio: user.bio || ''
-          });
-        } else {
-          console.error('Invalid user data structure:', userData);
-        }
+        console.log('Setting user data:', userWithSplitName);
+        setUser(userWithSplitName);
+        setFormData({
+          firstName,
+          lastName,
+          email: user.email || '',
+          career: user.carrer || '', // Note: using 'carrer' as per user's table
+          bio: user.bio || ''
+        });
       } else {
-        const errorText = await response.text();
-        console.error('Failed to fetch user profile:', response.status, errorText);
+        console.error('Invalid user data structure:', userData);
       }
+
     } catch (error) {
       console.error('Error fetching user profile:', error);
     } finally {
@@ -93,8 +87,17 @@ const ProfilePage = () => {
         bio: formData.bio
       };
 
-      // TODO: Implement update profile API
+      // Implement update profile API using apiClient
       console.log('Updating profile:', updateData);
+      // Assuming we can update via PUT /users/profile or /users/:id.
+      // Using SettingsPage logic reference: PUT /users/:id. But we need ID.
+      // Or if there is a /users/profile PUT endpoint.
+      // Let's assume we use the same endpoint structure as SettingsPage, which gets ID from session.
+      // But here we have `user.id` from the fetched profile data.
+
+      if (!user.id) throw new Error("User ID missing");
+
+      await apiClient.put(`/users/${user.id}`, updateData);
 
       // For now, update local state
       setUser(prev => ({

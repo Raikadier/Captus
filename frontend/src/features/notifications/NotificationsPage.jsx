@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
-import api from '../../lib/api'
+import apiClient from '../../shared/api/client'
 import { Card } from '../../ui/card'
 import { Button } from '../../ui/button'
 import { Badge } from '../../ui/badge'
@@ -19,8 +19,15 @@ export default function NotificationsPage() {
 
   const fetchNotifications = async () => {
     try {
-      const { data } = await api.get('/notifications')
-      setNotifications(data)
+      // Use apiClient instead of api.get
+      // apiClient.get returns { data: responseData }
+      const response = await apiClient.get('/notifications')
+      // If backend returns { success: true, data: [...] } or just [...]
+      // Usually apiClient wraps response in { data: response.data }
+      const data = response.data
+      // Depending on backend, data might be the array or { data: array }
+      // Assuming array based on previous api.get usage
+      setNotifications(Array.isArray(data) ? data : data.data || [])
     } catch (error) {
       console.error('Error fetching notifications', error)
     } finally {
@@ -30,7 +37,7 @@ export default function NotificationsPage() {
 
   const handleMarkAsRead = async (id) => {
     try {
-      await api.put(`/notifications/${id}/read`)
+      await apiClient.put(`/notifications/${id}/read`)
       setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
     } catch (error) {
       console.error('Error marking read', error)
