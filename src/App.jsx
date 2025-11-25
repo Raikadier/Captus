@@ -26,6 +26,7 @@ import TeacherDiagramsPage from './features/teacher/TeacherDiagramsPage';
 import TeacherReviewsPage from './features/teacher/TeacherReviewsPage';
 import TeacherEditTaskPage from './features/teacher/TeacherEditTaskPage';
 import TeacherCalendarPage from './features/teacher/TeacherCalendarPage';
+import NotificationsPage from './features/notifications/NotificationsPage';
 import Loading from './ui/loading';
 import { Toaster } from 'sonner';
 
@@ -173,6 +174,16 @@ function AppContent() {
                   </MainLayout>
                 </ProtectedRoute>
               }
+        />
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <NotificationsPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
         />
         {/* Rutas docente */}
         <Route
