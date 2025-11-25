@@ -3,12 +3,9 @@ import axios from 'axios';
 import { supabase } from './supabase';
 
 const getBaseUrl = () => {
-  let url = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
-  // Ensure it ends with /api if it's a full URL and doesn't have it
-  if (url.startsWith('http') && !url.endsWith('/api')) {
-    url = `${url}/api`;
-  }
-  return url;
+  // During development, we use a relative path to leverage Vite's proxy.
+  // VITE_API_BASE_URL can be used to override this for production or other environments.
+  return import.meta.env.VITE_API_BASE_URL || '/api';
 };
 
 // Create axios instance with default config
