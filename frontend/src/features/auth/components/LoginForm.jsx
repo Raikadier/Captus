@@ -64,7 +64,7 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F6F7FB] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
@@ -73,20 +73,20 @@ const LoginForm = () => {
               <BookOpen className="h-8 w-8 text-white" />
             </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900">
+          <h2 className="text-3xl font-bold text-foreground">
             {isRegistering ? 'Crear cuenta' : 'Iniciar sesión'}
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-muted-foreground">
             {isRegistering ? 'Únete a Captus' : 'Accede a tu cuenta de Captus'}
           </p>
         </div>
 
         {/* Form */}
-        <div className="bg-white rounded-xl shadow-sm p-8">
+        <div className="bg-card rounded-xl shadow-sm p-8">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {isRegistering && (
               <div>
-                <Label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                <Label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
                   Nombre completo
                 </Label>
                 <Input
@@ -104,7 +104,7 @@ const LoginForm = () => {
 
             {isRegistering && (
               <div>
-                <Label className="block text-sm font-medium text-gray-700 mb-3">
+                <Label className="block text-sm font-medium text-foreground mb-3">
                   Tipo de usuario
                 </Label>
                 <div className="grid grid-cols-2 gap-3">
@@ -114,11 +114,11 @@ const LoginForm = () => {
                     className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
                       userRole === 'student'
                         ? 'border-primary bg-primary/10'
-                        : 'border-gray-200 bg-white hover:border-gray-300'
+                        : 'border-border bg-background hover:border-muted-foreground'
                     }`}
                   >
-                    <GraduationCap className={`h-6 w-6 ${userRole === 'student' ? 'text-primary' : 'text-gray-400'}`} />
-                    <span className={`text-sm font-medium ${userRole === 'student' ? 'text-primary' : 'text-gray-700'}`}>
+                    <GraduationCap className={`h-6 w-6 ${userRole === 'student' ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <span className={`text-sm font-medium ${userRole === 'student' ? 'text-primary' : 'text-foreground'}`}>
                       Estudiante
                     </span>
                   </button>
@@ -128,11 +128,11 @@ const LoginForm = () => {
                     className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
                       userRole === 'teacher'
                         ? 'border-primary bg-primary/10'
-                        : 'border-gray-200 bg-white hover:border-gray-300'
+                        : 'border-border bg-background hover:border-muted-foreground'
                     }`}
                   >
-                    <User className={`h-6 w-6 ${userRole === 'teacher' ? 'text-primary' : 'text-gray-400'}`} />
-                    <span className={`text-sm font-medium ${userRole === 'teacher' ? 'text-primary' : 'text-gray-700'}`}>
+                    <User className={`h-6 w-6 ${userRole === 'teacher' ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <span className={`text-sm font-medium ${userRole === 'teacher' ? 'text-primary' : 'text-foreground'}`}>
                       Profesor
                     </span>
                   </button>
@@ -141,7 +141,7 @@ const LoginForm = () => {
             )}
 
             <div>
-              <Label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <Label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
                 Correo electrónico
               </Label>
               <Input
@@ -157,7 +157,7 @@ const LoginForm = () => {
             </div>
 
             <div>
-              <Label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <Label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
                 Contraseña
               </Label>
               <div className="relative">
@@ -177,9 +177,9 @@ const LoginForm = () => {
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400" />
+                    <EyeOff className="h-5 w-5 text-muted-foreground" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-400" />
+                    <Eye className="h-5 w-5 text-muted-foreground" />
                   )}
                 </button>
               </div>

@@ -30,12 +30,12 @@ function getCurrentDate() {
 
 function StatCard({ icon, label, value, bgColor }) {
   return (
-    <Card className="p-6 border border-gray-200 rounded-xl hover:shadow-md transition-shadow">
+    <Card className="p-6 border border-border rounded-xl hover:shadow-md transition-shadow">
       <div className="flex items-center space-x-4">
         <div className={`${bgColor} p-4 rounded-xl`}>{icon}</div>
         <div>
-          <p className="text-3xl font-bold text-gray-900">{value}</p>
-          <p className="text-sm text-gray-600 mt-1">{label}</p>
+          <p className="text-3xl font-bold text-foreground">{value}</p>
+          <p className="text-sm text-muted-foreground mt-1">{label}</p>
         </div>
       </div>
     </Card>
@@ -59,16 +59,16 @@ function SubjectProgress({ subject }) {
     <div>
       <div className="flex justify-between items-center mb-2">
         <div>
-          <h3 className="font-medium text-gray-900">{subject.name}</h3>
+          <h3 className="font-medium text-foreground">{subject.name}</h3>
           {/* Display progress if available, or default text */}
-          <p className="text-sm text-gray-500">{subject.progress ? `${subject.progress}% completado` : ''}</p>
+          <p className="text-sm text-muted-foreground">{subject.progress ? `${subject.progress}% completado` : ''}</p>
         </div>
         <div className="text-right">
-          <p className="text-lg font-bold text-gray-900">{subject.grade}</p>
-          <p className="text-sm text-gray-500">Promedio</p>
+          <p className="text-lg font-bold text-foreground">{subject.grade}</p>
+          <p className="text-sm text-muted-foreground">Promedio</p>
         </div>
       </div>
-      <div className="w-full bg-gray-200 rounded-full h-3">
+      <div className="w-full bg-muted rounded-full h-3">
         <div
           className={`h-3 rounded-full transition-all ${getColorClass(subject.color)}`}
           style={{ width: `${subject.progress || 0}%` }}
@@ -305,12 +305,12 @@ export default function StatsPage() {
 function MonthBar({ month, color, value, label }) {
   return (
     <div className="flex justify-between items-center">
-      <span className="text-gray-600">{month}</span>
+      <span className="text-muted-foreground">{month}</span>
       <div className="flex items-center gap-2">
-        <div className="w-32 bg-gray-200 rounded-full h-2">
+        <div className="w-32 bg-muted rounded-full h-2">
           <div className={`${color} h-2 rounded-full`} style={{ width: `${value}%` }} />
         </div>
-        <span className="text-sm font-medium text-gray-900">{label}</span>
+        <span className="text-sm font-medium text-foreground">{label}</span>
       </div>
     </div>
   )
