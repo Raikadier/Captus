@@ -1,11 +1,11 @@
 import express from "express";
 import { PriorityController } from "../controllers/PriorityController.js";
 import buildSupabaseAuthMiddleware from "../middlewares/verifySupabaseToken.js";
-import { getSupabaseClient } from "../lib/supabaseAdmin.js";
+import { requireSupabaseClient } from "../lib/supabaseAdmin.js";
 
 const router = express.Router();
 const priorityController = new PriorityController();
-const supabaseAdmin = getSupabaseClient();
+const supabaseAdmin = requireSupabaseClient();
 const verifySupabaseToken = buildSupabaseAuthMiddleware(supabaseAdmin);
 
 // Rutas de prioridades (datos maestros, requieren autenticación)

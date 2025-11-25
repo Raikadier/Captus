@@ -1,11 +1,11 @@
 import express from "express";
 import { EventsController } from "../controllers/EventsController.js";
 import buildSupabaseAuthMiddleware from "../middlewares/verifySupabaseToken.js";
-import { getSupabaseClient } from "../lib/supabaseAdmin.js";
+import { requireSupabaseClient } from "../lib/supabaseAdmin.js";
 
 const router = express.Router();
 const eventsController = new EventsController();
-const supabaseAdmin = getSupabaseClient();
+const supabaseAdmin = requireSupabaseClient();
 const verifySupabaseToken = buildSupabaseAuthMiddleware(supabaseAdmin);
 
 // Aplicar middleware de autenticación y usuario a todas las rutas

@@ -1,5 +1,5 @@
 import UserService from "../services/UserService.js";
-import { getSupabaseClient } from "../lib/supabaseAdmin.js";
+import { requireSupabaseClient } from "../lib/supabaseAdmin.js";
 
 // Initialize service with Supabase admin client
 const supabaseAdmin = getSupabaseClient();

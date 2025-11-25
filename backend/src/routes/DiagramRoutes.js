@@ -1,11 +1,11 @@
 import express from "express";
 import { DiagramController } from "../controllers/DiagramController.js";
 import buildSupabaseAuthMiddleware from "../middlewares/verifySupabaseToken.js";
-import { getSupabaseClient } from "../lib/supabaseAdmin.js";
+import { requireSupabaseClient } from "../lib/supabaseAdmin.js";
 
 const router = express.Router();
 const diagramController = new DiagramController();
-const supabaseAdmin = getSupabaseClient();
+const supabaseAdmin = requireSupabaseClient();
 const verifySupabaseToken = buildSupabaseAuthMiddleware(supabaseAdmin);
 
 router.use(verifySupabaseToken);

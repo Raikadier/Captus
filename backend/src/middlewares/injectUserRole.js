@@ -1,4 +1,4 @@
-import { getSupabaseClient } from '../lib/supabaseAdmin.js';
+import { requireSupabaseClient } from '../lib/supabaseAdmin.js';
 
 /**
  * Middleware to fetch full user details (including role) from public.users
@@ -11,7 +11,7 @@ export async function injectUserRole(req, res, next) {
       return res.status(401).json({ error: 'Unauthorized: No user token found' });
     }
 
-    const supabase = getSupabaseClient();
+    const supabase = requireSupabaseClient();
     const { data: userData, error } = await supabase
       .from('users')
       .select('role, name, email')
