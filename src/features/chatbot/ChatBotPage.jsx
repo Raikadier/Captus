@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { aiEventsService } from '../../services/aiEventsService';
 import { useEvents } from '../../hooks/useEvents';
+import apiClient from '../../shared/api/client'; // Importar apiClient
 
 const ChatBotPage = () => {
   const { user } = useAuth();
@@ -24,9 +25,6 @@ const ChatBotPage = () => {
   // The prompt says "El chat debe mostrar un mensaje de confirmación".
   // The response from backend "result" field will serve as this confirmation.
   const { fetchEvents } = useEvents();
-
-  // Access environment variable for API URL
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -54,23 +52,19 @@ const ChatBotPage = () => {
 
   const fetchConversations = async () => {
     try {
-      const response = await fetch(`${API_URL}/ai/conversations`, {
-        headers: getAuthHeaders()
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setConversations(data);
-        if (data.length > 0 && !activeConversation) {
-          setActiveConversation(data[0].id);
-        } else if (data.length === 0) {
-           setActiveConversation(null);
-           setMessages([{
-             id: 'intro',
-             type: 'bot',
-             content: '¡Hola! Soy Captus AI, tu asistente personal de productividad académica. ¿En qué puedo ayudarte hoy?',
-             timestamp: new Date(),
-           }]);
-        }
+      const response = await apiClient.get('/ai/conversations');
+      const data = response.data;
+      setConversations(data);
+      if (data.length > 0 && !activeConversation) {
+        setActiveConversation(data[0].id);
+      } else if (data.length === 0) {
+        setActiveConversation(null);
+        setMessages([{
+          id: 'intro',
+          type: 'bot',
+          content: '¡Hola! Soy Captus AI, tu asistente personal de productividad académica. ¿En qué puedo ayudarte hoy?',
+          timestamp: new Date(),
+        }]);
       }
     } catch (error) {
       console.error('Error fetching conversations:', error);
