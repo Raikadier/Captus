@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Filter, Search as SearchIcon, Bell, Calendar as CalendarIcon, AlertTriangle } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
-import { useTasks } from './hooks/useTasks';
+import { useTaskContext } from '../../context/TaskContext';
 import { useSubTasks } from '../../hooks/useSubTasks';
 import TaskCard from './components/TaskCard';
 import TaskForm from './components/TaskForm';
@@ -30,7 +30,7 @@ const TaskPage = () => {
     updateTask,
     deleteTask,
     toggleTaskCompletion
-  } = useTasks();
+  } = useTaskContext();
 
   const [categories, setCategories] = useState([]);
   const [priorities, setPriorities] = useState([]);
