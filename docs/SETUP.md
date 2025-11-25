@@ -43,6 +43,8 @@ cd ../frontend
 npm install
 ```
 
+> Nota: se usa `patch-package` en la raíz para aplicar un fix a `spawn-command` (warning de `util._extend`). El parche se aplica automáticamente en `npm install` (script `postinstall`).
+
 ---
 
 ## ⚙️ Configuración
@@ -56,6 +58,10 @@ SUPABASE_SERVICE_ROLE_KEY=tu_service_role_key
 PORT=4000
 FRONTEND_URL=http://localhost:5173
 NODE_ENV=development
+
+# Gmail configuration for email notifications (opcional)
+GMAIL_USER=tu-email@gmail.com
+GMAIL_APP_PASSWORD=tu-app-password
 ```
 
 #### **Frontend (`frontend/.env`):**
@@ -71,6 +77,9 @@ NODE_ENV=development
 2. Crea un nuevo proyecto
 3. Ve a Settings > API
 4. Copia la URL y las keys necesarias
+
+### **3. Configurar Notificaciones por Email (Opcional)**
+Para activar las notificaciones por email de eventos, configura Gmail siguiendo la guía en [`docs/GMAIL_SETUP.md`](GMAIL_SETUP.md).
 
 ---
 
@@ -110,9 +119,15 @@ npm run check:ports
 npm run health
 ```
 
+### **Lint**
+```bash
+npm run lint --prefix backend
+npm run lint --prefix frontend
+```
+
 ### **URLs de Acceso**
-- **Frontend:** http://localhost:5173
-- **Backend API:** http://localhost:4000/api
+- **Frontend:** http://localhost:5173 (Vite usará el siguiente puerto libre si 5173 está ocupado; revisa la consola)
+- **Backend API base:** http://localhost:4000/api (respuesta JSON con enlaces)
 - **Documentación API:** http://localhost:4000/api-docs
 - **Health Check:** http://localhost:4000/api/health
 

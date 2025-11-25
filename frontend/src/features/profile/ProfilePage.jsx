@@ -1,15 +1,21 @@
 // ProfilePage - User profile management
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Phone, Calendar, Edit3, Save, X } from 'lucide-react';
+import { Link } from 'react-router-dom'
+import { User, Mail, Calendar, Edit3, Save, X, Sparkles } from 'lucide-react';
+import { Button } from '../../ui/button'
+import { Input } from '../../ui/input'
+import Loading from '../../ui/loading'
 import apiClient from '../../shared/api/client';
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
-    phone: ''
+    career: '',
+    bio: ''
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -20,22 +26,41 @@ const ProfilePage = () => {
 
   const fetchUserProfile = async () => {
     try {
-      // TODO: Implement get current user profile API
-      // For now, simulate user data
-      const mockUser = {
-        id: 'user-123',
-        name: 'Juan Pérez',
-        email: 'juan@example.com',
-        phone: '+57 300 123 4567',
-        created_at: '2024-01-15T10:30:00Z',
-        last_login: new Date().toISOString()
-      };
-      setUser(mockUser);
-      setFormData({
-        name: mockUser.name,
-        email: mockUser.email,
-        phone: mockUser.phone || ''
-      });
+      console.log('Fetching user profile...');
+      const response = await apiClient.get('/users/profile');
+
+      const userData = response.data;
+      console.log('User data received:', userData);
+
+      if (userData.success && userData.data) {
+        const user = userData.data;
+        console.log('User object:', user);
+
+        // Split full name into first and last name
+        const nameParts = user.name ? user.name.split(' ') : ['', ''];
+        const firstName = nameParts[0] || '';
+        const lastName = nameParts.slice(1).join(' ') || '';
+
+        const userWithSplitName = {
+          ...user,
+          firstName,
+          lastName,
+          fullName: user.name
+        };
+
+        console.log('Setting user data:', userWithSplitName);
+        setUser(userWithSplitName);
+        setFormData({
+          firstName,
+          lastName,
+          email: user.email || '',
+          career: user.carrer || '', // Note: using 'carrer' as per user's table
+          bio: user.bio || ''
+        });
+      } else {
+        console.error('Invalid user data structure:', userData);
+      }
+
     } catch (error) {
       console.error('Error fetching user profile:', error);
     } finally {
@@ -53,14 +78,39 @@ const ProfilePage = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      // TODO: Implement update profile API
-      console.log('Updating profile:', formData);
+      // Combine first and last name
+      const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+
+      const updateData = {
+        name: fullName,
+        carrer: formData.career, // Note: using 'carrer' as per user's table
+        bio: formData.bio
+      };
+
+      // Implement update profile API using apiClient
+      console.log('Updating profile:', updateData);
+      // Assuming we can update via PUT /users/profile or /users/:id.
+      // Using SettingsPage logic reference: PUT /users/:id. But we need ID.
+      // Or if there is a /users/profile PUT endpoint.
+      // Let's assume we use the same endpoint structure as SettingsPage, which gets ID from session.
+      // But here we have `user.id` from the fetched profile data.
+
+      if (!user.id) throw new Error("User ID missing");
+
+      await apiClient.put(`/users/${user.id}`, updateData);
+
+      // For now, update local state
       setUser(prev => ({
         ...prev,
-        ...formData
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        name: fullName,
+        phone: formData.phone,
+        carrer: formData.career,
+        bio: formData.bio
       }));
       setIsEditing(false);
-      alert('Perfil actualizado exitosamente');
+      // alert('Perfil actualizado exitosamente');
     } catch (error) {
       console.error('Error updating profile:', error);
       alert('Error al actualizar el perfil');
@@ -71,42 +121,40 @@ const ProfilePage = () => {
 
   const handleCancel = () => {
     setFormData({
-      name: user.name,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
-      phone: user.phone || ''
+      career: user.carrer || '',
+      bio: user.bio || ''
     });
     setIsEditing(false);
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Cargando perfil...</div>
-      </div>
-    );
+    return <Loading message="Cargando perfil..." />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-green-600 text-white p-6 shadow-lg">
+      <div className="bg-primary text-white p-6 shadow-lg">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-2xl font-bold">Mi Perfil</h1>
-          <p className="text-green-100 mt-1">Gestiona tu información personal</p>
+          <p className="text-white/90 mt-1">Gestiona tu información personal</p>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto p-6">
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="bg-card rounded-lg shadow-lg overflow-hidden border border-border">
           {/* Profile Header */}
-          <div className="bg-gradient-to-r from-green-500 to-green-600 p-8 text-white">
+          <div className="bg-gradient-to-r from-primary to-primary/80 p-8 text-white">
             <div className="flex items-center space-x-6">
               <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center">
                 <User size={48} />
               </div>
               <div>
-                <h2 className="text-3xl font-bold">{user.name}</h2>
-                <p className="text-green-100 mt-1">{user.email}</p>
+                <h2 className="text-3xl font-bold">{user.fullName}</h2>
+                <p className="text-white/90 mt-1">{user.email}</p>
                 <div className="flex items-center space-x-4 mt-3 text-sm">
                   <div className="flex items-center space-x-1">
                     <Calendar size={16} />
@@ -120,11 +168,11 @@ const ProfilePage = () => {
           {/* Profile Content */}
           <div className="p-8">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-semibold text-gray-900">Información Personal</h3>
+              <h3 className="text-xl font-semibold text-foreground">Información Personal</h3>
               {!isEditing ? (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                 >
                   <Edit3 className="h-4 w-4 mr-2" />
                   Editar
@@ -134,14 +182,14 @@ const ProfilePage = () => {
                   <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50"
                   >
                     <Save className="h-4 w-4 mr-2" />
                     {saving ? 'Guardando...' : 'Guardar'}
                   </button>
                   <button
                     onClick={handleCancel}
-                    className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                   >
                     <X className="h-4 w-4 mr-2" />
                     Cancelar
@@ -151,75 +199,116 @@ const ProfilePage = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Name Field */}
+              {/* First Name Field */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Nombre Completo
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Nombre
                 </label>
                 {isEditing ? (
-                  <input
+                  <Input
                     type="text"
-                    value={formData.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                    value={formData.firstName}
+                    onChange={(e) => handleInputChange('firstName', e.target.value)}
+                    className="w-full bg-background border-border text-foreground"
                   />
                 ) : (
-                  <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
-                    <User className="h-5 w-5 text-gray-400" />
-                    <span className="text-gray-900">{user.name}</span>
+                  <div className="flex items-center space-x-2 p-3 bg-muted rounded-md">
+                    <User className="h-5 w-5 text-muted-foreground" />
+                    <span className="text-foreground">{user.firstName}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Last Name Field */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Apellido
+                </label>
+                {isEditing ? (
+                  <Input
+                    type="text"
+                    value={formData.lastName}
+                    onChange={(e) => handleInputChange('lastName', e.target.value)}
+                    className="w-full bg-background border-border text-foreground"
+                  />
+                ) : (
+                  <div className="flex items-center space-x-2 p-3 bg-muted rounded-md">
+                    <User className="h-5 w-5 text-muted-foreground" />
+                    <span className="text-foreground">{user.lastName}</span>
                   </div>
                 )}
               </div>
 
               {/* Email Field */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Correo Electrónico
                 </label>
                 {isEditing ? (
-                  <input
+                  <Input
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                    className="w-full bg-background border-border text-foreground"
                   />
                 ) : (
-                  <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
-                    <Mail className="h-5 w-5 text-gray-400" />
-                    <span className="text-gray-900">{user.email}</span>
+                  <div className="flex items-center space-x-2 p-3 bg-muted rounded-md">
+                    <Mail className="h-5 w-5 text-muted-foreground" />
+                    <span className="text-foreground">{user.email}</span>
                   </div>
                 )}
               </div>
 
-              {/* Phone Field */}
+
+              {/* Career Field */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Teléfono
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Carrera
                 </label>
                 {isEditing ? (
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => handleInputChange('phone', e.target.value)}
-                    placeholder="Ingresa tu número de teléfono"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                  <Input
+                    type="text"
+                    value={formData.career}
+                    onChange={(e) => handleInputChange('career', e.target.value)}
+                    placeholder="Ej: Ingeniería de Sistemas"
+                    className="w-full bg-background border-border text-foreground"
                   />
                 ) : (
-                  <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
-                    <Phone className="h-5 w-5 text-gray-400" />
-                    <span className="text-gray-900">{user.phone || 'No especificado'}</span>
+                  <div className="flex items-center space-x-2 p-3 bg-muted rounded-md">
+                    <User className="h-5 w-5 text-muted-foreground" />
+                    <span className="text-foreground">{user.carrer || 'No especificada'}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Bio Field - Full Width */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Biografía
+                </label>
+                {isEditing ? (
+                  <textarea
+                    value={formData.bio}
+                    onChange={(e) => handleInputChange('bio', e.target.value)}
+                    placeholder="Cuéntanos un poco sobre ti..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary resize-none"
+                    rows={3}
+                  />
+                ) : (
+                  <div className="p-3 bg-muted rounded-md">
+                    <span className="text-foreground">{user.bio || 'Sin biografía'}</span>
                   </div>
                 )}
               </div>
 
               {/* Registration Date */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Fecha de Registro
                 </label>
-                <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
-                  <Calendar className="h-5 w-5 text-gray-400" />
-                  <span className="text-gray-900">
+                <div className="flex items-center space-x-2 p-3 bg-muted rounded-md">
+                  <Calendar className="h-5 w-5 text-muted-foreground" />
+                  <span className="text-foreground">
                     {new Date(user.created_at).toLocaleDateString('es-ES', {
                       year: 'numeric',
                       month: 'long',
@@ -231,12 +320,12 @@ const ProfilePage = () => {
             </div>
 
             {/* Account Statistics */}
-            <div className="mt-8 pt-6 border-t border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Estadísticas de Cuenta</h3>
+            <div className="mt-8 pt-6 border-t border-border">
+              <h3 className="text-xl font-semibold text-foreground mb-4">Estadísticas de Cuenta</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">0</div>
-                  <div className="text-sm text-green-700">Tareas Completadas</div>
+                <div className="bg-primary/10 p-4 rounded-lg">
+                  <div className="text-2xl font-bold text-primary">0</div>
+                  <div className="text-sm text-primary/80">Tareas Completadas</div>
                 </div>
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <div className="text-2xl font-bold text-blue-600">0</div>

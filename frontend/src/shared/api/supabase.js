@@ -4,22 +4,19 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Supabase URL or Anon Key is missing. Check your .env.local file.');
+}
 
-// Keep backend Authorization header in sync with current Supabase session
-// We reuse localStorage key 'token' so existing axios interceptor in client.js continues to work.
-supabase.auth.onAuthStateChange((_event, session) => {
-  const accessToken = session?.access_token || null;
-  if (accessToken) {
-    localStorage.setItem('token', accessToken);
-  } else {
-    localStorage.removeItem('token');
-  }
-});
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Helpers
 export async function getCurrentSession() {
-  const { data } = await supabase.auth.getSession();
+  const { data, error } = await supabase.auth.getSession();
+  if (error) {
+    console.error('Error getting session:', error);
+    return null;
+  }
   return data.session;
 }
 
@@ -29,6 +26,10 @@ export async function getAccessToken() {
 }
 
 export async function getCurrentUser() {
-  const { data } = await supabase.auth.getUser();
+  const { data, error } = await supabase.auth.getUser();
+  if (error) {
+    // It's common to not have a user if not logged in, so maybe just return null
+    return null;
+  }
   return data?.user ?? null;
 }

@@ -10,6 +10,8 @@ CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     email VARCHAR(255) UNIQUE NOT NULL,
     name VARCHAR(255),
+    carrer VARCHAR(255), -- Carrera del estudiante
+    bio TEXT, -- Biografía del usuario
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -57,6 +59,32 @@ CREATE TABLE IF NOT EXISTS streaks (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Statistics table (port of desktop Statistics model)
+CREATE TABLE IF NOT EXISTS statistics (
+    id SERIAL PRIMARY KEY,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE UNIQUE NOT NULL,
+    start_date TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    end_date TIMESTAMP WITH TIME ZONE,
+    last_racha_date TIMESTAMP WITH TIME ZONE,
+    racha INTEGER DEFAULT 0,
+    total_tasks INTEGER DEFAULT 0,
+    completed_tasks INTEGER DEFAULT 0,
+    daily_goal INTEGER DEFAULT 5,
+    best_streak INTEGER DEFAULT 0,
+    favorite_category INTEGER REFERENCES categories(id)
+);
+
+-- User achievements
+CREATE TABLE IF NOT EXISTS user_achievements (
+    id SERIAL PRIMARY KEY,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+    achievement_id TEXT NOT NULL,
+    progress INTEGER DEFAULT 0,
+    is_completed BOOLEAN DEFAULT FALSE,
+    unlocked_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(user_id, achievement_id)
+);
+
 -- Documents table (for future phase 2)
 CREATE TABLE IF NOT EXISTS documents (
     id SERIAL PRIMARY KEY,
@@ -94,6 +122,8 @@ CREATE INDEX IF NOT EXISTS idx_tasks_completed ON tasks(completed);
 CREATE INDEX IF NOT EXISTS idx_tasks_due_date ON tasks(due_date);
 CREATE INDEX IF NOT EXISTS idx_categories_user_id ON categories(user_id);
 CREATE INDEX IF NOT EXISTS idx_streaks_user_id ON streaks(user_id);
+CREATE INDEX IF NOT EXISTS idx_statistics_user_id ON statistics(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_achievements_user_id ON user_achievements(user_id);
 CREATE INDEX IF NOT EXISTS idx_documents_user_id ON documents(user_id);
 
 -- Triggers for updated_at
@@ -109,3 +139,7 @@ CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users FOR EACH ROW EXECU
 CREATE TRIGGER update_tasks_updated_at BEFORE UPDATE ON tasks FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_streaks_updated_at BEFORE UPDATE ON streaks FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_documents_updated_at BEFORE UPDATE ON documents FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Migration: Add carrer and bio columns to users table (if not exists)
+ALTER TABLE users ADD COLUMN IF NOT EXISTS carrer VARCHAR(255);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS bio TEXT;

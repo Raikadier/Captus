@@ -1,8 +1,12 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Bell, MessageSquare, TrendingUp, CheckSquare, Target, Award } from 'lucide-react'
+import { Bell, MessageSquare, TrendingUp, CheckSquare, Target, Award, Settings, PlusCircle, CheckCircle2, ListChecks } from 'lucide-react'
 import { Button } from '../../ui/button'
 import { Card } from '../../ui/card'
+import apiClient from '../../shared/api/client'
+import Loading from '../../ui/loading'
+import { ManageSubjectsDialog } from '../subjects/components/ManageSubjectsDialog'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
 function getCurrentDate() {
   const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
@@ -22,23 +26,6 @@ function getCurrentDate() {
   ]
   const now = new Date()
   return `${days[now.getDay()]}, ${now.getDate()} de ${months[now.getMonth()]} de ${now.getFullYear()}`
-}
-
-const subjects = [
-  { name: 'Matemáticas III', grade: 8.5, progress: 85, tasks: 12, color: 'blue' },
-  { name: 'Literatura Española', grade: 9.0, progress: 90, tasks: 8, color: 'purple' },
-  { name: 'Historia Mundial', grade: 7.8, progress: 78, tasks: 10, color: 'red' },
-  { name: 'Química Orgánica', grade: 8.2, progress: 82, tasks: 15, color: 'orange' },
-  { name: 'Programación Web', grade: 9.2, progress: 92, tasks: 6, color: 'green' },
-  { name: 'Filosofía Moderna', grade: 8.0, progress: 80, tasks: 9, color: 'yellow' },
-]
-
-const stats = {
-  averageGrade: 8.45,
-  completedTasks: 48,
-  totalTasks: 60,
-  studyHours: 156,
-  streak: 12,
 }
 
 function StatCard({ icon, label, value, bgColor }) {
@@ -73,7 +60,8 @@ function SubjectProgress({ subject }) {
       <div className="flex justify-between items-center mb-2">
         <div>
           <h3 className="font-medium text-gray-900">{subject.name}</h3>
-          <p className="text-sm text-gray-500">{subject.tasks} tareas</p>
+          {/* Display progress if available, or default text */}
+          <p className="text-sm text-gray-500">{subject.progress ? `${subject.progress}% completado` : ''}</p>
         </div>
         <div className="text-right">
           <p className="text-lg font-bold text-gray-900">{subject.grade}</p>
@@ -83,7 +71,7 @@ function SubjectProgress({ subject }) {
       <div className="w-full bg-gray-200 rounded-full h-3">
         <div
           className={`h-3 rounded-full transition-all ${getColorClass(subject.color)}`}
-          style={{ width: `${subject.progress}%` }}
+          style={{ width: `${subject.progress || 0}%` }}
         />
       </div>
     </div>
@@ -91,27 +79,123 @@ function SubjectProgress({ subject }) {
 }
 
 export default function StatsPage() {
-  const completionPercent = Math.round((stats.completedTasks / stats.totalTasks) * 100)
-  const circumference = 2 * Math.PI * 88
-  const strokeDasharray = `${(stats.completedTasks / stats.totalTasks) * circumference} ${circumference}`
+  const [stats, setStats] = useState({
+    averageGrade: 0,
+    completedTasks: 0,
+    totalTasks: 0,
+    studyHours: 0,
+    racha: 0, // Backend uses 'racha' or 'streak'
+    subjects: []
+  });
+  // New state for detailed task stats
+  const [taskStats, setTaskStats] = useState({
+    tasksCreatedToday: 0,
+    tasksCompletedToday: 0,
+    subTasksCompletedToday: 0,
+    productivityChart: [],
+    totalCompleted: 0,
+    weeklyCompletionRate: 0
+  });
+
+  const [loading, setLoading] = useState(true);
+
+  const fetchStats = async () => {
+    try {
+      const [generalResponse, taskResponse] = await Promise.all([
+        apiClient.get('/statistics'),
+        apiClient.get('/statistics/tasks')
+      ]);
+
+      const data = generalResponse.data?.data || generalResponse.data;
+      const tData = taskResponse.data;
+
+      if (data) {
+        setStats({
+          averageGrade: data.averageGrade || 0,
+          completedTasks: data.completedTasks || 0,
+          totalTasks: data.totalTasks || 0,
+          studyHours: data.studyHours || 0,
+          racha: data.racha || data.streak || 0,
+          subjects: data.subjects || []
+        });
+      }
+
+      if (tData) {
+        setTaskStats({
+          tasksCreatedToday: tData.tasksCreatedToday || 0,
+          tasksCompletedToday: tData.tasksCompletedToday || 0,
+          subTasksCompletedToday: tData.subTasksCompletedToday || 0,
+          productivityChart: tData.productivityChart || [],
+          totalCompleted: tData.totalCompleted || 0,
+          weeklyCompletionRate: tData.weeklyCompletionRate || 0
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  // Use taskStats for completion percentage if available, otherwise fallback
+  const completionPercent = taskStats.weeklyCompletionRate;
+
+  const circumference = 2 * Math.PI * 88;
+  const strokeDasharray = `${(completionPercent / 100) * circumference} ${circumference}`;
+
+  if (loading) {
+     return <Loading message="Cargando estadísticas..." />;
+  }
 
   return (
-    <div className="min-h-screen bg-[#F6F7FB]">
+    <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto p-8">
         {/* Header */}
-        <header className="sticky top-0 bg-white rounded-xl shadow-sm p-6 mb-6 z-10">
+        <header className="sticky top-0 bg-card rounded-xl shadow-sm p-6 mb-6 z-10 border border-border">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">📊 Mis Estadísticas</h1>
-              <p className="text-gray-600 mt-1">{getCurrentDate()}</p>
+              <h1 className="text-2xl font-bold text-foreground">📊 Mis Estadísticas</h1>
+              <p className="text-muted-foreground mt-1">{getCurrentDate()}</p>
             </div>
-            <Button variant="outline" className="border-gray-300 relative bg-transparent">
-              <Bell size={18} className="text-gray-500" />
-            </Button>
+            <ManageSubjectsDialog
+              onUpdate={fetchStats}
+              trigger={
+                <Button variant="outline" className="gap-2">
+                  <Settings className="h-4 w-4" />
+                  Gestionar Materias
+                </Button>
+              }
+            />
           </div>
         </header>
 
-        {/* Key Stats */}
+        {/* Daily Stats Row (New Requirement A) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+           <StatCard
+            icon={<PlusCircle className="text-blue-600" size={24} />}
+            label="Tareas Creadas Hoy"
+            value={taskStats.tasksCreatedToday}
+            bgColor="bg-blue-50"
+          />
+          <StatCard
+            icon={<CheckCircle2 className="text-green-600" size={24} />}
+            label="Tareas Completadas Hoy"
+            value={taskStats.tasksCompletedToday}
+            bgColor="bg-green-50"
+          />
+          <StatCard
+            icon={<ListChecks className="text-purple-600" size={24} />}
+            label="Subtareas Completadas"
+            value={taskStats.subTasksCompletedToday}
+            bgColor="bg-purple-50"
+          />
+        </div>
+
+        {/* Key Stats (Existing + Enhanced) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
           <StatCard
             icon={<TrendingUp className="text-green-600" size={28} />}
@@ -121,38 +205,65 @@ export default function StatsPage() {
           />
           <StatCard
             icon={<CheckSquare className="text-blue-600" size={28} />}
-            label="Tareas Completadas"
-            value={`${stats.completedTasks}/${stats.totalTasks}`}
+            label="Total Completadas"
+            value={taskStats.totalCompleted} // Using real total
             bgColor="bg-blue-50"
           />
           <StatCard
             icon={<Target className="text-orange-600" size={28} />}
-            label="Horas de Estudio"
-            value={`${stats.studyHours}h`}
+            label="Productividad Semanal"
+            value={`${taskStats.weeklyCompletionRate}%`} // Using real rate
             bgColor="bg-orange-50"
           />
           <StatCard
             icon={<Award className="text-purple-600" size={28} />}
             label="Racha Actual"
-            value={`${stats.streak} días`}
+            value={`${stats.racha} días`}
             bgColor="bg-purple-50"
           />
         </div>
 
         {/* Progress by Subject */}
-        <Card className="p-6 bg-white rounded-xl shadow-sm mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">Progreso por Materia</h2>
-          <div className="space-y-6">
-            {subjects.map((subject) => (
-              <SubjectProgress key={subject.name} subject={subject} />
-            ))}
-          </div>
-        </Card>
+        {stats.subjects && stats.subjects.length > 0 ? (
+          <Card className="p-6 bg-card rounded-xl shadow-sm mb-6 border border-border">
+            <h2 className="text-xl font-semibold text-foreground mb-6">Progreso por Materia</h2>
+            <div className="space-y-6">
+              {stats.subjects.map((subject) => (
+                <SubjectProgress key={subject.id || subject.name} subject={subject} />
+              ))}
+            </div>
+          </Card>
+        ) : (
+           <Card className="p-6 bg-card rounded-xl shadow-sm mb-6 border border-border">
+              <h2 className="text-xl font-semibold text-foreground mb-2">Materias</h2>
+              <p className="text-muted-foreground">No hay materias registradas aún. ¡Agrega algunas para ver tu progreso académico!</p>
+           </Card>
+        )}
 
-        {/* Charts mock (no external libs) */}
+        {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="p-6 bg-white rounded-xl shadow-sm">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Completación de Tareas</h2>
+          {/* Weekly Productivity Chart (New Requirement B) */}
+          <Card className="p-6 bg-card rounded-xl shadow-sm border border-border">
+            <h2 className="text-xl font-semibold text-foreground mb-4">Productividad Semanal</h2>
+            <div className="h-64 w-full">
+               <ResponsiveContainer width="100%" height="100%">
+                 <BarChart data={taskStats.productivityChart}>
+                    <XAxis dataKey="day" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                    <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}`} />
+                    <Tooltip
+                      cursor={{fill: 'transparent'}}
+                      contentStyle={{ backgroundColor: 'var(--card)', borderRadius: '8px', border: '1px solid var(--border)' }}
+                    />
+                    <Bar dataKey="created" name="Creadas" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="completed" name="Completadas" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                 </BarChart>
+               </ResponsiveContainer>
+            </div>
+          </Card>
+
+          {/* Completion Circle */}
+          <Card className="p-6 bg-card rounded-xl shadow-sm border border-border">
+            <h2 className="text-xl font-semibold text-foreground mb-4">Tasa de Cumplimiento Semanal</h2>
             <div className="flex items-center justify-center h-64">
               <div className="relative w-48 h-48">
                 <svg className="transform -rotate-90 w-48 h-48">
@@ -169,19 +280,10 @@ export default function StatsPage() {
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center flex-col">
-                  <span className="text-4xl font-bold text-gray-900">{completionPercent}%</span>
-                  <span className="text-sm text-gray-500">Completado</span>
+                  <span className="text-4xl font-bold text-foreground">{completionPercent}%</span>
+                  <span className="text-sm text-muted-foreground">Esta Semana</span>
                 </div>
               </div>
-            </div>
-          </Card>
-
-          <Card className="p-6 bg-white rounded-xl shadow-sm">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Rendimiento Mensual</h2>
-            <div className="space-y-4">
-              <MonthBar month="Septiembre" color="bg-blue-600" value={75} label="7.5" />
-              <MonthBar month="Octubre" color="bg-green-600" value={85} label="8.5" />
-              <MonthBar month="Noviembre" color="bg-green-600" value={90} label="9.0" />
             </div>
           </Card>
         </div>

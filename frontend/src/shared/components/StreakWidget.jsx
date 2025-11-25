@@ -1,6 +1,7 @@
 // StreakWidget - Widget mejorado con animación y mejor diseño
 import React, { useState, useEffect } from 'react';
 import { Flame, Target, Calendar } from 'lucide-react';
+import Loading from '../../ui/loading';
 import apiClient from '../api/client';
 
 const StreakWidget = () => {
@@ -14,8 +15,8 @@ const StreakWidget = () => {
 
   useEffect(() => {
     // Animate streak number
-    if (streakData?.current_streak !== undefined) {
-      const targetStreak = streakData.current_streak;
+    if (streakData?.currentStreak !== undefined) {
+      const targetStreak = streakData.currentStreak;
       const duration = 1000; // 1 second
       const steps = 60;
       const increment = targetStreak / steps;
@@ -33,30 +34,31 @@ const StreakWidget = () => {
 
       return () => clearInterval(timer);
     }
-  }, [streakData?.current_streak]);
+  }, [streakData?.currentStreak]);
 
   const fetchStreakData = async () => {
     try {
-      const response = await apiClient.get('/streaks');
+      // Use the statistics endpoint for streak data
+      const response = await apiClient.get('/statistics/streak-stats');
       const data = response?.data;
       if (data) {
         setStreakData(data);
       } else {
         // Default streak data if none exists
         setStreakData({
-          current_streak: 0,
-          last_completed_date: null,
-          daily_goal: 5,
-          completed_today: 0
+          currentStreak: 0,
+          lastCompletedDate: null,
+          dailyGoal: 5,
+          completionRate: 0
         });
       }
     } catch (error) {
       console.error('Error fetching streak data:', error);
       setStreakData({
-        current_streak: 0,
-        last_completed_date: null,
-        daily_goal: 5,
-        completed_today: 0
+        currentStreak: 0,
+        lastCompletedDate: null,
+        dailyGoal: 5,
+        completionRate: 0
       });
     } finally {
       setLoading(false);
@@ -65,44 +67,44 @@ const StreakWidget = () => {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <div className="text-center text-gray-500">Cargando racha...</div>
+      <div className="bg-card rounded-xl shadow-sm p-6">
+        <Loading message="Cargando racha..." fullScreen={false} />
       </div>
     );
   }
 
   if (!streakData) {
     return (
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <div className="text-center text-gray-500">No se pudo cargar la información de racha</div>
+      <div className="bg-card rounded-xl shadow-sm p-6">
+        <div className="text-center text-muted-foreground">No se pudo cargar la información de racha</div>
       </div>
     );
   }
 
-  const isStreakActive = streakData.last_completed_date &&
-    new Date(streakData.last_completed_date).toDateString() === new Date().toDateString();
+  const isStreakActive = streakData.lastCompletedDate &&
+    new Date(streakData.lastCompletedDate).toDateString() === new Date().toDateString();
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6">
+    <div className="bg-card rounded-xl shadow-sm p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-bold text-gray-800 flex items-center">
+        <h3 className="text-lg font-bold text-foreground flex items-center">
           <Flame className="mr-2 text-orange-500" size={20} />
           Mi Racha
         </h3>
-        <div className="flex items-center text-sm text-gray-600">
+        <div className="flex items-center text-sm text-muted-foreground">
           <Target size={16} className="mr-1" />
-          Meta: {streakData.daily_goal} tareas/día
+          Meta: {streakData.dailyGoal} tareas/día
         </div>
       </div>
 
       {/* Streak counter */}
       <div className="text-center mb-4">
         <div className={`text-6xl font-bold mb-2 ${
-          animatedStreak > 0 ? 'text-orange-500' : 'text-gray-400'
+          animatedStreak > 0 ? 'text-orange-500' : 'text-muted-foreground'
         }`}>
           {animatedStreak}
         </div>
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-muted-foreground">
           {animatedStreak === 1 ? 'día consecutivo' : 'días consecutivos'}
         </div>
       </div>
@@ -110,38 +112,31 @@ const StreakWidget = () => {
       {/* Streak status */}
       <div className="text-center mb-4">
         {isStreakActive ? (
-          <div className="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm">
+          <div className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-sm">
             <Flame size={14} className="mr-1" />
             ¡Racha activa!
           </div>
         ) : (
-          <div className="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-sm">
+          <div className="inline-flex items-center px-3 py-1 rounded-full bg-muted text-muted-foreground text-sm">
             <Calendar size={14} className="mr-1" />
             Completa tareas hoy para mantener la racha
           </div>
         )}
       </div>
 
-      {/* Progress towards daily goal */}
-      <div className="mb-4">
-        <div className="flex justify-between text-sm text-gray-600 mb-1">
-          <span>Progreso diario</span>
-          <span>{streakData.completed_today || 0}/{streakData.daily_goal}</span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div
-            className="bg-green-500 h-2 rounded-full transition-all duration-500"
-            style={{
-              width: `${Math.min((streakData.completed_today || 0) / streakData.daily_goal * 100, 100)}%`
-            }}
-          ></div>
-        </div>
-      </div>
+      {/* Progress towards daily goal (using completionRate as proxy if daily completions not sent explicitly,
+          or assuming 0/goal if not in stats payload. The stats payload has completionRate over 30 days,
+          but not 'completed_today'. We might need to adjust backend if we want today's precise progress bar here.
+          For now, let's hide the progress bar if we don't have 'completed_today' or mock it based on activity) */}
+
+      {/* Note: The original mockup used 'completed_today'. The /streaks/stats endpoint returns 'completionRate'.
+          If we want 'completed_today' we might need to call /streaks or just accept the stats data.
+          Let's render what we have safely. */}
 
       {/* Last completed date */}
-      {streakData.last_completed_date && (
-        <div className="text-center text-xs text-gray-500">
-          Última tarea completada: {new Date(streakData.last_completed_date).toLocaleDateString('es-ES')}
+      {streakData.lastCompletedDate && (
+        <div className="text-center text-xs text-muted-foreground mt-2">
+          Última: {new Date(streakData.lastCompletedDate).toLocaleDateString('es-ES')}
         </div>
       )}
     </div>
