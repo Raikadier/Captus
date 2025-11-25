@@ -34,14 +34,14 @@ export default function StudentCoursesPage() {
     <div className="p-6 space-y-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6 flex justify-between items-center">
+        <div className="bg-card rounded-xl shadow-sm p-6 mb-6 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
               <BookOpen className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Mis Cursos</h1>
-              <p className="text-sm text-gray-600">Gestiona tus cursos inscritos</p>
+              <h1 className="text-2xl font-bold text-foreground">Mis Cursos</h1>
+              <p className="text-sm text-muted-foreground">Gestiona tus cursos inscritos</p>
             </div>
           </div>
 
@@ -74,33 +74,33 @@ export default function StudentCoursesPage() {
         {/* Courses Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {courses.length === 0 && (
-              <div className="col-span-3 text-center py-10 text-gray-500">
+              <div className="col-span-3 text-center py-10 text-muted-foreground">
                   No estás inscrito en ningún curso. ¡Únete a uno!
               </div>
           )}
           {courses.map((course) => (
             <div
               key={course.id}
-              className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow cursor-pointer hover:scale-[1.02] duration-200"
+              className="bg-card rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow cursor-pointer hover:scale-[1.02] duration-200"
               onClick={() => navigate(`/courses/${course.id}`)}
             >
               <div
                 className="w-full h-32 rounded-lg mb-4 bg-blue-500" // Fallback color
                 style={{ backgroundColor: course.color || '#3b82f6' }}
               />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-foreground mb-2">
                 {course.title}
               </h3>
-              <p className="text-sm text-gray-600 mb-4">{course.professor}</p>
+              <p className="text-sm text-muted-foreground mb-4">{course.professor}</p>
 
               <div className="space-y-2 mb-4">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Progreso</span>
-                  <span className="font-semibold text-gray-900">
+                  <span className="text-muted-foreground">Progreso</span>
+                  <span className="font-semibold text-foreground">
                     {course.progress}%
                   </span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="w-full bg-muted rounded-full h-2">
                   <div
                     className="bg-primary h-2 rounded-full transition-all"
                     style={{ width: `${course.progress}%` }}
@@ -109,13 +109,13 @@ export default function StudentCoursesPage() {
               </div>
 
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1 text-sm text-gray-600">
+                <div className="flex items-center gap-1 text-sm text-muted-foreground">
                   <Clock className="w-4 h-4" />
                   <span>Inscrito: {new Date(course.enrolled_at).toLocaleDateString()}</span>
                 </div>
                 <Button
                   size="sm"
-                  className="bg-primary hover:bg-primary/90 text-white"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground"
                   onClick={(e) => {
                     e.stopPropagation()
                     navigate(`/courses/${course.id}`)

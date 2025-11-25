@@ -9,7 +9,7 @@ export default function Loading({ message = 'Cargando...', fullScreen = true }) 
     <div className={containerClass}>
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-        <p className="mt-4 text-gray-600">{message}</p>
+        {message && <p className="mt-4 text-muted-foreground">{message}</p>}
       </div>
     </div>
   )

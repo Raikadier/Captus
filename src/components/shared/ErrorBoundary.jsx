@@ -23,7 +23,6 @@ class ErrorBoundary extends React.Component {
           <p className="text-sm text-red-600 mb-4">Ha ocurrido un error al cargar este componente.</p>
           <Button
             variant="outline"
-            className="bg-white"
             onClick={() => this.setState({ hasError: false })}
           >
             Intentar de nuevo

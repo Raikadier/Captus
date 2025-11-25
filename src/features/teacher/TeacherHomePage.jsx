@@ -40,14 +40,14 @@ export default function TeacherHomePage() {
 
   return (
     <div className="p-6 space-y-6 animate-in fade-in duration-500">
-      <div className="bg-white rounded-xl shadow-sm p-6">
+      <div className="bg-card rounded-xl shadow-sm p-6">
         <div className="flex items-start space-x-4">
           <div className="bg-primary/10 p-3 rounded-xl">
             <BookOpen className="text-primary" size={32} />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Bienvenid@ {(user?.user_metadata?.name || user?.name || 'Profesor').split(' ')[0]}</h1>
-            <p className="text-gray-600 mt-1">Revisa tus cursos y actividades académicas</p>
+            <h1 className="text-3xl font-bold text-foreground">Bienvenid@ {(user?.user_metadata?.name || user?.name || 'Profesor').split(' ')[0]}</h1>
+            <p className="text-muted-foreground mt-1">Revisa tus cursos y actividades académicas</p>
           </div>
         </div>
       </div>
@@ -89,17 +89,17 @@ export default function TeacherHomePage() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {mockCourses.map((course) => (
-                <div key={course.id} className="p-4 border border-gray-200 rounded-xl hover:shadow-md transition-all">
+                <div key={course.id} className="p-4 border border-border rounded-xl hover:shadow-md transition-all">
                   <div className="flex items-start justify-between">
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900">{course.name}</h3>
-                      <p className="text-sm text-gray-600">{course.students} estudiantes</p>
+                      <h3 className="text-lg font-semibold text-foreground">{course.name}</h3>
+                      <p className="text-sm text-muted-foreground">{course.students} estudiantes</p>
                     </div>
                     <Button variant="ghost" size="sm" onClick={() => navigate(`/teacher/courses/${course.id}`)}>
                       Ver curso
                     </Button>
                   </div>
-                  <div className="mt-3 text-sm text-gray-600">Tareas pendientes: {course.pendingTasks}</div>
+                  <div className="mt-3 text-sm text-muted-foreground">Tareas pendientes: {course.pendingTasks}</div>
                 </div>
               ))}
             </div>
@@ -115,10 +115,10 @@ export default function TeacherHomePage() {
           </CardHeader>
           <CardContent className="space-y-3">
             {mockUpcomingEvents.map((event) => (
-              <div key={event.id} className="p-3 border border-gray-200 rounded-lg flex items-center justify-between">
+              <div key={event.id} className="p-3 border border-border rounded-lg flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-gray-900">{event.title}</p>
-                  <p className="text-sm text-gray-600">{event.date} • {event.time}</p>
+                  <p className="font-medium text-foreground">{event.title}</p>
+                  <p className="text-sm text-muted-foreground">{event.date} • {event.time}</p>
                 </div>
                 <Button variant="ghost" size="sm">
                   Ver
@@ -137,10 +137,10 @@ export default function TeacherHomePage() {
           </CardHeader>
           <CardContent className="space-y-3">
             {mockPendingReviews.map((review) => (
-              <div key={review.id} className="p-3 border border-gray-200 rounded-lg flex items-center justify-between">
+              <div key={review.id} className="p-3 border border-border rounded-lg flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-gray-900">{review.student}</p>
-                  <p className="text-sm text-gray-600">{review.task} • {review.course}</p>
+                  <p className="font-medium text-foreground">{review.student}</p>
+                  <p className="text-sm text-muted-foreground">{review.task} • {review.course}</p>
                 </div>
                 <Button variant="outline" size="sm" onClick={() => navigate(`/teacher/reviews/${review.id}`)}>
                   Revisar

@@ -98,7 +98,7 @@ export default function TeacherReviewsPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="bg-white rounded-xl shadow-sm p-6 flex items-center gap-3">
+      <div className="bg-card rounded-xl shadow-sm p-6 flex items-center gap-3">
         <Button variant="ghost" onClick={() => navigate(-1)} className="mr-2">
             <ArrowLeft className="w-4 h-4" />
         </Button>
@@ -106,8 +106,8 @@ export default function TeacherReviewsPage() {
           <ListChecks className="text-primary" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Revisiones: {assignment?.title || 'Cargando...'}</h1>
-          <p className="text-sm text-gray-600">Total entregas: {displayedSubmissions.length}</p>
+          <h1 className="text-2xl font-bold text-foreground">Revisiones: {assignment?.title || 'Cargando...'}</h1>
+          <p className="text-sm text-muted-foreground">Total entregas: {displayedSubmissions.length}</p>
         </div>
       </div>
 
@@ -118,11 +118,11 @@ export default function TeacherReviewsPage() {
                        <div className="flex items-center gap-4">
                            <div className={`w-2 h-12 rounded-full ${sub.graded ? 'bg-green-500' : 'bg-yellow-500'}`} />
                            <div>
-                               <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                               <h3 className="font-bold text-foreground flex items-center gap-2">
                                    {sub.student?.name || sub.student?.email || (sub.group ? `Grupo: ${sub.group.name}` : 'Desconocido')}
-                                   {sub.is_mock && <span className="text-xs text-gray-400 font-normal">(Mock)</span>}
+                                   {sub.is_mock && <span className="text-xs text-muted-foreground font-normal">(Mock)</span>}
                                </h3>
-                               <div className="text-sm text-gray-500 flex items-center gap-2">
+                               <div className="text-sm text-muted-foreground flex items-center gap-2">
                                    <Clock className="w-3 h-3" />
                                    Entregado: {new Date(sub.submitted_at).toLocaleString()}
                                </div>
@@ -136,7 +136,7 @@ export default function TeacherReviewsPage() {
                            {sub.graded && (
                                <div className="text-right mr-4">
                                    <div className="text-2xl font-bold text-green-700">{sub.grade}</div>
-                                   <div className="text-xs text-gray-500">Calificado</div>
+                                   <div className="text-xs text-muted-foreground">Calificado</div>
                                </div>
                            )}
 
@@ -177,7 +177,7 @@ export default function TeacherReviewsPage() {
                </Card>
            ))}
            {displayedSubmissions.length === 0 && (
-               <div className="text-center py-12 text-gray-500 bg-white rounded-xl border border-dashed border-gray-300">
+               <div className="text-center py-12 text-muted-foreground bg-card rounded-xl border border-dashed border-border">
                    No hay entregas para esta tarea aún.
                </div>
            )}
