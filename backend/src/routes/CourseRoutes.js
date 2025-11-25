@@ -2,12 +2,12 @@ import express from 'express';
 import { CourseController } from '../controllers/CourseController.js';
 import buildSupabaseAuthMiddleware from '../middlewares/verifySupabaseToken.js';
 import { requireTeacherRole } from '../middlewares/requireRole.js';
-import { getSupabaseClient } from '../lib/supabaseAdmin.js';
+import { requireSupabaseClient } from '../lib/supabaseAdmin.js';
 import { injectUserRole } from '../middlewares/injectUserRole.js';
 
 const router = express.Router();
 const controller = new CourseController();
-const supabaseAdmin = getSupabaseClient();
+const supabaseAdmin = requireSupabaseClient();
 const verifySupabaseToken = buildSupabaseAuthMiddleware(supabaseAdmin);
 
 // Middleware pipeline

@@ -1,11 +1,11 @@
 import express from "express";
 import { UserController } from "../controllers/UserController.js";
 import buildSupabaseAuthMiddleware from "../middlewares/verifySupabaseToken.js";
-import { getSupabaseClient } from "../lib/supabaseAdmin.js";
+import { requireSupabaseClient } from "../lib/supabaseAdmin.js";
 
 const router = express.Router();
 const userController = new UserController();
-const supabaseAdmin = getSupabaseClient();
+const supabaseAdmin = requireSupabaseClient();
 const verifySupabaseToken = buildSupabaseAuthMiddleware(supabaseAdmin);
 
 // Rutas públicas

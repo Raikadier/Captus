@@ -29,7 +29,7 @@ import SubmissionRoutes from './routes/SubmissionRoutes.js';
 import AcademicGroupRoutes from './routes/AcademicGroupRoutes.js';
 import NotificationRoutes from './routes/NotificationRoutes.js';
 import aiRouter from './routes/ai.js';
-import { getSupabaseClient } from './lib/supabaseAdmin.js';
+import { requireSupabaseClient } from './lib/supabaseAdmin.js';
 
 // Ensure dotenv is configured before anything else if possible,
 // though imports are hoisted, side-effect imports like 'dotenv/config' are better.

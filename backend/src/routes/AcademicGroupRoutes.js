@@ -1,12 +1,12 @@
 import express from 'express';
 import { AcademicGroupController } from '../controllers/AcademicGroupController.js';
 import buildSupabaseAuthMiddleware from '../middlewares/verifySupabaseToken.js';
-import { getSupabaseClient } from '../lib/supabaseAdmin.js';
+import { requireSupabaseClient } from '../lib/supabaseAdmin.js';
 import { injectUserRole } from '../middlewares/injectUserRole.js';
 
 const router = express.Router();
 const controller = new AcademicGroupController();
-const supabaseAdmin = getSupabaseClient();
+const supabaseAdmin = requireSupabaseClient();
 const verifySupabaseToken = buildSupabaseAuthMiddleware(supabaseAdmin);
 
 router.use(verifySupabaseToken);
