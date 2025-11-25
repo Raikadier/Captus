@@ -56,11 +56,19 @@ AI: { "tool": "create_task", "input": { "title": "comprar leche", "description":
         console.info("[AI/orchestrator] executing tool", { userId, tool: parsed.tool, ms: duration });
         const result = await tools[parsed.tool].handler(parsed.input);
 
+        // Generate a more user-friendly result message
+        let userMessage = `Acción '${parsed.tool}' completada.`;
+        if (parsed.tool === 'create_task') {
+          userMessage = 'Tarea creada exitosamente.';
+        } else if (parsed.tool === 'create_event') {
+          userMessage = 'Evento creado exitosamente.';
+        }
+
         // Return a structured response that the controller can use
         return {
-          result: `He ejecutado la acción: ${parsed.tool}. Resultado: éxito.`,
+          result: userMessage,
           actionPerformed: parsed.tool,
-          data: result.data // Optional: pass back data if needed
+          data: result.data, // Optional: pass back data if needed
         };
       }
     } catch (e) {
