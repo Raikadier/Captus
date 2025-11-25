@@ -105,7 +105,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // AI routes
 if (ENV_OK && supabaseAdmin) {
-  app.use('/ai', verifySupabaseToken, aiRouter);
+  app.use('/api/ai', verifySupabaseToken, aiRouter);
 }
 
 // Extended API routes
