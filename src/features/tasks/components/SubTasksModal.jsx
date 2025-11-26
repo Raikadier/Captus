@@ -86,9 +86,20 @@ const SubTasksModal = ({ task, isOpen, onClose, useSubTasks }) => {
   };
 
   const handleToggle = async (subTaskId) => {
+    const subTask = subTasks.find(st => st.id_SubTask === subTaskId);
+    if (!subTask) return;
+
     const result = await toggleSubTask(subTaskId);
     if (!result.success) {
       alert(result.error);
+      return;
+    }
+
+    // Check if all subtasks are now completed
+    const newCompletedCount = completedCount + (subTask.state ? -1 : 1);
+    if (newCompletedCount === totalCount && totalCount > 0) {
+      // Backend will automatically complete parent task
+      // No need to refresh here as backend handles it
     }
   };
 
@@ -128,16 +139,18 @@ const SubTasksModal = ({ task, isOpen, onClose, useSubTasks }) => {
           </div>
 
           {/* Add SubTask Button */}
-          <div className="mb-4">
-            <Button
-              onClick={() => setShowCreateForm(!showCreateForm)}
-              className="w-full"
-              variant="outline"
-            >
-              <Plus size={16} className="mr-2" />
-              {showCreateForm ? 'Cancelar' : 'Agregar Subtarea'}
-            </Button>
-          </div>
+          {!task.completed && (
+            <div className="mb-4">
+              <Button
+                onClick={() => setShowCreateForm(!showCreateForm)}
+                className="w-full"
+                variant="outline"
+              >
+                <Plus size={16} className="mr-2" />
+                {showCreateForm ? 'Cancelar' : 'Agregar Subtarea'}
+              </Button>
+            </div>
+          )}
 
           {/* Create/Edit Form */}
           {showCreateForm && (

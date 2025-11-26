@@ -29,7 +29,8 @@ const TaskPage = () => {
     createTask,
     updateTask,
     deleteTask,
-    toggleTaskCompletion
+    toggleTaskCompletion,
+    refetch
   } = useTasks();
 
   const [categories, setCategories] = useState([]);
@@ -73,21 +74,19 @@ const TaskPage = () => {
   const checkTasksWithSubTasks = async () => {
     if (tasks.length === 0) return;
 
-    const tasksWithSubs = new Set();
-
-    // Check each task for subtasks
-    for (const task of tasks) {
-      try {
-        const response = await apiClient.get(`/subtasks/task/${task.id}`);
-        if (response.data.success && response.data.data.length > 0) {
-          tasksWithSubs.add(task.id);
-        }
-      } catch (error) {
-        console.error(`Error checking subtasks for task ${task.id}:`, error);
+    try {
+      const response = await apiClient.get('/subtasks/tasks/with-subtasks');
+      if (response.data.success) {
+        const taskIdsWithSubTasks = new Set(response.data.data);
+        setTasksWithSubTasks(taskIdsWithSubTasks);
+      } else {
+        console.error('Error fetching tasks with subtasks:', response.data.message);
+        setTasksWithSubTasks(new Set());
       }
+    } catch (error) {
+      console.error('Error checking tasks with subtasks:', error);
+      setTasksWithSubTasks(new Set());
     }
-
-    setTasksWithSubTasks(tasksWithSubs);
   };
 
   const handleCreateTask = async (taskData) => {
@@ -421,6 +420,7 @@ const TaskPage = () => {
                       onToggleComplete={(taskId) => toggleTaskCompletion(taskId)}
                       onEdit={handleEditTask}
                       onDelete={handleDeleteTask}
+                      onRefreshTasks={refetch}
                     />
                   ))}
               </div>
@@ -430,8 +430,8 @@ const TaskPage = () => {
               <div className="space-y-4">
                 {filteredTasks
                   .filter((task) => {
-                    // Mostrar solo tareas que tienen subtareas
-                    return tasksWithSubTasks.has(task.id);
+                    // Mostrar solo tareas no completadas que tienen subtareas
+                    return !task.completed && tasksWithSubTasks.has(task.id);
                   })
                   .map((task) => (
                     <TaskCard
