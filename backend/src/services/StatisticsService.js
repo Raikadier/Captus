@@ -23,10 +23,13 @@ export class StatisticsService {
     subjectService.setCurrentUser(user);
   }
 
-  // ✅ Enhanced Dashboard Stats
+  // ✅ Enhanced Dashboard Stats - Focused on streak and favorite category
   async getDashboardStats() {
      try {
        if (!this.currentUser) return new OperationResult(false, "Not authenticated");
+
+       // Check and update streak before getting stats
+       await this.checkStreak();
 
        // Get base stats
        const baseStats = await this.getByCurrentUser();
@@ -39,16 +42,14 @@ export class StatisticsService {
          ? subjects.reduce((acc, sub) => acc + sub.grade, 0) / subjects.length
          : 0;
 
-       // Calculate "study hours" (mocked for now or sum from sessions if table exists)
-       // For now we return a placeholder or if we implemented StudySessionsRepository we would sum it.
-       // Let's assume 0 for now until StudySessions are fully hooked up, or mock it based on tasks completed
-       const studyHours = Math.round(baseStats.completedTasks * 0.5); // Estimate 30 mins per task
+       // Get favorite category analysis
+       const favoriteCategoryAnalysis = await this.getFavoriteCategoryAnalysis();
 
        return new OperationResult(true, "Dashboard stats retrieved", {
           ...baseStats,
           averageGrade: parseFloat(averageGrade.toFixed(2)),
-          studyHours,
-          subjects // Include subjects for the progress bars
+          subjects,
+          favoriteCategoryAnalysis
        });
      } catch (error) {
        return new OperationResult(false, `Error fetching dashboard stats: ${error.message}`);
@@ -98,54 +99,91 @@ export class StatisticsService {
 
   // ... [Rest of the existing methods remain unchanged, just re-exporting them below] ...
 
-  async checkStreak() {
-    try {
-      const stats = await this.getByCurrentUser();
-      if (!stats) return;
+ async checkStreak() {
+   try {
+     const stats = await this.getByCurrentUser();
+     if (!stats) return;
 
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+     const today = new Date();
+     today.setHours(0, 0, 0, 0);
+     const yesterday = new Date(today);
+     yesterday.setDate(yesterday.getDate() - 1);
 
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
+     // Get tasks completed today
+     const completedTodayResult = await taskService.getCompletedTodayByUser();
+     const tasksCompletedToday = completedTodayResult.success ? completedTodayResult.data.length : 0;
 
-      const completedTodayResult = await taskService.getCompletedTodayByUser();
-      const completedToday = completedTodayResult.success ? completedTodayResult.data.length : 0;
+     console.log(`[STREAK] Checking streak: ${tasksCompletedToday}/${stats.dailyGoal} tasks completed today`);
 
-      let streakChanged = false;
+     let streakChanged = false;
+     const lastCompletionDate = stats.lastRachaDate ? new Date(stats.lastRachaDate) : null;
+     const lastCompletionDateString = lastCompletionDate ? lastCompletionDate.toDateString() : null;
+     const todayString = today.toDateString();
+     const yesterdayString = yesterday.toDateString();
 
-      if (completedToday < stats.dailyGoal) {
-        if (!stats.lastRachaDate || new Date(stats.lastRachaDate).getTime() < yesterday.getTime()) {
-          stats.racha = 0;
-          stats.lastRachaDate = null;
-          streakChanged = true;
-          await statisticsRepository.update(stats);
-        }
-      } else {
-        if (!stats.lastRachaDate || new Date(stats.lastRachaDate).getTime() < today.getTime()) {
-          if (stats.lastRachaDate && new Date(stats.lastRachaDate).getTime() === yesterday.getTime()) {
-            stats.racha += 1;
-            streakChanged = true;
-          } else {
-            stats.racha = 1;
-            streakChanged = true;
-          }
+     console.log(`[STREAK] Last completion: ${lastCompletionDateString}, Today: ${todayString}, Yesterday: ${yesterdayString}`);
+     console.log(`[STREAK] Current streak before check: ${stats.racha}`);
 
-          stats.lastRachaDate = today;
-          await statisticsRepository.update(stats);
-        }
-      }
+     if (tasksCompletedToday >= stats.dailyGoal) {
+       // Goal achieved today
+       console.log(`[STREAK] Goal achieved! Current streak: ${stats.racha}`);
 
-      if (streakChanged && stats.racha > stats.bestStreak) {
-        stats.bestStreak = stats.racha;
-        await statisticsRepository.update(stats);
-      }
+       if (!lastCompletionDate || lastCompletionDateString !== todayString) {
+         // Check if yesterday was also completed (consecutive streak)
+         const yesterdayCompleted = lastCompletionDateString === yesterdayString;
 
-      await this.checkAchievements();
-    } catch (error) {
-      console.error("Error verificando racha:", error);
-    }
-  }
+         if (yesterdayCompleted) {
+           stats.racha += 1;
+           console.log(`[STREAK] Consecutive day! New streak: ${stats.racha}`);
+         } else {
+           stats.racha = 1;
+           console.log(`[STREAK] New streak started: ${stats.racha}`);
+         }
+
+         stats.lastRachaDate = today;
+         streakChanged = true;
+       } else {
+         console.log(`[STREAK] Already updated for today`);
+       }
+     } else {
+       // Goal not achieved today - check if we need to reset streak
+       console.log(`[STREAK] Goal not achieved. Checking if streak should reset...`);
+
+       if (lastCompletionDate && lastCompletionDateString !== todayString && lastCompletionDateString !== yesterdayString) {
+         // Last completion was before yesterday, reset streak
+         console.log(`[STREAK] Resetting streak from ${stats.racha} to 0`);
+         stats.racha = 0;
+         stats.lastRachaDate = null;
+         streakChanged = true;
+       } else {
+         console.log(`[STREAK] Streak maintained: ${stats.racha}`);
+       }
+     }
+
+     // Update best streak if current is higher
+     if (stats.racha > stats.bestStreak) {
+       stats.bestStreak = stats.racha;
+       console.log(`[STREAK] New best streak: ${stats.bestStreak}`);
+       streakChanged = true;
+     }
+
+     if (streakChanged) {
+       console.log(`[STREAK] Updating stats in database...`);
+       await statisticsRepository.update(stats);
+     } else {
+       console.log(`[STREAK] No changes needed`);
+     }
+
+     try {
+       await this.checkAchievements();
+     } catch (error) {
+       // Ignore achievements errors for now
+       console.log('[STREAK] Achievements check failed, ignoring');
+     }
+   } catch (error) {
+     console.error("Error verificando racha:", error);
+   }
+ }
 
   async updateGeneralStats() {
     try {
@@ -447,7 +485,7 @@ export class StatisticsService {
 
   async updateDailyGoal(newGoal) {
     try {
-      if (!newGoal || newGoal <= 0) return new OperationResult(false, "La meta diaria debe ser mayor a 0.");
+      if (!newGoal || newGoal < 3) return new OperationResult(false, "La meta diaria debe ser al menos 3 tareas.");
       const stats = await this.getByCurrentUser();
       if (!stats) return new OperationResult(false, "Estadísticas no encontradas.");
       stats.dailyGoal = newGoal;
@@ -538,14 +576,11 @@ export class StatisticsService {
       if (completedError) throw completedError;
 
       // 3. Subtasks Completed Today
-      // Assuming subtasks have parent_task_id IS NOT NULL
-      // Checking if 'parent_task_id' exists in schema: Memory says "self-referencing parent_task_id column".
       const { count: subTasksCompletedToday, error: subError } = await supabase
-        .from('tasks')
+        .from('subtasks')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', userId)
-        .not('parent_task_id', 'is', null)
-        .eq('completed', true)
+        .eq('state', true)
         .gte('updated_at', todayStart.toISOString())
         .lte('updated_at', todayEnd.toISOString());
 
@@ -597,12 +632,20 @@ export class StatisticsService {
       const completedCountWeek = completedLastWeek.length;
       const weeklyCompletionRate = createdCountWeek > 0 ? Math.round((completedCountWeek / createdCountWeek) * 100) : 0;
 
+      // 7. Total Subtasks Completed (Historical)
+      const { count: totalSubTasksCompleted, error: subTasksError } = await supabase
+        .from('subtasks')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .eq('state', true);
+
       return new OperationResult(true, "Estadísticas de tareas obtenidas", {
         tasksCreatedToday: tasksCreatedToday || 0,
         tasksCompletedToday: tasksCompletedToday || 0,
         subTasksCompletedToday: subTasksCompletedToday || 0,
         productivityChart,
         totalCompleted: totalCompleted || 0,
+        totalSubTasksCompleted: totalSubTasksCompleted || 0,
         weeklyCompletionRate
       });
 
@@ -610,6 +653,116 @@ export class StatisticsService {
       console.error("Error fetching task stats:", error);
       // Fallback in case of column missing or other errors
       return new OperationResult(false, `Error obteniendo estadísticas de tareas: ${error.message}`);
+    }
+  }
+
+  // ✅ Favorite Category Analysis - Intelligent Algorithm
+  async getFavoriteCategoryAnalysis() {
+    try {
+      if (!this.currentUser) return null;
+
+      // Get all tasks for the user
+      const allTasks = await taskService.getAll();
+      if (!allTasks.success) return null;
+
+      const tasks = allTasks.data;
+
+      // Group tasks by category and calculate metrics
+      const categoryStats = {};
+
+      for (const task of tasks) {
+        if (task.id_Category) {
+          const categoryId = task.id_Category;
+
+          if (!categoryStats[categoryId]) {
+            categoryStats[categoryId] = {
+              id: categoryId,
+              totalTasks: 0,
+              completedTasks: 0,
+              completionRate: 0,
+              score: 0
+            };
+          }
+
+          categoryStats[categoryId].totalTasks += 1;
+          if (task.state) {
+            categoryStats[categoryId].completedTasks += 1;
+          }
+        }
+      }
+
+      // Calculate completion rates and scores
+      const categories = Object.values(categoryStats);
+      categories.forEach(cat => {
+        cat.completionRate = cat.totalTasks > 0 ? cat.completedTasks / cat.totalTasks : 0;
+        // Score formula: completion rate * log(total tasks + 1)
+        // This prioritizes effectiveness over volume, but considers both
+        cat.score = cat.completionRate * Math.log(cat.totalTasks + 1);
+      });
+
+      // Find the category with the highest score
+      if (categories.length === 0) return null;
+
+      const favoriteCategory = categories.reduce((best, current) =>
+        current.score > best.score ? current : best
+      );
+
+      // Get category details
+      const categoryRepository = (await import('../repositories/CategoryRepository.js')).default;
+      const catRepo = new categoryRepository();
+      const categoryDetails = await catRepo.getById(favoriteCategory.id);
+
+      if (!categoryDetails) return null;
+
+      return {
+        category: categoryDetails,
+        stats: {
+          totalTasks: favoriteCategory.totalTasks,
+          completedTasks: favoriteCategory.completedTasks,
+          completionRate: Math.round(favoriteCategory.completionRate * 100),
+          score: Math.round(favoriteCategory.score * 100) / 100,
+          reason: this.getFavoriteCategoryReason(favoriteCategory)
+        }
+      };
+    } catch (error) {
+      console.error("Error analyzing favorite category:", error);
+      return null;
+    }
+  }
+
+  getFavoriteCategoryReason(categoryStats) {
+    const { totalTasks, completedTasks, completionRate } = categoryStats;
+
+    if (completionRate >= 0.8 && totalTasks >= 10) {
+      return `Excelente rendimiento: ${Math.round(completionRate * 100)}% de completación con ${totalTasks} tareas`;
+    } else if (completionRate >= 0.7) {
+      return `Buen equilibrio: ${Math.round(completionRate * 100)}% de efectividad con ${totalTasks} tareas`;
+    } else if (totalTasks >= 20) {
+      return `Categoría más activa: ${totalTasks} tareas totales con ${Math.round(completionRate * 100)}% de completación`;
+    } else {
+      return `Categoría destacada: ${totalTasks} tareas con ${Math.round(completionRate * 100)}% de completación`;
+    }
+  }
+
+  // ✅ Update Favorite Category when tasks are completed
+  async updateFavoriteCategory() {
+    try {
+      if (!this.currentUser) return;
+
+      const favoriteAnalysis = await this.getFavoriteCategoryAnalysis();
+      if (!favoriteAnalysis) return;
+
+      const stats = await this.getByCurrentUser();
+      if (!stats) return;
+
+      const updatedStats = {
+        ...stats,
+        favoriteCategory: favoriteAnalysis.category.id_Category
+      };
+
+      await statisticsRepository.update(updatedStats);
+    } catch (error) {
+      console.error("Error updating favorite category:", error);
     }
   }
 }
