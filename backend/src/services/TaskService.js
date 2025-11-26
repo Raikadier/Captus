@@ -247,6 +247,11 @@ export class TaskService {
 
   async update(task) {
     try {
+      // Map completed to state if present
+      if (task.completed !== undefined) {
+        task.state = task.completed;
+      }
+
       const validation = this.validateTask(task, true); // isUpdate = true
       if (!validation.success) return validation;
 
@@ -261,6 +266,11 @@ export class TaskService {
 
       if (!task.state && existingTask.state) {
         return new OperationResult(false, "No se puede desmarcar una tarea completada.");
+      }
+
+      // If completing the task, mark all subtasks as completed
+      if (task.state && !existingTask.state) {
+        await this.markAllSubTasksAsCompleted(task.id_Task);
       }
 
       const updated = await taskRepository.update(task);
@@ -337,6 +347,9 @@ export class TaskService {
         if (hasOverdueSubTasks) {
           return new OperationResult(false, "No se puede completar una tarea que tiene subtareas vencidas.");
         }
+
+        // Mark all subtasks as completed when completing parent task
+        await this.markAllSubTasksAsCompleted(taskId);
       }
 
       task.state = state;
@@ -446,11 +459,21 @@ export class TaskService {
   async loadTaskRelations(task) {
     try {
       if (task.id_Category) {
-        task.Category = await categoryRepository.getById(task.id_Category);
+        try {
+          task.Category = await categoryRepository.getById(task.id_Category);
+        } catch (error) {
+          console.error("Error cargando categoría de tarea:", error);
+          task.Category = null;
+        }
       }
 
       if (task.id_Priority) {
-        task.Priority = await priorityRepository.getById(task.id_Priority);
+        try {
+          task.Priority = await priorityRepository.getById(task.id_Priority);
+        } catch (error) {
+          console.error("Error cargando prioridad de tarea:", error);
+          task.Priority = null;
+        }
       }
     } catch (error) {
       console.error("Error cargando relaciones de tarea:", error);

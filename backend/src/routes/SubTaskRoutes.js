@@ -16,6 +16,7 @@ router.use(subTaskController.injectUser);
 router.get("/", subTaskController.getAll.bind(subTaskController));
 router.get("/:id", subTaskController.getById.bind(subTaskController));
 router.get("/task/:taskId", subTaskController.getByTask.bind(subTaskController));
+router.get("/tasks/with-subtasks", subTaskController.getTaskIdsWithSubTasks.bind(subTaskController));
 router.post("/", subTaskController.create.bind(subTaskController));
 router.put("/:id", subTaskController.update.bind(subTaskController));
 router.delete("/:id", subTaskController.delete.bind(subTaskController));
