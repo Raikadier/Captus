@@ -373,17 +373,37 @@ export class TaskService {
 
   async updateStatisticsOnCompletion(userId) {
     try {
-      const stats = await statisticsRepository.getByUser(userId);
-      if (!stats) return;
+      // Update streak after completing a task
+      await this.updateStreakOnCompletion(userId);
 
-      const updatedStats = {
-        ...stats,
-        completedTasks: (stats.completedTasks ?? 0) + 1,
-      };
-
-      await statisticsRepository.update(updatedStats);
+      // Update favorite category analysis
+      await this.updateFavoriteCategory(userId);
     } catch (error) {
       console.error("Error actualizando estadísticas:", error);
+    }
+  }
+
+  async updateFavoriteCategory(userId) {
+    try {
+      // Import StatisticsService dynamically to avoid circular dependency
+      const { StatisticsService } = await import('./StatisticsService.js');
+      const statsService = new StatisticsService();
+      statsService.setCurrentUser({ id: userId });
+      await statsService.updateFavoriteCategory();
+    } catch (error) {
+      console.error("Error actualizando categoría favorita:", error);
+    }
+  }
+
+  async updateStreakOnCompletion(userId) {
+    try {
+      // Import StatisticsService dynamically to avoid circular dependency
+      const { StatisticsService } = await import('./StatisticsService.js');
+      const statsService = new StatisticsService();
+      statsService.setCurrentUser({ id: userId });
+      await statsService.checkStreak();
+    } catch (error) {
+      console.error("Error actualizando racha:", error);
     }
   }
 
