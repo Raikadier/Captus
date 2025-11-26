@@ -50,7 +50,7 @@ const createToolHandler = ({ serviceClass, action, inputSchema }) => {
       if (!validation.success) {
         return validation.message;
       }
-
+      
       const result = await action(service, validation.data, user);
 
       if (!result || typeof result.success !== 'boolean') {
