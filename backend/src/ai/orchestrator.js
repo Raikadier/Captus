@@ -1,85 +1,156 @@
-import { together, MODEL_REASONING } from "./model.js";
-import { tools } from "./toolRegistry.js";
+// backend/src/ai/orchestrator.js
 
-export const orchestrator = async (objective, userId) => {
+import { together, MODEL_REASONING } from './model.js';
+import { tools } from './toolRegistry.js';
+import { OperationResult } from '../shared/OperationResult.js';
+
+/**
+ * Intenta extraer un objeto JSON de una cadena de texto.
+ * Es tolerante a texto adicional antes o después del JSON.
+ * @param {string} text - El texto de entrada, posiblemente del LLM.
+ * @returns {object|null} - El objeto JSON parseado o null si no se encuentra o es inválido.
+ */
+const parseToolCall = (text) => {
+  const jsonRegex = /\{[\s\S]*\}/;
+  const match = text.match(jsonRegex);
+
+  if (!match) {
+    return null;
+  }
+
+  try {
+    // Intenta parsear el JSON encontrado.
+    const parsed = JSON.parse(match[0]);
+    // Valida que tenga la estructura mínima de una tool call.
+    if (parsed && typeof parsed.tool === 'string' && typeof parsed.input === 'object') {
+      return parsed;
+    }
+    return null;
+  } catch (error) {
+    console.warn('[AI/orchestrator] Falló el parseo de JSON, se considera conversacional.', { error: error.message });
+    return null;
+  }
+};
+
+/**
+ * Ejecuta una herramienta validada del toolRegistry.
+ * @param {object} toolCall - El objeto de la herramienta parseado ({ tool, input }).
+ * @param {object} user - El objeto de usuario autenticado.
+ * @returns {Promise<OperationResult>} - El resultado de la ejecución de la herramienta, normalizado a OperationResult.
+ */
+const executeTool = async (toolCall, user) => {
+  const toolDefinition = tools[toolCall.tool];
+
+  if (!toolDefinition) {
+    console.warn(`[AI/orchestrator] Intento de llamada a herramienta no existente: ${toolCall.tool}`);
+    return new OperationResult(false, `La herramienta '${toolCall.tool}' no fue encontrada.`);
+  }
+
+  try {
+    const handlerArgs = { ...toolCall.input, user };
+    const result = await toolDefinition.handler(handlerArgs);
+
+    // Normaliza la respuesta del handler a un OperationResult.
+    if (result instanceof OperationResult) {
+      return result;
+    }
+    if (typeof result === 'string') {
+      return new OperationResult(true, result);
+    }
+
+    console.error(`[AI/orchestrator] La herramienta '${toolCall.tool}' devolvió un tipo de respuesta inesperado.`);
+    return new OperationResult(false, 'La herramienta devolvió una respuesta con un formato inválido.');
+
+  } catch (error) {
+    console.error(`[AI/orchestrator] Error durante la ejecución de la herramienta '${toolCall.tool}':`, error);
+    return new OperationResult(false, `Ocurrió un error al ejecutar la herramienta: ${error.message}`);
+  }
+};
+
+/**
+ * Orquesta la interacción con el LLM, decide si usar una herramienta y devuelve una respuesta estructurada.
+ * @param {string} objective - El mensaje del usuario.
+ * @param {object} user - El objeto de usuario completo (requerido para los handlers).
+ * @returns {Promise<object>} - Una respuesta estructurada y consistente.
+ */
+export const orchestrator = async (objective, user) => {
   const started = Date.now();
 
-  const toolsList = Object.keys(tools).map(k => `- ${k}: ${tools[k].description}`).join("\n");
+  if (!user || !user.id) {
+    console.error('[AI/orchestrator] Error Crítico: El orchestrator fue llamado sin un objeto de usuario válido.');
+    return {
+      result: 'Error de autenticación. No se pudo identificar al usuario.',
+      actionPerformed: null,
+      data: null,
+    };
+  }
 
-  const response = await together.chat.completions.create({
-    model: MODEL_REASONING,
-    messages: [
-      {
-        role: "system",
-        content: `
-Eres un asistente IA avanzado de Captus.
-Tu objetivo es ayudar al usuario: "${userId}".
+  const toolsList = Object.values(tools).map(t => `- ${t.description}`).join('\n');
+  const userId = user.id; // Se usa en el prompt para contexto del LLM.
 
+  try {
+    const response = await together.chat.completions.create({
+      model: MODEL_REASONING,
+      messages: [
+        {
+          role: 'system',
+          content: `
+Eres un asistente IA avanzado de Captus para el usuario con ID: "${userId}".
 TIENES ACCESO A ESTAS HERRAMIENTAS:
 ${toolsList}
 
 REGLAS:
-1. Si el usuario pide una acción que coincide con una herramienta, DEBES generar una respuesta JSON válida con este formato:
-{
-  "tool": "nombre_de_la_herramienta",
-  "input": { "parametro": "valor", "user_id": "${userId}" }
-}
+1. Si la petición del usuario se alinea con una herramienta, RESPONDE ÚNICAMENTE con un objeto JSON con el formato: {"tool": "nombre_herramienta", "input": {...}}.
+2. NO incluyas el JSON dentro de texto o explicaciones. Solo el JSON.
+3. Si no tienes suficiente información para usar una herramienta, pregunta al usuario.
+4. Si es una conversación general, responde en texto plano sin formato JSON.
+          `.trim(),
+        },
+        {
+          role: 'user',
+          content: objective,
+        },
+      ],
+      temperature: 0.1,
+    });
 
-2. Si falta información para ejecutar la herramienta, PREGUNTA al usuario.
-3. Si es solo una conversación, responde en texto plano.
-4. IMPORTANTE: Siempre inyecta el "user_id": "${userId}" en el input de la herramienta.
+    const llmResponse = response.choices[0].message.content.trim();
+    const duration = Date.now() - started;
 
-Ejemplo:
-User: "Crea tarea comprar leche"
-AI: { "tool": "create_task", "input": { "title": "comprar leche", "description": "", "user_id": "${userId}" } }
-        `,
-      },
-      {
-        role: "user",
-        content: objective,
-      },
-    ],
-    temperature: 0.1, // Low temp for precise tool calling
-  });
+    const toolCall = parseToolCall(llmResponse);
 
-  const content = response.choices[0].message.content.trim();
-  const duration = Date.now() - started;
+    if (toolCall) {
+      // --- MODO: TOOL EJECUTADA ---
+      console.log(`[AI/orchestrator] Herramienta detectada: ${toolCall.tool}`, { userId, input: toolCall.input, durationMs: duration });
 
-  // Try to detect JSON
-  if (content.startsWith("{") || content.startsWith("```json")) {
-    try {
-      // Clean code blocks if present
-      const cleanContent = content.replace(/```json/g, "").replace(/```/g, "").trim();
-      const parsed = JSON.parse(cleanContent);
+      const executionResult = await executeTool(toolCall, user);
 
-      if (parsed.tool && tools[parsed.tool]) {
-        console.info("[AI/orchestrator] executing tool", { userId, tool: parsed.tool, ms: duration });
-        const result = await tools[parsed.tool].handler(parsed.input);
+      // Si la herramienta falló, no se considera una acción completada.
+      const actionPerformed = executionResult.success ? toolCall.tool : null;
 
-        // Generate a more user-friendly result message
-        let userMessage = `Acción '${parsed.tool}' completada.`;
-        if (parsed.tool === 'create_task') {
-          userMessage = 'Tarea creada exitosamente.';
-        } else if (parsed.tool === 'create_event') {
-          userMessage = 'Evento creado exitosamente.';
-        }
+      return {
+        result: executionResult.message,
+        actionPerformed: actionPerformed,
+        data: executionResult.data ?? null,
+      };
 
-        // Return a structured response that the controller can use
-        return {
-          result: userMessage,
-          actionPerformed: parsed.tool,
-          data: result.data, // Optional: pass back data if needed
-        };
-      }
-    } catch (e) {
-      console.warn("[AI/orchestrator] JSON parse error", e);
-      // Fallback to returning content if parsing fails
+    } else {
+      // --- MODO: CONVERSACIONAL ---
+      console.log('[AI/orchestrator] Respuesta conversacional generada.', { userId, durationMs: duration });
+      return {
+        result: llmResponse,
+        actionPerformed: null,
+        data: null,
+      };
     }
-  }
 
-  console.info("[AI/orchestrator] no tool used", { userId, ms: duration });
-  // If no tool was used, return object to maintain consistent interface if controller expects it,
-  // or just string. But we must support legacy/string return for standard chat.
-  // Actually, let's keep it simple: if object, it's structured. If string, it's chat.
-  return content;
+  } catch (error) {
+    // --- MODO: ERROR INESPERADO ---
+    console.error('[AI/orchestrator] Error fatal en el flujo principal:', { userId, error });
+    return {
+      result: 'Ocurrió un error interno al procesar tu solicitud. Por favor, intenta nuevamente.',
+      actionPerformed: null,
+      data: null,
+    };
+  }
 };
