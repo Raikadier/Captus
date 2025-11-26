@@ -31,11 +31,7 @@ export class TaskController {
   }
 
   async create(req, res) {
-    console.log('🔍 BACKEND CREATE - Request body:', JSON.stringify(req.body, null, 2));
-    console.log('🔍 BACKEND CREATE - User:', req.user?.id);
-    console.log('🔍 BACKEND CREATE - Category ID:', req.body.category_id, 'Type:', typeof req.body.category_id);
     const result = await taskService.save(req.body, req.user);
-    console.log('🔍 BACKEND CREATE - Service result:', JSON.stringify(result, null, 2));
 
     if (result.success) {
       // Auto-notification
