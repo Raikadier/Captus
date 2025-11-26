@@ -6,7 +6,7 @@ import { useTasks } from './hooks/useTasks';
 import { useSubTasks } from '../../hooks/useSubTasks';
 import TaskCard from './components/TaskCard';
 import TaskForm from './components/TaskForm';
-import StreakWidget from '../../shared/components/StreakWidget';
+import { MiniStreakWidget } from '../../shared/components/StreakWidget';
 import CategoryManagement from '../categories/CategoryManagement';
 import apiClient from '../../shared/api/client';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../ui/tabs';
@@ -203,9 +203,9 @@ const TaskPage = () => {
       {/* Show Streak Widget and Task Controls only in tasks tab */}
       {activeTab === 'tasks' && (
         <>
-          {/* Streak Widget */}
+          {/* Mini Streak Widget */}
           <div className="mb-6">
-            <StreakWidget />
+            <MiniStreakWidget />
           </div>
 
           {/* Actions Bar */}
