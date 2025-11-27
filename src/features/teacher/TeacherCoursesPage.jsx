@@ -32,14 +32,14 @@ export default function TeacherCoursesPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between bg-white rounded-xl shadow-sm p-6">
+      <div className="flex items-center justify-between bg-card rounded-xl shadow-sm p-6">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
             <BookOpen className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Mis Cursos (Profesor)</h1>
-            <p className="text-gray-600">Gestiona tus clases y estudiantes</p>
+            <h1 className="text-2xl font-bold text-foreground">Mis Cursos (Profesor)</h1>
+            <p className="text-muted-foreground">Gestiona tus clases y estudiantes</p>
           </div>
         </div>
 
@@ -81,22 +81,22 @@ export default function TeacherCoursesPage() {
         {courses.map((course) => (
           <div
             key={course.id}
-            className="p-6 bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all cursor-pointer"
+            className="p-6 bg-card rounded-xl shadow-sm border border-border hover:shadow-md transition-all cursor-pointer"
             onClick={() => navigate(`/teacher/courses/${course.id}`)}
           >
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h3 className="text-xl font-bold text-gray-900">{course.title}</h3>
-                <p className="text-sm text-gray-500 mt-1 line-clamp-2">{course.description}</p>
+                <h3 className="text-xl font-bold text-foreground">{course.title}</h3>
+                <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{course.description}</p>
               </div>
             </div>
 
-            <div className="bg-gray-50 rounded-lg p-3 mb-4">
-                <span className="text-xs text-gray-500 uppercase font-bold tracking-wider">Código de Invitación</span>
+            <div className="bg-muted rounded-lg p-3 mb-4">
+                <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Código de Invitación</span>
                 <div className="text-lg font-mono font-semibold text-green-700 tracking-widest">{course.invite_code}</div>
             </div>
 
-            <div className="flex items-center justify-between text-sm text-gray-600 pt-4 border-t border-gray-100">
+            <div className="flex items-center justify-between text-sm text-muted-foreground pt-4 border-t border-border">
                <span className="flex items-center gap-1">
                    <Users className="w-4 h-4" /> Gestor de Clase
                </span>

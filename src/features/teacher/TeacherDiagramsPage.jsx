@@ -66,14 +66,14 @@ export default function TeacherDiagramsPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="bg-white rounded-xl shadow-sm p-6 flex items-center justify-between">
+      <div className="bg-card rounded-xl shadow-sm p-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
             <GitBranch className="text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Diagramas</h1>
-            <p className="text-sm text-gray-600">Gestión de visualizaciones académicas</p>
+            <h1 className="text-2xl font-bold text-foreground">Diagramas</h1>
+            <p className="text-sm text-muted-foreground">Gestión de visualizaciones académicas</p>
           </div>
         </div>
         <Button onClick={handleCreate} className="gap-2 bg-primary hover:bg-primary/90">
@@ -89,11 +89,11 @@ export default function TeacherDiagramsPage() {
       ) : diagrams.length === 0 ? (
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-              <Layout className="w-8 h-8 text-gray-400" />
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+              <Layout className="w-8 h-8 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900">No hay diagramas todavía</h3>
-            <p className="text-sm text-gray-600 max-w-sm mt-2 mb-6">
+            <h3 className="text-lg font-semibold text-foreground">No hay diagramas todavía</h3>
+            <p className="text-sm text-muted-foreground max-w-sm mt-2 mb-6">
               Crea diagramas para explicar conceptos complejos visualmente a tus estudiantes.
             </p>
             <Button onClick={handleCreate} variant="outline" className="gap-2">
@@ -111,20 +111,20 @@ export default function TeacherDiagramsPage() {
                   <span className="truncate" title={diagram.title}>{diagram.title}</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="flex-1 min-h-[200px] bg-slate-50 p-4 flex items-center justify-center relative group">
+              <CardContent className="flex-1 min-h-[200px] bg-muted p-4 flex items-center justify-center relative group">
                 <div className="w-full h-full overflow-hidden max-h-[250px]">
                    <div className="transform scale-90 origin-center pointer-events-none">
                      <MermaidRenderer code={diagram.code} />
                    </div>
                 </div>
-                <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <div className="absolute inset-0 bg-background/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                    <Button variant="secondary" size="sm" onClick={() => handleEdit(diagram)}>
                      Ver detalles
                    </Button>
                 </div>
               </CardContent>
-              <CardFooter className="pt-4 border-t bg-gray-50/50 flex justify-between">
-                 <span className="text-xs text-gray-500">
+              <CardFooter className="pt-4 border-t bg-muted/50 flex justify-between">
+                 <span className="text-xs text-muted-foreground">
                    Actualizado: {new Date(diagram.updatedAt).toLocaleDateString()}
                  </span>
                  <div className="flex gap-2">

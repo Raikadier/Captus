@@ -255,7 +255,7 @@ const TaskPage = () => {
                     <select
                       value={filters.categoryId}
                       onChange={(e) => handleFilterChange('categoryId', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary bg-white"
+                      className="w-full px-3 py-2 border border-border rounded-lg focus:ring-primary focus:border-primary bg-card"
                     >
                       <option value="">Todas las categorías</option>
                       {categories.map((category) => (
@@ -273,7 +273,7 @@ const TaskPage = () => {
                     <select
                       value={filters.priorityId}
                       onChange={(e) => handleFilterChange('priorityId', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary bg-white"
+                      className="w-full px-3 py-2 border border-border rounded-lg focus:ring-primary focus:border-primary bg-card"
                     >
                       <option value="">Todas las prioridades</option>
                       {priorities.map((priority) => (
@@ -291,7 +291,7 @@ const TaskPage = () => {
                     <select
                       value={filters.completed}
                       onChange={(e) => handleFilterChange('completed', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary bg-white"
+                      className="w-full px-3 py-2 border border-border rounded-lg focus:ring-primary focus:border-primary bg-card"
                     >
                       <option value="">Todos</option>
                       <option value="false">Pendientes</option>
