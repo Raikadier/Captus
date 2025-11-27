@@ -93,14 +93,27 @@ router.post("/chat", async (req, res) => {
     // 4. Get AI Response
     const responseObj = await routerAgent(message, userId);
 
-    // Normalize response: routerAgent might return string (from other agents) or object (from taskAgent)
+    // Normalize response: routerAgent might return a string or a structured object from the orchestrator
     let resultText = "";
     let actionPerformed = null;
 
-    if (typeof responseObj === "object" && responseObj !== null && responseObj.text) {
-      resultText = responseObj.text;
-      actionPerformed = responseObj.toolUsed || null;
+    if (typeof responseObj === "object" && responseObj !== null) {
+      // Handle structured response from orchestrator
+      if (responseObj.result) {
+        resultText = responseObj.result;
+        actionPerformed = responseObj.actionPerformed || null;
+      }
+      // Handle legacy/other object structures with a 'text' property
+      else if (responseObj.text) {
+        resultText = responseObj.text;
+        actionPerformed = responseObj.toolUsed || null;
+      }
+      // Fallback for unknown object shapes
+      else {
+        resultText = JSON.stringify(responseObj);
+      }
     } else {
+      // Handle plain string responses
       resultText = String(responseObj);
     }
 
