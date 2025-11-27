@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronRight, Globe, Lock, MessageSquare, Palette, Shield, User, Bell, Eye, EyeOff, Check, Sparkles, Trophy } from 'lucide-react'
-import AchievementsPage from './AchievementsPage'
+import { ChevronRight, Globe, Lock, MessageSquare, Palette, Shield, User, Bell, Eye, EyeOff, Check, Sparkles, Award, Star, Flame, Zap, Crown, Trophy, Target, CheckCircle2, Lock as LockIcon } from 'lucide-react'
 import { Button } from '../../ui/button'
 import { Card } from '../../ui/card'
 import { Label } from '../../ui/label'
@@ -20,6 +19,11 @@ import { supabase } from '../../shared/api/supabase'
 import apiClient from '../../shared/api/client'
 import Loading from '../../ui/loading'
 import { toast } from 'sonner'
+import { useAchievements } from '../../hooks/useAchievements'
+import { Progress } from '../../ui/progress'
+import { Badge } from '../../ui/badge'
+import { Filter } from 'lucide-react'
+import { achievements as achievementsConfig, difficultyOrder, difficultyLabels, difficultyColors } from '../../shared/achievementsConfig'
 
 function getCurrentDate() {
   const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
@@ -73,8 +77,11 @@ function SettingsMenuItem({
 export default function SettingsPage() {
   const { darkMode, toggleTheme, compactView, setCompactView, fontSize, changeFontSize, accentColor, changeAccentColor } = useTheme()
   const { user } = useAuth()
+  const { achievements, loading: achievementsLoading, error: achievementsError } = useAchievements()
 
   const [activeSection, setActiveSection] = useState('perfil')
+  const [statusFilter, setStatusFilter] = useState('all') // all, completed, pending
+  const [difficultyFilter, setDifficultyFilter] = useState('all') // all, easy, medium, hard, special, epic
   const [userData, setUserData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -101,6 +108,39 @@ export default function SettingsPage() {
   useEffect(() => {
     fetchUserProfile()
   }, [])
+
+  // Filter achievements by status and difficulty
+  let filteredAchievements = achievements;
+
+  // Apply status filter
+  if (statusFilter !== 'all') {
+    filteredAchievements = filteredAchievements.filter(achievement => {
+      const isCompleted = achievement.userAchievement?.isCompleted || false;
+      return statusFilter === 'completed' ? isCompleted : !isCompleted;
+    });
+  }
+
+  // Apply difficulty filter
+  if (difficultyFilter !== 'all') {
+    filteredAchievements = filteredAchievements.filter(a => a && a.difficulty === difficultyFilter);
+  }
+
+  // Group filtered achievements by difficulty for display
+  const achievementsByDifficulty = filteredAchievements.reduce((groups, achievement) => {
+    if (achievement && achievement.difficulty) {
+      const difficulty = achievement.difficulty;
+      if (!groups[difficulty]) groups[difficulty] = [];
+      groups[difficulty].push(achievement);
+    }
+    return groups;
+  }, {});
+
+  const getDifficultyColor = (difficulty) => {
+    return difficultyColors[difficulty] || 'bg-gray-100 text-gray-800 border-gray-200';
+  };
+
+  const totalAchievements = achievements.length;
+  const unlockedAchievements = achievements.filter(a => a.userAchievement?.isCompleted).length;
 
   // Contador para la confirmación final
   useEffect(() => {
@@ -317,7 +357,13 @@ export default function SettingsPage() {
 
     } catch (error) {
       console.error('Error fetching user profile:', error)
-      setError(error.message || 'Error de conexión al cargar perfil')
+      // Don't set error state for auth issues, just log
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        console.warn('Authentication issue, user may need to re-login')
+        // Don't set error state to avoid crashes
+      } else {
+        setError(error.message || 'Error de conexión al cargar perfil')
+      }
     } finally {
       setLoading(false)
     }
@@ -336,64 +382,63 @@ export default function SettingsPage() {
 
 
 
+
   return (
-    <div className={`${darkMode ? 'bg-background' : 'bg-[#F6F7FB]'}`}>
+    <div className="bg-background">
       <div className={`max-w-7xl mx-auto ${compactView ? 'p-4' : 'p-8'} ${compactView ? 'pb-24' : 'pb-8'}`}>
-        <header className={`sticky top-0 ${darkMode ? 'bg-card' : 'bg-white'} rounded-xl shadow-sm ${compactView ? 'p-4' : 'p-6'} mb-6 z-10 animate-in slide-in-from-top duration-300`}>
+        <header className={`sticky top-0 bg-card rounded-xl shadow-sm ${compactView ? 'p-4' : 'p-6'} mb-6 z-10 animate-in slide-in-from-top duration-300`}>
           <div className="flex justify-between items-center">
             <div>
-              <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>⚙️ Configuración</h1>
-              <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>{getCurrentDate()}</p>
+              <h1 className="text-2xl font-bold text-foreground">⚙️ Configuración</h1>
+              <p className="text-muted-foreground mt-1">{getCurrentDate()}</p>
             </div>
           </div>
         </header>
 
         <div className={`grid grid-cols-1 lg:grid-cols-3 ${compactView ? 'gap-4' : 'gap-6'}`}>
           <div className="lg:col-span-1 animate-in slide-in-from-left duration-500">
-            <div className={`${activeSection === 'logros' ? '' : 'sticky top-24'}`}>
-              <Card className={`${compactView ? 'p-3' : 'p-4'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
-                <nav className={compactView ? 'space-y-1' : 'space-y-2'}>
-                  <SettingsMenuItem
-                    icon={<User size={18} />}
-                    label="Perfil"
-                    active={activeSection === 'perfil'}
-                    onClick={() => setActiveSection('perfil')}
-                  />
-                  <SettingsMenuItem
-                    icon={<Lock size={18} />}
-                    label="Seguridad"
-                    active={activeSection === 'seguridad'}
-                    onClick={() => setActiveSection('seguridad')}
-                  />
-                  <SettingsMenuItem
-                    icon={<Palette size={18} />}
-                    label="Apariencia"
-                    active={activeSection === 'apariencia'}
-                    onClick={() => setActiveSection('apariencia')}
-                  />
-                  <SettingsMenuItem
-                    icon={<Shield size={18} />}
-                    label="Privacidad"
-                    active={activeSection === 'privacidad'}
-                    onClick={() => setActiveSection('privacidad')}
-                  />
-                  <SettingsMenuItem
-                    icon={<Trophy size={18} />}
-                    label="Logros"
-                    active={activeSection === 'logros'}
-                    onClick={() => setActiveSection('logros')}
-                  />
-                </nav>
-              </Card>
-            </div>
+            <Card className={`${compactView ? 'p-3' : 'p-4'} bg-card rounded-xl shadow-sm`}>
+              <nav className={compactView ? 'space-y-1' : 'space-y-2'}>
+                <SettingsMenuItem
+                  icon={<User size={18} />}
+                  label="Perfil"
+                  active={activeSection === 'perfil'}
+                  onClick={() => setActiveSection('perfil')}
+                />
+                <SettingsMenuItem
+                  icon={<Lock size={18} />}
+                  label="Seguridad"
+                  active={activeSection === 'seguridad'}
+                  onClick={() => setActiveSection('seguridad')}
+                />
+                <SettingsMenuItem
+                  icon={<Palette size={18} />}
+                  label="Apariencia"
+                  active={activeSection === 'apariencia'}
+                  onClick={() => setActiveSection('apariencia')}
+                />
+                <SettingsMenuItem
+                  icon={<Shield size={18} />}
+                  label="Privacidad"
+                  active={activeSection === 'privacidad'}
+                  onClick={() => setActiveSection('privacidad')}
+                />
+                <SettingsMenuItem
+                  icon={<Award size={18} />}
+                  label="Logros"
+                  active={activeSection === 'logros'}
+                  onClick={() => setActiveSection('logros')}
+                />
+              </nav>
+            </Card>
           </div>
 
           <div className={`lg:col-span-2 ${compactView ? 'space-y-4' : 'space-y-6'} animate-in fade-in slide-in-from-right duration-500`}>
 
             {/* PERFIL SECTION */}
             {activeSection === 'perfil' && (
-              <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
-                <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} ${compactView ? 'mb-4' : 'mb-6'}`}>
+              <Card className={`${compactView ? 'p-4' : 'p-6'} bg-card rounded-xl shadow-sm`}>
+                <h2 className={`text-xl font-semibold text-foreground ${compactView ? 'mb-4' : 'mb-6'}`}>
                   Información Personal
                 </h2>
                 {loading ? (
@@ -421,7 +466,7 @@ export default function SettingsPage() {
                     </div>
                     <div className={`grid grid-cols-1 md:grid-cols-2 ${compactView ? 'gap-3' : 'gap-4'}`}>
                       <div>
-                        <Label htmlFor="nombre" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        <Label htmlFor="nombre" className="text-sm font-medium text-foreground">
                           Nombre
                         </Label>
                         <input
@@ -430,11 +475,11 @@ export default function SettingsPage() {
                           value={formData.firstName}
                           onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
                           placeholder="Tu nombre"
-                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
+                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border bg-background border-border text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
                         />
                       </div>
                       <div>
-                        <Label htmlFor="apellido" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        <Label htmlFor="apellido" className="text-sm font-medium text-foreground">
                           Apellido
                         </Label>
                         <input
@@ -443,12 +488,12 @@ export default function SettingsPage() {
                           value={formData.lastName}
                           onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
                           placeholder="Tu apellido"
-                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
+                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border bg-background border-border text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
                         />
                       </div>
                     </div>
                     <div>
-                      <Label htmlFor="email" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <Label htmlFor="email" className="text-sm font-medium text-foreground">
                         Email
                       </Label>
                       <input
@@ -456,11 +501,11 @@ export default function SettingsPage() {
                         type="email"
                         value={formData.email}
                         disabled
-                      className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary opacity-60 cursor-not-allowed`}
+                      className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border bg-background border-border text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-primary opacity-60 cursor-not-allowed`}
                       />
                     </div>
                     <div>
-                      <Label htmlFor="carrera" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <Label htmlFor="carrera" className="text-sm font-medium text-foreground">
                         Carrera
                       </Label>
                       <input
@@ -469,11 +514,11 @@ export default function SettingsPage() {
                         value={formData.career}
                         onChange={(e) => setFormData(prev => ({ ...prev, career: e.target.value }))}
                         placeholder="Ej: Ingeniería de Sistemas"
-                      className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
+                      className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border bg-background border-border text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
                       />
                     </div>
                     <div>
-                      <Label htmlFor="bio" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <Label htmlFor="bio" className="text-sm font-medium text-foreground">
                         Biografía
                       </Label>
                       <textarea
@@ -482,7 +527,7 @@ export default function SettingsPage() {
                         value={formData.bio}
                         onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
                         placeholder="Cuéntanos un poco sobre ti..."
-                      className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
+                      className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border bg-background border-border text-foreground placeholder-muted-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
                       />
                     </div>
                     <div className={compactView ? 'mt-4' : 'mt-6'}>
@@ -504,19 +549,15 @@ export default function SettingsPage() {
                             : 'bg-gradient-to-r from-primary/10 to-blue-50 border-primary/20'
                         } backdrop-blur-sm`}>
                           <div className="flex items-center gap-2">
-                            <div className={`w-2 h-2 rounded-full bg-primary animate-pulse`}></div>
-                            <span className={`text-sm font-medium ${
-                              darkMode ? 'text-primary/80' : 'text-primary'
-                            }`}>
+                            <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+                            <span className="text-sm font-medium text-primary">
                               Miembro desde
                             </span>
                           </div>
                           <div className={`px-3 py-1 rounded-lg ${
                             darkMode ? 'bg-gray-800/50' : 'bg-white/70'
                           } border border-primary/20`}>
-                            <span className={`font-bold ${
-                              darkMode ? 'text-white' : 'text-gray-800'
-                            }`}>
+                            <span className="font-bold text-foreground">
                               {new Date(userData.createdAt).toLocaleDateString('es-ES', {
                                 day: 'numeric',
                                 month: 'long',
@@ -525,19 +566,13 @@ export default function SettingsPage() {
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className={`text-sm font-medium ${
-                              darkMode ? 'text-blue-300' : 'text-blue-700'
-                            }`}>
+                            <span className="text-sm font-medium text-blue-700">
                               🎉
                             </span>
-                            <div className={`w-2 h-2 rounded-full ${
-                              darkMode ? 'bg-blue-400' : 'bg-blue-500'
-                            } animate-pulse`}></div>
+                            <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
                           </div>
                         </div>
-                        <p className={`text-xs mt-2 ${
-                          darkMode ? 'text-gray-400' : 'text-gray-500'
-                        }`}>
+                        <p className="text-xs mt-2 text-muted-foreground">
                           ¡Gracias por ser parte de Captus!
                         </p>
                       </div>
@@ -549,13 +584,13 @@ export default function SettingsPage() {
 
             {/* SEGURIDAD SECTION */}
             {activeSection === 'seguridad' && (
-              <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
-                <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} ${compactView ? 'mb-4' : 'mb-6'}`}>
+              <Card className={`${compactView ? 'p-4' : 'p-6'} bg-card rounded-xl shadow-sm`}>
+                <h2 className={`text-xl font-semibold text-foreground ${compactView ? 'mb-4' : 'mb-6'}`}>
                   Cambiar Contraseña
                 </h2>
                 <div className={compactView ? 'space-y-3' : 'space-y-4'}>
                   <div>
-                    <Label htmlFor="current-password" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <Label htmlFor="current-password" className="text-sm font-medium text-foreground">
                       Contraseña Actual
                     </Label>
                     <div className="relative">
@@ -565,19 +600,19 @@ export default function SettingsPage() {
                         value={passwordData.currentPassword}
                         onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
                         placeholder="Ingresa tu contraseña actual"
-                          className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} pr-10 border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
+                          className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} pr-10 border bg-background border-border text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                       >
                         {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                       </button>
                     </div>
                   </div>
                   <div>
-                    <Label htmlFor="new-password" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <Label htmlFor="new-password" className="text-sm font-medium text-foreground">
                       Nueva Contraseña
                     </Label>
                     <input
@@ -586,11 +621,11 @@ export default function SettingsPage() {
                       value={passwordData.newPassword}
                       onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
                       placeholder="Ingresa tu nueva contraseña"
-                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
+                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border bg-background border-border text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="confirm-password" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <Label htmlFor="confirm-password" className="text-sm font-medium text-foreground">
                       Confirmar Nueva Contraseña
                     </Label>
                     <input
@@ -599,11 +634,11 @@ export default function SettingsPage() {
                       value={passwordData.confirmPassword}
                       onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
                       placeholder="Confirma tu nueva contraseña"
-                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
+                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border bg-background border-border text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
                     />
                   </div>
-                  <div className={`p-3 ${darkMode ? 'bg-blue-900/20 border-blue-600/30' : 'bg-blue-50 border-blue-200'} border rounded-lg`}>
-                    <p className={`text-sm ${darkMode ? 'text-blue-300' : 'text-blue-700'}`}>
+                  <div className="p-3 bg-blue-50 border-blue-200 border rounded-lg">
+                    <p className="text-sm text-blue-700">
                       <strong>Requisitos de contraseña:</strong> Mínimo 8 caracteres, una mayúscula, una minúscula y un número.
                     </p>
                   </div>
@@ -623,27 +658,27 @@ export default function SettingsPage() {
 
             {/* APARIENCIA SECTION */}
             {activeSection === 'apariencia' && (
-              <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
-                <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} ${compactView ? 'mb-4' : 'mb-6'}`}>
+              <Card className={`${compactView ? 'p-4' : 'p-6'} bg-card rounded-xl shadow-sm`}>
+                <h2 className={`text-xl font-semibold text-foreground ${compactView ? 'mb-4' : 'mb-6'}`}>
                   Personalización de la Interfaz
                 </h2>
                 <div className={compactView ? 'space-y-3' : 'space-y-4'}>
-                  <div className={`flex items-center justify-between ${compactView ? 'py-2' : 'py-3'} border-b ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+                  <div className={`flex items-center justify-between ${compactView ? 'py-2' : 'py-3'} border-b border-border`}>
                     <div>
-                      <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Modo oscuro</p>
-                      <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Activa el tema oscuro en toda la aplicación</p>
+                      <p className="font-medium text-foreground">Modo oscuro</p>
+                      <p className="text-sm text-muted-foreground">Activa el tema oscuro en toda la aplicación</p>
                     </div>
                     <Switch checked={darkMode} onCheckedChange={toggleTheme} />
                   </div>
-                  <div className={`flex items-center justify-between ${compactView ? 'py-2' : 'py-3'} border-b ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+                  <div className={`flex items-center justify-between ${compactView ? 'py-2' : 'py-3'} border-b border-border`}>
                     <div>
-                      <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Vista compacta</p>
-                      <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Reduce el espaciado entre elementos</p>
+                      <p className="font-medium text-foreground">Vista compacta</p>
+                      <p className="text-sm text-muted-foreground">Reduce el espaciado entre elementos</p>
                     </div>
                     <Switch checked={compactView} onCheckedChange={setCompactView} />
                   </div>
                   <div className={compactView ? 'py-2' : 'py-3'}>
-                    <Label className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-3 block`}>
+                    <Label className="text-sm font-medium text-foreground mb-3 block">
                       Tamaño de fuente
                     </Label>
                     <div className="flex gap-2">
@@ -674,7 +709,7 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   <div className={compactView ? 'py-2' : 'py-3'}>
-                    <Label className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-3 block`}>
+                    <Label className="text-sm font-medium text-foreground mb-3 block">
                       Color de acento
                     </Label>
                     <div className="flex gap-2">
@@ -684,7 +719,7 @@ export default function SettingsPage() {
                           onClick={() => changeAccentColor(color.name)}
                           className={`w-10 h-10 rounded-full ${color.bg} flex items-center justify-center transition-all ${
                             accentColor === color.name
-                              ? `border-2 ${darkMode ? 'border-white' : 'border-gray-900'} ring-2 ${darkMode ? 'ring-gray-700' : 'ring-gray-200'}`
+                              ? `border-2 border-foreground ring-2 ring-muted`
                               : 'hover:scale-110'
                           }`}
                         >
@@ -701,8 +736,8 @@ export default function SettingsPage() {
 
             {/* PRIVACIDAD SECTION */}
             {activeSection === 'privacidad' && (
-              <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
-                <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} ${compactView ? 'mb-4' : 'mb-6'}`}>
+              <Card className={`${compactView ? 'p-4' : 'p-6'} bg-card rounded-xl shadow-sm`}>
+                <h2 className={`text-xl font-semibold text-foreground ${compactView ? 'mb-4' : 'mb-6'}`}>
                   Gestión de Datos
                 </h2>
                 <div className={compactView ? 'space-y-2' : 'space-y-3'}>
@@ -715,8 +750,8 @@ export default function SettingsPage() {
                     {deletingAccount ? 'Eliminando cuenta...' : 'Eliminar mi cuenta'}
                   </Button>
                 </div>
-                <div className={`${compactView ? 'mt-3' : 'mt-4'} p-3 ${darkMode ? 'bg-red-900/20 border-red-600/30' : 'bg-red-50 border-red-200'} border rounded-lg`}>
-                  <p className={`text-sm ${darkMode ? 'text-red-300' : 'text-red-700'}`}>
+                <div className={`${compactView ? 'mt-3' : 'mt-4'} p-3 bg-red-50 border-red-200 border rounded-lg`}>
+                  <p className="text-sm text-red-700">
                     ⚠️ <strong>Advertencia importante:</strong> La eliminación de tu cuenta es <strong>permanente</strong> e <strong>irreversible</strong>.
                     Perderás acceso a todas tus tareas, estadísticas, rachas y datos almacenados. Esta acción no se puede deshacer.
                   </p>
@@ -726,27 +761,232 @@ export default function SettingsPage() {
 
             {/* LOGROS SECTION */}
             {activeSection === 'logros' && (
-              <div className="animate-in fade-in slide-in-from-right duration-500">
-                <AchievementsPage />
-              </div>
+              <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
+                <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} ${compactView ? 'mb-4' : 'mb-6'}`}>
+                  🏆 Mis Logros
+                </h2>
+
+                {achievementsLoading ? (
+                  <div className="text-center py-8">
+                    <Loading message="Cargando logros..." fullScreen={false} />
+                  </div>
+                ) : achievementsError ? (
+                  <div className="text-center py-8">
+                    <div className="text-red-600 text-lg mb-4">Error: {achievementsError}</div>
+                    <Button onClick={() => window.location.reload()} variant="outline">
+                      Reintentar
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {/* Header */}
+                    <div className="mb-6">
+                      <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-3">
+                        <Trophy className="text-yellow-500" size={32} />
+                        Sistema de Logros
+                      </h2>
+                      <p className="text-muted-foreground">Completa desafíos y desbloquea logros para demostrar tu productividad</p>
+                    </div>
+
+                    {/* Sidebar de filtros arriba */}
+                    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-xl p-6 mb-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-yellow-500 rounded-lg">
+                            <Trophy className="text-white" size={20} />
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-gray-800">🏆 Tu Progreso</h3>
+                            <p className="text-xs text-gray-600">Estadísticas y filtros</p>
+                          </div>
+                        </div>
+
+                        {/* Stats rápidas */}
+                        <div className="flex gap-4">
+                          <div className="bg-white/70 rounded-lg px-4 py-2 border border-yellow-200 text-center">
+                            <div className="text-lg font-bold text-yellow-600">{unlockedAchievements}</div>
+                            <div className="text-xs text-gray-600">Completados</div>
+                          </div>
+                          <div className="bg-white/70 rounded-lg px-4 py-2 border border-yellow-200 text-center">
+                            <div className="text-lg font-bold text-orange-600">{totalAchievements}</div>
+                            <div className="text-xs text-gray-600">Por Descubrir</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Filtros */}
+                      <div className="flex flex-wrap gap-4">
+                        <div>
+                          <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                            <Filter size={14} />
+                            Estado
+                          </h4>
+                          <div className="flex gap-2">
+                            <Button
+                              variant={statusFilter === 'all' ? 'default' : 'outline'}
+                              size="sm"
+                              onClick={() => setStatusFilter('all')}
+                              className={`${statusFilter === 'all' ? 'bg-yellow-500 hover:bg-yellow-600 text-white' : 'border-yellow-300 text-yellow-700 hover:bg-yellow-50'}`}
+                            >
+                              Todos
+                            </Button>
+                            <Button
+                              variant={statusFilter === 'pending' ? 'default' : 'outline'}
+                              size="sm"
+                              onClick={() => setStatusFilter('pending')}
+                              className={`${statusFilter === 'pending' ? 'bg-yellow-500 hover:bg-yellow-600 text-white' : 'border-yellow-300 text-yellow-700 hover:bg-yellow-50'}`}
+                            >
+                              🔍 Por Descubrir
+                            </Button>
+                            <Button
+                              variant={statusFilter === 'completed' ? 'default' : 'outline'}
+                              size="sm"
+                              onClick={() => setStatusFilter('completed')}
+                              className={`${statusFilter === 'completed' ? 'bg-yellow-500 hover:bg-yellow-600 text-white' : 'border-yellow-300 text-yellow-700 hover:bg-yellow-50'}`}
+                            >
+                              ✅ Completados
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <h4 className="text-sm font-semibold text-gray-700 mb-2">Dificultad</h4>
+                          <div className="flex gap-2">
+                            <Button
+                              variant={difficultyFilter === 'all' ? 'default' : 'outline'}
+                              size="sm"
+                              onClick={() => setDifficultyFilter('all')}
+                              className={`${difficultyFilter === 'all' ? 'bg-orange-500 hover:bg-orange-600 text-white' : 'border-orange-300 text-orange-700 hover:bg-orange-50'}`}
+                            >
+                              Todas
+                            </Button>
+                            {difficultyOrder.map(difficulty => (
+                              <Button
+                                key={difficulty}
+                                variant={difficultyFilter === difficulty ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={() => setDifficultyFilter(difficulty)}
+                                className={`${
+                                  difficultyFilter === difficulty
+                                    ? `${getDifficultyColor(difficulty).split(' ')[0]} hover:opacity-90 text-white`
+                                    : `${getDifficultyColor(difficulty)} border-opacity-50`
+                                }`}
+                              >
+                                {difficultyLabels[difficulty]}
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Contenido de logros */}
+                    <div className="space-y-6">
+                      {difficultyOrder.map(difficulty => {
+                        const difficultyAchievements = achievementsByDifficulty[difficulty] || [];
+                        if (difficultyAchievements.length === 0) return null;
+
+                        return (
+                          <div key={difficulty}>
+                            <div className="flex items-center mb-4">
+                              <div className={`px-3 py-1 rounded-full border font-semibold text-sm ${
+                                getDifficultyColor(difficulty)
+                              }`}>
+                                {difficultyLabels[difficulty]}
+                              </div>
+                              <div className="ml-3 h-px bg-gradient-to-r from-gray-300 to-transparent flex-1"></div>
+                              <div className="text-xs text-gray-500">
+                                {difficultyAchievements.length} logro{difficultyAchievements.length !== 1 ? 's' : ''}
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                              {difficultyAchievements.map(achievement => {
+                                if (!achievement || !achievement.achievementId) return null;
+
+                                const config = achievementsConfig[achievement.achievementId];
+                                const isCompleted = achievement.userAchievement?.isCompleted || false;
+                                const progress = achievement.userAchievement?.progress || 0;
+                                const progressPercent = Math.min((progress / (config?.targetValue || 1)) * 100, 100);
+
+                                return (
+                                  <Card key={achievement.achievementId} className={`p-4 hover:shadow-md transition-shadow relative overflow-hidden ${
+                                    isCompleted
+                                      ? 'border-green-300 bg-gradient-to-br from-green-50 to-emerald-50'
+                                      : 'border-gray-200'
+                                  }`}>
+                                    {!isCompleted && (
+                                      <div className="absolute top-0 left-0 right-0 h-3/4 bg-gradient-to-b from-black/60 via-black/40 to-transparent flex items-start justify-center pt-6 rounded-t-lg">
+                                        <div className="bg-gray-800/95 text-white px-3 py-1 rounded-full font-semibold text-xs shadow-lg">
+                                          🔒 Bloqueado
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    <div className="flex items-start space-x-3">
+                                      <div className={`text-3xl ${isCompleted ? '' : 'opacity-70'}`}>{config?.icon || '🏆'}</div>
+                                      <div className="flex-1">
+                                        <div className="flex items-center justify-between mb-2">
+                                          <h3 className={`font-semibold text-lg ${isCompleted ? 'text-green-800' : 'text-gray-900'}`}>
+                                            {config?.name || achievement.achievementId}
+                                          </h3>
+                                          {isCompleted && (
+                                            <CheckCircle className="text-green-600" size={24} />
+                                          )}
+                                        </div>
+                                        <p className={`text-sm mb-3 ${isCompleted ? 'text-green-700' : 'text-gray-600'}`}>
+                                          {config?.description || 'Descripción no disponible'}
+                                        </p>
+                                        <div className="space-y-2">
+                                          <div className="flex justify-between text-xs">
+                                            <span className={isCompleted ? 'text-green-700' : 'text-gray-600'}>Progreso</span>
+                                            <span className={`font-medium ${isCompleted ? 'text-green-800' : 'text-gray-900'}`}>
+                                              {progress}/{config?.targetValue || 1}
+                                            </span>
+                                          </div>
+                                          <Progress
+                                            value={progressPercent}
+                                            className={`h-2 ${isCompleted ? 'bg-green-200' : 'bg-gray-200'}`}
+                                          />
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </Card>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })}
+
+                      {filteredAchievements.length === 0 && (
+                        <div className="text-center py-12">
+                          <Trophy size={48} className="mx-auto text-gray-400 mb-4" />
+                          <h3 className="text-lg font-semibold text-gray-600 mb-2">No se encontraron logros</h3>
+                          <p className="text-gray-500 text-sm">Prueba cambiando los filtros para ver más logros</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </Card>
             )}
 
             {/* Delete Account Modal */}
             <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
-              <DialogContent className={`${darkMode ? 'bg-card border-gray-700' : 'bg-white'} max-w-md`}>
+              <DialogContent className={`bg-card max-w-md`}>
                 <DialogHeader>
-                  <DialogTitle className={`text-xl font-bold ${darkMode ? 'text-red-400' : 'text-red-600'}`}>
+                  <DialogTitle className="text-xl font-bold text-red-600">
                     ⚠️ Eliminar Cuenta
                   </DialogTitle>
-                  <DialogDescription className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  <DialogDescription className="text-muted-foreground">
                     {deleteStep === 1 ? (
                       <div className="space-y-3">
                         <p>¿Estás seguro de que quieres eliminar tu cuenta?</p>
-                        <div className={`p-3 rounded-lg ${darkMode ? 'bg-red-900/30' : 'bg-red-50'}`}>
-                          <p className={`text-sm font-medium ${darkMode ? 'text-red-300' : 'text-red-700'} mb-2`}>
+                        <div className="p-3 rounded-lg bg-red-50">
+                          <p className="text-sm font-medium text-red-700 mb-2">
                             Esta acción es <strong>IRREVERSIBLE</strong> y eliminará:
                           </p>
-                          <ul className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'} space-y-1`}>
+                          <ul className="text-sm text-muted-foreground space-y-1">
                             <li>• Todas tus tareas y subtareas</li>
                             <li>• Tus estadísticas y rachas de productividad</li>
                             <li>• Tus logros y medallas desbloqueadas</li>
@@ -756,23 +996,23 @@ export default function SettingsPage() {
                       </div>
                     ) : (
                       <div className="space-y-3">
-                        <div className={`p-4 rounded-lg border-2 ${darkMode ? 'bg-red-900/30 border-red-600' : 'bg-red-50 border-red-300'}`}>
-                          <h3 className={`font-bold text-lg ${darkMode ? 'text-red-400' : 'text-red-600'} mb-2`}>
+                        <div className="p-4 rounded-lg border-2 bg-red-50 border-red-300">
+                          <h3 className="font-bold text-lg text-red-600 mb-2">
                             🚨 ÚLTIMA ADVERTENCIA 🚨
                           </h3>
-                          <p className={`${darkMode ? 'text-red-300' : 'text-red-700'} font-medium`}>
+                          <p className="text-red-700 font-medium">
                             Esta es tu última oportunidad para cancelar.
                           </p>
-                          <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'} mt-2`}>
+                          <p className="text-muted-foreground mt-2">
                             ¿Realmente quieres <strong>ELIMINAR DEFINITIVAMENTE</strong> tu cuenta de Captus?
                           </p>
-                          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'} mt-2`}>
+                          <p className="text-sm text-muted-foreground mt-2">
                             No podrás recuperar ningún dato después de esto.
                           </p>
                         </div>
                         {countdownActive && (
-                          <div className={`text-center p-3 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                            <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                          <div className="text-center p-3 rounded-lg bg-muted">
+                            <p className="text-sm text-muted-foreground">
                               El botón se habilitará en: <span className="font-bold text-red-500">{countdown}s</span>
                             </p>
                             <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
@@ -792,7 +1032,7 @@ export default function SettingsPage() {
                     variant="outline"
                     onClick={handleCancelDelete}
                     disabled={deletingAccount}
-                    className={darkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : ''}
+                    className=""
                   >
                     Cancelar
                   </Button>

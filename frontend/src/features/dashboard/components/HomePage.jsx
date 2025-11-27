@@ -59,12 +59,12 @@ const mockTasks = [
 
 function StatCard({ icon, label, value, bgColor }) {
   return (
-    <Card className="p-4 border border-gray-200 rounded-xl hover:shadow-md transition-shadow">
+    <Card className="p-4 border border-border rounded-xl hover:shadow-md transition-shadow">
       <div className="flex items-center space-x-3">
         <div className={`${bgColor} p-3 rounded-lg`}>{icon}</div>
         <div>
-          <p className="text-2xl font-bold text-gray-900">{value}</p>
-          <p className="text-sm text-gray-600">{label}</p>
+          <p className="text-2xl font-bold text-foreground">{value}</p>
+          <p className="text-sm text-muted-foreground">{label}</p>
         </div>
       </div>
     </Card>
@@ -84,10 +84,10 @@ function TaskItem({ task, index, onClick }) {
         <h3 className="text-base font-semibold text-foreground">
           {task.title}
         </h3>
-        <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-800">
+        <span className="text-xs px-2 py-0.5 rounded-full bg-red-500/10 text-red-500">
           {task.Priority?.name || 'Sin prioridad'}
         </span>
-        <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-800">
+        <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
           {task.state ? 'Completada' : 'Pendiente'}
         </span>
       </div>
@@ -236,11 +236,11 @@ const HomePage = () => {
               {loading ? (
                 <div className="text-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
-                  <p className="mt-2 text-gray-600">Cargando tareas...</p>
+                  <p className="mt-2 text-muted-foreground">Cargando tareas...</p>
                 </div>
               ) : pendingTasks.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-gray-600">No tienes tareas pendientes</p>
+                  <p className="text-muted-foreground">No tienes tareas pendientes</p>
                   <Link to="/tasks">
                     <Button className="mt-2 bg-green-600 hover:bg-green-700">
                       Crear tarea
