@@ -11,7 +11,7 @@ const getBaseUrl = () => {
 // Create axios instance with default config
 const apiClient = axios.create({
   baseURL: getBaseUrl(),
-  timeout: 10000,
+  timeout: 30000, // Increased to 30s for statistics queries
   headers: {
     'Content-Type': 'application/json',
   },

@@ -54,4 +54,9 @@ export class SubTaskController {
     const result = await subTaskService.complete(parseInt(id));
     res.status(result.success ? 200 : 400).json(result);
   }
+
+  async getTaskIdsWithSubTasks(req, res) {
+    const result = await subTaskService.getTaskIdsWithSubTasks();
+    res.status(result.success ? 200 : 401).json(result);
+  }
 }

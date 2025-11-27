@@ -24,8 +24,8 @@ const TaskCard = ({
 
   return (
     <div className={`bg-card border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow ${
-      task.completed ? 'opacity-75' : ''
-    } ${isOverdue ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-border'}`}>
+      isOverdue ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-border'
+    }`}>
       <div className="flex items-start justify-between">
         <div className="flex items-start space-x-3 flex-1">
           <button
@@ -112,7 +112,7 @@ const TaskCard = ({
           <div className="flex items-center space-x-2 ml-4">
             <button
               onClick={() => setShowSubTasksModal(true)}
-              className="text-blue-600 hover:text-blue-900 text-sm font-medium flex items-center"
+              className={`${task.completed ? 'text-gray-600 hover:text-gray-900' : 'text-blue-600 hover:text-blue-900'} text-sm font-medium flex items-center`}
               title="Gestionar subtareas"
             >
               <ListChecks size={16} className="mr-1" />

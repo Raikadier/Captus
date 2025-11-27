@@ -79,6 +79,7 @@ class SubTaskRepository extends BaseRepository {
     }
     return true;
   }
+
 }
 
 export default SubTaskRepository;

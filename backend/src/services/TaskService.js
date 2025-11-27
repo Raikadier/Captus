@@ -167,7 +167,15 @@ export class TaskService {
    */
   async delete(taskId, userId) {
     try {
-      const existingTask = await taskRepository.getById(taskId);
+      // Map completed to state if present
+      if (task.completed !== undefined) {
+        task.state = task.completed;
+      }
+
+      const validation = this.validateTask(task, true); // isUpdate = true
+      if (!validation.success) return validation;
+
+      const existingTask = await taskRepository.getById(task.id_Task);
       if (!existingTask) {
         return new OperationResult(false, "Tarea no encontrada.");
       }
@@ -175,8 +183,20 @@ export class TaskService {
         return new OperationResult(false, "No tienes permiso para eliminar esta tarea.");
       }
 
-      await this.deleteSubTasksByParentTask(taskId);
-      await taskRepository.delete(taskId);
+      if (!task.state && existingTask.state) {
+        return new OperationResult(false, "No se puede desmarcar una tarea completada.");
+      }
+
+      // If completing the task, mark all subtasks as completed
+      if (task.state && !existingTask.state) {
+        await this.markAllSubTasksAsCompleted(task.id_Task);
+      }
+
+      const updated = await taskRepository.update(task);
+
+      if (updated) {
+        // Load relations for email notification
+        await this.loadTaskRelations(updated);
 
       return new OperationResult(true, "¡Tarea eliminada exitosamente!");
     } catch (error) {
@@ -231,34 +251,102 @@ export class TaskService {
    */
   async getIncompleteByUser(userId) {
     try {
-      let tasks = await taskRepository.getAllByUserId(userId);
-      tasks = tasks.filter(task => !task.state);
-      return new OperationResult(true, "Tareas incompletas obtenidas.", tasks);
+      const task = await taskRepository.getById(taskId);
+      if (!task || task.id_User !== this.currentUser?.id) {
+        return new OperationResult(false, "Tarea no encontrada.");
+      }
+
+      // Check if task is overdue
+      if (state && task.endDate) {
+        const now = new Date();
+        const dueDate = new Date(task.endDate);
+        if (dueDate < now) {
+          return new OperationResult(false, "No se puede completar una tarea que ha pasado su fecha límite.");
+        }
+      }
+
+      // Check if any subtasks are overdue (if trying to complete parent task)
+      if (state) {
+        const subTasks = await subTaskRepository.getAllByTaskId(taskId);
+        const hasOverdueSubTasks = subTasks.some(subTask => {
+          if (subTask.endDate) {
+            const now = new Date();
+            const subTaskDueDate = new Date(subTask.endDate);
+            return subTaskDueDate < now;
+          }
+          return false;
+        });
+
+        if (hasOverdueSubTasks) {
+          return new OperationResult(false, "No se puede completar una tarea que tiene subtareas vencidas.");
+        }
+
+        // Mark all subtasks as completed when completing parent task
+        await this.markAllSubTasksAsCompleted(taskId);
+      }
+
+      task.state = state;
+      const result = await this.update(task);
+
+      if (state) {
+        await this.updateStatisticsOnCompletion(task.id_User);
+
+        // Send completion notification email (non-blocking)
+        await this.loadTaskRelations(task);
+        this.sendTaskNotification(task, 'completed').catch(error => {
+          console.error('Error sending task completion notification:', error);
+        });
+      }
+
+      return result;
     } catch (error) {
       console.error(`Error inesperado en TaskService.getIncompleteByUser: ${error.message}`);
       throw new Error("Ocurrió un error inesperado al obtener las tareas incompletas.");
     }
   }
 
-  // --- Métodos de Ayuda (Helper Methods) ---
+  async updateStatisticsOnCompletion(userId) {
+    try {
+      // Update streak after completing a task
+      await this.updateStreakOnCompletion(userId);
 
-  async deleteSubTasksByParentTask(taskId) {
-    // Este método no requiere userId porque la validación se hace en el método público `delete`.
-    const subTasks = await subTaskRepository.getAllByTaskId(taskId);
-    for (const subTask of subTasks) {
-      await subTaskRepository.delete(subTask.id_SubTask);
+      // Update favorite category analysis
+      await this.updateFavoriteCategory(userId);
+    } catch (error) {
+      console.error("Error actualizando estadísticas:", error);
     }
   }
 
-  async updateStatisticsOnCompletion(userId) {
-    const stats = await statisticsRepository.getByUser(userId);
-    if (!stats) return;
+  async updateFavoriteCategory(userId) {
+    try {
+      // Import StatisticsService dynamically to avoid circular dependency
+      const { StatisticsService } = await import('./StatisticsService.js');
+      const statsService = new StatisticsService();
+      statsService.setCurrentUser({ id: userId });
+      await statsService.updateFavoriteCategory();
+    } catch (error) {
+      console.error("Error actualizando categoría favorita:", error);
+    }
+  }
 
-    const updatedStats = {
-      ...stats,
-      completedTasks: (stats.completedTasks ?? 0) + 1,
-    };
-    await statisticsRepository.update(updatedStats);
+  async updateStreakOnCompletion(userId) {
+    try {
+      // Import StatisticsService dynamically to avoid circular dependency
+      const { StatisticsService } = await import('./StatisticsService.js');
+      const statsService = new StatisticsService();
+      statsService.setCurrentUser({ id: userId });
+      await statsService.checkStreak();
+    } catch (error) {
+      console.error("Error actualizando racha:", error);
+    }
+  }
+
+  async create(task) {
+    return this.save(task);
+  }
+
+  async complete(id) {
+    return this.updateTaskState(id, true);
   }
 
   async loadTaskRelations(task) {
@@ -270,11 +358,27 @@ export class TaskService {
     }
   }
 
-  async sendTaskNotification(task, action, userEmail) {
-    if (!userEmail) return; // No se puede notificar sin email.
-    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
-      console.warn('Credenciales de Gmail no configuradas. Omitiendo notificación por email.');
-      return;
+  async loadTaskRelations(task) {
+    try {
+      if (task.id_Category) {
+        try {
+          task.Category = await categoryRepository.getById(task.id_Category);
+        } catch (error) {
+          console.error("Error cargando categoría de tarea:", error);
+          task.Category = null;
+        }
+      }
+
+      if (task.id_Priority) {
+        try {
+          task.Priority = await priorityRepository.getById(task.id_Priority);
+        } catch (error) {
+          console.error("Error cargando prioridad de tarea:", error);
+          task.Priority = null;
+        }
+      }
+    } catch (error) {
+      console.error("Error cargando relaciones de tarea:", error);
     }
 
     // El resto de la lógica de nodemailer permanece igual...
