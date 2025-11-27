@@ -1,7 +1,9 @@
 import { TaskService } from "../services/TaskService.js";
 import NotificationService from '../services/NotificationService.js';
+import { AchievementValidatorService } from '../services/AchievementValidatorService.js';
 
 const taskService = new TaskService();
+const achievementValidator = new AchievementValidatorService();
 
 export class TaskController {
   constructor() {
@@ -9,6 +11,7 @@ export class TaskController {
     this.injectUser = (req, res, next) => {
       if (req.user) {
         taskService.setCurrentUser(req.user);
+        achievementValidator.setCurrentUser(req.user);
       }
       next();
     };
@@ -43,6 +46,13 @@ export class TaskController {
         entity_id: result.data.id || result.data.id_Task,
         is_auto: true
       });
+
+      // Validar logros relacionados con creación de tareas
+      try {
+        await achievementValidator.onTaskCreated(req.user.id);
+      } catch (error) {
+        console.error('Error validating achievements on task creation:', error);
+      }
     }
 
     res.status(result.success ? 201 : 400).json(result);
@@ -64,6 +74,16 @@ export class TaskController {
   async complete(req, res) {
     const { id } = req.params;
     const result = await taskService.complete(parseInt(id));
+
+    if (result.success) {
+      // Validar logros relacionados con completar tareas
+      try {
+        await achievementValidator.onTaskCompleted(req.user.id);
+      } catch (error) {
+        console.error('Error validating achievements on task completion:', error);
+      }
+    }
+
     res.status(result.success ? 200 : 400).json(result);
   }
 
