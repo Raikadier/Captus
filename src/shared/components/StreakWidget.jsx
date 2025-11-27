@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Card } from '../../ui/card';
 import apiClient from '../api/client';
 import { toast } from 'sonner';
+import { useStreakData, useEventsData, useProjectsData, useNotesData, usePriorityData, useTimeData, useAchievementsData } from '../../hooks/useConsolidatedStats';
 
 const StreakWidget = () => {
   const [streakData, setStreakData] = useState(null);
@@ -413,29 +414,7 @@ export const FavoriteCategoryWidget = () => {
 
 // Events Overview Widget (Small)
 export const EventsOverviewWidget = () => {
-  const [eventsData, setEventsData] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchEventsData();
-  }, []);
-
-  const fetchEventsData = async () => {
-    try {
-      const response = await apiClient.get('/statistics/additional');
-      const data = response?.data;
-      if (data) {
-        setEventsData({
-          totalEvents: data.totalEvents || 0,
-          upcomingEvents: data.upcomingEvents || 0
-        });
-      }
-    } catch (error) {
-      console.error('Error fetching events data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { eventsData, loading } = useEventsData();
 
   if (loading) {
     return (
@@ -443,7 +422,6 @@ export const EventsOverviewWidget = () => {
         <div className="animate-pulse space-y-2">
           <div className="h-4 bg-muted rounded w-3/4"></div>
           <div className="h-6 bg-muted rounded w-1/2"></div>
-          <div className="h-4 bg-muted rounded w-2/3"></div>
         </div>
       </Card>
     );
@@ -459,23 +437,13 @@ export const EventsOverviewWidget = () => {
         </div>
         <div>
           <h3 className="font-semibold text-gray-900">Eventos</h3>
-          <p className="text-sm text-gray-600">Calendario y actividades</p>
+          <p className="text-sm text-gray-600">Calendario</p>
         </div>
       </div>
 
-      <div className="space-y-3">
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-600">Total de eventos</span>
-          <span className="font-bold text-purple-600">{eventsData.totalEvents}</span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-600">Próximos</span>
-          <span className="font-medium text-gray-900">{eventsData.upcomingEvents}</span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-600">Completados</span>
-          <span className="font-medium text-green-600">{eventsData.totalEvents - eventsData.upcomingEvents}</span>
-        </div>
+      <div className="flex justify-between items-center mt-2">
+        <span className="text-sm text-gray-600">Total de eventos</span>
+        <span className="text-2xl font-bold text-purple-600">{eventsData.totalEvents}</span>
       </div>
     </Card>
   );
@@ -483,29 +451,7 @@ export const EventsOverviewWidget = () => {
 
 // Projects Overview Widget (Small)
 export const ProjectsOverviewWidget = () => {
-  const [projectsData, setProjectsData] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchProjectsData();
-  }, []);
-
-  const fetchProjectsData = async () => {
-    try {
-      const response = await apiClient.get('/statistics/additional');
-      const data = response?.data;
-      if (data) {
-        setProjectsData({
-          totalProjects: data.totalProjects || 0,
-          activeProjects: data.activeProjects || 0
-        });
-      }
-    } catch (error) {
-      console.error('Error fetching projects data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { projectsData, loading } = useProjectsData();
 
   if (loading) {
     return (
@@ -551,32 +497,9 @@ export const ProjectsOverviewWidget = () => {
   );
 };
 
-// Notes & Categories Widget (Small)
-export const NotesCategoriesWidget = () => {
-  const [notesData, setNotesData] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchNotesData();
-  }, []);
-
-  const fetchNotesData = async () => {
-    try {
-      const response = await apiClient.get('/statistics/additional');
-      const data = response?.data;
-      if (data) {
-        setNotesData({
-          totalNotes: data.totalNotes || 0,
-          recentNotes: data.recentNotes || 0,
-          totalCategories: data.totalCategories || 0
-        });
-      }
-    } catch (error) {
-      console.error('Error fetching notes data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+// Notes Stats Widget (Small)
+export const NotesStatsWidget = () => {
+  const { notesData, loading } = useNotesData();
 
   if (loading) {
     return (
@@ -584,7 +507,6 @@ export const NotesCategoriesWidget = () => {
         <div className="animate-pulse space-y-2">
           <div className="h-4 bg-muted rounded w-3/4"></div>
           <div className="h-6 bg-muted rounded w-1/2"></div>
-          <div className="h-4 bg-muted rounded w-2/3"></div>
         </div>
       </Card>
     );
@@ -599,47 +521,22 @@ export const NotesCategoriesWidget = () => {
           <CheckCircle className="text-cyan-600" size={24} />
         </div>
         <div>
-          <h3 className="font-semibold text-gray-900">Notas y Categorías</h3>
-          <p className="text-sm text-gray-600">Organización del contenido</p>
+          <h3 className="font-semibold text-gray-900">Notas</h3>
+          <p className="text-sm text-gray-600">Total de notas</p>
         </div>
       </div>
 
-      <div className="space-y-3">
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-600">Total de notas</span>
-          <span className="font-bold text-cyan-600">{notesData.totalNotes}</span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-600">Categorías</span>
-          <span className="font-medium text-purple-600">{notesData.totalCategories}</span>
-        </div>
+      <div className="flex justify-between items-center mt-2">
+        <span className="text-sm text-gray-600">Total</span>
+        <span className="text-2xl font-bold text-cyan-600">{notesData.totalNotes}</span>
       </div>
     </Card>
   );
 };
 
-// Priority Stats Widget
-export const PriorityStatsWidget = () => {
-  const [priorityData, setPriorityData] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchPriorityData();
-  }, []);
-
-  const fetchPriorityData = async () => {
-    try {
-      const response = await apiClient.get('/statistics/additional');
-      const data = response?.data;
-      if (data?.priorityStats) {
-        setPriorityData(data.priorityStats);
-      }
-    } catch (error) {
-      console.error('Error fetching priority data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+// Categories Stats Widget (Small)
+export const CategoriesStatsWidget = () => {
+  const { notesData, loading } = useNotesData();
 
   if (loading) {
     return (
@@ -647,83 +544,38 @@ export const PriorityStatsWidget = () => {
         <div className="animate-pulse space-y-2">
           <div className="h-4 bg-muted rounded w-3/4"></div>
           <div className="h-6 bg-muted rounded w-1/2"></div>
-          <div className="h-4 bg-muted rounded w-2/3"></div>
         </div>
       </Card>
     );
   }
 
-  if (!priorityData) return null;
-
-  const total = priorityData.high + priorityData.medium + priorityData.low;
+  if (!notesData) return null;
 
   return (
     <Card className="p-6 border border-gray-200 rounded-xl hover:shadow-md transition-shadow">
       <div className="flex items-center space-x-4 mb-4">
-        <div className="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
-          <AlertTriangle className="text-red-600" size={24} />
+        <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
+          <Settings className="text-purple-600" size={24} />
         </div>
         <div>
-          <h3 className="font-semibold text-gray-900">Prioridades</h3>
-          <p className="text-sm text-gray-600">Distribución por urgencia</p>
+          <h3 className="font-semibold text-gray-900">Categorías</h3>
+          <p className="text-sm text-gray-600">Organización</p>
         </div>
       </div>
 
-      <div className="space-y-3">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <AlertTriangle className="text-red-500" size={16} />
-            <span className="text-sm text-gray-600">Alta</span>
-          </div>
-          <span className="font-bold text-red-600">{priorityData.high}</span>
-        </div>
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <Minus className="text-yellow-500" size={16} />
-            <span className="text-sm text-gray-600">Media</span>
-          </div>
-          <span className="font-medium text-yellow-600">{priorityData.medium}</span>
-        </div>
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <AlertCircle className="text-green-500" size={16} />
-            <span className="text-sm text-gray-600">Baja</span>
-          </div>
-          <span className="font-medium text-green-600">{priorityData.low}</span>
-        </div>
-        <div className="pt-2 border-t">
-          <div className="flex justify-between items-center">
-            <span className="text-sm font-medium text-gray-600">Total</span>
-            <span className="font-bold text-gray-900">{total}</span>
-          </div>
-        </div>
+      <div className="flex justify-between items-center mt-2">
+        <span className="text-sm text-gray-600">Total Categorías</span>
+        <span className="text-2xl font-bold text-purple-600">{notesData.totalCategories}</span>
       </div>
     </Card>
   );
 };
 
+
+
 // Average Completion Time Widget
 export const AverageTimeWidget = () => {
-  const [timeData, setTimeData] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchTimeData();
-  }, []);
-
-  const fetchTimeData = async () => {
-    try {
-      const response = await apiClient.get('/statistics/additional');
-      const data = response?.data;
-      if (data?.averageCompletionTime !== undefined) {
-        setTimeData({ averageTime: data.averageCompletionTime });
-      }
-    } catch (error) {
-      console.error('Error fetching time data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { timeData, loading } = useTimeData();
 
   if (loading) {
     return (
@@ -774,26 +626,7 @@ export const AverageTimeWidget = () => {
 
 // Recent Achievements Widget
 export const RecentAchievementsWidget = () => {
-  const [achievements, setAchievements] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchAchievements();
-  }, []);
-
-  const fetchAchievements = async () => {
-    try {
-      const response = await apiClient.get('/statistics/additional');
-      const data = response?.data;
-      if (data?.recentAchievements) {
-        setAchievements(data.recentAchievements);
-      }
-    } catch (error) {
-      console.error('Error fetching achievements:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { achievements, loading } = useAchievementsData();
 
   if (loading) {
     return (
@@ -835,6 +668,47 @@ export const RecentAchievementsWidget = () => {
             </div>
           </div>
         ))}
+      </div>
+    </Card>
+  );
+};
+
+// Best Streak Widget (Historical Record)
+export const BestStreakWidget = () => {
+  const { streakData, loading } = useStreakData();
+
+  if (loading) {
+    return (
+      <Card className="p-6 border border-gray-200 rounded-xl hover:shadow-md transition-shadow">
+        <div className="animate-pulse space-y-2">
+          <div className="h-4 bg-muted rounded w-3/4"></div>
+          <div className="h-6 bg-muted rounded w-1/2"></div>
+        </div>
+      </Card>
+    );
+  }
+
+  if (!streakData || !streakData.bestStreak) return null;
+
+  return (
+    <Card className="p-6 border border-gray-200 rounded-xl hover:shadow-md transition-shadow">
+      <div className="flex items-center space-x-4 mb-4">
+        <div className="w-12 h-12 bg-yellow-50 rounded-xl flex items-center justify-center">
+          <Award className="text-yellow-600" size={24} />
+        </div>
+        <div>
+          <h3 className="font-semibold text-gray-900">Mejor Racha</h3>
+          <p className="text-sm text-gray-600">Récord histórico</p>
+        </div>
+      </div>
+
+      <div className="text-center">
+        <div className="text-4xl font-bold text-yellow-600 mb-2">
+          {streakData.bestStreak} días
+        </div>
+        <p className="text-sm text-gray-600">
+          Tu mejor racha consecutiva
+        </p>
       </div>
     </Card>
   );
