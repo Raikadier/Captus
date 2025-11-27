@@ -1,157 +1,165 @@
+// backend/src/services/NotesService.js
 import NotesRepository from "../repositories/NotesRepository.js";
 import { OperationResult } from "../shared/OperationResult.js";
 
 const notesRepository = new NotesRepository();
 
+/**
+ * Servicio para la gestión de notas.
+ * Sigue un patrón stateless donde cada método recibe el userId para validación.
+ */
 export class NotesService {
-  constructor() {
-    this.currentUser = null;
-  }
 
-  setCurrentUser(user) {
-    this.currentUser = user;
-  }
+  constructor() {}
 
+  /**
+   * Valida los datos de una nota.
+   * @param {object} note - El objeto de la nota.
+   * @returns {OperationResult} - El resultado de la validación.
+   */
   validateNote(note) {
     if (!note) {
       return new OperationResult(false, "La nota no puede ser nula.");
     }
-
     if (!note.title || note.title.trim() === "") {
       return new OperationResult(false, "El título de la nota no puede estar vacío.");
     }
-
     return new OperationResult(true);
   }
 
-  async create(note) {
-    return this.save(note);
-  }
-
-  async save(note) {
+  /**
+   * Crea una nueva nota.
+   * @param {object} noteData - Datos de la nota.
+   * @param {string} userId - ID del usuario propietario.
+   * @returns {Promise<OperationResult>}
+   */
+  async create(noteData, userId) {
     try {
-      const validation = this.validateNote(note);
+      const validation = this.validateNote(noteData);
       if (!validation.success) return validation;
 
-      note.user_id = this.currentUser?.id;
+      const noteToSave = {
+        ...noteData,
+        user_id: userId,
+      };
 
-      if (!note.user_id) {
-        return new OperationResult(false, "Usuario no autenticado.");
-      }
-
-      const savedNote = await notesRepository.save(note);
-      if (savedNote) {
-        return new OperationResult(true, "Nota guardada exitosamente.", savedNote);
-      } else {
-        return new OperationResult(false, "Error al guardar la nota.");
-      }
+      const savedNote = await notesRepository.save(noteToSave);
+      return new OperationResult(true, `Nota "${savedNote.title}" creada exitosamente.`, savedNote);
     } catch (error) {
-      return new OperationResult(false, `Error al guardar la nota: ${error.message}`);
+      console.error(`Error inesperado en NotesService.create: ${error.message}`);
+      throw new Error("Ocurrió un error inesperado al crear la nota.");
     }
   }
 
-  async getAll() {
+  /**
+   * Actualiza una nota existente.
+   * @param {string|number} noteId - ID de la nota.
+   * @param {object} updates - Campos a actualizar.
+   * @param {string} userId - ID del usuario.
+   * @returns {Promise<OperationResult>}
+   */
+  async update(noteId, updates, userId) {
     try {
-      if (!this.currentUser) {
-        return new OperationResult(false, "Usuario no autenticado.");
+      const validation = this.validateNote(updates, true);
+      if (!validation.success) return validation;
+
+      const existingNote = await notesRepository.getById(noteId);
+      if (!existingNote) {
+        return new OperationResult(false, "Nota no encontrada.");
+      }
+      if (existingNote.user_id !== userId) {
+        return new OperationResult(false, "No tienes permiso para actualizar esta nota.");
       }
 
-      const notes = await notesRepository.getAllByUserId(this.currentUser.id);
+      const noteToUpdate = { ...existingNote, ...updates, update_at: new Date() };
+      const updatedNote = await notesRepository.update(noteToUpdate);
+      return new OperationResult(true, "Nota actualizada exitosamente.", updatedNote);
+    } catch (error) {
+      console.error(`Error inesperado en NotesService.update: ${error.message}`);
+      throw new Error("Ocurrió un error inesperado al actualizar la nota.");
+    }
+  }
+
+  /**
+   * Elimina una nota.
+   * @param {string|number} noteId - ID de la nota.
+   * @param {string} userId - ID del usuario.
+   * @returns {Promise<OperationResult>}
+   */
+  async delete(noteId, userId) {
+    try {
+      const existingNote = await notesRepository.getById(noteId);
+      if (!existingNote) {
+        return new OperationResult(false, "Nota no encontrada.");
+      }
+      if (existingNote.user_id !== userId) {
+        return new OperationResult(false, "No tienes permiso para eliminar esta nota.");
+      }
+
+      await notesRepository.delete(noteId);
+      return new OperationResult(true, "Nota eliminada exitosamente.");
+    } catch (error) {
+      console.error(`Error inesperado en NotesService.delete: ${error.message}`);
+      throw new Error("Ocurrió un error inesperado al eliminar la nota.");
+    }
+  }
+
+  /**
+   * Obtiene una nota por su ID.
+   * @param {string|number} noteId - ID de la nota.
+   * @param {string} userId - ID del usuario.
+   * @returns {Promise<OperationResult>}
+   */
+  async getById(noteId, userId) {
+    try {
+      const note = await notesRepository.getById(noteId);
+      if (!note) {
+        return new OperationResult(false, "Nota no encontrada.");
+      }
+      if (note.user_id !== userId) {
+        return new OperationResult(false, "No tienes permiso para ver esta nota.");
+      }
+      return new OperationResult(true, "Nota encontrada.", note);
+    } catch (error) {
+      console.error(`Error inesperado en NotesService.getById: ${error.message}`);
+      throw new Error("Ocurrió un error inesperado al obtener la nota.");
+    }
+  }
+
+  /**
+   * Obtiene todas las notas de un usuario.
+   * @param {string} userId - ID del usuario.
+   * @returns {Promise<OperationResult>}
+   */
+  async getAll(userId) {
+    try {
+      const notes = await notesRepository.getAllByUserId(userId);
       return new OperationResult(true, "Notas obtenidas exitosamente.", notes);
     } catch (error) {
-      return new OperationResult(false, `Error al obtener notas: ${error.message}`);
+      console.error(`Error inesperado en NotesService.getAll: ${error.message}`);
+      throw new Error("Ocurrió un error inesperado al obtener las notas.");
     }
   }
 
-  async getById(id) {
+  /**
+   * Cambia el estado de fijado de una nota.
+   * @param {string|number} noteId - ID de la nota.
+   * @param {string} userId - ID del usuario.
+   * @returns {Promise<OperationResult>}
+   */
+  async togglePin(noteId, userId) {
     try {
-      if (!id) {
-        return new OperationResult(false, "ID de nota inválido.");
-      }
-
-      const note = await notesRepository.getById(id);
-      if (note) {
-        if (note.user_id === this.currentUser?.id) {
-          return new OperationResult(true, "Nota encontrada.", note);
-        } else {
-          return new OperationResult(false, "Nota no accesible.");
-        }
-      } else {
-        return new OperationResult(false, "Nota no encontrada.");
-      }
-    } catch (error) {
-      return new OperationResult(false, `Error al obtener nota: ${error.message}`);
-    }
-  }
-
-  async update(note) {
-    try {
-      const validation = this.validateNote(note);
-      if (!validation.success) return validation;
-
-      const existingNote = await notesRepository.getById(note.id);
-      if (!existingNote) {
-        return new OperationResult(false, "Nota no encontrada.");
-      }
-
-      if (existingNote.user_id !== this.currentUser?.id) {
-        return new OperationResult(false, "Nota no accesible.");
-      }
-
-      // Update the update_at timestamp
-      note.update_at = new Date();
-
-      const updated = await notesRepository.update(note);
-      if (updated) {
-        return new OperationResult(true, "Nota actualizada exitosamente.", updated);
-      } else {
-        return new OperationResult(false, "Error al actualizar la nota.");
-      }
-    } catch (error) {
-      return new OperationResult(false, `Error al actualizar nota: ${error.message}`);
-    }
-  }
-
-  async togglePin(id) {
-    try {
-      if (!id) {
-        return new OperationResult(false, "ID de nota inválido.");
-      }
-
-      const toggled = await notesRepository.togglePin(id, this.currentUser?.id);
+      // La validación de propiedad la hace el propio repositorio en este caso.
+      const toggled = await notesRepository.togglePin(noteId, userId);
       if (toggled) {
-        return new OperationResult(true, "Estado de fijación actualizado.", toggled);
+        return new OperationResult(true, "Estado de fijación de la nota actualizado.", toggled);
       } else {
-        return new OperationResult(false, "Error al actualizar el estado de fijación.");
+        // Esto podría pasar si la nota no se encuentra o no pertenece al usuario.
+        return new OperationResult(false, "No se pudo actualizar el estado de fijación de la nota.");
       }
     } catch (error) {
-      return new OperationResult(false, `Error al cambiar estado de fijación: ${error.message}`);
-    }
-  }
-
-  async delete(id) {
-    try {
-      if (!id) {
-        return new OperationResult(false, "ID de nota inválido.");
-      }
-
-      const existingNote = await notesRepository.getById(id);
-      if (!existingNote) {
-        return new OperationResult(false, "Nota no encontrada.");
-      }
-
-      if (existingNote.user_id !== this.currentUser?.id) {
-        return new OperationResult(false, "Nota no accesible.");
-      }
-
-      const deleted = await notesRepository.delete(id);
-      if (deleted) {
-        return new OperationResult(true, "Nota eliminada exitosamente.");
-      } else {
-        return new OperationResult(false, "Error al eliminar la nota.");
-      }
-    } catch (error) {
-      return new OperationResult(false, `Error al eliminar nota: ${error.message}`);
+      console.error(`Error inesperado en NotesService.togglePin: ${error.message}`);
+      throw new Error("Ocurrió un error inesperado al cambiar el estado de fijación.");
     }
   }
 }
