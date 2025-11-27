@@ -243,7 +243,7 @@ export default function StudentCourseDetailPage() {
       </Breadcrumb>
 
       {/* Header with course info */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
+      <div className="bg-card rounded-xl shadow-sm p-6">
         <Button
           variant="ghost"
           size="sm"
@@ -260,15 +260,15 @@ export default function StudentCourseDetailPage() {
             style={{ backgroundColor: displayCourse.color || '#3b82f6' }}
           />
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{displayCourse.title || displayCourse.name}</h1>
-            <p className="text-sm text-gray-600">{displayCourse.description || displayCourse.professor}</p>
+            <h1 className="text-2xl font-bold text-foreground">{displayCourse.title || displayCourse.name}</h1>
+            <p className="text-sm text-muted-foreground">{displayCourse.description || displayCourse.professor}</p>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="bg-white border mb-6">
+        <TabsList className="bg-card border mb-6">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="content">Contenido</TabsTrigger>
           <TabsTrigger value="assignments">Tareas</TabsTrigger>
@@ -279,34 +279,34 @@ export default function StudentCourseDetailPage() {
         <TabsContent value="overview">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Próximas clases */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">Próximas Clases</h3>
+            <div className="bg-card rounded-xl shadow-sm p-6">
+              <h3 className="font-semibold text-foreground mb-4">Próximas Clases</h3>
               <div className="space-y-3">
                 <div className="p-3 bg-blue-50 rounded-lg">
-                  <p className="text-sm font-medium text-gray-900">Límites y Continuidad</p>
-                  <p className="text-xs text-gray-600">Lunes 10:00 AM</p>
+                  <p className="text-sm font-medium text-foreground">Límites y Continuidad</p>
+                  <p className="text-xs text-muted-foreground">Lunes 10:00 AM</p>
                 </div>
               </div>
             </div>
 
             {/* Últimas publicaciones */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">Últimas Publicaciones</h3>
+            <div className="bg-card rounded-xl shadow-sm p-6">
+              <h3 className="font-semibold text-foreground mb-4">Últimas Publicaciones</h3>
               <div className="space-y-3">
                 <div className="p-3 bg-primary/10 rounded-lg">
-                  <p className="text-sm font-medium text-gray-900">Material de Derivadas</p>
-                  <p className="text-xs text-gray-600">Hace 2 días</p>
+                  <p className="text-sm font-medium text-foreground">Material de Derivadas</p>
+                  <p className="text-xs text-muted-foreground">Hace 2 días</p>
                 </div>
               </div>
             </div>
 
             {/* Tareas pendientes */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">Tareas Pendientes</h3>
+            <div className="bg-card rounded-xl shadow-sm p-6">
+              <h3 className="font-semibold text-foreground mb-4">Tareas Pendientes</h3>
               <div className="space-y-3">
                 <div className="p-3 bg-red-50 rounded-lg">
-                  <p className="text-sm font-medium text-gray-900">Taller 3</p>
-                  <p className="text-xs text-gray-600">Vence en 2 días</p>
+                  <p className="text-sm font-medium text-foreground">Taller 3</p>
+                  <p className="text-xs text-muted-foreground">Vence en 2 días</p>
                 </div>
               </div>
             </div>
@@ -315,19 +315,19 @@ export default function StudentCourseDetailPage() {
 
         <TabsContent value="content">
           <Card className="p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Material del Curso</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-4">Material del Curso</h2>
             <div className="space-y-2">
               {contentItems.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                  className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted transition-colors cursor-pointer"
                   onClick={() => console.log('[v0] Open content', item.id)}
                 >
                   <div className="flex items-center gap-3">
                     {getTypeIcon(item.type)}
                     <div>
-                      <p className="font-medium text-gray-900">{item.title}</p>
-                      <p className="text-xs text-gray-600">
+                      <p className="font-medium text-foreground">{item.title}</p>
+                      <p className="text-xs text-muted-foreground">
                         {item.type} • {item.type === 'Video' ? item.duration : `${item.pages} páginas`}
                       </p>
                     </div>
@@ -349,22 +349,22 @@ export default function StudentCourseDetailPage() {
         <TabsContent value="assignments">
           <Card className="p-6">
             <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-gray-900">Tareas del Curso</h2>
+                <h2 className="text-xl font-semibold text-foreground">Tareas del Curso</h2>
             </div>
 
             <div className="space-y-3">
               {displayedAssignments.map((assignment) => (
                 <div
                   key={assignment.id}
-                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted transition-colors"
                 >
                   <div className="flex-1">
-                    <p className="font-medium text-gray-900">{assignment.name}</p>
+                    <p className="font-medium text-foreground">{assignment.name}</p>
                     <div className="flex items-center gap-2 mt-1">
-                      <Calendar className="w-3 h-3 text-gray-500" />
-                      <p className="text-xs text-gray-600">Entrega: {assignment.dueDate}</p>
+                      <Calendar className="w-3 h-3 text-muted-foreground" />
+                      <p className="text-xs text-muted-foreground">Entrega: {assignment.dueDate}</p>
                       {assignment.grade && (
-                        <span className="text-xs text-gray-600 ml-2">• Nota: {assignment.grade}/100</span>
+                        <span className="text-xs text-muted-foreground ml-2">• Nota: {assignment.grade}/100</span>
                       )}
                     </div>
                   </div>
@@ -419,19 +419,19 @@ export default function StudentCourseDetailPage() {
 
         <TabsContent value="announcements">
           <Card className="p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Anuncios del Curso</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-4">Anuncios del Curso</h2>
             <div className="space-y-4">
               {announcements.map((announcement) => (
-                <div key={announcement.id} className="border-b border-gray-200 pb-4 last:border-0 last:pb-0">
+                <div key={announcement.id} className="border-b border-border pb-4 last:border-0 last:pb-0">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <Bell className="w-4 h-4 text-gray-600" />
-                      <h3 className="font-semibold text-gray-900">{announcement.title}</h3>
+                      <Bell className="w-4 h-4 text-muted-foreground" />
+                      <h3 className="font-semibold text-foreground">{announcement.title}</h3>
                     </div>
                     {getAnnouncementBadge(announcement.type)}
                   </div>
-                  <p className="text-sm text-gray-700 mb-2">{announcement.content}</p>
-                  <p className="text-xs text-gray-500">{announcement.date}</p>
+                  <p className="text-sm text-muted-foreground mb-2">{announcement.content}</p>
+                  <p className="text-xs text-muted-foreground">{announcement.date}</p>
                 </div>
               ))}
             </div>
@@ -440,7 +440,7 @@ export default function StudentCourseDetailPage() {
 
         <TabsContent value="students">
           <Card className="p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Estudiantes Inscritos</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-4">Estudiantes Inscritos</h2>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -457,20 +457,20 @@ export default function StudentCourseDetailPage() {
                       {student.status === 'activo' ? (
                         <Badge className="bg-primary/10 text-primary hover:bg-primary/20">Activo</Badge>
                       ) : (
-                        <Badge className="bg-gray-100 text-gray-700 hover:bg-gray-100">Retirado</Badge>
+                        <Badge className="bg-muted text-muted-foreground hover:bg-muted">Retirado</Badge>
                       )}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Progress value={student.progress} className="w-24" />
-                        <span className="text-sm text-gray-600">{student.progress}%</span>
+                        <span className="text-sm text-muted-foreground">{student.progress}%</span>
                       </div>
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-            {groups.length === 0 && <p className="text-gray-500 mt-4">No hay grupos formados.</p>}
+            {groups.length === 0 && <p className="text-muted-foreground mt-4">No hay grupos formados.</p>}
           </Card>
         </TabsContent>
       </Tabs>

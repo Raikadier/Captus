@@ -52,7 +52,7 @@ function EditEventModal({ onClose, onUpdate, event }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
       <div className="bg-card rounded-xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-300 border border-border">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
@@ -182,7 +182,7 @@ function CreateEventModal({ onClose, onCreate, selectedDate }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
       <div className="bg-card rounded-xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-300 border border-border">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
@@ -557,7 +557,7 @@ export default function CalendarPage() {
                       className={`p-3 rounded-lg border shadow-sm transition-all hover:shadow-md cursor-pointer flex items-center gap-3 ${getEventColor(event.type)}`}
                       onClick={() => handleEventClick(event)}
                     >
-                        <div className="p-2 bg-white/50 rounded-lg backdrop-blur-sm">
+                        <div className="p-2 bg-card/50 rounded-lg backdrop-blur-sm">
                             <Clock size={16} />
                         </div>
                         <div>
@@ -603,7 +603,7 @@ export default function CalendarPage() {
                     </div>
                     <span
                       className={`shrink-0 px-2 py-0.5 text-[10px] rounded-full font-medium border ${
-                        task.state ? 'bg-green-200/50 border-green-300 text-green-800' : 'bg-white/50 border-gray-200 text-gray-800'
+                        task.state ? 'bg-green-200/50 border-green-300 text-green-800' : 'bg-card/50 border-border text-foreground'
                       }`}
                     >
                       {task.state ? 'Listo' : 'Pendiente'}
@@ -824,14 +824,12 @@ export default function CalendarPage() {
                 newDate.setDate(newDate.getDate() - 7)
                 setCurrentDate(newDate)
               }}
-              className={`p-2 rounded-lg transition-colors ${
-                darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
-              }`}
+              className="p-2 rounded-lg transition-colors hover:bg-muted"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronLeft className="w-5 h-5 text-foreground" />
             </button>
 
-            <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+            <h2 className="text-2xl font-bold text-foreground">
               Semana del {currentDate.toLocaleDateString('es-ES')}
             </h2>
 
@@ -854,7 +852,7 @@ export default function CalendarPage() {
 
       {/* Task Details Modal */}
       {showTaskDetails && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-card rounded-xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-300 border border-border">
             <div className="p-6">
               <div className="flex justify-between items-start mb-6">
@@ -908,7 +906,7 @@ export default function CalendarPage() {
 
       {/* Event Details Modal */}
       {showEventDetails && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-card rounded-xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-300 border border-border">
             <div className="p-6">
               <div className="flex justify-between items-start mb-6">
@@ -999,7 +997,7 @@ export default function CalendarPage() {
       )}
 
       {showDeleteEventConfirm && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-card rounded-xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-300 border border-border">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">

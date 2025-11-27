@@ -63,8 +63,8 @@ export default function NotificationsPage() {
     <div className="container mx-auto p-6 max-w-4xl">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Notificaciones</h1>
-          <p className="text-gray-500 mt-1">Mantente al día con tus actividades académicas y personales</p>
+          <h1 className="text-3xl font-bold text-foreground">Notificaciones</h1>
+          <p className="text-muted-foreground mt-1">Mantente al día con tus actividades académicas y personales</p>
         </div>
         <div className="flex items-center gap-3">
           <Button variant="outline" onClick={handleMarkAllAsRead}>
@@ -89,40 +89,40 @@ export default function NotificationsPage() {
 
       <div className="space-y-4">
         {filteredNotifications.length === 0 ? (
-          <div className="text-center py-12 bg-gray-50 rounded-lg border border-dashed border-gray-200">
-            <Bell className="h-12 w-12 mx-auto text-gray-300 mb-3" />
-            <h3 className="text-lg font-medium text-gray-900">Sin notificaciones</h3>
-            <p className="text-gray-500">No tienes notificaciones {filter !== 'all' ? 'en esta categoría' : ''}</p>
+          <div className="text-center py-12 bg-card rounded-lg border border-dashed border-border">
+            <Bell className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+            <h3 className="text-lg font-medium text-foreground">Sin notificaciones</h3>
+            <p className="text-muted-foreground">No tienes notificaciones {filter !== 'all' ? 'en esta categoría' : ''}</p>
           </div>
         ) : (
           filteredNotifications.map((notification) => (
             <Card
               key={notification.id}
-              className={`p-4 transition-all hover:shadow-md ${!notification.read ? 'bg-blue-50/50 border-blue-100' : 'bg-white'}`}
+              className={`p-4 transition-all hover:shadow-md ${!notification.read ? 'bg-blue-50/50 border-blue-100' : 'bg-card'}`}
             >
               <div className="flex items-start gap-4">
-                <div className={`p-2 rounded-full ${!notification.read ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500'}`}>
+                <div className={`p-2 rounded-full ${!notification.read ? 'bg-blue-100 text-blue-600' : 'bg-muted text-muted-foreground'}`}>
                   <Bell size={20} />
                 </div>
 
                 <div className="flex-1">
                   <div className="flex justify-between items-start">
-                    <h3 className={`font-semibold text-lg ${!notification.read ? 'text-gray-900' : 'text-gray-700'}`}>
+                    <h3 className={`font-semibold text-lg ${!notification.read ? 'text-foreground' : 'text-muted-foreground'}`}>
                       {notification.title}
                     </h3>
-                    <span className="text-xs text-gray-400 flex items-center gap-1 whitespace-nowrap ml-2">
+                    <span className="text-xs text-muted-foreground flex items-center gap-1 whitespace-nowrap ml-2">
                       <Clock size={12} />
                       {new Date(notification.created_at).toLocaleString()}
                     </span>
                   </div>
 
-                  <p className="text-gray-600 mt-1 leading-relaxed">
+                  <p className="text-muted-foreground mt-1 leading-relaxed">
                     {notification.body}
                   </p>
 
                   {notification.event_type && (
                     <div className="mt-3">
-                      <Badge variant="secondary" className="text-xs font-normal bg-gray-100 text-gray-600">
+                      <Badge variant="secondary" className="text-xs font-normal bg-muted text-muted-foreground">
                         {notification.event_type.replace('_', ' ')}
                       </Badge>
                     </div>
