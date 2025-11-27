@@ -7,7 +7,8 @@ import apiClient from '../../shared/api/client'
 import Loading from '../../ui/loading'
 import { ManageSubjectsDialog } from '../subjects/components/ManageSubjectsDialog'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, AreaChart, Area, ComposedChart } from 'recharts'
-import StreakWidget, { FavoriteCategoryWidget, EventsOverviewWidget, ProjectsOverviewWidget, NotesCategoriesWidget, PriorityStatsWidget, AverageTimeWidget, RecentAchievementsWidget } from '../../shared/components/StreakWidget'
+import StreakWidget, { FavoriteCategoryWidget, EventsOverviewWidget, ProjectsOverviewWidget, NotesStatsWidget, CategoriesStatsWidget, AverageTimeWidget, RecentAchievementsWidget, BestStreakWidget } from '../../shared/components/StreakWidget'
+import { StatsProvider, useStreakData, useAdditionalStats } from '../../hooks/useConsolidatedStats'
 
 function getCurrentDate() {
   const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
@@ -79,7 +80,11 @@ function SubjectProgress({ subject }) {
   )
 }
 
-export default function StatsPage() {
+
+function StatsPageContent() {
+  const { streakData, loading: streakLoading } = useStreakData();
+  const { additionalStats, loading: additionalLoading } = useAdditionalStats();
+
   const [stats, setStats] = useState({
     averageGrade: 0,
     completedTasks: 0,
@@ -142,41 +147,16 @@ export default function StatsPage() {
 
   useEffect(() => {
     fetchStats();
-    fetchAdditionalStats();
   }, []);
 
-  // Use taskStats for completion percentage if available, otherwise fallback
   const completionPercent = taskStats.weeklyCompletionRate;
-
-  // Prepare data for new charts
   const totalCompleted = taskStats.totalCompleted || 0;
-  const totalCreated = totalCompleted + (taskStats.tasksCreatedToday || 0); // Estimate total created
+  const totalCreated = totalCompleted + (taskStats.tasksCreatedToday || 0);
   const pendingTasks = Math.max(0, totalCreated - totalCompleted);
 
-  // Get expired tasks (past due date but not completed)
   const expiredTasks = taskStats.productivityChart?.reduce((sum, day) => {
-    // Estimate expired tasks as created but not completed over time
     return sum + Math.max(0, day.created - day.completed);
   }, 0) || 0;
-
-  // Priority distribution data from backend
-  const [additionalStats, setAdditionalStats] = useState(null);
-
-  const fetchAdditionalStats = async () => {
-    try {
-      const response = await apiClient.get('/statistics/additional');
-      const data = response?.data;
-      if (data) {
-        setAdditionalStats(data);
-      }
-    } catch (error) {
-      console.error('Error fetching additional stats:', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchAdditionalStats();
-  }, []);
 
   const priorityDistribution = additionalStats?.priorityStats ? [
     { name: 'Alta', value: additionalStats.priorityStats.high, color: '#ef4444' },
@@ -184,13 +164,18 @@ export default function StatsPage() {
     { name: 'Baja', value: additionalStats.priorityStats.low, color: '#10b981' }
   ].filter(item => item.value > 0) : [];
 
+  if (loading) {
+    return <Loading message="Cargando estadísticas..." />;
+  }
+
   const completionRateData = [
     { name: 'Completadas', value: totalCompleted, color: '#22c55e', percentage: totalCreated > 0 ? Math.round((totalCompleted / totalCreated) * 100) : 0 },
     { name: 'Pendientes', value: Math.max(0, pendingTasks - expiredTasks), color: '#f59e0b', percentage: totalCreated > 0 ? Math.round(((pendingTasks - expiredTasks) / totalCreated) * 100) : 0 },
     { name: 'Expiradas', value: expiredTasks, color: '#ef4444', percentage: totalCreated > 0 ? Math.round((expiredTasks / totalCreated) * 100) : 0 }
-  ].filter(item => item.value > 0); // Only show if there's data
+  ].filter(item => item.value > 0);
 
-  // Weekly performance by day of week
+
+  // Weekly performance by day
   const weeklyPerformanceData = taskStats.productivityChart?.map(day => ({
     day: day.day,
     created: day.created,
@@ -215,7 +200,7 @@ export default function StatsPage() {
   const strokeDasharray = `${(completionPercent / 100) * circumference} ${circumference}`;
 
   if (loading) {
-     return <Loading message="Cargando estadísticas..." />;
+    return <Loading message="Cargando estadísticas..." />;
   }
 
   return (
@@ -250,9 +235,9 @@ export default function StatsPage() {
           <FavoriteCategoryWidget />
         </div>
 
-        {/* Daily Stats Row (New Requirement A) */}
+        {/* Daily Stats Row */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-           <StatCard
+          <StatCard
             icon={<PlusCircle className="text-blue-600" size={24} />}
             label="Tareas Creadas Hoy"
             value={taskStats.tasksCreatedToday}
@@ -267,27 +252,28 @@ export default function StatsPage() {
           <StatCard
             icon={<ListChecks className="text-purple-600" size={24} />}
             label="Subtareas Completadas (Total)"
-            value={taskStats.totalSubTasksCompleted}
+            value={streakData?.totalSubTasksCompleted || 0}
             bgColor="bg-purple-50"
           />
         </div>
 
         {/* Small Insight Widgets */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-           <EventsOverviewWidget />
-           <ProjectsOverviewWidget />
-           <NotesCategoriesWidget />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <EventsOverviewWidget />
+          <ProjectsOverviewWidget />
+          <NotesStatsWidget />
+          <CategoriesStatsWidget />
         </div>
 
         {/* Additional Insight Widgets */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-           <PriorityStatsWidget />
-           <AverageTimeWidget />
-           <RecentAchievementsWidget />
+          <AverageTimeWidget />
+          <RecentAchievementsWidget />
+          <BestStreakWidget />
         </div>
 
-        {/* Key Stats (Existing + Enhanced) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        {/* Key Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
           <StatCard
             icon={<TrendingUp className="text-green-600" size={28} />}
             label="Promedio General"
@@ -297,20 +283,14 @@ export default function StatsPage() {
           <StatCard
             icon={<CheckSquare className="text-blue-600" size={28} />}
             label="Total Completadas"
-            value={taskStats.totalCompleted} // Using real total
+            value={taskStats.totalCompleted}
             bgColor="bg-blue-50"
           />
           <StatCard
             icon={<Target className="text-orange-600" size={28} />}
             label="Productividad Semanal"
-            value={`${taskStats.weeklyCompletionRate}%`} // Using real rate
+            value={`${taskStats.weeklyCompletionRate}%`}
             bgColor="bg-orange-50"
-          />
-          <StatCard
-            icon={<Award className="text-purple-600" size={28} />}
-            label="Racha Actual"
-            value={`${stats.racha} días`}
-            bgColor="bg-purple-50"
           />
         </div>
 
@@ -325,10 +305,10 @@ export default function StatsPage() {
             </div>
           </Card>
         ) : (
-           <Card className="p-6 bg-card rounded-xl shadow-sm mb-6 border border-border">
-              <h2 className="text-xl font-semibold text-foreground mb-2">Materias</h2>
-              <p className="text-muted-foreground">No hay materias registradas aún. ¡Agrega algunas para ver tu progreso académico!</p>
-           </Card>
+          <Card className="p-6 bg-card rounded-xl shadow-sm mb-6 border border-border">
+            <h2 className="text-xl font-semibold text-foreground mb-2">Materias</h2>
+            <p className="text-muted-foreground">No hay materias registradas aún. ¡Agrega algunas para ver tu progreso académico!</p>
+          </Card>
         )}
 
         {/* Charts Section */}
@@ -337,28 +317,28 @@ export default function StatsPage() {
           <Card className="p-6 border border-gray-200 rounded-xl hover:shadow-md transition-shadow">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Estado General de Tareas</h2>
             <div className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={completionRateData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={100}
-                      paddingAngle={5}
-                      dataKey="value"
-                      label={({ percentage }) => `${percentage}%`}
-                    >
-                      {completionRateData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{ backgroundColor: 'white', borderRadius: '8px', border: '1px solid #e5e7eb' }}
-                      formatter={(value, name) => [`${value} tareas`, name]}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={completionRateData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={100}
+                    paddingAngle={5}
+                    dataKey="value"
+                    label={({ percentage }) => `${percentage}%`}
+                  >
+                    {completionRateData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{ backgroundColor: 'white', borderRadius: '8px', border: '1px solid #e5e7eb' }}
+                    formatter={(value, name) => [`${value} tareas`, name]}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
             </div>
             <div className="flex justify-center space-x-4 mt-4">
               {completionRateData.map((item, index) => (
@@ -370,22 +350,22 @@ export default function StatsPage() {
             </div>
           </Card>
 
-          {/* Weekly Productivity Chart (New Requirement B) */}
+          {/* Weekly Productivity Chart */}
           <Card className="p-6 bg-card rounded-xl shadow-sm border border-border">
             <h2 className="text-xl font-semibold text-foreground mb-4">Productividad Semanal</h2>
             <div className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={taskStats.productivityChart}>
-                     <XAxis dataKey="day" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                     <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}`} />
-                     <Tooltip
-                       cursor={{fill: 'transparent'}}
-                       contentStyle={{ backgroundColor: 'var(--card)', borderRadius: '8px', border: '1px solid var(--border)' }}
-                     />
-                     <Bar dataKey="created" name="Creadas" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                     <Bar dataKey="completed" name="Completadas" fill="#22c55e" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={taskStats.productivityChart}>
+                  <XAxis dataKey="day" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}`} />
+                  <Tooltip
+                    cursor={{ fill: 'transparent' }}
+                    contentStyle={{ backgroundColor: 'var(--card)', borderRadius: '8px', border: '1px solid var(--border)' }}
+                  />
+                  <Bar dataKey="created" name="Creadas" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="completed" name="Completadas" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </Card>
         </div>
@@ -422,37 +402,38 @@ export default function StatsPage() {
           <Card className="p-6 border border-gray-200 rounded-xl hover:shadow-md transition-shadow">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Distribución por Prioridad</h2>
             <div className="h-64 w-full">
+              {priorityDistribution.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={priorityDistribution}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={100}
-                      paddingAngle={5}
-                      dataKey="value"
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    >
-                      {priorityDistribution.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
+                  <BarChart data={priorityDistribution}>
+                    <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                    <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}`} />
                     <Tooltip
                       contentStyle={{ backgroundColor: 'white', borderRadius: '8px', border: '1px solid #e5e7eb' }}
                       formatter={(value, name) => [`${value} tareas`, name]}
                     />
-                  </PieChart>
+                    <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                      {priorityDistribution.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Bar>
+                  </BarChart>
                 </ResponsiveContainer>
-            </div>
-            <div className="flex justify-center space-x-4 mt-4">
-              {priorityDistribution.map((item, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <div className={`w-3 h-3 rounded-full`} style={{ backgroundColor: item.color }}></div>
-                  <span className="text-sm text-gray-600">{item.name} ({item.value})</span>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
+                  <p>No hay tareas con prioridad asignada</p>
                 </div>
-              ))}
+              )}
             </div>
+            {priorityDistribution.length > 0 && (
+              <div className="flex justify-center space-x-4 mt-4">
+                {priorityDistribution.map((item, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <div className={`w-3 h-3 rounded-full`} style={{ backgroundColor: item.color }}></div>
+                    <span className="text-sm text-gray-600">{item.name} ({item.value})</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </Card>
         </div>
       </div>
@@ -482,4 +463,13 @@ function MonthBar({ month, color, value, label }) {
       </div>
     </div>
   )
+}
+
+// Main export with Provider wrapper
+export default function StatsPage() {
+  return (
+    <StatsProvider>
+      <StatsPageContent />
+    </StatsProvider>
+  );
 }
