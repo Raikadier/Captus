@@ -1,14 +1,19 @@
 import TaskService from "../services/TaskService.js";
 import NotificationService from '../services/NotificationService.js';
+import { AchievementValidatorService } from '../services/AchievementValidatorService.js';
 
 const taskService = new TaskService();
+const achievementValidator = new AchievementValidatorService();
 
 export class TaskController {
   constructor() {
     // Middleware removed as Service is stateless.
     // Kept for compatibility if routes call it, but it does nothing.
     this.injectUser = (req, res, next) => {
-      // No-op
+      if (req.user) {
+        taskService.setCurrentUser(req.user);
+        achievementValidator.setCurrentUser(req.user);
+      }
       next();
     };
   }
@@ -41,17 +46,20 @@ export class TaskController {
 
     if (result.success) {
       // Auto-notification
+      await NotificationService.notify({
+        user_id: req.user.id,
+        title: 'Tarea Creada',
+        body: `Has creado la tarea: "${result.data.title}"`,
+        event_type: 'task_created',
+        entity_id: result.data.id || result.data.id_Task,
+        is_auto: true
+      });
+
+      // Validar logros relacionados con creación de tareas
       try {
-        await NotificationService.notify({
-          user_id: req.user.id,
-          title: 'Tarea Creada',
-          body: `Has creado la tarea: "${result.data.title}"`,
-          event_type: 'task_created',
-          entity_id: result.data.id || result.data.id_Task,
-          is_auto: true
-        });
-      } catch (err) {
-        console.error("Error in auto-notification:", err);
+        await achievementValidator.onTaskCreated(req.user.id);
+      } catch (error) {
+        console.error('Error validating achievements on task creation:', error);
       }
     }
 
@@ -75,7 +83,17 @@ export class TaskController {
   async complete(req, res) {
     if (!req.user || !req.user.id) return res.status(401).json({ success: false, message: "Unauthorized" });
     const { id } = req.params;
-    const result = await taskService.complete(parseInt(id), req.user.id, req.user.email);
+    const result = await taskService.complete(parseInt(id));
+
+    if (result.success) {
+      // Validar logros relacionados con completar tareas
+      try {
+        await achievementValidator.onTaskCompleted(req.user.id);
+      } catch (error) {
+        console.error('Error validating achievements on task completion:', error);
+      }
+    }
+
     res.status(result.success ? 200 : 400).json(result);
   }
 
