@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronRight, Globe, Lock, MessageSquare, Palette, Shield, User, Bell, Eye, EyeOff, Check, Sparkles, Trophy } from 'lucide-react'
-import AchievementsPage from './AchievementsPage'
+import { ChevronRight, Globe, Lock, MessageSquare, Palette, Shield, User, Bell, Eye, EyeOff, Check, Sparkles, Award, Star, Flame, Zap, Crown, Trophy, Target, CheckCircle2, Lock as LockIcon } from 'lucide-react'
 import { Button } from '../../ui/button'
 import { Card } from '../../ui/card'
 import { Label } from '../../ui/label'
@@ -20,6 +19,11 @@ import { supabase } from '../../shared/api/supabase'
 import apiClient from '../../shared/api/client'
 import Loading from '../../ui/loading'
 import { toast } from 'sonner'
+import { useAchievements } from '../../hooks/useAchievements'
+import { Progress } from '../../ui/progress'
+import { Badge } from '../../ui/badge'
+import { Filter } from 'lucide-react'
+import { achievements as achievementsConfig, difficultyOrder, difficultyLabels, difficultyColors } from '../../shared/achievementsConfig'
 
 function getCurrentDate() {
   const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
@@ -73,8 +77,11 @@ function SettingsMenuItem({
 export default function SettingsPage() {
   const { darkMode, toggleTheme, compactView, setCompactView, fontSize, changeFontSize, accentColor, changeAccentColor } = useTheme()
   const { user } = useAuth()
+  const { achievements, loading: achievementsLoading, error: achievementsError } = useAchievements()
 
   const [activeSection, setActiveSection] = useState('perfil')
+  const [statusFilter, setStatusFilter] = useState('all') // all, completed, pending
+  const [difficultyFilter, setDifficultyFilter] = useState('all') // all, easy, medium, hard, special, epic
   const [userData, setUserData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -101,6 +108,39 @@ export default function SettingsPage() {
   useEffect(() => {
     fetchUserProfile()
   }, [])
+
+  // Filter achievements by status and difficulty
+  let filteredAchievements = achievements;
+
+  // Apply status filter
+  if (statusFilter !== 'all') {
+    filteredAchievements = filteredAchievements.filter(achievement => {
+      const isCompleted = achievement.userAchievement?.isCompleted || false;
+      return statusFilter === 'completed' ? isCompleted : !isCompleted;
+    });
+  }
+
+  // Apply difficulty filter
+  if (difficultyFilter !== 'all') {
+    filteredAchievements = filteredAchievements.filter(a => a && a.difficulty === difficultyFilter);
+  }
+
+  // Group filtered achievements by difficulty for display
+  const achievementsByDifficulty = filteredAchievements.reduce((groups, achievement) => {
+    if (achievement && achievement.difficulty) {
+      const difficulty = achievement.difficulty;
+      if (!groups[difficulty]) groups[difficulty] = [];
+      groups[difficulty].push(achievement);
+    }
+    return groups;
+  }, {});
+
+  const getDifficultyColor = (difficulty) => {
+    return difficultyColors[difficulty] || 'bg-gray-100 text-gray-800 border-gray-200';
+  };
+
+  const totalAchievements = achievements.length;
+  const unlockedAchievements = achievements.filter(a => a.userAchievement?.isCompleted).length;
 
   // Contador para la confirmación final
   useEffect(() => {
@@ -317,7 +357,13 @@ export default function SettingsPage() {
 
     } catch (error) {
       console.error('Error fetching user profile:', error)
-      setError(error.message || 'Error de conexión al cargar perfil')
+      // Don't set error state for auth issues, just log
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        console.warn('Authentication issue, user may need to re-login')
+        // Don't set error state to avoid crashes
+      } else {
+        setError(error.message || 'Error de conexión al cargar perfil')
+      }
     } finally {
       setLoading(false)
     }
@@ -336,6 +382,7 @@ export default function SettingsPage() {
 
 
 
+
   return (
     <div className={`${darkMode ? 'bg-background' : 'bg-[#F6F7FB]'}`}>
       <div className={`max-w-7xl mx-auto ${compactView ? 'p-4' : 'p-8'} ${compactView ? 'pb-24' : 'pb-8'}`}>
@@ -350,42 +397,40 @@ export default function SettingsPage() {
 
         <div className={`grid grid-cols-1 lg:grid-cols-3 ${compactView ? 'gap-4' : 'gap-6'}`}>
           <div className="lg:col-span-1 animate-in slide-in-from-left duration-500">
-            <div className={`${activeSection === 'logros' ? '' : 'sticky top-24'}`}>
-              <Card className={`${compactView ? 'p-3' : 'p-4'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
-                <nav className={compactView ? 'space-y-1' : 'space-y-2'}>
-                  <SettingsMenuItem
-                    icon={<User size={18} />}
-                    label="Perfil"
-                    active={activeSection === 'perfil'}
-                    onClick={() => setActiveSection('perfil')}
-                  />
-                  <SettingsMenuItem
-                    icon={<Lock size={18} />}
-                    label="Seguridad"
-                    active={activeSection === 'seguridad'}
-                    onClick={() => setActiveSection('seguridad')}
-                  />
-                  <SettingsMenuItem
-                    icon={<Palette size={18} />}
-                    label="Apariencia"
-                    active={activeSection === 'apariencia'}
-                    onClick={() => setActiveSection('apariencia')}
-                  />
-                  <SettingsMenuItem
-                    icon={<Shield size={18} />}
-                    label="Privacidad"
-                    active={activeSection === 'privacidad'}
-                    onClick={() => setActiveSection('privacidad')}
-                  />
-                  <SettingsMenuItem
-                    icon={<Trophy size={18} />}
-                    label="Logros"
-                    active={activeSection === 'logros'}
-                    onClick={() => setActiveSection('logros')}
-                  />
-                </nav>
-              </Card>
-            </div>
+            <Card className={`${compactView ? 'p-3' : 'p-4'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
+              <nav className={compactView ? 'space-y-1' : 'space-y-2'}>
+                <SettingsMenuItem
+                  icon={<User size={18} />}
+                  label="Perfil"
+                  active={activeSection === 'perfil'}
+                  onClick={() => setActiveSection('perfil')}
+                />
+                <SettingsMenuItem
+                  icon={<Lock size={18} />}
+                  label="Seguridad"
+                  active={activeSection === 'seguridad'}
+                  onClick={() => setActiveSection('seguridad')}
+                />
+                <SettingsMenuItem
+                  icon={<Palette size={18} />}
+                  label="Apariencia"
+                  active={activeSection === 'apariencia'}
+                  onClick={() => setActiveSection('apariencia')}
+                />
+                <SettingsMenuItem
+                  icon={<Shield size={18} />}
+                  label="Privacidad"
+                  active={activeSection === 'privacidad'}
+                  onClick={() => setActiveSection('privacidad')}
+                />
+                <SettingsMenuItem
+                  icon={<Award size={18} />}
+                  label="Logros"
+                  active={activeSection === 'logros'}
+                  onClick={() => setActiveSection('logros')}
+                />
+              </nav>
+            </Card>
           </div>
 
           <div className={`lg:col-span-2 ${compactView ? 'space-y-4' : 'space-y-6'} animate-in fade-in slide-in-from-right duration-500`}>
@@ -726,9 +771,214 @@ export default function SettingsPage() {
 
             {/* LOGROS SECTION */}
             {activeSection === 'logros' && (
-              <div className="animate-in fade-in slide-in-from-right duration-500">
-                <AchievementsPage />
-              </div>
+              <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
+                <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} ${compactView ? 'mb-4' : 'mb-6'}`}>
+                  🏆 Mis Logros
+                </h2>
+
+                {achievementsLoading ? (
+                  <div className="text-center py-8">
+                    <Loading message="Cargando logros..." fullScreen={false} />
+                  </div>
+                ) : achievementsError ? (
+                  <div className="text-center py-8">
+                    <div className="text-red-600 text-lg mb-4">Error: {achievementsError}</div>
+                    <Button onClick={() => window.location.reload()} variant="outline">
+                      Reintentar
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {/* Header */}
+                    <div className="mb-6">
+                      <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-3">
+                        <Trophy className="text-yellow-500" size={32} />
+                        Sistema de Logros
+                      </h2>
+                      <p className="text-muted-foreground">Completa desafíos y desbloquea logros para demostrar tu productividad</p>
+                    </div>
+
+                    {/* Sidebar de filtros arriba */}
+                    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-xl p-6 mb-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-yellow-500 rounded-lg">
+                            <Trophy className="text-white" size={20} />
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-gray-800">🏆 Tu Progreso</h3>
+                            <p className="text-xs text-gray-600">Estadísticas y filtros</p>
+                          </div>
+                        </div>
+
+                        {/* Stats rápidas */}
+                        <div className="flex gap-4">
+                          <div className="bg-white/70 rounded-lg px-4 py-2 border border-yellow-200 text-center">
+                            <div className="text-lg font-bold text-yellow-600">{unlockedAchievements}</div>
+                            <div className="text-xs text-gray-600">Completados</div>
+                          </div>
+                          <div className="bg-white/70 rounded-lg px-4 py-2 border border-yellow-200 text-center">
+                            <div className="text-lg font-bold text-orange-600">{totalAchievements}</div>
+                            <div className="text-xs text-gray-600">Por Descubrir</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Filtros */}
+                      <div className="flex flex-wrap gap-4">
+                        <div>
+                          <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                            <Filter size={14} />
+                            Estado
+                          </h4>
+                          <div className="flex gap-2">
+                            <Button
+                              variant={statusFilter === 'all' ? 'default' : 'outline'}
+                              size="sm"
+                              onClick={() => setStatusFilter('all')}
+                              className={`${statusFilter === 'all' ? 'bg-yellow-500 hover:bg-yellow-600 text-white' : 'border-yellow-300 text-yellow-700 hover:bg-yellow-50'}`}
+                            >
+                              Todos
+                            </Button>
+                            <Button
+                              variant={statusFilter === 'pending' ? 'default' : 'outline'}
+                              size="sm"
+                              onClick={() => setStatusFilter('pending')}
+                              className={`${statusFilter === 'pending' ? 'bg-yellow-500 hover:bg-yellow-600 text-white' : 'border-yellow-300 text-yellow-700 hover:bg-yellow-50'}`}
+                            >
+                              🔍 Por Descubrir
+                            </Button>
+                            <Button
+                              variant={statusFilter === 'completed' ? 'default' : 'outline'}
+                              size="sm"
+                              onClick={() => setStatusFilter('completed')}
+                              className={`${statusFilter === 'completed' ? 'bg-yellow-500 hover:bg-yellow-600 text-white' : 'border-yellow-300 text-yellow-700 hover:bg-yellow-50'}`}
+                            >
+                              ✅ Completados
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <h4 className="text-sm font-semibold text-gray-700 mb-2">Dificultad</h4>
+                          <div className="flex gap-2">
+                            <Button
+                              variant={difficultyFilter === 'all' ? 'default' : 'outline'}
+                              size="sm"
+                              onClick={() => setDifficultyFilter('all')}
+                              className={`${difficultyFilter === 'all' ? 'bg-orange-500 hover:bg-orange-600 text-white' : 'border-orange-300 text-orange-700 hover:bg-orange-50'}`}
+                            >
+                              Todas
+                            </Button>
+                            {difficultyOrder.map(difficulty => (
+                              <Button
+                                key={difficulty}
+                                variant={difficultyFilter === difficulty ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={() => setDifficultyFilter(difficulty)}
+                                className={`${
+                                  difficultyFilter === difficulty
+                                    ? `${getDifficultyColor(difficulty).split(' ')[0]} hover:opacity-90 text-white`
+                                    : `${getDifficultyColor(difficulty)} border-opacity-50`
+                                }`}
+                              >
+                                {difficultyLabels[difficulty]}
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Contenido de logros */}
+                    <div className="space-y-6">
+                      {difficultyOrder.map(difficulty => {
+                        const difficultyAchievements = achievementsByDifficulty[difficulty] || [];
+                        if (difficultyAchievements.length === 0) return null;
+
+                        return (
+                          <div key={difficulty}>
+                            <div className="flex items-center mb-4">
+                              <div className={`px-3 py-1 rounded-full border font-semibold text-sm ${
+                                getDifficultyColor(difficulty)
+                              }`}>
+                                {difficultyLabels[difficulty]}
+                              </div>
+                              <div className="ml-3 h-px bg-gradient-to-r from-gray-300 to-transparent flex-1"></div>
+                              <div className="text-xs text-gray-500">
+                                {difficultyAchievements.length} logro{difficultyAchievements.length !== 1 ? 's' : ''}
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                              {difficultyAchievements.map(achievement => {
+                                if (!achievement || !achievement.achievementId) return null;
+
+                                const config = achievementsConfig[achievement.achievementId];
+                                const isCompleted = achievement.userAchievement?.isCompleted || false;
+                                const progress = achievement.userAchievement?.progress || 0;
+                                const progressPercent = Math.min((progress / (config?.targetValue || 1)) * 100, 100);
+
+                                return (
+                                  <Card key={achievement.achievementId} className={`p-4 hover:shadow-md transition-shadow relative overflow-hidden ${
+                                    isCompleted
+                                      ? 'border-green-300 bg-gradient-to-br from-green-50 to-emerald-50'
+                                      : 'border-gray-200'
+                                  }`}>
+                                    {!isCompleted && (
+                                      <div className="absolute top-0 left-0 right-0 h-3/4 bg-gradient-to-b from-black/60 via-black/40 to-transparent flex items-start justify-center pt-6 rounded-t-lg">
+                                        <div className="bg-gray-800/95 text-white px-3 py-1 rounded-full font-semibold text-xs shadow-lg">
+                                          🔒 Bloqueado
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    <div className="flex items-start space-x-3">
+                                      <div className={`text-3xl ${isCompleted ? '' : 'opacity-70'}`}>{config?.icon || '🏆'}</div>
+                                      <div className="flex-1">
+                                        <div className="flex items-center justify-between mb-2">
+                                          <h3 className={`font-semibold text-lg ${isCompleted ? 'text-green-800' : 'text-gray-900'}`}>
+                                            {config?.name || achievement.achievementId}
+                                          </h3>
+                                          {isCompleted && (
+                                            <CheckCircle className="text-green-600" size={24} />
+                                          )}
+                                        </div>
+                                        <p className={`text-sm mb-3 ${isCompleted ? 'text-green-700' : 'text-gray-600'}`}>
+                                          {config?.description || 'Descripción no disponible'}
+                                        </p>
+                                        <div className="space-y-2">
+                                          <div className="flex justify-between text-xs">
+                                            <span className={isCompleted ? 'text-green-700' : 'text-gray-600'}>Progreso</span>
+                                            <span className={`font-medium ${isCompleted ? 'text-green-800' : 'text-gray-900'}`}>
+                                              {progress}/{config?.targetValue || 1}
+                                            </span>
+                                          </div>
+                                          <Progress
+                                            value={progressPercent}
+                                            className={`h-2 ${isCompleted ? 'bg-green-200' : 'bg-gray-200'}`}
+                                          />
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </Card>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })}
+
+                      {filteredAchievements.length === 0 && (
+                        <div className="text-center py-12">
+                          <Trophy size={48} className="mx-auto text-gray-400 mb-4" />
+                          <h3 className="text-lg font-semibold text-gray-600 mb-2">No se encontraron logros</h3>
+                          <p className="text-gray-500 text-sm">Prueba cambiando los filtros para ver más logros</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </Card>
             )}
 
             {/* Delete Account Modal */}
