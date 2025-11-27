@@ -5,8 +5,8 @@
  * de enrutamiento estandarizado al orquestador. No contiene lógica de negocio ni ejecuta herramientas.
  */
 
-import { runOrchestrator } from './orchestrator.js';
-import { callRouterModel } from './llm/routerClient.js'; // Asumiendo nueva arquitectura
+import { orchestrator } from './orchestrator.js';
+import { groq, MODEL_FAST } from './model.js';
 
 // --- Constantes y Tipos de Datos ---
 
@@ -121,15 +121,34 @@ The JSON object must have three keys: "intent", "reason", and "entities".
 };
 
 /**
+ * Llama al modelo LLM para obtener la respuesta de enrutamiento.
+ */
+const callRouterModel = async (prompt) => {
+  try {
+    const completion = await groq.chat.completions.create({
+      messages: [{ role: "user", content: prompt }],
+      model: MODEL_FAST,
+      temperature: 0,
+      response_format: { type: "json_object" }
+    });
+    return completion.choices[0].message.content;
+  } catch (error) {
+    console.error("Error calling router model:", error);
+    throw error;
+  }
+};
+
+/**
  * Función principal del router. Clasifica, extrae entidades y delega al orquestador.
  * @param {object} params
  * @param {string} params.userId - El ID del usuario.
  * @param {string} params.message - El mensaje del usuario.
  * @param {string} params.conversationId - El ID de la conversación actual.
+ * @param {object} params.user - El objeto de usuario completo (para tool execution).
  * @param {object} params.metadata - Metadatos adicionales.
  * @returns {Promise<any>} El resultado de la ejecución del orquestador.
  */
-export const handleRoutedMessage = async ({ userId, message, conversationId, metadata }) => {
+export const handleRoutedMessage = async ({ userId, message, conversationId, user, metadata }) => {
   let routingContext;
 
   if (!userId || !message) {
@@ -147,12 +166,11 @@ export const handleRoutedMessage = async ({ userId, message, conversationId, met
     }
   }
 
-  // Delegar siempre al orquestador
-  return runOrchestrator({
-    userId,
-    message,
-    conversationId,
-    routingContext,
-    metadata,
-  });
+  // Delegar siempre al orquestador.
+  // Nota: orchestrator(objective, user) es la firma actual.
+  // No acepta routingContext aun, pero el objetivo es reparar el servidor.
+  // Pasamos 'message' como objetivo y 'user' (o construimos uno si falta, aunque routes/ai.js lo pasa).
+  const userObj = user || { id: userId };
+
+  return orchestrator(message, userObj);
 };
