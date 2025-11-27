@@ -25,165 +25,165 @@ export class StatisticsService {
 
   // ✅ Enhanced Dashboard Stats - Focused on streak and favorite category
   async getDashboardStats() {
-     try {
-       if (!this.currentUser) return new OperationResult(false, "Not authenticated");
+    try {
+      if (!this.currentUser) return new OperationResult(false, "Not authenticated");
 
-       // Check and update streak before getting stats
-       await this.checkStreak();
+      // Check and update streak before getting stats
+      await this.checkStreak();
 
-       // Get base stats
-       const baseStats = await this.getByCurrentUser();
+      // Get base stats
+      const baseStats = await this.getByCurrentUser();
 
-       // Get academic stats
-       const subjectsResult = await subjectService.getAllByUser();
-       const subjects = subjectsResult.success ? subjectsResult.data : [];
+      // Get academic stats
+      const subjectsResult = await subjectService.getAllByUser();
+      const subjects = subjectsResult.success ? subjectsResult.data : [];
 
-       const averageGrade = subjects.length > 0
-         ? subjects.reduce((acc, sub) => acc + sub.grade, 0) / subjects.length
-         : 0;
+      const averageGrade = subjects.length > 0
+        ? subjects.reduce((acc, sub) => acc + sub.grade, 0) / subjects.length
+        : 0;
 
-       // Get favorite category analysis
-       const favoriteCategoryAnalysis = await this.getFavoriteCategoryAnalysis();
+      // Get favorite category analysis
+      const favoriteCategoryAnalysis = await this.getFavoriteCategoryAnalysis();
 
-       return new OperationResult(true, "Dashboard stats retrieved", {
-          ...baseStats,
-          averageGrade: parseFloat(averageGrade.toFixed(2)),
-          subjects,
-          favoriteCategoryAnalysis
-       });
-     } catch (error) {
-       return new OperationResult(false, `Error fetching dashboard stats: ${error.message}`);
-     }
-   }
+      return new OperationResult(true, "Dashboard stats retrieved", {
+        ...baseStats,
+        averageGrade: parseFloat(averageGrade.toFixed(2)),
+        subjects,
+        favoriteCategoryAnalysis
+      });
+    } catch (error) {
+      return new OperationResult(false, `Error fetching dashboard stats: ${error.message}`);
+    }
+  }
 
-   // ✅ Simple Dashboard Stats for HomePage
-   async getHomePageStats() {
-     try {
-       if (!this.currentUser) return new OperationResult(false, "Usuario no autenticado");
+  // ✅ Simple Dashboard Stats for HomePage
+  async getHomePageStats() {
+    try {
+      if (!this.currentUser) return new OperationResult(false, "Usuario no autenticado");
 
-       const supabaseClient = requireSupabaseClient();
+      const supabaseClient = requireSupabaseClient();
 
-       // Get total tasks efficiently
-       const { count: totalTasks, error: tasksError } = await supabaseClient
-         .from('tasks')
-         .select('*', { count: 'exact', head: true })
-         .eq('user_id', this.currentUser.id);
+      // Get total tasks efficiently
+      const { count: totalTasks, error: tasksError } = await supabaseClient
+        .from('tasks')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', this.currentUser.id);
 
-       if (tasksError) {
-         console.error('Error counting tasks:', tasksError);
-         return new OperationResult(false, `Error obteniendo estadísticas del dashboard: ${tasksError.message}`);
-       }
+      if (tasksError) {
+        console.error('Error counting tasks:', tasksError);
+        return new OperationResult(false, `Error obteniendo estadísticas del dashboard: ${tasksError.message}`);
+      }
 
-       // Get total notes directly from database
-       const { count: totalNotes, error: notesError } = await supabaseClient
-         .from('notes')
-         .select('*', { count: 'exact', head: true })
-         .eq('user_id', this.currentUser.id);
+      // Get total notes directly from database
+      const { count: totalNotes, error: notesError } = await supabaseClient
+        .from('notes')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', this.currentUser.id);
 
-       if (notesError) {
-         console.error('Error counting notes:', notesError);
-         return new OperationResult(false, `Error obteniendo estadísticas del dashboard: ${notesError.message}`);
-       }
+      if (notesError) {
+        console.error('Error counting notes:', notesError);
+        return new OperationResult(false, `Error obteniendo estadísticas del dashboard: ${notesError.message}`);
+      }
 
-       return new OperationResult(true, "Estadísticas del dashboard obtenidas", {
-         totalTasks: totalTasks || 0,
-         totalNotes: totalNotes || 0,
-         // Próximos eventos y recordatorios activos serán implementados después
-         upcomingEvents: 0,
-         activeReminders: 0
-       });
-     } catch (error) {
-       return new OperationResult(false, `Error obteniendo estadísticas del dashboard: ${error.message}`);
-     }
-   }
+      return new OperationResult(true, "Estadísticas del dashboard obtenidas", {
+        totalTasks: totalTasks || 0,
+        totalNotes: totalNotes || 0,
+        // Próximos eventos y recordatorios activos serán implementados después
+        upcomingEvents: 0,
+        activeReminders: 0
+      });
+    } catch (error) {
+      return new OperationResult(false, `Error obteniendo estadísticas del dashboard: ${error.message}`);
+    }
+  }
 
   // ... [Rest of the existing methods remain unchanged, just re-exporting them below] ...
 
- async checkStreak() {
-   try {
-     const stats = await this.getByCurrentUser();
-     if (!stats) return;
+  async checkStreak() {
+    try {
+      const stats = await this.getByCurrentUser();
+      if (!stats) return;
 
-     const today = new Date();
-     today.setHours(0, 0, 0, 0);
-     const yesterday = new Date(today);
-     yesterday.setDate(yesterday.getDate() - 1);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
 
-     // Get tasks completed today
-     const completedTodayResult = await taskService.getCompletedTodayByUser();
-     const tasksCompletedToday = completedTodayResult.success ? completedTodayResult.data.length : 0;
+      // Get tasks completed today
+      const completedTodayResult = await taskService.getCompletedTodayByUser();
+      const tasksCompletedToday = completedTodayResult.success ? completedTodayResult.data.length : 0;
 
-     console.log(`[STREAK] Checking streak: ${tasksCompletedToday}/${stats.dailyGoal} tasks completed today`);
+      // console.log(`[STREAK] Checking streak: ${tasksCompletedToday}/${stats.dailyGoal} tasks completed today`);
 
-     let streakChanged = false;
-     const lastCompletionDate = stats.lastRachaDate ? new Date(stats.lastRachaDate) : null;
-     const lastCompletionDateString = lastCompletionDate ? lastCompletionDate.toDateString() : null;
-     const todayString = today.toDateString();
-     const yesterdayString = yesterday.toDateString();
+      let streakChanged = false;
+      const lastCompletionDate = stats.lastRachaDate ? new Date(stats.lastRachaDate) : null;
+      const lastCompletionDateString = lastCompletionDate ? lastCompletionDate.toDateString() : null;
+      const todayString = today.toDateString();
+      const yesterdayString = yesterday.toDateString();
 
-     console.log(`[STREAK] Last completion: ${lastCompletionDateString}, Today: ${todayString}, Yesterday: ${yesterdayString}`);
-     console.log(`[STREAK] Current streak before check: ${stats.racha}`);
+      // console.log(`[STREAK] Last completion: ${lastCompletionDateString}, Today: ${todayString}, Yesterday: ${yesterdayString}`);
+      // console.log(`[STREAK] Current streak before check: ${stats.racha}`);
 
-     if (tasksCompletedToday >= stats.dailyGoal) {
-       // Goal achieved today
-       console.log(`[STREAK] Goal achieved! Current streak: ${stats.racha}`);
+      if (tasksCompletedToday >= stats.dailyGoal) {
+        // Goal achieved today
+        // console.log(`[STREAK] Goal achieved! Current streak: ${stats.racha}`);
 
-       if (!lastCompletionDate || lastCompletionDateString !== todayString) {
-         // Check if yesterday was also completed (consecutive streak)
-         const yesterdayCompleted = lastCompletionDateString === yesterdayString;
+        if (!lastCompletionDate || lastCompletionDateString !== todayString) {
+          // Check if yesterday was also completed (consecutive streak)
+          const yesterdayCompleted = lastCompletionDateString === yesterdayString;
 
-         if (yesterdayCompleted) {
-           stats.racha += 1;
-           console.log(`[STREAK] Consecutive day! New streak: ${stats.racha}`);
-         } else {
-           stats.racha = 1;
-           console.log(`[STREAK] New streak started: ${stats.racha}`);
-         }
+          if (yesterdayCompleted) {
+            stats.racha += 1;
+            // console.log(`[STREAK] Consecutive day! New streak: ${stats.racha}`);
+          } else {
+            stats.racha = 1;
+            // console.log(`[STREAK] New streak started: ${stats.racha}`);
+          }
 
-         stats.lastRachaDate = today;
-         streakChanged = true;
-       } else {
-         console.log(`[STREAK] Already updated for today`);
-       }
-     } else {
-       // Goal not achieved today - check if we need to reset streak
-       console.log(`[STREAK] Goal not achieved. Checking if streak should reset...`);
+          stats.lastRachaDate = today;
+          streakChanged = true;
+        } else {
+          // console.log(`[STREAK] Already updated for today`);
+        }
+      } else {
+        // Goal not achieved today - check if we need to reset streak
+        // console.log(`[STREAK] Goal not achieved. Checking if streak should reset...`);
 
-       if (lastCompletionDate && lastCompletionDateString !== todayString && lastCompletionDateString !== yesterdayString) {
-         // Last completion was before yesterday, reset streak
-         console.log(`[STREAK] Resetting streak from ${stats.racha} to 0`);
-         stats.racha = 0;
-         stats.lastRachaDate = null;
-         streakChanged = true;
-       } else {
-         console.log(`[STREAK] Streak maintained: ${stats.racha}`);
-       }
-     }
+        if (lastCompletionDate && lastCompletionDateString !== todayString && lastCompletionDateString !== yesterdayString) {
+          // Last completion was before yesterday, reset streak
+          console.log(`[STREAK] Resetting streak from ${stats.racha} to 0`);
+          stats.racha = 0;
+          stats.lastRachaDate = null;
+          streakChanged = true;
+        } else {
+          // console.log(`[STREAK] Streak maintained: ${stats.racha}`);
+        }
+      }
 
-     // Update best streak if current is higher
-     if (stats.racha > stats.bestStreak) {
-       stats.bestStreak = stats.racha;
-       console.log(`[STREAK] New best streak: ${stats.bestStreak}`);
-       streakChanged = true;
-     }
+      // Update best streak if current is higher
+      if (stats.racha > stats.bestStreak) {
+        stats.bestStreak = stats.racha;
+        // console.log(`[STREAK] New best streak: ${stats.bestStreak}`);
+        streakChanged = true;
+      }
 
-     if (streakChanged) {
-       console.log(`[STREAK] Updating stats in database...`);
-       await statisticsRepository.update(stats);
-     } else {
-       console.log(`[STREAK] No changes needed`);
-     }
+      if (streakChanged) {
+        console.log(`[STREAK] Updating stats in database...`);
+        await statisticsRepository.update(stats);
+      } else {
+        // console.log(`[STREAK] No changes needed`);
+      }
 
-     try {
-       await this.checkAchievements();
-     } catch (error) {
-       // Ignore achievements errors for now
-       console.log('[STREAK] Achievements check failed, ignoring');
-     }
-   } catch (error) {
-     console.error("Error verificando racha:", error);
-   }
- }
+      // try {
+      //   await this.checkAchievements();
+      // } catch (error) {
+      //   // Ignore achievements errors for now
+      //   // console.log('[STREAK] Achievements check failed, ignoring');
+      // }
+    } catch (error) {
+      console.error("Error verificando racha:", error);
+    }
+  }
 
   async updateGeneralStats() {
     try {
@@ -213,7 +213,7 @@ export class StatisticsService {
       }
 
       await statisticsRepository.update(stats);
-      await this.checkAchievements();
+      // await this.checkAchievements();
     } catch (error) {
       console.error("Error actualizando estadísticas generales:", error);
     }
