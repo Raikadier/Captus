@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronRight, Globe, Lock, MessageSquare, Palette, Shield, User, Bell, Eye, EyeOff, Check, Sparkles } from 'lucide-react'
+import { ChevronRight, Globe, Lock, MessageSquare, Palette, Shield, User, Bell, Eye, EyeOff, Check, Sparkles, Trophy } from 'lucide-react'
+import AchievementsPage from './AchievementsPage'
 import { Button } from '../../ui/button'
 import { Card } from '../../ui/card'
 import { Label } from '../../ui/label'
@@ -349,34 +350,42 @@ export default function SettingsPage() {
 
         <div className={`grid grid-cols-1 lg:grid-cols-3 ${compactView ? 'gap-4' : 'gap-6'}`}>
           <div className="lg:col-span-1 animate-in slide-in-from-left duration-500">
-            <Card className={`${compactView ? 'p-3' : 'p-4'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
-              <nav className={compactView ? 'space-y-1' : 'space-y-2'}>
-                <SettingsMenuItem
-                  icon={<User size={18} />}
-                  label="Perfil"
-                  active={activeSection === 'perfil'}
-                  onClick={() => setActiveSection('perfil')}
-                />
-                <SettingsMenuItem
-                  icon={<Lock size={18} />}
-                  label="Seguridad"
-                  active={activeSection === 'seguridad'}
-                  onClick={() => setActiveSection('seguridad')}
-                />
-                <SettingsMenuItem
-                  icon={<Palette size={18} />}
-                  label="Apariencia"
-                  active={activeSection === 'apariencia'}
-                  onClick={() => setActiveSection('apariencia')}
-                />
-                <SettingsMenuItem
-                  icon={<Shield size={18} />}
-                  label="Privacidad"
-                  active={activeSection === 'privacidad'}
-                  onClick={() => setActiveSection('privacidad')}
-                />
-              </nav>
-            </Card>
+            <div className={`${activeSection === 'logros' ? '' : 'sticky top-24'}`}>
+              <Card className={`${compactView ? 'p-3' : 'p-4'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
+                <nav className={compactView ? 'space-y-1' : 'space-y-2'}>
+                  <SettingsMenuItem
+                    icon={<User size={18} />}
+                    label="Perfil"
+                    active={activeSection === 'perfil'}
+                    onClick={() => setActiveSection('perfil')}
+                  />
+                  <SettingsMenuItem
+                    icon={<Lock size={18} />}
+                    label="Seguridad"
+                    active={activeSection === 'seguridad'}
+                    onClick={() => setActiveSection('seguridad')}
+                  />
+                  <SettingsMenuItem
+                    icon={<Palette size={18} />}
+                    label="Apariencia"
+                    active={activeSection === 'apariencia'}
+                    onClick={() => setActiveSection('apariencia')}
+                  />
+                  <SettingsMenuItem
+                    icon={<Shield size={18} />}
+                    label="Privacidad"
+                    active={activeSection === 'privacidad'}
+                    onClick={() => setActiveSection('privacidad')}
+                  />
+                  <SettingsMenuItem
+                    icon={<Trophy size={18} />}
+                    label="Logros"
+                    active={activeSection === 'logros'}
+                    onClick={() => setActiveSection('logros')}
+                  />
+                </nav>
+              </Card>
+            </div>
           </div>
 
           <div className={`lg:col-span-2 ${compactView ? 'space-y-4' : 'space-y-6'} animate-in fade-in slide-in-from-right duration-500`}>
@@ -713,6 +722,13 @@ export default function SettingsPage() {
                   </p>
                 </div>
               </Card>
+            )}
+
+            {/* LOGROS SECTION */}
+            {activeSection === 'logros' && (
+              <div className="animate-in fade-in slide-in-from-right duration-500">
+                <AchievementsPage />
+              </div>
             )}
 
             {/* Delete Account Modal */}
