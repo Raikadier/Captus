@@ -15,8 +15,5 @@ router.use(injectUserRole);
 router.post('/', controller.create.bind(controller));
 router.post('/add-member', controller.addMember.bind(controller));
 router.get('/course/:id', controller.getByCourse.bind(controller));
-router.get('/student', controller.getStudentGroups.bind(controller));
-router.get('/:id', controller.getGroupDetails.bind(controller));
-router.delete('/:groupId/members/:studentId', controller.removeMember.bind(controller));
 
 export default router;
