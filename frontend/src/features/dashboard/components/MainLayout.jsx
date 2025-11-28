@@ -4,6 +4,7 @@ import { Sparkles } from 'lucide-react'
 import Sidebar from './Sidebar'
 import TeacherSidebar from './TeacherSidebar'
 import { Button } from '../../../ui/button'
+import { TaskProvider } from '../../../context/TaskContext'
 
 const MainLayout = ({ children }) => {
   const location = useLocation()
@@ -14,22 +15,23 @@ const MainLayout = ({ children }) => {
   const showFloatingButton = location.pathname !== '/chatbot'
 
   return (
-    <div className="min-h-screen bg-background animate-in fade-in duration-500">
-      {isTeacher ? (
-        <TeacherSidebar />
-      ) : (
-        <Sidebar onCollapseChange={setIsCollapsed} />
-      )}
-      <div
-        className={`min-h-screen transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-          isCollapsed ? 'ml-20' : 'ml-60'
-        }`}
-      >
-        {children || <Outlet />}
-      </div>
+    <TaskProvider>
+      <div className="min-h-screen bg-background animate-in fade-in duration-500">
+        {isTeacher ? (
+          <TeacherSidebar />
+        ) : (
+          <Sidebar onCollapseChange={setIsCollapsed} />
+        )}
+        <div
+          className={`min-h-screen transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+            isCollapsed ? 'ml-20' : 'ml-60'
+          }`}
+        >
+          {children || <Outlet />}
+        </div>
 
-      {showFloatingButton && (
-        <Link to="/chatbot" title="Hablar con Captus AI">
+        {showFloatingButton && (
+          <Link to="/chatbot" title="Hablar con Captus AI">
           <Button
             className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110 active:scale-95 animate-pulse z-50"
             size="icon"
@@ -39,6 +41,7 @@ const MainLayout = ({ children }) => {
         </Link>
       )}
     </div>
+    </TaskProvider>
   )
 }
 
