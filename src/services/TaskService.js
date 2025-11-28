@@ -23,6 +23,12 @@ export class TaskService {
     this.currentUser = user;
   }
 
+  resolveUserId(user) {
+    if (!user) return this.currentUser?.id || this.currentUser?.user_id || null;
+    if (typeof user === "string") return user;
+    return user.id || user.user_id || null;
+  }
+
   validateTask(task, isUpdate = false) {
     if (!task) {
       return new OperationResult(false, "La tarea no puede ser nula.");
@@ -35,6 +41,9 @@ export class TaskService {
       }
       if (!task.user_id && !task.id_User) {
         return new OperationResult(false, "La tarea debe tener un usuario asignado.");
+      }
+      if (!task.due_date && !task.endDate) {
+        return new OperationResult(false, "La tarea debe tener una fecha límite (due_date).");
       }
     } else {
       // For updates, user_id is required but title might not be present if only updating completion status
@@ -57,16 +66,23 @@ export class TaskService {
     return new OperationResult(true);
   }
 
-  async save(task) {
+  async save(task, userContext = null) {
     try {
-      const validation = this.validateTask(task);
+      const userId = this.resolveUserId(userContext);
+      if (!userId) {
+        return new OperationResult(false, "Usuario no autenticado.");
+      }
+
+      const taskWithUser = { ...task, user_id: task.user_id || task.id_User || userId };
+
+      const validation = this.validateTask(taskWithUser);
       if (!validation.success) return validation;
 
       if (!task.creationDate) {
         task.creationDate = new Date();
       }
 
-      const savedTask = await taskRepository.save(task);
+      const savedTask = await taskRepository.save(taskWithUser);
       if (!savedTask) {
         return new OperationResult(false, "Error al guardar la tarea.");
       }
@@ -92,13 +108,14 @@ export class TaskService {
     return new OperationResult(true);
   }
 
-  async delete(id) {
+  async delete(id, userContext = null) {
     try {
       const validation = this.validateTaskId(id);
       if (!validation.success) return validation;
 
       const existingTask = await taskRepository.getById(id);
-      if (!existingTask || existingTask.id_User !== this.currentUser?.id) {
+      const userId = this.resolveUserId(userContext);
+      if (!userId || !existingTask || existingTask.id_User !== userId) {
         return new OperationResult(false, "Tarea no encontrada.");
       }
 
@@ -150,11 +167,12 @@ export class TaskService {
     }
   }
 
-  async getTasksByUser(filter = null, limit = null) {
+  async getTasksByUser(userContext = null, filter = null, limit = null) {
     try {
-      if (!this.currentUser) return [];
+      const userId = this.resolveUserId(userContext);
+      if (!userId) return [];
 
-      let tasks = await taskRepository.getAllByUserId(this.currentUser.id);
+      let tasks = await taskRepository.getAllByUserId(userId);
 
       if (filter) {
         tasks = tasks.filter(filter);
@@ -171,9 +189,9 @@ export class TaskService {
     }
   }
 
-  async getAll() {
+  async getAll(userContext = null) {
     try {
-      const tasks = await this.getTasksByUser();
+      const tasks = await this.getTasksByUser(userContext);
 
       // Load relations in parallel for better performance
       const relationPromises = tasks.map(task => this.loadTaskRelations(task));
@@ -185,12 +203,13 @@ export class TaskService {
     }
   }
 
-  async getPendingTasks(limit = 3) {
+  async getPendingTasks(limit = 3, userContext = null) {
     try {
-      if (!this.currentUser) return new OperationResult(false, "Usuario no autenticado");
+      const userId = this.resolveUserId(userContext);
+      if (!userId) return new OperationResult(false, "Usuario no autenticado");
 
       // Get only incomplete tasks efficiently with limit
-      const tasks = await this.getTasksByUser((task) => !task.state, limit);
+      const tasks = await this.getTasksByUser({ id: userId }, (task) => !task.state, limit);
 
       // Load relations in parallel for better performance
       const relationPromises = tasks.map(task => this.loadTaskRelations(task));
@@ -202,40 +221,68 @@ export class TaskService {
     }
   }
 
-  async getIncompleteByUser() {
+  async getIncompleteByUser(userContext = null) {
     try {
-      const tasks = await this.getTasksByUser((task) => !task.state);
+      const tasks = await this.getTasksByUser(userContext, (task) => !task.state);
       return new OperationResult(true, "Tareas incompletas obtenidas exitosamente.", tasks);
     } catch (error) {
       return new OperationResult(false, `Error al obtener tareas incompletas: ${error.message}`);
     }
   }
 
-  async getCompletedByUser() {
+  async getCompletedByUser(userContext = null) {
     try {
-      const tasks = await this.getTasksByUser((task) => task.state);
+      const tasks = await this.getTasksByUser(userContext, (task) => task.state);
       return new OperationResult(true, "Tareas completadas obtenidas exitosamente.", tasks);
     } catch (error) {
       return new OperationResult(false, `Error al obtener tareas completadas: ${error.message}`);
     }
   }
 
-  async getCompletedTodayByUser() {
+  async getCompletedTodayByUser(userContext = null) {
     try {
-      const tasks = await taskRepository.getCompletedToday(this.currentUser?.id);
+      const userId = this.resolveUserId(userContext);
+      if (!userId) return new OperationResult(false, "Usuario no autenticado.");
+
+      const tasks = await taskRepository.getCompletedToday(userId);
       return new OperationResult(true, "Tareas completadas hoy obtenidas exitosamente.", tasks);
     } catch (error) {
       return new OperationResult(false, `Error al obtener tareas completadas hoy: ${error.message}`);
     }
   }
 
-  async getById(id) {
+  async getTasksForAi(options = {}, userContext = null) {
+    try {
+      const userId = this.resolveUserId(userContext);
+      if (!userId) return new OperationResult(false, "Usuario no autenticado.");
+
+      const includeCompleted = Boolean(options.includeCompleted);
+      const limit = options.limit || 10;
+
+      const tasks = await taskRepository.getAllByUserId(userId);
+      const filtered = includeCompleted ? tasks : tasks.filter((task) => !task.state && !task.completed);
+
+      // Order by due_date ascending when present
+      filtered.sort((a, b) => {
+        if (!a.due_date) return 1;
+        if (!b.due_date) return -1;
+        return new Date(a.due_date) - new Date(b.due_date);
+      });
+
+      return new OperationResult(true, "Tareas obtenidas exitosamente.", filtered.slice(0, limit));
+    } catch (error) {
+      return new OperationResult(false, `Error al obtener tareas: ${error.message}`);
+    }
+  }
+
+  async getById(id, userContext = null) {
     try {
       const validation = this.validateTaskId(id);
       if (!validation.success) return validation;
 
       const task = await taskRepository.getById(id);
-      if (task && task.id_User === this.currentUser?.id) {
+      const userId = this.resolveUserId(userContext);
+      if (task && userId && task.id_User === userId) {
         return new OperationResult(true, "Tarea encontrada.", task);
       }
 
@@ -245,7 +292,7 @@ export class TaskService {
     }
   }
 
-  async update(task) {
+  async update(task, userContext = null) {
     try {
       // Map completed to state if present
       if (task.completed !== undefined) {
@@ -260,7 +307,8 @@ export class TaskService {
         return new OperationResult(false, "Tarea no encontrada.");
       }
 
-      if (existingTask.id_User !== this.currentUser?.id) {
+      const userId = this.resolveUserId(userContext);
+      if (!userId || existingTask.id_User !== userId) {
         return new OperationResult(false, "No tienes acceso a esta tarea.");
       }
 
@@ -307,19 +355,28 @@ export class TaskService {
     }
   }
 
-  async getOverdueTasks() {
+  async getOverdueTasks(userContext = null) {
     try {
-      const tasks = await taskRepository.getOverdueByUser(this.currentUser?.id);
+      const userId = this.resolveUserId(userContext);
+      if (!userId) return new OperationResult(false, "Usuario no autenticado.");
+
+      const tasks = await taskRepository.getOverdueByUser(userId);
       return new OperationResult(true, "Tareas vencidas obtenidas exitosamente.", tasks);
     } catch (error) {
       return new OperationResult(false, `Error al obtener tareas vencidas: ${error.message}`);
     }
   }
 
-  async updateTaskState(taskId, state) {
+  async updateTaskState(taskId, state, userContext = null) {
     try {
+      const validation = this.validateTaskId(taskId);
+      if (!validation.success) return validation;
+
+      const userId = this.resolveUserId(userContext);
+      if (!userId) return new OperationResult(false, "Usuario no autenticado.");
+
       const task = await taskRepository.getById(taskId);
-      if (!task || task.id_User !== this.currentUser?.id) {
+      if (!task || task.id_User !== userId) {
         return new OperationResult(false, "Tarea no encontrada.");
       }
 
@@ -353,7 +410,7 @@ export class TaskService {
       }
 
       task.state = state;
-      const result = await this.update(task);
+      const result = await this.update(task, { id: userId });
 
       if (state) {
         await this.updateStatisticsOnCompletion(task.id_User);
@@ -411,8 +468,8 @@ export class TaskService {
     return this.save(task);
   }
 
-  async complete(id) {
-    return this.updateTaskState(id, true);
+  async complete(id, userContext = null) {
+    return this.updateTaskState(id, true, userContext);
   }
 
   async createAndSaveTask(title, description, endDate, priorityText, categoryText, userId) {
@@ -438,7 +495,7 @@ export class TaskService {
         id_User: userId,
       };
 
-      const savedTask = await this.save(newTask);
+      const savedTask = await this.save(newTask, { id: userId });
       if (savedTask.success) {
         await this.loadTaskRelations(savedTask.data);
       }
@@ -503,6 +560,10 @@ export class TaskService {
   // Email notification methods
   async sendTaskNotification(task, action) {
     try {
+      if (process.env.DISABLE_EMAIL_NOTIFICATIONS === 'true') {
+        console.warn('Email notifications are disabled by DISABLE_EMAIL_NOTIFICATIONS');
+        return;
+      }
       if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
         console.warn('Gmail credentials not configured for task notifications');
         return;
@@ -549,6 +610,10 @@ export class TaskService {
 
       console.log(`Task notification email sent for ${action} task: ${task.title}`);
     } catch (error) {
+      if (error?.code === 'EAUTH') {
+        console.warn('Gmail authentication failed. Skipping email notification.');
+        return;
+      }
       console.error('Error sending task notification:', error);
     }
   }

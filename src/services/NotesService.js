@@ -12,32 +12,43 @@ export class NotesService {
     this.currentUser = user;
   }
 
-  validateNote(note) {
+  resolveUserId(user) {
+    if (!user) return this.currentUser?.id || this.currentUser?.user_id || null;
+    if (typeof user === "string") return user;
+    return user.id || user.user_id || null;
+  }
+
+  validateNote(note, isUpdate = false) {
     if (!note) {
       return new OperationResult(false, "La nota no puede ser nula.");
     }
 
-    if (!note.title || note.title.trim() === "") {
-      return new OperationResult(false, "El título de la nota no puede estar vacío.");
+    if (!isUpdate) {
+      if (!note.title || note.title.trim() === "") {
+        return new OperationResult(false, "El título de la nota no puede estar vacío.");
+      }
+    } else if (!note.title && !note.content && !note.subject) {
+      return new OperationResult(false, "No hay cambios para actualizar en la nota.");
     }
 
     return new OperationResult(true);
   }
 
-  async create(note) {
-    return this.save(note);
+  async create(note, userContext = null) {
+    return this.save(note, userContext);
   }
 
-  async save(note) {
+  async save(note, userContext = null) {
     try {
       const validation = this.validateNote(note);
       if (!validation.success) return validation;
 
-      note.user_id = this.currentUser?.id;
-
-      if (!note.user_id) {
+      const userId = this.resolveUserId(userContext);
+      if (!userId) {
         return new OperationResult(false, "Usuario no autenticado.");
       }
+
+      note.user_id = userId;
 
       const savedNote = await notesRepository.save(note);
       if (savedNote) {
@@ -50,20 +61,19 @@ export class NotesService {
     }
   }
 
-  async getAll() {
+  async getAll(userContext = null) {
     try {
-      if (!this.currentUser) {
-        return new OperationResult(false, "Usuario no autenticado.");
-      }
+      const userId = this.resolveUserId(userContext);
+      if (!userId) return new OperationResult(false, "Usuario no autenticado.");
 
-      const notes = await notesRepository.getAllByUserId(this.currentUser.id);
+      const notes = await notesRepository.getAllByUserId(userId);
       return new OperationResult(true, "Notas obtenidas exitosamente.", notes);
     } catch (error) {
       return new OperationResult(false, `Error al obtener notas: ${error.message}`);
     }
   }
 
-  async getById(id) {
+  async getById(id, userContext = null) {
     try {
       if (!id) {
         return new OperationResult(false, "ID de nota inválido.");
@@ -71,7 +81,8 @@ export class NotesService {
 
       const note = await notesRepository.getById(id);
       if (note) {
-        if (note.user_id === this.currentUser?.id) {
+        const userId = this.resolveUserId(userContext);
+        if (userId && note.user_id === userId) {
           return new OperationResult(true, "Nota encontrada.", note);
         } else {
           return new OperationResult(false, "Nota no accesible.");
@@ -84,9 +95,9 @@ export class NotesService {
     }
   }
 
-  async update(note) {
+  async update(note, userContext = null) {
     try {
-      const validation = this.validateNote(note);
+      const validation = this.validateNote(note, true);
       if (!validation.success) return validation;
 
       const existingNote = await notesRepository.getById(note.id);
@@ -94,14 +105,15 @@ export class NotesService {
         return new OperationResult(false, "Nota no encontrada.");
       }
 
-      if (existingNote.user_id !== this.currentUser?.id) {
+      const userId = this.resolveUserId(userContext);
+      if (!userId || existingNote.user_id !== userId) {
         return new OperationResult(false, "Nota no accesible.");
       }
 
       // Update the update_at timestamp
       note.update_at = new Date();
 
-      const updated = await notesRepository.update(note);
+      const updated = await notesRepository.update({ ...note, user_id: userId });
       if (updated) {
         return new OperationResult(true, "Nota actualizada exitosamente.", updated);
       } else {
@@ -112,13 +124,14 @@ export class NotesService {
     }
   }
 
-  async togglePin(id) {
+  async togglePin(id, userContext = null) {
     try {
       if (!id) {
         return new OperationResult(false, "ID de nota inválido.");
       }
 
-      const toggled = await notesRepository.togglePin(id, this.currentUser?.id);
+      const userId = this.resolveUserId(userContext);
+      const toggled = await notesRepository.togglePin(id, userId);
       if (toggled) {
         return new OperationResult(true, "Estado de fijación actualizado.", toggled);
       } else {
@@ -129,7 +142,7 @@ export class NotesService {
     }
   }
 
-  async delete(id) {
+  async delete(id, userContext = null) {
     try {
       if (!id) {
         return new OperationResult(false, "ID de nota inválido.");
@@ -140,7 +153,8 @@ export class NotesService {
         return new OperationResult(false, "Nota no encontrada.");
       }
 
-      if (existingNote.user_id !== this.currentUser?.id) {
+      const userId = this.resolveUserId(userContext);
+      if (!userId || existingNote.user_id !== userId) {
         return new OperationResult(false, "Nota no accesible.");
       }
 

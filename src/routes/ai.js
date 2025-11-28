@@ -93,23 +93,21 @@ router.post("/chat", async (req, res) => {
     // 4. Get AI Response
     const responseObj = await routerAgent(message, userId);
 
-    // Normalize response: routerAgent might return string (from other agents) or object (from taskAgent)
-    let resultText = "";
-    let actionPerformed = null;
+    const resultText = typeof responseObj?.result === "string"
+      ? responseObj.result
+      : typeof responseObj === "string"
+        ? responseObj
+        : "";
 
-    if (typeof responseObj === "object" && responseObj !== null && responseObj.text) {
-      resultText = responseObj.text;
-      actionPerformed = responseObj.toolUsed || null;
-    } else {
-      resultText = String(responseObj);
-    }
+    const actionPerformed = responseObj?.actionPerformed || null;
+    const toolData = responseObj?.data || null;
 
     // 5. Save AI Message
     await messageRepo.create(conversationId, "bot", resultText);
 
     console.info("[AI/chat] response", { userId, preview: resultText.slice(0, 80), actionPerformed });
 
-    return res.json({ result: resultText, conversationId, actionPerformed });
+    return res.json({ result: resultText, conversationId, actionPerformed, data: toolData });
   } catch (err) {
     console.error("[AI/chat] error", err);
     return res.status(500).json({ error: "Error en IA" });
