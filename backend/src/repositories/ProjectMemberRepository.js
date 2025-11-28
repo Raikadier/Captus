@@ -1,22 +1,22 @@
 import BaseRepository from "./BaseRepository.js";
 
 const mapFromDb = (row) => ({
-  id_ProjectMember: row.id,
-  id_User: row.user_id,
-  id_Project: row.project_id,
-  id_Rol: row.role_id,
+  id_ProjectMember: row.id_ProjectMember,
+  id_User: row.id_User,
+  id_Project: row.id_Project,
+  id_Rol: row.id_Rol,
 });
 
 const mapToDb = (entity) => ({
-  user_id: entity.id_User,
-  project_id: entity.id_Project,
-  role_id: entity.id_Rol,
+  id_User: entity.id_User,
+  id_Project: entity.id_Project,
+  id_Rol: entity.id_Rol,
 });
 
 class ProjectMemberRepository extends BaseRepository {
   constructor() {
-    super("project_members", {
-      primaryKey: "id",
+    super("projectMember", {
+      primaryKey: "id_ProjectMember",
       mapFromDb,
       mapToDb,
     });
@@ -48,7 +48,7 @@ class ProjectMemberRepository extends BaseRepository {
       const { data, error } = await this.client
         .from(this.tableName)
         .select("*")
-        .eq("project_id", projectId);
+        .eq("id_Project", projectId);
 
       if (error) {
         console.error("Error al obtener miembros por proyecto:", error.message);
@@ -69,7 +69,7 @@ class ProjectMemberRepository extends BaseRepository {
       const { data, error } = await this.client
         .from(this.tableName)
         .select("*")
-        .eq("user_id", userId);
+        .eq("id_User", userId);
 
       if (error) {
         console.error("Error al obtener proyectos por usuario:", error.message);
@@ -100,9 +100,9 @@ class ProjectMemberRepository extends BaseRepository {
       if (!projectId || !userId) return false;
       const { data, error } = await this.client
         .from(this.tableName)
-        .select("id")
-        .eq("project_id", projectId)
-        .eq("user_id", userId)
+        .select("id_ProjectMember")
+        .eq("id_Project", projectId)
+        .eq("id_User", userId)
         .maybeSingle();
 
       if (error) {
@@ -123,9 +123,9 @@ class ProjectMemberRepository extends BaseRepository {
       if (!projectId || !userId) return null;
       const { data, error } = await this.client
         .from(this.tableName)
-        .select("role_id")
-        .eq("project_id", projectId)
-        .eq("user_id", userId)
+        .select("id_Rol")
+        .eq("id_Project", projectId)
+        .eq("id_User", userId)
         .maybeSingle();
 
       if (error) {
@@ -133,7 +133,7 @@ class ProjectMemberRepository extends BaseRepository {
         return null;
       }
 
-      return data ? { id_Rol: data.role_id } : null; // Simplified, assuming Rol object
+      return data ? { id_Rol: data.id_Rol } : null; // Simplified, assuming Rol object
     } catch (error) {
       console.error("Error al obtener rol de usuario:", error);
       return null;
@@ -147,9 +147,9 @@ class ProjectMemberRepository extends BaseRepository {
 
       const { error } = await this.client
         .from(this.tableName)
-        .update({ role_id: roleId })
-        .eq("project_id", projectId)
-        .eq("user_id", userId);
+        .update({ id_Rol: roleId })
+        .eq("id_Project", projectId)
+        .eq("id_User", userId);
 
       if (error) {
         console.error("Error al actualizar rol de miembro:", error.message);
@@ -170,8 +170,8 @@ class ProjectMemberRepository extends BaseRepository {
       const { error } = await this.client
         .from(this.tableName)
         .delete()
-        .eq("project_id", projectId)
-        .eq("user_id", userId);
+        .eq("id_Project", projectId)
+        .eq("id_User", userId);
 
       if (error) {
         console.error("Error al eliminar miembro:", error.message);

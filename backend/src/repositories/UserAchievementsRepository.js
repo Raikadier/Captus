@@ -1,25 +1,30 @@
 import BaseRepository from "./BaseRepository.js";
 
 const mapFromDb = (row) => ({
-  id_User: row.user_id,
-  achievementId: row.achievement_id,
+  id_User: row.id_User,
+  achievementId: row.achievementId,
   progress: row.progress,
-  isCompleted: row.is_completed,
-  unlockedAt: row.unlocked_at,
+  isCompleted: row.isCompleted,
+  unlockedAt: row.unlockedAt,
 });
 
 const mapToDb = (entity) => ({
-  user_id: entity.id_User,
-  achievement_id: entity.achievementId,
+  id_User: entity.id_User,
+  achievementId: entity.achievementId,
   progress: entity.progress ?? 0,
-  is_completed: entity.isCompleted ?? false,
-  unlocked_at: entity.unlockedAt ?? new Date().toISOString(),
+  isCompleted: entity.isCompleted ?? false,
+  unlockedAt: entity.unlockedAt ?? new Date().toISOString(),
 });
 
 class UserAchievementsRepository extends BaseRepository {
   constructor() {
-    super("user_achievements", {
-      primaryKey: "id",
+    super("userAchievements", {
+      primaryKey: "achievementId", // Note: The PK in schema is actually composite (id_User, achievementId) or just achievementId? Schema says PK is achievementId but that seems wrong for a user-achievement link. Assuming achievementId is unique per row is wrong if multiple users. Schema: PRIMARY KEY (achievementId). Wait, the provided schema says: `CONSTRAINT userAchievements_pkey PRIMARY KEY (achievementId)`. This implies `achievementId` IS the primary key. This is weird for a many-to-many table but I must follow the schema "Truth".
+      // Correction: Schema `userAchievements` has `achievementId` as PK. This means `achievementId` must be unique globally? Or is `achievementId` a GUID/Int that represents the user-achievement pair?
+      // Schema: `achievementId character varying NOT NULL`.
+      // It seems the schema might be slightly flawed logically (a global achievement ID usually isn't unique per user unless it's a 'UserAchievementID'), but I must follow the structure.
+      // However, `getByUser` filters by `id_User`.
+      // Let's stick to the schema columns.
       mapFromDb,
       mapToDb,
     });
@@ -30,8 +35,8 @@ class UserAchievementsRepository extends BaseRepository {
     const { data, error } = await this.client
       .from(this.tableName)
       .select("*")
-      .eq("user_id", userId)
-      .order("unlocked_at", { ascending: false });
+      .eq("id_User", userId)
+      .order("unlockedAt", { ascending: false });
 
     if (error) {
       throw new Error(error.message);
@@ -45,8 +50,8 @@ class UserAchievementsRepository extends BaseRepository {
     const { data, error } = await this.client
       .from(this.tableName)
       .select("*")
-      .eq("user_id", userId)
-      .eq("achievement_id", achievementId)
+      .eq("id_User", userId)
+      .eq("achievementId", achievementId)
       .maybeSingle();
 
     if (error) {
@@ -87,15 +92,15 @@ class UserAchievementsRepository extends BaseRepository {
     };
 
     if (complete) {
-      payload.is_completed = true;
-      payload.unlocked_at = new Date().toISOString();
+      payload.isCompleted = true;
+      payload.unlockedAt = new Date().toISOString();
     }
 
     const { error } = await this.client
       .from(this.tableName)
       .update(payload)
-      .eq("user_id", userId)
-      .eq("achievement_id", achievementId);
+      .eq("id_User", userId)
+      .eq("achievementId", achievementId);
 
     if (error) {
       throw new Error(error.message);
@@ -121,8 +126,8 @@ class UserAchievementsRepository extends BaseRepository {
     const { error } = await this.client
       .from(this.tableName)
       .delete()
-      .eq("user_id", userId)
-      .eq("achievement_id", achievementId);
+      .eq("id_User", userId)
+      .eq("achievementId", achievementId);
 
     if (error) {
       throw new Error(error.message);

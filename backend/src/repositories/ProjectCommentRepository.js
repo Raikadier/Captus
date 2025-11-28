@@ -1,25 +1,25 @@
 import BaseRepository from "./BaseRepository.js";
 
 const mapFromDb = (row) => ({
-  id_Comment: row.id,
-  id_Project: row.project_id,
-  id_User: row.user_id,
-  id_ParentComment: row.parent_comment_id,
+  id_Comment: row.id_Comment,
+  id_Project: row.id_Project,
+  id_User: row.id_User,
+  id_ParentComment: row.id_ParentComment,
   content: row.content,
-  createdAt: row.created_at,
+  createdAt: row.createdAt,
 });
 
 const mapToDb = (entity) => ({
-  project_id: entity.id_Project,
-  user_id: entity.id_User,
-  parent_comment_id: entity.id_ParentComment ?? null,
+  id_Project: entity.id_Project,
+  id_User: entity.id_User,
+  id_ParentComment: entity.id_ParentComment ?? null,
   content: entity.content,
 });
 
 class ProjectCommentRepository extends BaseRepository {
   constructor() {
-    super("project_comments", {
-      primaryKey: "id",
+    super("projectComment", {
+      primaryKey: "id_Comment",
       mapFromDb,
       mapToDb,
     });
@@ -31,7 +31,7 @@ class ProjectCommentRepository extends BaseRepository {
       const { data, error } = await this.client
         .from(this.tableName)
         .select("*")
-        .order("created_at", { ascending: true });
+        .order("createdAt", { ascending: true });
 
       if (error) {
         console.error("Error al obtener comentarios:", error.message);
@@ -52,8 +52,8 @@ class ProjectCommentRepository extends BaseRepository {
       const { data, error } = await this.client
         .from(this.tableName)
         .select("*")
-        .eq("project_id", projectId)
-        .order("created_at", { ascending: true });
+        .eq("id_Project", projectId)
+        .order("createdAt", { ascending: true });
 
       if (error) {
         console.error("Error al obtener comentarios por proyecto:", error.message);
@@ -74,8 +74,8 @@ class ProjectCommentRepository extends BaseRepository {
       const { data, error } = await this.client
         .from(this.tableName)
         .select("*")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: true });
+        .eq("id_User", userId)
+        .order("createdAt", { ascending: true });
 
       if (error) {
         console.error("Error al obtener comentarios por usuario:", error.message);
@@ -107,8 +107,8 @@ class ProjectCommentRepository extends BaseRepository {
       const { data, error } = await this.client
         .from(this.tableName)
         .select("*")
-        .eq("parent_comment_id", commentId)
-        .order("created_at", { ascending: true });
+        .eq("id_ParentComment", commentId)
+        .order("createdAt", { ascending: true });
 
       if (error) {
         console.error("Error al obtener respuestas:", error.message);
@@ -140,7 +140,7 @@ class ProjectCommentRepository extends BaseRepository {
       const { error } = await this.client
         .from(this.tableName)
         .delete()
-        .eq("id", id);
+        .eq("id_Comment", id);
 
       if (error) {
         console.error("Error al eliminar comentario:", error.message);

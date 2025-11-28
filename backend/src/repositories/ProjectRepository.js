@@ -1,23 +1,23 @@
 import BaseRepository from "./BaseRepository.js";
 
 const mapFromDb = (row) => ({
-  id_Project: row.id,
+  id_Project: row.id_Project,
   name: row.name,
   description: row.description,
-  createdAt: row.created_at,
-  id_Creator: row.creator_id,
+  createdAt: row.createdAt,
+  id_Creator: row.id_Creator,
 });
 
 const mapToDb = (entity) => ({
   name: entity.name,
   description: entity.description ?? null,
-  creator_id: entity.id_Creator,
+  id_Creator: entity.id_Creator,
 });
 
 class ProjectRepository extends BaseRepository {
   constructor() {
-    super("projects", {
-      primaryKey: "id",
+    super("project", {
+      primaryKey: "id_Project",
       mapFromDb,
       mapToDb,
     });
@@ -49,7 +49,7 @@ class ProjectRepository extends BaseRepository {
       const { data, error } = await this.client
         .from(this.tableName)
         .select("*")
-        .eq("creator_id", creatorId);
+        .eq("id_Creator", creatorId);
 
       if (error) {
         console.error("Error al obtener proyectos por creador:", error.message);
@@ -114,7 +114,7 @@ class ProjectRepository extends BaseRepository {
       const { error } = await this.client
         .from(this.tableName)
         .delete()
-        .eq("id", id);
+        .eq("id_Project", id);
 
       if (error) {
         console.error("Error al eliminar proyecto:", error.message);

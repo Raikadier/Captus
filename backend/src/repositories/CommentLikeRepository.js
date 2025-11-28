@@ -1,21 +1,21 @@
 import BaseRepository from "./BaseRepository.js";
 
 const mapFromDb = (row) => ({
-  id_Like: row.id,
-  id_User: row.user_id,
-  id_Comment: row.comment_id,
-  createdAt: row.created_at,
+  id_Like: row.id_Like,
+  id_User: row.id_User,
+  id_Comment: row.id_Comment,
+  createdAt: row.createdAt,
 });
 
 const mapToDb = (entity) => ({
-  user_id: entity.id_User,
-  comment_id: entity.id_Comment,
+  id_User: entity.id_User,
+  id_Comment: entity.id_Comment,
 });
 
 class CommentLikeRepository extends BaseRepository {
   constructor() {
-    super("comment_likes", {
-      primaryKey: "id",
+    super("commentLike", {
+      primaryKey: "id_Like",
       mapFromDb,
       mapToDb,
     });
@@ -27,7 +27,7 @@ class CommentLikeRepository extends BaseRepository {
       const { data, error } = await this.client
         .from(this.tableName)
         .select("*")
-        .order("created_at", { ascending: false });
+        .order("createdAt", { ascending: false });
 
       if (error) {
         console.error("Error al obtener likes:", error.message);
@@ -48,8 +48,8 @@ class CommentLikeRepository extends BaseRepository {
       const { data, error } = await this.client
         .from(this.tableName)
         .select("*")
-        .eq("comment_id", commentId)
-        .order("created_at", { ascending: false });
+        .eq("id_Comment", commentId)
+        .order("createdAt", { ascending: false });
 
       if (error) {
         console.error("Error al obtener likes por comentario:", error.message);
@@ -70,8 +70,8 @@ class CommentLikeRepository extends BaseRepository {
       const { data, error } = await this.client
         .from(this.tableName)
         .select("*")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false });
+        .eq("id_User", userId)
+        .order("createdAt", { ascending: false });
 
       if (error) {
         console.error("Error al obtener likes por usuario:", error.message);
@@ -102,9 +102,9 @@ class CommentLikeRepository extends BaseRepository {
       if (!commentId || !userId) return false;
       const { data, error } = await this.client
         .from(this.tableName)
-        .select("id")
-        .eq("comment_id", commentId)
-        .eq("user_id", userId)
+        .select("id_Like")
+        .eq("id_Comment", commentId)
+        .eq("id_User", userId)
         .maybeSingle();
 
       if (error) {
@@ -156,8 +156,8 @@ class CommentLikeRepository extends BaseRepository {
       const { error } = await this.client
         .from(this.tableName)
         .delete()
-        .eq("comment_id", commentId)
-        .eq("user_id", userId);
+        .eq("id_Comment", commentId)
+        .eq("id_User", userId);
 
       if (error) {
         console.error("Error al remover like:", error.message);
@@ -178,7 +178,7 @@ class CommentLikeRepository extends BaseRepository {
       const { count, error } = await this.client
         .from(this.tableName)
         .select("*", { count: "exact", head: true })
-        .eq("comment_id", commentId);
+        .eq("id_Comment", commentId);
 
       if (error) {
         console.error("Error al contar likes:", error.message);
@@ -199,7 +199,7 @@ class CommentLikeRepository extends BaseRepository {
       const { error } = await this.client
         .from(this.tableName)
         .delete()
-        .eq("id", id);
+        .eq("id_Like", id);
 
       if (error) {
         console.error("Error al eliminar like:", error.message);

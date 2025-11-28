@@ -1,7 +1,7 @@
 import BaseRepository from "./BaseRepository.js";
 
 const mapFromDb = (row) => ({
-  id_Rol: row.id,
+  id_Rol: row.id_Rol,
   name: row.name,
 });
 
@@ -11,8 +11,8 @@ const mapToDb = (entity) => ({
 
 class RolRepository extends BaseRepository {
   constructor() {
-    super("roles", {
-      primaryKey: "id",
+    super("rol", {
+      primaryKey: "id_Rol",
       mapFromDb,
       mapToDb,
     });
