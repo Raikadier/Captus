@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+<<<<<<< HEAD
 import { ChevronRight, Globe, Lock, MessageSquare, Palette, Shield, User, Bell, Eye, EyeOff, Check, Sparkles, Award, Star, Flame, Zap, Crown, Trophy, Target, CheckCircle2, Lock as LockIcon } from 'lucide-react'
+=======
+import { ChevronRight, Globe, Lock, MessageSquare, Palette, Shield, User, Bell, Eye, EyeOff, Check, Sparkles } from 'lucide-react'
+>>>>>>> parent of e0adcf41 (Vista de los logros)
 import { Button } from '../../ui/button'
 import { Card } from '../../ui/card'
 import { Label } from '../../ui/label'
@@ -397,7 +401,11 @@ export default function SettingsPage() {
 
         <div className={`grid grid-cols-1 lg:grid-cols-3 ${compactView ? 'gap-4' : 'gap-6'}`}>
           <div className="lg:col-span-1 animate-in slide-in-from-left duration-500">
+<<<<<<< HEAD
             <Card className={`${compactView ? 'p-3' : 'p-4'} bg-card rounded-xl shadow-sm`}>
+=======
+            <Card className={`${compactView ? 'p-3' : 'p-4'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
+>>>>>>> parent of e0adcf41 (Vista de los logros)
               <nav className={compactView ? 'space-y-1' : 'space-y-2'}>
                 <SettingsMenuItem
                   icon={<User size={18} />}
@@ -423,12 +431,15 @@ export default function SettingsPage() {
                   active={activeSection === 'privacidad'}
                   onClick={() => setActiveSection('privacidad')}
                 />
+<<<<<<< HEAD
                 <SettingsMenuItem
                   icon={<Award size={18} />}
                   label="Logros"
                   active={activeSection === 'logros'}
                   onClick={() => setActiveSection('logros')}
                 />
+=======
+>>>>>>> parent of e0adcf41 (Vista de los logros)
               </nav>
             </Card>
           </div>
@@ -759,6 +770,7 @@ export default function SettingsPage() {
               </Card>
             )}
 
+<<<<<<< HEAD
             {/* LOGROS SECTION */}
             {activeSection === 'logros' && (
               <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
@@ -971,6 +983,8 @@ export default function SettingsPage() {
               </Card>
             )}
 
+=======
+>>>>>>> parent of e0adcf41 (Vista de los logros)
             {/* Delete Account Modal */}
             <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
               <DialogContent className={`bg-card max-w-md`}>
