@@ -5,8 +5,6 @@ node_modules
 
 # Testing
 coverage
-test-results/
-tests/
 
 # Production
 build

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Filter, Search as SearchIcon, Bell, Calendar as CalendarIcon, AlertTriangle } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
-import { useTaskContext } from '../../context/TaskContext';
+import { useTasks } from './hooks/useTasks';
 import { useSubTasks } from '../../hooks/useSubTasks';
 import TaskCard from './components/TaskCard';
 import TaskForm from './components/TaskForm';
@@ -29,8 +29,7 @@ const TaskPage = () => {
     createTask,
     updateTask,
     deleteTask,
-    toggleTaskCompletion,
-    refetch
+    toggleTaskCompletion
   } = useTasks();
 
   const [categories, setCategories] = useState([]);
