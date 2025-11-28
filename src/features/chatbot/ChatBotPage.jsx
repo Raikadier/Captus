@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, User, Sparkles, Plus, Menu, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
+import { useTaskContext } from '../../context/TaskContext';
 import { aiEventsService } from '../../services/aiEventsService';
 import { useEvents } from '../../hooks/useEvents';
 import apiClient from '../../shared/api/client'; // Importar apiClient
@@ -25,6 +26,7 @@ const ChatBotPage = () => {
   // The prompt says "El chat debe mostrar un mensaje de confirmación".
   // The response from backend "result" field will serve as this confirmation.
   const { fetchEvents } = useEvents();
+  const { fetchTasks } = useTaskContext();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -133,6 +135,9 @@ const ChatBotPage = () => {
 
           if (responseData.actionPerformed.includes('event')) {
              // We can optionally show a specific UI indicator or toast here
+          }
+          if (responseData.actionPerformed === 'create_task') {
+            fetchTasks();
           }
       }
 
