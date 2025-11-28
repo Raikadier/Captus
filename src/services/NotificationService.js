@@ -31,7 +31,8 @@ export class NotificationService {
       'assignment_updated': 'academic',
       'all_submitted': 'academic',
       'submission_graded': 'academic',
-      'deadline_3d': 'academic'
+      'deadline_3d': 'academic',
+      'achievement_unlocked': 'achievement'
     };
     return mapping[eventType] || 'system'; // Default fallback
   }

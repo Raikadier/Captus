@@ -21,11 +21,27 @@ class NotificationController {
       // I will rely on the fact that I can update NotificationRepository in the next step if I want to be 100% pure.
       // But to keep it simple and robust:
 
-      const { data, error } = await NotificationService.repo.client
+      const { type, unread, limit = 50 } = req.query;
+
+      let query = NotificationService.repo.client
         .from('notifications')
         .select('*')
         .eq('user_id', userId)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(parseInt(limit));
+
+      // Filter by type if provided
+      if (type) {
+        query = query.eq('type', type);
+      }
+
+      // Filter by read status if provided
+      if (unread !== undefined) {
+        const isUnread = unread === 'true';
+        query = query.eq('read', !isUnread);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       res.json(data);

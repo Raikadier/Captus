@@ -62,4 +62,26 @@ export class UserAchievementsController {
     const result = await userAchievementsService.resetUserAchievements(req.user.id);
     res.status(result.success ? 200 : 400).json(result);
   }
+
+  async recalculateAll(req, res) {
+    try {
+      const { AchievementValidatorService } = await import("../services/AchievementValidatorService.js");
+      const validator = new AchievementValidatorService();
+      validator.setCurrentUser(req.user);
+
+      const updatedCount = await validator.recalculateAllAchievements(req.user.id);
+
+      res.status(200).json({
+        success: true,
+        message: `Recalculados ${updatedCount} logros`,
+        updatedCount
+      });
+    } catch (error) {
+      console.error('Error recalculating achievements:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al recalcular logros'
+      });
+    }
+  }
 }

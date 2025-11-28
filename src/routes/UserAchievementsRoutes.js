@@ -20,5 +20,6 @@ router.get("/has/:achievementId", userAchievementsController.hasAchievement.bind
 router.post("/unlock/:achievementId", userAchievementsController.unlockAchievement.bind(userAchievementsController));
 router.put("/progress/:achievementId", userAchievementsController.updateProgress.bind(userAchievementsController));
 router.post("/reset", userAchievementsController.resetAchievements.bind(userAchievementsController));
+router.post("/recalculate", userAchievementsController.recalculateAll.bind(userAchievementsController));
 
 export default router;

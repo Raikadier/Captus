@@ -1,24 +1,25 @@
 import BaseRepository from "./BaseRepository.js";
 
 const mapFromDb = (row) => ({
-  id_User: row.user_id,
-  achievementId: row.achievement_id,
+  id: row.id,
+  id_User: row.id_User,
+  achievementId: row.achievementId,
   progress: row.progress,
-  isCompleted: row.is_completed,
-  unlockedAt: row.unlocked_at,
+  isCompleted: row.isCompleted,
+  unlockedAt: row.unlockedAt,
 });
 
 const mapToDb = (entity) => ({
-  user_id: entity.id_User,
-  achievement_id: entity.achievementId,
+  id_User: entity.id_User,
+  achievementId: entity.achievementId,
   progress: entity.progress ?? 0,
-  is_completed: entity.isCompleted ?? false,
-  unlocked_at: entity.unlockedAt ?? new Date().toISOString(),
+  isCompleted: entity.isCompleted ?? false,
+  unlockedAt: entity.unlockedAt ?? new Date().toISOString(),
 });
 
 class UserAchievementsRepository extends BaseRepository {
   constructor() {
-    super("user_achievements", {
+    super("userAchievements", {
       primaryKey: "id",
       mapFromDb,
       mapToDb,
@@ -30,8 +31,8 @@ class UserAchievementsRepository extends BaseRepository {
     const { data, error } = await this.client
       .from(this.tableName)
       .select("*")
-      .eq("user_id", userId)
-      .order("unlocked_at", { ascending: false });
+      .eq("id_User", userId)
+      .order("unlockedAt", { ascending: false });
 
     if (error) {
       throw new Error(error.message);
@@ -45,8 +46,8 @@ class UserAchievementsRepository extends BaseRepository {
     const { data, error } = await this.client
       .from(this.tableName)
       .select("*")
-      .eq("user_id", userId)
-      .eq("achievement_id", achievementId)
+      .eq("id_User", userId)
+      .eq("achievementId", achievementId)
       .maybeSingle();
 
     if (error) {
@@ -87,15 +88,15 @@ class UserAchievementsRepository extends BaseRepository {
     };
 
     if (complete) {
-      payload.is_completed = true;
-      payload.unlocked_at = new Date().toISOString();
+      payload.isCompleted = true;
+      payload.unlockedAt = new Date().toISOString();
     }
 
     const { error } = await this.client
       .from(this.tableName)
       .update(payload)
-      .eq("user_id", userId)
-      .eq("achievement_id", achievementId);
+      .eq("id_User", userId)
+      .eq("achievementId", achievementId);
 
     if (error) {
       throw new Error(error.message);
@@ -121,8 +122,8 @@ class UserAchievementsRepository extends BaseRepository {
     const { error } = await this.client
       .from(this.tableName)
       .delete()
-      .eq("user_id", userId)
-      .eq("achievement_id", achievementId);
+      .eq("id_User", userId)
+      .eq("achievementId", achievementId);
 
     if (error) {
       throw new Error(error.message);
