@@ -210,7 +210,7 @@ function StatsPageContent() {
         <header className="sticky top-0 bg-card rounded-xl shadow-sm p-6 mb-6 z-10 border border-border">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">📊 Mis Estadísticas</h1>
+              <h1 className="text-2xl font-bold text-foreground">📊 Panel de Estadísticas</h1>
               <p className="text-muted-foreground mt-1">{getCurrentDate()}</p>
             </div>
             <ManageSubjectsDialog

@@ -1,7 +1,9 @@
 // src/controllers/SubTaskController.js
 import { SubTaskService } from "../services/SubTaskService.js";
+import { AchievementValidatorService } from '../services/AchievementValidatorService.js';
 
 const subTaskService = new SubTaskService();
+const achievementValidator = new AchievementValidatorService();
 
 export class SubTaskController {
   constructor() {
@@ -9,6 +11,7 @@ export class SubTaskController {
     this.injectUser = (req, res, next) => {
       if (req.user) {
         subTaskService.setCurrentUser(req.user);
+        achievementValidator.setCurrentUser(req.user);
       }
       next();
     };
@@ -33,6 +36,16 @@ export class SubTaskController {
 
   async create(req, res) {
     const result = await subTaskService.create(req.body);
+
+    if (result.success) {
+      // Validar logros relacionados con creación de subtareas
+      try {
+        await achievementValidator.onSubtaskCreated(req.user.id);
+      } catch (error) {
+        console.error('Error validating achievements on subtask creation:', error);
+      }
+    }
+
     res.status(result.success ? 201 : 400).json(result);
   }
 
@@ -52,6 +65,16 @@ export class SubTaskController {
   async complete(req, res) {
     const { id } = req.params;
     const result = await subTaskService.complete(parseInt(id));
+
+    if (result.success) {
+      // Validar logros relacionados con completar subtareas
+      try {
+        await achievementValidator.onSubtaskCompleted(req.user.id);
+      } catch (error) {
+        console.error('Error validating achievements on subtask completion:', error);
+      }
+    }
+
     res.status(result.success ? 200 : 400).json(result);
   }
 

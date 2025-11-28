@@ -20,8 +20,11 @@ export class UserAchievementsService {
       }
 
       const achievements = await userAchievementsRepository.getByUser(userId);
+      console.log(`🎯 User ${userId} achievements from DB:`, achievements);
+      console.log(`📊 Found ${achievements.length} achievements for user ${userId}`);
       return new OperationResult(true, "Logros obtenidos exitosamente.", achievements);
     } catch (error) {
+      console.error(`❌ Error getting achievements for user ${userId}:`, error);
       return new OperationResult(false, `Error al obtener logros: ${error.message}`);
     }
   }

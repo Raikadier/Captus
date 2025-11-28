@@ -10,6 +10,7 @@ import { Card } from '../../ui/card';
 import apiClient from '../api/client';
 import { toast } from 'sonner';
 import { useStreakData, useEventsData, useProjectsData, useNotesData, usePriorityData, useTimeData, useAchievementsData } from '../../hooks/useConsolidatedStats';
+import { useAchievementsContext } from '../../context/AchievementContext';
 
 const StreakWidget = () => {
   const [streakData, setStreakData] = useState(null);
@@ -626,7 +627,13 @@ export const AverageTimeWidget = () => {
 
 // Recent Achievements Widget
 export const RecentAchievementsWidget = () => {
-  const { achievements, loading } = useAchievementsData();
+  const { userAchievements, loading } = useAchievementsContext();
+  
+  // Filter only completed achievements and sort by most recent
+  const recentAchievements = userAchievements
+    .filter(achievement => achievement.isCompleted)
+    .sort((a, b) => new Date(b.unlockedAt) - new Date(a.unlockedAt))
+    .slice(0, 3);
 
   if (loading) {
     return (
@@ -640,7 +647,24 @@ export const RecentAchievementsWidget = () => {
     );
   }
 
-  if (!achievements || achievements.length === 0) return null;
+  if (recentAchievements.length === 0) {
+    return (
+      <Card className="p-6 border border-gray-200 rounded-xl hover:shadow-md transition-shadow">
+        <div className="flex items-center space-x-4 mb-4">
+          <div className="w-12 h-12 bg-yellow-50 rounded-xl flex items-center justify-center">
+            <Award className="text-yellow-600" size={24} />
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-900">Logros Recientes</h3>
+            <p className="text-sm text-gray-600">Tus últimos desbloqueos</p>
+          </div>
+        </div>
+        <div className="text-center py-4">
+          <p className="text-sm text-gray-500">¡Completa tareas para desbloquear logros!</p>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="p-6 border border-gray-200 rounded-xl hover:shadow-md transition-shadow">
@@ -655,15 +679,17 @@ export const RecentAchievementsWidget = () => {
       </div>
 
       <div className="space-y-3">
-        {achievements.slice(0, 3).map((achievement, index) => (
-          <div key={index} className="flex items-center space-x-3 p-2 bg-yellow-50 rounded-lg">
+        {recentAchievements.map((achievement) => (
+          <div key={achievement.achievementId} className="flex items-center space-x-3 p-2 bg-yellow-50 rounded-lg">
             <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
               <span className="text-yellow-600 text-sm">🏆</span>
             </div>
             <div className="flex-1">
-              <p className="text-sm font-medium text-gray-900">{achievement.achievements?.name || 'Logro'}</p>
+              <p className="text-sm font-medium text-gray-900">
+                {achievement.achievementId ? achievement.achievementId.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Logro Desbloqueado'}
+              </p>
               <p className="text-xs text-gray-600">
-                {new Date(achievement.unlockedAt).toLocaleDateString('es-ES')}
+                {achievement.unlockedAt ? new Date(achievement.unlockedAt).toLocaleDateString('es-ES') : 'Hoy'}
               </p>
             </div>
           </div>

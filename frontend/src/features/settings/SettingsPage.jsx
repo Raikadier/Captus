@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronRight, Globe, Lock, MessageSquare, Palette, Shield, User, Bell, Eye, EyeOff, Check, Sparkles, Award, Star, Flame, Zap, Crown, Trophy, Target, CheckCircle2, Lock as LockIcon } from 'lucide-react'
+import { ChevronRight, Globe, Lock, MessageSquare, Palette, Shield, User, Bell, Eye, EyeOff, Check, Sparkles, Award, Star, Flame, Zap, Crown, Trophy, Target, CheckCircle, Lock as LockIcon } from 'lucide-react'
 import { Button } from '../../ui/button'
 import { Card } from '../../ui/card'
 import { Label } from '../../ui/label'
@@ -19,7 +19,7 @@ import { supabase } from '../../shared/api/supabase'
 import apiClient from '../../shared/api/client'
 import Loading from '../../ui/loading'
 import { toast } from 'sonner'
-import { useAchievements } from '../../hooks/useAchievements'
+import { useAchievementsContext } from '../../context/AchievementContext'
 import { Progress } from '../../ui/progress'
 import { Badge } from '../../ui/badge'
 import { Filter } from 'lucide-react'
@@ -77,7 +77,7 @@ function SettingsMenuItem({
 export default function SettingsPage() {
   const { darkMode, toggleTheme, compactView, setCompactView, fontSize, changeFontSize, accentColor, changeAccentColor } = useTheme()
   const { user } = useAuth()
-  const { achievements, loading: achievementsLoading, error: achievementsError } = useAchievements()
+  const { userAchievements, loading: achievementsLoading, error: achievementsError, refreshAchievements } = useAchievementsContext()
 
   const [activeSection, setActiveSection] = useState('perfil')
   const [statusFilter, setStatusFilter] = useState('all') // all, completed, pending
@@ -108,6 +108,18 @@ export default function SettingsPage() {
   useEffect(() => {
     fetchUserProfile()
   }, [])
+
+  // Combine configuration with user achievements data
+  const achievements = Object.keys(achievementsConfig).map(achievementId => {
+    const config = achievementsConfig[achievementId];
+    const userAchievement = userAchievements.find(ua => ua.achievementId === achievementId);
+
+    return {
+      achievementId,
+      ...config,
+      userAchievement: userAchievement || null
+    };
+  });
 
   // Filter achievements by status and difficulty
   let filteredAchievements = achievements;
@@ -141,6 +153,15 @@ export default function SettingsPage() {
 
   const totalAchievements = achievements.length;
   const unlockedAchievements = achievements.filter(a => a.userAchievement?.isCompleted).length;
+
+  // Show toast when achievements are refreshed
+  useEffect(() => {
+    if (!achievementsLoading && achievementsError === null && userAchievements.length > 0) {
+      toast.success(`Logros actualizados: ${unlockedAchievements}/${totalAchievements} completados`, {
+        duration: 3000,
+      });
+    }
+  }, [achievementsLoading, achievementsError, userAchievements.length, unlockedAchievements, totalAchievements]);
 
   // Contador para la confirmación final
   useEffect(() => {
@@ -810,6 +831,26 @@ export default function SettingsPage() {
                             <p className="text-xs text-gray-600">Estadísticas y filtros</p>
                           </div>
                         </div>
+
+                        {/* Refresh button */}
+                        <Button
+                          onClick={() => refreshAchievements(true)}
+                          disabled={achievementsLoading}
+                          variant="outline"
+                          size="sm"
+                          className="bg-white/70 hover:bg-white border-yellow-300 text-yellow-700 hover:text-yellow-800"
+                        >
+                          {achievementsLoading ? (
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin"></div>
+                              Actualizando...
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              🔄 Actualizar
+                            </div>
+                          )}
+                        </Button>
 
                         {/* Stats rápidas */}
                         <div className="flex gap-4">
