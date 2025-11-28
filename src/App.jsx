@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider, useTheme } from './context/themeContext';
+import { AchievementProvider } from './context/AchievementContext';
 import LoginForm from './features/auth/components/LoginForm';
 import HomePage from './features/dashboard/components/HomePage';
 import MainLayout from './features/dashboard/components/MainLayout';
@@ -26,8 +27,11 @@ import TeacherDiagramsPage from './features/teacher/TeacherDiagramsPage';
 import TeacherReviewsPage from './features/teacher/TeacherReviewsPage';
 import TeacherEditTaskPage from './features/teacher/TeacherEditTaskPage';
 import TeacherCalendarPage from './features/teacher/TeacherCalendarPage';
+import AchievementsPage from './features/achievements/AchievementsPage';
 import Loading from './ui/loading';
 import { Toaster } from 'sonner';
+import AchievementNotification from './components/shared/AchievementNotification';
+import { useAchievementNotifications } from './hooks/useAchievementNotifications';
 
  // Protected Route component
  const ProtectedRoute = ({ children }) => {
@@ -47,11 +51,21 @@ import { Toaster } from 'sonner';
 
 function AppContent() {
   const { fontSize } = useTheme();
+  const { currentNotification, closeNotification } = useAchievementNotifications();
 
   return (
     <Router>
       <div className={`App text-primary font-${fontSize}`}>
         <Toaster richColors position="top-right" />
+
+        {/* Achievement Notification */}
+        {currentNotification && (
+          <AchievementNotification
+            achievementId={currentNotification}
+            onClose={closeNotification}
+          />
+        )}
+
         <Routes>
         <Route path="/" element={<LoginForm />} />
         <Route
@@ -150,6 +164,16 @@ function AppContent() {
             <ProtectedRoute>
               <MainLayout>
                 <StatsPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/achievements"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <AchievementsPage />
               </MainLayout>
             </ProtectedRoute>
           }
@@ -276,7 +300,9 @@ function App() {
   return (
     <AuthProvider>
       <ThemeProvider>
-        <AppContent />
+        <AchievementProvider>
+          <AppContent />
+        </AchievementProvider>
       </ThemeProvider>
     </AuthProvider>
   );
