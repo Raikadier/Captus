@@ -43,4 +43,40 @@ export class AcademicGroupController {
       res.status(403).json({ error: error.message });
     }
   }
+
+  async getStudentGroups(req, res) {
+    try {
+      const userId = req.user.id;
+      const result = await this.service.getStudentGroups(userId);
+      res.json(result);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+
+  async getGroupDetails(req, res) {
+    try {
+      const { id } = req.params; // groupId
+      const userId = req.user.id;
+      const role = req.user.role || 'student';
+
+      const result = await this.service.getGroupDetails(id, userId, role);
+      res.json(result);
+    } catch (error) {
+      res.status(403).json({ error: error.message });
+    }
+  }
+
+  async removeMember(req, res) {
+    try {
+      const { groupId, studentId } = req.params;
+      const requesterId = req.user.id;
+      const role = req.user.role || 'student';
+
+      await this.service.removeMember(groupId, studentId, requesterId, role);
+      res.json({ success: true, message: 'Miembro eliminado del grupo' });
+    } catch (error) {
+      res.status(403).json({ error: error.message });
+    }
+  }
 }
