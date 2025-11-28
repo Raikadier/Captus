@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useCourses } from '../../hooks/useCourses'
 import { useEnrollments } from '../../hooks/useEnrollments'
 import { useAssignments } from '../../hooks/useAssignments'
+import { useCourseGroups } from '../../hooks/useCourseGroups'
 import { Button } from '../../ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../ui/tabs'
@@ -18,15 +19,23 @@ export default function TeacherCourseDetailPage() {
   const { getCourse } = useCourses()
   const { getStudents, addStudentManually } = useEnrollments()
   const { getAssignments } = useAssignments()
+  const { getGroups, createGroup, addMember, removeMember, getGroupDetails } = useCourseGroups()
 
   const [course, setCourse] = useState(null)
   const [students, setStudents] = useState([])
   const [assignments, setAssignments] = useState([])
+  const [groups, setGroups] = useState([])
   const [loading, setLoading] = useState(true)
 
   // Add Student State
   const [emailToAdd, setEmailToAdd] = useState('')
   const [isAddStudentOpen, setIsAddStudentOpen] = useState(false)
+
+  // Group States
+  const [isCreateGroupOpen, setIsCreateGroupOpen] = useState(false)
+  const [newGroupName, setNewGroupName] = useState('')
+  const [newGroupDescription, setNewGroupDescription] = useState('')
+  const [selectedGroupDetails, setSelectedGroupDetails] = useState(null)
 
   // Mock Data
   const mockStudents = [
@@ -35,44 +44,76 @@ export default function TeacherCourseDetailPage() {
   ]
 
   const mockTasks = [
-      { id: 't1', title: 'Examen Parcial (Mock)', dueDate: '2025-02-15', description: 'Evaluación de mitad de periodo' },
-      { id: 't2', title: 'Proyecto Final (Mock)', dueDate: '2025-03-01', description: 'Entrega del proyecto grupal' }
+    { id: 't1', title: 'Examen Parcial (Mock)', dueDate: '2025-02-15', description: 'Evaluación de mitad de periodo' },
+    { id: 't2', title: 'Proyecto Final (Mock)', dueDate: '2025-03-01', description: 'Entrega del proyecto grupal' }
   ]
 
   const mockAnnouncements = [
-      { id: 'a1', title: 'Bienvenidos (Mock)', body: 'Inicio de curso', type: 'info' },
+    { id: 'a1', title: 'Bienvenidos (Mock)', body: 'Inicio de curso', type: 'info' },
   ]
 
   const loadData = async () => {
-      try {
-        const c = await getCourse(id)
-        setCourse(c)
-        const s = await getStudents(id)
-        setStudents(s)
-        const a = await getAssignments(id)
-        setAssignments(a)
-      } catch (err) {
-        console.error(err)
-        // toast.error('Error cargando datos del curso')
-      } finally {
-        setLoading(false)
-      }
+    try {
+      const c = await getCourse(id)
+      setCourse(c)
+      const s = await getStudents(id)
+      setStudents(s)
+      const a = await getAssignments(id)
+      setAssignments(a)
+      const g = await getGroups(id)
+      setGroups(g)
+    } catch (err) {
+      console.error(err)
+      // toast.error('Error cargando datos del curso')
+    } finally {
+      setLoading(false)
     }
+  }
 
   useEffect(() => {
     loadData()
   }, [id])
 
   const handleAddStudent = async () => {
-      try {
-          await addStudentManually(id, emailToAdd)
-          toast.success('Estudiante agregado')
-          setEmailToAdd('')
-          setIsAddStudentOpen(false)
-          loadData() // Refresh list
-      } catch (error) {
-          toast.error(error.message)
-      }
+    try {
+      await addStudentManually(id, emailToAdd)
+      toast.success('Estudiante agregado')
+      setEmailToAdd('')
+      setIsAddStudentOpen(false)
+      loadData() // Refresh list
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
+
+  const handleCreateGroup = async () => {
+    if (!newGroupName.trim()) {
+      toast.error('Por favor ingresa un nombre para el grupo')
+      return
+    }
+    try {
+      await createGroup({
+        course_id: id,
+        name: newGroupName,
+        description: newGroupDescription
+      })
+      toast.success('Grupo creado exitosamente')
+      setNewGroupName('')
+      setNewGroupDescription('')
+      setIsCreateGroupOpen(false)
+      loadData()
+    } catch (error) {
+      toast.error(error.message || 'Error al crear el grupo')
+    }
+  }
+
+  const handleViewGroupDetails = async (groupId) => {
+    try {
+      const details = await getGroupDetails(groupId)
+      setSelectedGroupDetails(details)
+    } catch (error) {
+      toast.error('Error al cargar detalles del grupo')
+    }
   }
 
   if (loading) return <Loading message="Cargando..." />
@@ -80,19 +121,19 @@ export default function TeacherCourseDetailPage() {
 
   // Combine real and mock data for display
   const displayedAssignments = [
-      ...assignments,
-      ...mockTasks.map(t => ({
-          id: t.id,
-          title: t.title,
-          description: t.description,
-          due_date: t.dueDate,
-          is_mock: true
-      }))
+    ...assignments,
+    ...mockTasks.map(t => ({
+      id: t.id,
+      title: t.title,
+      description: t.description,
+      due_date: t.dueDate,
+      is_mock: true
+    }))
   ]
 
   const displayedStudents = [
-      ...students,
-      ...mockStudents.map(s => ({ ...s, is_mock: true }))
+    ...students,
+    ...mockStudents.map(s => ({ ...s, is_mock: true }))
   ]
 
   return (
@@ -106,90 +147,137 @@ export default function TeacherCourseDetailPage() {
             <h1 className="text-3xl font-bold text-gray-900">{course.title}</h1>
             <p className="text-gray-600 mt-2">{course.description}</p>
             <div className="mt-4 inline-flex items-center gap-2 bg-green-50 px-3 py-1 rounded-full border border-green-200">
-                <span className="text-sm font-medium text-green-800">Código de Invitación:</span>
-                <span className="font-mono font-bold text-green-900">{course.invite_code}</span>
+              <span className="text-sm font-medium text-green-800">Código de Invitación:</span>
+              <span className="font-mono font-bold text-green-900">{course.invite_code}</span>
             </div>
           </div>
         </div>
-         <Button onClick={() => navigate(`/teacher/tasks/new/edit?courseId=${id}`)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Crear Tarea
-          </Button>
-       </div>
+        <Button onClick={() => navigate(`/teacher/tasks/new/edit?courseId=${id}`)}>
+          <Plus className="w-4 h-4 mr-2" />
+          Crear Tarea
+        </Button>
+      </div>
 
-       <Card className="p-6">
-           <Tabs defaultValue="assignments">
-               <TabsList>
-                   <TabsTrigger value="assignments" className="flex gap-2"><FileText className="w-4 h-4"/> Tareas</TabsTrigger>
-                   <TabsTrigger value="students" className="flex gap-2"><Users className="w-4 h-4"/> Estudiantes</TabsTrigger>
-                   <TabsTrigger value="announcements" className="flex gap-2"><BookOpen className="w-4 h-4"/> Anuncios</TabsTrigger>
-               </TabsList>
+      <Card className="p-6">
+        <Tabs defaultValue="assignments">
+          <TabsList>
+            <TabsTrigger value="assignments" className="flex gap-2"><FileText className="w-4 h-4" /> Tareas</TabsTrigger>
+            <TabsTrigger value="students" className="flex gap-2"><Users className="w-4 h-4" /> Estudiantes</TabsTrigger>
+            <TabsTrigger value="groups" className="flex gap-2"><Users className="w-4 h-4" /> Grupos</TabsTrigger>
+            <TabsTrigger value="announcements" className="flex gap-2"><BookOpen className="w-4 h-4" /> Anuncios</TabsTrigger>
+          </TabsList>
 
-               <TabsContent value="assignments" className="mt-6 space-y-4">
-                   {displayedAssignments.map(assign => (
-                       <Card key={assign.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`/teacher/reviews/${assign.id}`)}>
-                           <CardHeader className="flex flex-row items-center justify-between pb-2">
-                               <CardTitle className="text-lg font-bold">{assign.title} {assign.is_mock && '(Mock)'}</CardTitle>
-                               <Button variant="outline" size="sm" onClick={(e) => {
-                                   e.stopPropagation()
-                                   navigate(`/teacher/tasks/${assign.id}/edit`)
-                               }}>
-                                   Editar
-                               </Button>
-                           </CardHeader>
-                           <CardContent>
-                               <p className="text-sm text-gray-500 mb-2">{assign.description}</p>
-                               <div className="flex items-center gap-4 text-sm">
-                                   <span className="bg-gray-100 px-2 py-1 rounded">Vence: {assign.due_date ? new Date(assign.due_date).toLocaleDateString() : 'Sin fecha'}</span>
-                                   <span className="text-blue-600 font-medium flex items-center gap-1">
-                                       <ClipboardList className="w-4 h-4" />
-                                       Revisar Entregas
-                                   </span>
-                               </div>
-                           </CardContent>
-                       </Card>
-                   ))}
-                   {displayedAssignments.length === 0 && <p className="text-gray-500 p-4">No hay tareas creadas.</p>}
-               </TabsContent>
+          <TabsContent value="assignments" className="mt-6 space-y-4">
+            {displayedAssignments.map(assign => (
+              <Card key={assign.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`/teacher/reviews/${assign.id}`)}>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-lg font-bold">{assign.title} {assign.is_mock && '(Mock)'}</CardTitle>
+                  <Button variant="outline" size="sm" onClick={(e) => {
+                    e.stopPropagation()
+                    navigate(`/teacher/tasks/${assign.id}/edit`)
+                  }}>
+                    Editar
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-500 mb-2">{assign.description}</p>
+                  <div className="flex items-center gap-4 text-sm">
+                    <span className="bg-gray-100 px-2 py-1 rounded">Vence: {assign.due_date ? new Date(assign.due_date).toLocaleDateString() : 'Sin fecha'}</span>
+                    <span className="text-blue-600 font-medium flex items-center gap-1">
+                      <ClipboardList className="w-4 h-4" />
+                      Revisar Entregas
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+            {displayedAssignments.length === 0 && <p className="text-gray-500 p-4">No hay tareas creadas.</p>}
+          </TabsContent>
 
-               <TabsContent value="students" className="mt-6 space-y-3">
-                   <div className="flex justify-end mb-4">
-                        <Dialog open={isAddStudentOpen} onOpenChange={setIsAddStudentOpen}>
-                            <DialogTrigger asChild>
-                                <Button variant="outline"><Plus className="w-4 h-4 mr-2"/> Agregar Estudiante</Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>Agregar Estudiante Manualmente</DialogTitle>
-                                </DialogHeader>
-                                <div className="space-y-4 py-4">
-                                    <Input placeholder="Email del estudiante" value={emailToAdd} onChange={e => setEmailToAdd(e.target.value)} />
-                                    <Button onClick={handleAddStudent} className="w-full">Agregar</Button>
-                                </div>
-                            </DialogContent>
-                        </Dialog>
-                   </div>
-                  {displayedStudents.map((s) => (
-                    <div key={s.id} className="p-3 border border-gray-200 rounded-lg bg-white">
-                      <p className="font-medium text-gray-900">{s.name}</p>
-                      <p className="text-sm text-gray-600">{s.email}</p>
-                      {s.is_mock && <span className="text-xs text-gray-400">(Mock Data)</span>}
+          <TabsContent value="students" className="mt-6 space-y-3">
+            <div className="flex justify-end mb-4">
+              <Dialog open={isAddStudentOpen} onOpenChange={setIsAddStudentOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline"><Plus className="w-4 h-4 mr-2" /> Agregar Estudiante</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Agregar Estudiante Manualmente</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <Input placeholder="Email del estudiante" value={emailToAdd} onChange={e => setEmailToAdd(e.target.value)} />
+                    <Button onClick={handleAddStudent} className="w-full">Agregar</Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+            {displayedStudents.map((s) => (
+              <div key={s.id} className="p-3 border border-gray-200 rounded-lg bg-white">
+                <p className="font-medium text-gray-900">{s.name}</p>
+                <p className="text-sm text-gray-600">{s.email}</p>
+                {s.is_mock && <span className="text-xs text-gray-400">(Mock Data)</span>}
+              </div>
+            ))}
+            {displayedStudents.length === 0 && <p className="text-gray-500">No hay estudiantes inscritos.</p>}
+          </TabsContent>
+
+          <TabsContent value="groups" className="mt-6 space-y-4">
+            <div className="flex justify-end mb-4">
+              <Dialog open={isCreateGroupOpen} onOpenChange={setIsCreateGroupOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline"><Plus className="w-4 h-4 mr-2" /> Crear Grupo</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Crear Nuevo Grupo</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Nombre del Grupo</label>
+                      <Input
+                        placeholder="Nombre del grupo"
+                        value={newGroupName}
+                        onChange={e => setNewGroupName(e.target.value)}
+                      />
                     </div>
-                  ))}
-                  {displayedStudents.length === 0 && <p className="text-gray-500">No hay estudiantes inscritos.</p>}
-               </TabsContent>
-
-               <TabsContent value="announcements" className="mt-6 space-y-3">
-                  {mockAnnouncements.map((a) => (
-                    <div key={a.id} className="p-3 border border-gray-200 rounded-lg bg-white">
-                      <p className="font-medium text-gray-900">{a.title}</p>
-                      <p className="text-sm text-gray-600">{a.body}</p>
-                      <span className="text-xs px-2 py-1 rounded-full bg-red-50 text-red-700 inline-block mt-2">{a.type}</span>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Descripción</label>
+                      <Input
+                        placeholder="Descripción del grupo"
+                        value={newGroupDescription}
+                        onChange={e => setNewGroupDescription(e.target.value)}
+                      />
                     </div>
-                  ))}
-               </TabsContent>
-           </Tabs>
-       </Card>
+                    <Button onClick={handleCreateGroup} className="w-full">Crear Grupo</Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+            {groups.map((group) => (
+              <Card key={group.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => handleViewGroupDetails(group.id)}>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-lg font-bold">{group.name}</CardTitle>
+                  <span className="text-sm text-gray-500">{group.members?.length || 0} miembros</span>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-500">{group.description || 'Sin descripción'}</p>
+                </CardContent>
+              </Card>
+            ))}
+            {groups.length === 0 && <p className="text-gray-500 p-4">No hay grupos creados.</p>}
+          </TabsContent>
+
+          <TabsContent value="announcements" className="mt-6 space-y-3">
+            {mockAnnouncements.map((a) => (
+              <div key={a.id} className="p-3 border border-gray-200 rounded-lg bg-white">
+                <p className="font-medium text-gray-900">{a.title}</p>
+                <p className="text-sm text-gray-600">{a.body}</p>
+                <span className="text-xs px-2 py-1 rounded-full bg-red-50 text-red-700 inline-block mt-2">{a.type}</span>
+              </div>
+            ))}
+          </TabsContent>
+        </Tabs>
+      </Card>
     </div>
   )
 }
