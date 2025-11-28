@@ -69,9 +69,11 @@ const LoginForm = () => {
         {/* Header */}
         <div className="text-center">
           <div className="flex justify-center mb-4">
-            <div className="bg-primary p-3 rounded-xl">
-              <BookOpen className="h-8 w-8 text-white" />
-            </div>
+              <img
+                src="/LgCP.png"               
+                alt="Logo Captus"
+                className="w-20 h-20 object-contain"
+              />
           </div>
           <h2 className="text-3xl font-bold text-gray-900">
             {isRegistering ? 'Crear cuenta' : 'Iniciar sesión'}
