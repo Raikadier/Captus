@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Users, Plus, Search, X, ChevronDown, Trash2 } from 'lucide-react'
+import { Users, Plus, MessageCircle, Calendar, CheckSquare, Search, X, ChevronDown } from 'lucide-react'
 import { Button } from '../../ui/button'
 import {
   DropdownMenu,
@@ -7,146 +7,63 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../../ui/dropdown-menu'
-import { useCourseGroups } from '../../hooks/useCourseGroups'
-import { useCourses } from '../../hooks/useCourses'
-import { useEnrollments } from '../../hooks/useEnrollments'
-import { useAuth } from '../../context/AuthContext'
-import { toast } from 'sonner'
-import Loading from '../../ui/loading'
 
 export default function GroupsPage() {
-  const { user } = useAuth()
-  const role = user?.user_metadata?.role || 'student'
-  const isTeacher = role === 'teacher'
-
-  const { getStudentGroups, createGroup, addMember, getGroupDetails, removeMember, loading: groupsLoading } = useCourseGroups()
-  const { courses, loading: coursesLoading } = useCourses()
-  const { getStudents } = useEnrollments()
-
   const [groups, setGroups] = useState([])
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [selectedGroup, setSelectedGroup] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
-  const [loading, setLoading] = useState(true)
 
-  // Form states
   const [groupName, setGroupName] = useState('')
   const [groupDescription, setGroupDescription] = useState('')
-  const [selectedCourse, setSelectedCourse] = useState(null)
+  const [selectedCourse, setSelectedCourse] = useState('')
   const [availableStudents, setAvailableStudents] = useState([])
   const [selectedStudents, setSelectedStudents] = useState([])
   const [searchInput, setSearchInput] = useState('')
   const [showSuggestions, setShowSuggestions] = useState(false)
 
-  // Load groups on mount
   useEffect(() => {
-    loadGroups()
+    const mockGroups = [
+      {
+        id: 1,
+        name: 'Equipo de Desarrollo',
+        description: 'Grupo para coordinar tareas de desarrollo',
+        members: 5,
+        tasks: 12,
+        created_at: '2024-01-15T10:30:00Z',
+        lastActivity: '2024-10-18T14:30:00Z',
+      },
+      {
+        id: 2,
+        name: 'Proyecto Marketing',
+        description: 'Campañas y estrategias de marketing',
+        members: 3,
+        tasks: 8,
+        created_at: '2024-02-20T09:15:00Z',
+        lastActivity: '2024-10-17T16:45:00Z',
+      },
+      {
+        id: 3,
+        name: 'Estudio y Aprendizaje',
+        description: 'Grupo para compartir recursos de estudio',
+        members: 7,
+        tasks: 15,
+        created_at: '2024-03-10T11:00:00Z',
+        lastActivity: '2024-10-18T12:20:00Z',
+      },
+    ]
+    setGroups(mockGroups)
+
+    const mockStudents = [
+      { id: 1, name: 'María García', email: 'maria@universidad.edu', course: 'Matemáticas III' },
+      { id: 2, name: 'Juan Pérez', email: 'juan@universidad.edu', course: 'Matemáticas III' },
+      { id: 3, name: 'Ana López', email: 'ana@universidad.edu', course: 'Matemáticas III' },
+      { id: 4, name: 'Carlos Rodríguez', email: 'carlos@universidad.edu', course: 'Física II' },
+      { id: 5, name: 'Laura Martínez', email: 'laura@universidad.edu', course: 'Física II' },
+      { id: 6, name: 'Pedro Sánchez', email: 'pedro@universidad.edu', course: 'Literatura Española' },
+    ]
+    setAvailableStudents(mockStudents)
   }, [])
-
-  const loadGroups = async () => {
-    try {
-      setLoading(true)
-      const data = await getStudentGroups()
-      setGroups(data || [])
-    } catch (error) {
-      console.error('Error loading groups:', error)
-      toast.error('Error al cargar los grupos')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // Load students when a course is selected
-  useEffect(() => {
-    if (selectedCourse) {
-      loadStudentsForCourse(selectedCourse.id)
-    } else {
-      setAvailableStudents([])
-    }
-  }, [selectedCourse])
-
-  const loadStudentsForCourse = async (courseId) => {
-    try {
-      const students = await getStudents(courseId)
-      setAvailableStudents(students || [])
-    } catch (error) {
-      console.error('Error loading students:', error)
-      toast.error('Error al cargar estudiantes del curso')
-    }
-  }
-
-  const handleCreateGroup = async () => {
-    if (!groupName.trim()) {
-      toast.error('Por favor ingresa un nombre para el grupo')
-      return
-    }
-    if (!selectedCourse) {
-      toast.error('Por favor selecciona un curso')
-      return
-    }
-
-    try {
-      const newGroup = await createGroup({
-        course_id: selectedCourse.id,
-        name: groupName,
-        description: groupDescription
-      })
-
-      // Add members to the group
-      for (const student of selectedStudents) {
-        try {
-          await addMember(newGroup.id, student.id)
-        } catch (error) {
-          console.error(`Error adding member ${student.name}:`, error)
-          toast.error(`Error al agregar a ${student.name}`)
-        }
-      }
-
-      toast.success(`Grupo "${groupName}" creado exitosamente`)
-      setShowCreateForm(false)
-      resetForm()
-      loadGroups()
-    } catch (error) {
-      console.error('Error creating group:', error)
-      toast.error(error.message || 'Error al crear el grupo')
-    }
-  }
-
-  const resetForm = () => {
-    setGroupName('')
-    setGroupDescription('')
-    setSelectedCourse(null)
-    setSelectedStudents([])
-    setSearchInput('')
-  }
-
-  const handleViewGroup = async (group) => {
-    try {
-      const details = await getGroupDetails(group.id)
-      setSelectedGroup(details)
-    } catch (error) {
-      console.error('Error loading group details:', error)
-      toast.error('Error al cargar detalles del grupo')
-    }
-  }
-
-  const handleRemoveMember = async (groupId, studentId, studentName) => {
-    if (!confirm(`¿Estás seguro de eliminar a ${studentName} del grupo?`)) {
-      return
-    }
-
-    try {
-      await removeMember(groupId, studentId)
-      toast.success('Miembro eliminado del grupo')
-      // Reload group details
-      const details = await getGroupDetails(groupId)
-      setSelectedGroup(details)
-      loadGroups()
-    } catch (error) {
-      console.error('Error removing member:', error)
-      toast.error(error.message || 'Error al eliminar miembro')
-    }
-  }
 
   const addStudent = (student) => {
     if (!selectedStudents.find(s => s.id === student.id)) {
@@ -160,19 +77,50 @@ export default function GroupsPage() {
     setSelectedStudents(selectedStudents.filter(s => s.id !== studentId))
   }
 
+  const handleCreateGroup = () => {
+    if (!groupName.trim()) {
+      alert('Por favor ingresa un nombre para el grupo')
+      return
+    }
+    if (!selectedCourse) {
+      alert('Por favor selecciona un curso')
+      return
+    }
+
+    console.log('[v0] Creating group:', {
+      name: groupName,
+      description: groupDescription,
+      course: selectedCourse,
+      members: selectedStudents.map(s => s.id)
+    })
+
+    alert(`Grupo "${groupName}" creado con ${selectedStudents.length} miembros`)
+
+    setShowCreateForm(false)
+    setGroupName('')
+    setGroupDescription('')
+    setSelectedCourse('')
+    setSelectedStudents([])
+    setSearchInput('')
+  }
+
+  const handleJoinGroup = (groupId) => {
+    alert(`Unirse al grupo ${groupId} próximamente`)
+  }
+
   const filteredGroups = groups.filter(group =>
-    group.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    group.description?.toLowerCase().includes(searchQuery.toLowerCase())
+    group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    group.description.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const suggestedStudents = availableStudents.filter(student =>
-    student.name?.toLowerCase().includes(searchInput.toLowerCase()) &&
+  const filteredStudents = selectedCourse
+    ? availableStudents.filter(student => student.course === selectedCourse)
+    : []
+
+  const suggestedStudents = filteredStudents.filter(student =>
+    student.name.toLowerCase().includes(searchInput.toLowerCase()) &&
     !selectedStudents.find(s => s.id === student.id)
   )
-
-  if (loading || coursesLoading) {
-    return <Loading message="Cargando grupos..." />
-  }
 
   return (
     <div className="p-6 space-y-6">
@@ -185,20 +133,16 @@ export default function GroupsPage() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-foreground">Mis Grupos</h1>
-                <p className="text-sm text-muted-foreground">
-                  {isTeacher ? 'Gestiona los grupos de tus cursos' : 'Colabora con tu equipo'}
-                </p>
+                <p className="text-sm text-muted-foreground">Colabora con tu equipo</p>
               </div>
             </div>
-            {isTeacher && (
-              <button
-                onClick={() => setShowCreateForm(true)}
-                className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2 font-medium"
-              >
-                <Plus className="w-5 h-5" />
-                Nuevo Grupo
-              </button>
-            )}
+            <button
+              onClick={() => setShowCreateForm(true)}
+              className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2 font-medium"
+            >
+              <Plus className="w-5 h-5" />
+              Nuevo Grupo
+            </button>
           </div>
         </div>
       </div>
@@ -222,7 +166,7 @@ export default function GroupsPage() {
             <div
               key={group.id}
               className="bg-card rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-border"
-              onClick={() => handleViewGroup(group)}
+              onClick={() => setSelectedGroup(group)}
             >
               <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
@@ -232,21 +176,40 @@ export default function GroupsPage() {
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-foreground">{group.name}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {group.members?.length || 0} miembros
-                      </p>
+                      <p className="text-sm text-muted-foreground">{group.members} miembros</p>
                     </div>
                   </div>
                 </div>
 
-                <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
-                  {group.description || 'Sin descripción'}
-                </p>
+                <p className="text-muted-foreground text-sm mb-4 line-clamp-2">{group.description}</p>
 
-                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <span className="text-xs">
-                    Creado {new Date(group.created_at).toLocaleDateString('es-ES')}
-                  </span>
+                <div className="flex items-center justify-between text-sm text-muted-foreground mb-4 pb-4 border-b border-border">
+                  <div className="flex items-center gap-1">
+                    <CheckSquare className="w-4 h-4" />
+                    <span>{group.tasks} tareas</span>
+                  </div>
+                  <span className="text-xs">Activo {new Date(group.lastActivity).toLocaleDateString('es-ES')}</span>
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleJoinGroup(group.id)
+                    }}
+                    className="flex-1 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+                  >
+                    Unirse
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setSelectedGroup(group)
+                    }}
+                    className="px-4 py-2 border border-border text-foreground rounded-lg text-sm font-medium hover:bg-muted transition-colors"
+                  >
+                    Ver
+                  </button>
                 </div>
               </div>
             </div>
@@ -258,13 +221,9 @@ export default function GroupsPage() {
             <Users className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
             <h3 className="text-lg font-semibold text-foreground mb-2">No hay grupos</h3>
             <p className="text-muted-foreground mb-6">
-              {searchQuery
-                ? 'No se encontraron grupos con ese criterio'
-                : isTeacher
-                  ? 'Crea tu primer grupo para organizar a tus estudiantes'
-                  : 'Aún no perteneces a ningún grupo'}
+              {searchQuery ? 'No se encontraron grupos con ese criterio' : 'Crea tu primer grupo para comenzar a colaborar'}
             </p>
-            {!searchQuery && isTeacher && (
+            {!searchQuery && (
               <button
                 onClick={() => setShowCreateForm(true)}
                 className="bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors inline-flex items-center gap-2 font-medium"
@@ -276,7 +235,6 @@ export default function GroupsPage() {
           </div>
         )}
 
-        {/* Create Group Modal */}
         {showCreateForm && (
           <div className="fixed inset-0 bg-black/30 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
             <div className="bg-card rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-border">
@@ -284,10 +242,7 @@ export default function GroupsPage() {
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-xl font-bold text-foreground">Crear Nuevo Grupo</h3>
                   <button
-                    onClick={() => {
-                      setShowCreateForm(false)
-                      resetForm()
-                    }}
+                    onClick={() => setShowCreateForm(false)}
                     className="text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <X className="w-6 h-6" />
@@ -326,24 +281,48 @@ export default function GroupsPage() {
                           className="w-full justify-between bg-background hover:bg-muted border-border text-foreground"
                         >
                           <span className="text-sm">
-                            {selectedCourse ? selectedCourse.title : 'Selecciona un curso'}
+                            {selectedCourse || 'Selecciona un curso'}
                           </span>
                           <ChevronDown size={16} className="ml-2 text-muted-foreground" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="start" className="w-full min-w-[400px]">
-                        {courses.map((course) => (
-                          <DropdownMenuItem
-                            key={course.id}
-                            onClick={() => {
-                              setSelectedCourse(course)
-                              setSelectedStudents([])
-                            }}
-                            className={selectedCourse?.id === course.id ? 'bg-primary/10 text-primary' : ''}
-                          >
-                            {course.title}
-                          </DropdownMenuItem>
-                        ))}
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSelectedCourse('')
+                            setSelectedStudents([])
+                          }}
+                          className={!selectedCourse ? 'bg-primary/10 text-primary' : ''}
+                        >
+                          Selecciona un curso
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSelectedCourse('Matemáticas III')
+                            setSelectedStudents([])
+                          }}
+                          className={selectedCourse === 'Matemáticas III' ? 'bg-primary/10 text-primary' : ''}
+                        >
+                          Matemáticas III
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSelectedCourse('Física II')
+                            setSelectedStudents([])
+                          }}
+                          className={selectedCourse === 'Física II' ? 'bg-primary/10 text-primary' : ''}
+                        >
+                          Física II
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSelectedCourse('Literatura Española')
+                            setSelectedStudents([])
+                          }}
+                          className={selectedCourse === 'Literatura Española' ? 'bg-primary/10 text-primary' : ''}
+                        >
+                          Literatura Española
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
@@ -412,7 +391,11 @@ export default function GroupsPage() {
                   <button
                     onClick={() => {
                       setShowCreateForm(false)
-                      resetForm()
+                      setGroupName('')
+                      setGroupDescription('')
+                      setSelectedCourse('')
+                      setSelectedStudents([])
+                      setSearchInput('')
                     }}
                     className="flex-1 px-4 py-2 text-sm font-medium text-foreground bg-muted border border-border rounded-lg hover:bg-muted/80 transition-colors"
                   >
@@ -420,10 +403,9 @@ export default function GroupsPage() {
                   </button>
                   <button
                     onClick={handleCreateGroup}
-                    disabled={groupsLoading}
-                    className="flex-1 px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
+                    className="flex-1 px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-lg hover:bg-primary/90 transition-colors"
                   >
-                    {groupsLoading ? 'Creando...' : 'Crear Grupo'}
+                    Crear Grupo
                   </button>
                 </div>
               </div>
@@ -431,7 +413,6 @@ export default function GroupsPage() {
           </div>
         )}
 
-        {/* Group Details Modal */}
         {selectedGroup && (
           <div className="fixed inset-0 bg-black/30 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
             <div className="bg-card rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-border">
@@ -454,40 +435,59 @@ export default function GroupsPage() {
                   </button>
                 </div>
 
-                <div className="mb-6">
-                  <h4 className="text-lg font-bold text-foreground mb-4">
-                    Miembros ({selectedGroup.members?.length || 0})
-                  </h4>
-                  <div className="space-y-2">
-                    {selectedGroup.members?.map((member) => (
-                      <div
-                        key={member.student_id}
-                        className="flex items-center justify-between p-3 border border-border rounded-lg bg-background"
-                      >
-                        <div>
-                          <p className="font-medium text-foreground">{member.student?.name}</p>
-                          <p className="text-sm text-muted-foreground">{member.student?.email}</p>
-                        </div>
-                        {isTeacher && (
-                          <button
-                            onClick={() => handleRemoveMember(selectedGroup.id, member.student_id, member.student?.name)}
-                            className="text-red-600 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                    {(!selectedGroup.members || selectedGroup.members.length === 0) && (
-                      <p className="text-muted-foreground text-center py-4">No hay miembros en este grupo</p>
-                    )}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <div className="bg-primary/10 p-4 rounded-lg">
+                    <div className="text-2xl font-bold text-primary">{selectedGroup.members}</div>
+                    <div className="text-sm text-primary font-medium">Miembros</div>
+                  </div>
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <div className="text-2xl font-bold text-blue-600">{selectedGroup.tasks}</div>
+                    <div className="text-sm text-blue-700 font-medium">Tareas</div>
+                  </div>
+                  <div className="bg-purple-50 p-4 rounded-lg">
+                    <div className="text-lg font-bold text-purple-600">
+                      {new Date(selectedGroup.created_at).toLocaleDateString('es-ES')}
+                    </div>
+                    <div className="text-sm text-purple-700 font-medium">Creado</div>
                   </div>
                 </div>
 
-                <div className="flex gap-3">
+                <div>
+                  <h4 className="text-lg font-bold text-foreground mb-4">Funcionalidades del Grupo</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                      <MessageCircle className="w-6 h-6 text-blue-600 mb-2" />
+                      <h5 className="font-semibold text-foreground mb-1">Chat del Grupo</h5>
+                      <p className="text-sm text-muted-foreground">Comunicación en tiempo real con los miembros</p>
+                    </div>
+                    <div className="p-4 bg-primary/10 rounded-lg border border-primary/20">
+                      <CheckSquare className="w-6 h-6 text-primary mb-2" />
+                      <h5 className="font-semibold text-foreground mb-1">Tareas Compartidas</h5>
+                      <p className="text-sm text-muted-foreground">Asigna y sigue tareas del equipo</p>
+                    </div>
+                    <div className="p-4 bg-purple-50 rounded-lg border border-purple-100">
+                      <Calendar className="w-6 h-6 text-purple-600 mb-2" />
+                      <h5 className="font-semibold text-foreground mb-1">Calendario Compartido</h5>
+                      <p className="text-sm text-muted-foreground">Coordina eventos y reuniones</p>
+                    </div>
+                    <div className="p-4 bg-orange-50 rounded-lg border border-orange-100">
+                      <Users className="w-6 h-6 text-orange-600 mb-2" />
+                      <h5 className="font-semibold text-foreground mb-1">Gestión de Miembros</h5>
+                      <p className="text-sm text-muted-foreground">Invita y administra miembros del grupo</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 flex gap-3">
+                  <button
+                    onClick={() => handleJoinGroup(selectedGroup.id)}
+                    className="flex-1 bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors font-medium"
+                  >
+                    Unirse al Grupo
+                  </button>
                   <button
                     onClick={() => setSelectedGroup(null)}
-                    className="flex-1 px-6 py-3 border border-border text-foreground rounded-lg hover:bg-muted transition-colors font-medium"
+                    className="px-6 py-3 border border-border text-foreground rounded-lg hover:bg-muted transition-colors font-medium"
                   >
                     Cerrar
                   </button>
