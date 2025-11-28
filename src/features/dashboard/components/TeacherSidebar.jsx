@@ -15,6 +15,7 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  Users,
 } from 'lucide-react'
 
 const TeacherSidebar = ({ onCollapseChange }) => {
@@ -26,6 +27,7 @@ const TeacherSidebar = ({ onCollapseChange }) => {
   const teacherMenuItems = [
     { path: '/teacher/home', icon: School, label: 'Panel del Profesor' },
     { path: '/teacher/courses', icon: BookOpen, label: 'Cursos' },
+    { path: '/groups', icon: Users, label: 'Grupos' },
     { path: '/teacher/tasks', icon: ClipboardList, label: 'Tareas' },
     { path: '/teacher/reviews', icon: ListChecks, label: 'Revisiones Pendientes' },
     { path: '/teacher/calendar', icon: Calendar, label: 'Calendario' },
@@ -52,9 +54,8 @@ const TeacherSidebar = ({ onCollapseChange }) => {
 
   return (
     <div
-      className={`fixed inset-y-0 left-0 bg-sidebar border-r border-sidebar-border z-10 flex flex-col transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] animate-in slide-in-from-left-10 duration-500 ${
-        isCollapsed ? 'w-20' : 'w-60'
-      }`}
+      className={`fixed inset-y-0 left-0 bg-sidebar border-r border-sidebar-border z-10 flex flex-col transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] animate-in slide-in-from-left-10 duration-500 ${isCollapsed ? 'w-20' : 'w-60'
+        }`}
     >
       <div className={`flex items-center justify-between h-16 border-b border-sidebar-border px-4`}>
         {!isCollapsed ? (
@@ -100,11 +101,10 @@ const TeacherSidebar = ({ onCollapseChange }) => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} px-3 py-2.5 rounded-xl transition-all duration-200 active:scale-95 ${
-                    active
-                      ? 'bg-sidebar-accent text-primary font-medium shadow-sm'
-                      : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'
-                  }`}
+                  className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} px-3 py-2.5 rounded-xl transition-all duration-200 active:scale-95 ${active
+                    ? 'bg-sidebar-accent text-primary font-medium shadow-sm'
+                    : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'
+                    }`}
                   title={isCollapsed ? item.label : ''}
                 >
                   <span className={active ? 'text-primary' : 'text-muted-foreground'}>
