@@ -88,7 +88,15 @@ const TaskListView = () => {
       {/* Header with view toggle */}
       <div className="max-w-4xl mx-auto mb-6">
         <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm">
-          <h1 className="text-2xl font-bold text-gray-800">Mis Tareas</h1>
+          
+          <h1 className="text-2xl font-bold text-gray-800">
+              <img 
+                  src="/tareas.png" 
+                  alt="Icono"
+                  className="w-6 h-6 object-contain"
+              />
+              Mis Tareas
+              </h1>
 
           <div className="flex items-center space-x-4">
             {/* View toggle buttons */}

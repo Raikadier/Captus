@@ -61,13 +61,23 @@ const Sidebar = ({ onCollapseChange }) => {
       <div className={`flex items-center justify-between h-16 border-b border-sidebar-border px-4`}>
         {!isCollapsed ? (
           <div className="flex items-center space-x-2 transition-opacity duration-200">
-            <BookOpen className="text-primary" size={24} />
-            <h1 className={`text-xl font-semibold text-primary`}>Captus</h1>
+            <img 
+                src="/LgCP.png"
+                alt="Captus Logo"
+                className="w-8 h-8 rounded-lg object-cover"
+            />
+              <h1 className="text-xl font-semibold text-primary">Captus</h1>
           </div>
+
         ) : (
           <div className="transition-opacity duration-200">
-            <BookOpen className="text-primary" size={24} />
+            <img 
+                src="/LgCP.png"
+                alt="Captus Logo"
+                className="w-8 h-8 rounded-lg object-cover mx-auto"
+            />
           </div>
+
         )}
         <button
           onClick={handleCollapse}
