@@ -118,12 +118,15 @@ const ChatBotPage = () => {
       // Check for tool action
       if (data.actionPerformed) {
         console.log('AI Performed action:', data.actionPerformed);
-        // Trigger a custom event for other components to listen to (e.g., Task List)
-        // This satisfies the "Update UI in real-time" requirement if components listen to it.
-        window.dispatchEvent(new CustomEvent('task-update', { detail: { action: data.actionPerformed } }));
-
-        // If we are showing tasks in this page (future), we would refresh here.
-        // Currently, the text response confirms the action.
+        // Infer domain and dispatch targeted event so other components can react (tasks/calendar/notes)
+        const action = data.actionPerformed;
+        if (action.includes('task')) {
+          window.dispatchEvent(new CustomEvent('task-update', { detail: { action } }));
+        } else if (action.includes('event')) {
+          window.dispatchEvent(new CustomEvent('event-update', { detail: { action } }));
+        } else if (action.includes('note')) {
+          window.dispatchEvent(new CustomEvent('note-update', { detail: { action } }));
+        }
       }
 
       // Backend returns the AI result. We add it to the list.
