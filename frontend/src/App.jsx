@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import LoginForm from './features/auth/components/LoginForm';
-import TeacherDashboard from './features/dashboard/teacher/TeacherDashboard';
 import HomePage from './features/dashboard/components/HomePage';
 import MainLayout from './features/dashboard/components/MainLayout';
 import TaskPage from './features/tasks/TaskPage';
@@ -14,6 +13,7 @@ import GroupsPage from './features/groups/GroupsPage';
 import SettingsPage from './features/settings/SettingsPage';
 import StatsPage from './features/stats/StatsPage';
 import { Toaster } from 'sonner';
+import SidebarDocente from './features/dashboardDc/componentsDc/SidebarDocente';
 
  // Protected Route component
  const ProtectedRoute = ({ children }) => {
@@ -43,14 +43,30 @@ function App() {
           <Toaster richColors position="top-right" />
           <Routes>
 
+
+            <Route path="/" element={<LoginForm />} />
             <Route
-            path="/teacher-dashboard"
-            element={
-            <ProtectedRoute>
-            <TeacherDashboard />
-            </ProtectedRoute>
+              path="/home"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <HomePage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/sidebar-docente"
+              element={
+              <ProtectedRoute>
+                <MainLayout>
+              <SidebarDocente/>
+              </MainLayout>
+              </ProtectedRoute>
             }
             />
+
 
 
             <Route

@@ -65,6 +65,7 @@ export const AuthProvider = ({ children }) => {
       const accessToken = data.session?.access_token ?? null;
       setToken(accessToken ?? null);
 
+        console.log("Usuario en login:", data);
       return { success: true };
     } catch (err) {
       return { success: false, error: err.message || 'Login failed' };

@@ -144,9 +144,11 @@ const ChatBotPage = () => {
               <Menu size={20} />
             </button>
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-600 rounded-lg flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
+              <img 
+                  src="/LgCP.png"
+                  alt="Logo Captus"
+                  className="w-8 h-8 rounded-lg object-cover"
+              />
               <div>
                 <h1 className="font-semibold text-gray-900">Captus AI</h1>
                 <p className="text-xs text-gray-500">Tu asistente académico</p>

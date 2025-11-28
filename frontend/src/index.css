@@ -82,6 +82,11 @@
   }
 }
 
+.sidebar-item {
+  @apply block py-2 px-3 rounded-lg transition hover:bg-pink-100 hover:text-pink-600;
+}
+
+
 @layer base {
   * {
     border-color: hsl(var(--border));

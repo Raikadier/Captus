@@ -33,6 +33,27 @@ const Sidebar = () => {
     { path: '/configuracion', icon: Settings, label: 'Configuración' },
   ];
 
+  ///Menú estudiante
+  const studentMenuItems = [
+    { path: '/estudiante', icon: Home, label: 'Estudiante' },
+    
+  ];
+
+   ///Menú docente
+  const docenteMenuItems = [
+    { path: '/docente', icon: Home, label: 'Docente' },
+    
+  ];
+
+  console.log('User role:', user);
+
+  let menuToUse = user?.role === 'docente' ? docenteMenuItems : studentMenuItems;
+  menuToUse = menuToUse.concat(menuItems);
+
+
+  
+
+
   const isActive = (path) => location.pathname === path;
 
   const handleLogout = async () => {
@@ -98,7 +119,7 @@ const Sidebar = () => {
         </div>
 
         <nav className="space-y-1">
-          {menuItems.map((item) => {
+          {menuToUse.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
             return (
