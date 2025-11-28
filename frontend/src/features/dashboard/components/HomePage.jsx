@@ -184,9 +184,15 @@ const HomePage = () => {
       <header className="sticky top-0 rounded-xl shadow-sm p-6 mb-6 z-10 animate-in slide-in-from-top duration-300 bg-card">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">
-              👋 Bienvenid@ {userName ? userName : 'Estudiante'}
-            </h1>
+            <h1 className="text-xl font-bold flex items-center gap-2">
+              <img 
+                  src="/hola.png" 
+                  alt="Icono"
+                  className="w-6 h-6 object-contain"
+              />
+              Bienvenida, María
+              </h1>
+
             <p className="text-muted-foreground mt-1">
               {getCurrentDate()}
             </p>
