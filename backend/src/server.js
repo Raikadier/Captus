@@ -103,9 +103,9 @@ const swaggerSpec = swaggerJsdoc(swaggerOptions);
 // Swagger documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// AI routes
+// AI routes (prefijo /api/ai para frontend)
 if (ENV_OK && supabaseAdmin) {
-  app.use('/ai', verifySupabaseToken, aiRouter);
+  app.use('/api/ai', verifySupabaseToken, aiRouter);
 }
 
 // Extended API routes

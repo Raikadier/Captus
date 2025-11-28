@@ -24,6 +24,12 @@ export class EventsService {
     this.currentUser = user;
   }
 
+  resolveUserId(user) {
+    if (!user) return this.currentUser?.id || this.currentUser?.user_id || null;
+    if (typeof user === "string") return user;
+    return user.id || user.user_id || null;
+  }
+
   validateEvent(event) {
     if (!event) {
       return new OperationResult(false, "El evento no puede ser nulo.");
@@ -60,18 +66,25 @@ export class EventsService {
     return new OperationResult(true);
   }
 
-  async create(event) {
-    return this.save(event);
+  async create(event, userContext = null) {
+    return this.save(event, userContext);
   }
 
-  async save(event) {
+  async save(event, userContext = null) {
     try {
       const validation = this.validateEvent(event);
       if (!validation.success) return validation;
 
-      event.user_id = this.currentUser?.id;
-      if (!event.user_id) {
+      const userId = this.resolveUserId(userContext);
+      if (!userId) {
         return new OperationResult(false, "Usuario no autenticado.");
+      }
+
+      event.user_id = userId;
+      event.is_past = Boolean(event.is_past);
+      event.notify = Boolean(event.notify);
+      if (!event.type) {
+        event.type = "personal";
       }
 
       const savedEvent = await eventsRepository.save(event);
@@ -92,20 +105,19 @@ export class EventsService {
     }
   }
 
-  async getAll() {
+  async getAll(userContext = null) {
     try {
-      if (!this.currentUser) {
-        return new OperationResult(false, "Usuario no autenticado.");
-      }
+      const userId = this.resolveUserId(userContext);
+      if (!userId) return new OperationResult(false, "Usuario no autenticado.");
 
-      const events = await eventsRepository.getAllByUserId(this.currentUser.id);
+      const events = await eventsRepository.getAllByUserId(userId);
       return new OperationResult(true, "Eventos obtenidos exitosamente.", events);
     } catch (error) {
       return new OperationResult(false, `Error al obtener eventos: ${error.message}`);
     }
   }
 
-  async getById(id) {
+  async getById(id, userContext = null) {
     try {
       if (!id) {
         return new OperationResult(false, "ID de evento inválido.");
@@ -113,7 +125,8 @@ export class EventsService {
 
       const event = await eventsRepository.getById(id);
       if (event) {
-        if (event.user_id === this.currentUser?.id) {
+        const userId = this.resolveUserId(userContext);
+        if (userId && event.user_id === userId) {
           return new OperationResult(true, "Evento encontrado.", event);
         } else {
           return new OperationResult(false, "Evento no accesible.");
@@ -126,24 +139,31 @@ export class EventsService {
     }
   }
 
-  async update(event) {
+  async update(event, userContext = null) {
     try {
-      const validation = this.validateEvent(event);
-      if (!validation.success) return validation;
-
       const existingEvent = await eventsRepository.getById(event.id);
       if (!existingEvent) {
         return new OperationResult(false, "Evento no encontrado.");
       }
 
-      if (existingEvent.user_id !== this.currentUser?.id) {
+      const userId = this.resolveUserId(userContext);
+      if (!userId || existingEvent.user_id !== userId) {
         return new OperationResult(false, "Evento no accesible.");
       }
 
-      // Update the update_at timestamp
-      event.updated_at = new Date();
+      const mergedEvent = {
+        ...existingEvent,
+        ...event,
+        user_id: userId,
+      };
 
-      const updated = await eventsRepository.update(event);
+      const validation = this.validateEvent(mergedEvent);
+      if (!validation.success) return validation;
+
+      // Update the update_at timestamp
+      mergedEvent.updated_at = new Date();
+
+      const updated = await eventsRepository.update(mergedEvent);
       if (updated) {
         // Send notification email if requested and notify setting changed or event was updated
         if (event.notify) {
@@ -161,7 +181,7 @@ export class EventsService {
     }
   }
 
-  async delete(id) {
+  async delete(id, userContext = null) {
     try {
       if (!id) {
         return new OperationResult(false, "ID de evento inválido.");
@@ -172,7 +192,8 @@ export class EventsService {
         return new OperationResult(false, "Evento no encontrado.");
       }
 
-      if (existingEvent.user_id !== this.currentUser?.id) {
+      const userId = this.resolveUserId(userContext);
+      if (!userId || existingEvent.user_id !== userId) {
         return new OperationResult(false, "Evento no accesible.");
       }
 
@@ -187,16 +208,28 @@ export class EventsService {
     }
   }
 
-  async getByDateRange(startDate, endDate) {
+  async getByDateRange(startDate, endDate, userContext = null) {
     try {
-      if (!this.currentUser) {
-        return new OperationResult(false, "Usuario no autenticado.");
-      }
+      const userId = this.resolveUserId(userContext);
+      if (!userId) return new OperationResult(false, "Usuario no autenticado.");
 
-      const events = await eventsRepository.getByDateRange(this.currentUser.id, startDate, endDate);
+      const events = await eventsRepository.getByDateRange(userId, startDate, endDate);
       return new OperationResult(true, "Eventos obtenidos exitosamente.", events);
     } catch (error) {
       return new OperationResult(false, `Error al obtener eventos por rango de fecha: ${error.message}`);
+    }
+  }
+
+  async getUpcoming(options = {}, userContext = null) {
+    try {
+      const userId = this.resolveUserId(userContext);
+      if (!userId) return new OperationResult(false, "Usuario no autenticado.");
+
+      const limit = options.limit || null;
+      const events = await eventsRepository.getUpcomingByUserId(userId, limit);
+      return new OperationResult(true, "Próximos eventos obtenidos exitosamente.", events);
+    } catch (error) {
+      return new OperationResult(false, `Error al obtener eventos próximos: ${error.message}`);
     }
   }
 
