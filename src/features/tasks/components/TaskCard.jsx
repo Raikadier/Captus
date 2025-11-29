@@ -142,7 +142,6 @@ const TaskCard = ({
         task={task}
         isOpen={showSubTasksModal}
         onClose={() => setShowSubTasksModal(false)}
-        useSubTasks={() => useSubTasks(task.id)}
       />
     </div>
   );
