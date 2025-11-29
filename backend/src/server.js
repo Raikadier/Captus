@@ -28,6 +28,8 @@ import AssignmentRoutes from './routes/AssignmentRoutes.js';
 import SubmissionRoutes from './routes/SubmissionRoutes.js';
 import AcademicGroupRoutes from './routes/AcademicGroupRoutes.js';
 import NotificationRoutes from './routes/NotificationRoutes.js';
+import TelegramRoutes from './routes/TelegramRoutes.js';
+import telegramController from './controllers/TelegramController.js';
 import aiRouter from './routes/ai.js';
 import { getSupabaseClient } from './lib/supabaseAdmin.js';
 
@@ -131,7 +133,14 @@ if (ENV_OK && supabaseAdmin) {
   app.use('/api/assignments', AssignmentRoutes);
   app.use('/api/submissions', SubmissionRoutes);
   app.use('/api/groups', AcademicGroupRoutes);
+
   app.use('/api/notifications', NotificationRoutes);
+
+  // Telegram Routes
+  // Webhook must be public
+  app.post('/api/telegram/webhook', telegramController.handleWebhook);
+  // Other routes protected
+  app.use('/api/telegram', verifySupabaseToken, TelegramRoutes);
 }
 
 // Root route

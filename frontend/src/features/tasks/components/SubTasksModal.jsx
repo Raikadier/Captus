@@ -5,8 +5,9 @@ import { Input } from '../../../ui/input';
 import { Textarea } from '../../../ui/textarea';
 import { Label } from '../../../ui/label';
 import { Progress } from '../../../ui/progress';
+import { useSubTasks } from '../../../hooks/useSubTasks';
 
-const SubTasksModal = ({ task, isOpen, onClose, useSubTasks }) => {
+const SubTasksModal = ({ task, isOpen, onClose }) => {
   const {
     subTasks,
     loading,
