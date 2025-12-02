@@ -2,32 +2,25 @@ import User from '../models/UserModels.js';
 import { OperationResult } from '../shared/OperationResult.js';
 import CategoryService from "./CategoryService.js";
 import { StatisticsService } from "./StatisticsService.js";
+import UserRepository from "../repositories/UserRepository.js";
 
 class UserService {
-  constructor(supabase) {
-    this.supabase = supabase;
-    this.categoryService = new CategoryService();
-    this.statisticsService = new StatisticsService();
+  constructor(supabase, userRepo, categorySvc, statisticsSvc) {
+    this.supabase = supabase; // Kept for legacy compatibility if needed, but unused in main methods
+    this.userRepository = userRepo || new UserRepository();
+    this.categoryService = categorySvc || new CategoryService();
+    this.statisticsService = statisticsSvc || new StatisticsService();
     this.currentUser = null;
   }
 
   // Get user by ID
   async getUserById(userId) {
     try {
-      const { data, error } = await this.supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (error) {
-        if (error.code === 'PGRST116') {
-          throw new Error('User not found');
-        }
-        throw error;
+      const user = await this.userRepository.getById(userId);
+      if (!user) {
+        throw new Error('User not found');
       }
-
-      return User.fromDatabase(data);
+      return new User(user);
     } catch (error) {
       throw new Error(`Failed to get user: ${error.message}`);
     }
@@ -36,14 +29,8 @@ class UserService {
   // Get all users (admin function)
   async getAllUsers() {
     try {
-      const { data, error } = await this.supabase
-        .from('users')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      return data.map(row => User.fromDatabase(row));
+      const users = await this.userRepository.getAll();
+      return users.map(row => new User(row));
     } catch (error) {
       throw new Error(`Failed to get users: ${error.message}`);
     }
@@ -54,34 +41,32 @@ class UserService {
     try {
       const user = User.fromSupabaseAuth(authUser);
 
-      const { data, error } = await this.supabase
-        .from('users')
-        .upsert(user.toDatabase(), { onConflict: 'id' })
-        .select()
-        .single();
+      const savedUser = await this.userRepository.save(user.toDatabase());
+      if (!savedUser) throw new Error("Failed to save user via repository");
 
-      if (error) throw error;
+      const syncedUser = new User(savedUser);
 
-      const syncedUser = User.fromDatabase(data);
-
-      // Initialize features for the user (Harold logic)
+      // Initialize features for the user
       try {
-        // Set current user for services
         this.setCurrentUser(syncedUser);
 
-        // Create "General" category if it doesn't exist
-        // Note: CategoryService.save usually handles creation.
-        // We might need to check if it exists first or rely on save to handle duplicates.
-        // Assuming save is safe or we just try it.
+        // 1. Initialize Statistics
+        try {
+          if (this.statisticsService.checkStreak) {
+            await this.statisticsService.checkStreak();
+          }
+        } catch (statsError) {
+          console.warn("Error initializing statistics:", statsError.message);
+        }
+
+        // 2. Create "General" category if it doesn't exist
         const generalCategory = {
           name: "General",
           id_User: syncedUser.id
         };
-        // We'll attempt to save. If it fails (e.g. duplicate), we catch it.
         await this.categoryService.save(generalCategory);
         console.log(`Category "General" initialized for user: ${syncedUser.email}`);
       } catch (initError) {
-        // Ignore error if category already exists or other non-critical issue
         console.warn("Note: Could not initialize default category (might already exist):", initError.message);
       }
 
@@ -107,16 +92,10 @@ class UserService {
         throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
       }
 
-      const { data, error } = await this.supabase
-        .from('users')
-        .update(updatedUser.toDatabase())
-        .eq('id', userId)
-        .select()
-        .single();
+      const savedData = await this.userRepository.update(userId, updatedUser.toDatabase());
+      if (!savedData) throw new Error("Failed to update user via repository");
 
-      if (error) throw error;
-
-      return User.fromDatabase(data);
+      return new User(savedData);
     } catch (error) {
       throw new Error(`Failed to update user: ${error.message}`);
     }
@@ -125,23 +104,16 @@ class UserService {
   // Delete user (admin function)
   async deleteUser(userId) {
     try {
-      // Check if user exists
       await this.getUserById(userId);
-
-      const { error } = await this.supabase
-        .from('users')
-        .delete()
-        .eq('id', userId);
-
-      if (error) throw error;
-
+      const success = await this.userRepository.delete(userId);
+      if (!success) throw new Error("Failed to delete user via repository");
       return true;
     } catch (error) {
       throw new Error(`Failed to delete user: ${error.message}`);
     }
   }
 
-  // Delete account with cascading cleanup (Harold logic)
+  // Delete account with cascading cleanup
   async deleteAccount(userId) {
     try {
       // 1. Cleanup Statistics
@@ -160,8 +132,7 @@ class UserService {
         await achievementsRepo.deleteByUser(userId);
       } catch (e) { console.warn("Error cleaning achievements:", e.message); }
 
-      // 3. Cleanup Categories (and Tasks via cascade if DB configured, or manual)
-      // Harold logic deleted categories manually.
+      // 3. Cleanup Categories
       try {
         this.categoryService.setCurrentUser({ id: userId });
         const categoriesResult = await this.categoryService.getAll();
@@ -174,7 +145,7 @@ class UserService {
         }
       } catch (e) { console.warn("Error cleaning categories:", e.message); }
 
-      // 4. Cleanup Tasks (if not deleted by categories)
+      // 4. Cleanup Tasks
       try {
         const taskModule = await import("./TaskService.js");
         const TaskServiceClass = taskModule.TaskService || taskModule.default;
@@ -198,20 +169,9 @@ class UserService {
   // Check if email is registered
   async isEmailRegistered(email) {
     try {
-      const { data, error } = await this.supabase
-        .from('users')
-        .select('id')
-        .eq('email', email)
-        .single();
-
-      if (data) return { success: true, data: { registered: true } };
-
-      // If not found, it might be in Auth but not synced.
-      return { success: true, data: { registered: false } };
+      const registered = await this.userRepository.isEmailRegistered(email);
+      return { success: true, data: { registered } };
     } catch (error) {
-      if (error.code === 'PGRST116') {
-        return { success: true, data: { registered: false } };
-      }
       return { success: false, error: error.message };
     }
   }
@@ -226,44 +186,6 @@ class UserService {
       return new OperationResult(true, "Contraseña validada correctamente. Use el cliente para actualizar.");
     } catch (error) {
       return new OperationResult(false, `Error al cambiar contraseña: ${error.message}`);
-    }
-  }
-
-  // Get user statistics
-  async getUserStats(userId) {
-    try {
-      // Get task counts
-      const { data: taskStats, error: taskError } = await this.supabase
-        .from('tasks')
-        .select('completed, id')
-        .eq('user_id', userId);
-
-      if (taskError) throw taskError;
-
-      const totalTasks = taskStats.length;
-      const completedTasks = taskStats.filter(task => task.completed).length;
-      const pendingTasks = totalTasks - completedTasks;
-
-      // Get streak info
-      const { data: streakData, error: streakError } = await this.supabase
-        .from('streaks')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
-
-      let currentStreak = 0;
-      if (!streakError && streakData) {
-        currentStreak = streakData.current_streak;
-      }
-
-      return {
-        totalTasks,
-        completedTasks,
-        pendingTasks,
-        currentStreak
-      };
-    } catch (error) {
-      throw new Error(`Failed to get user stats: ${error.message}`);
     }
   }
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
+import { useAuth } from './hooks/useAuth';
 import { ThemeProvider, useTheme } from './context/themeContext';
 import { AchievementProvider } from './context/AchievementContext';
 import LoginForm from './features/auth/components/LoginForm';
@@ -28,26 +29,40 @@ import TeacherReviewsPage from './features/teacher/TeacherReviewsPage';
 import TeacherEditTaskPage from './features/teacher/TeacherEditTaskPage';
 import TeacherCalendarPage from './features/teacher/TeacherCalendarPage';
 import AchievementsPage from './features/achievements/AchievementsPage';
+import NotificationsPage from './features/notifications/NotificationsPage';
 import Loading from './ui/loading';
 import { Toaster } from 'sonner';
 import AchievementNotification from './components/shared/AchievementNotification';
 import { useAchievementNotifications } from './hooks/useAchievementNotifications';
 
- // Protected Route component
- const ProtectedRoute = ({ children }) => {
-   const { isAuthenticated, loading } = useAuth();
- 
-   // En desarrollo, permite navegar sin autenticación para validar estilos/UX
-   if (import.meta.env.MODE !== 'production') {
-     return children;
-   }
- 
-   if (loading) {
-     return <Loading message="Cargando..." />;
-   }
- 
-   return isAuthenticated ? children : <Navigate to="/" />;
- };
+// Protected Route component
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+
+  // En desarrollo, permite navegar sin autenticación para validar estilos/UX
+  if (import.meta.env.MODE !== 'production') {
+    return children;
+  }
+
+  if (loading) {
+    return <Loading message="Cargando..." />;
+  }
+
+  return isAuthenticated ? children : <Navigate to="/" />;
+};
+
+// Teacher Route component
+const TeacherRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <Loading message="Verificando permisos..." />;
+  }
+
+  const isTeacher = user?.user_metadata?.role === 'teacher' || user?.email === 'teacher@gmail.com';
+
+  return isTeacher ? children : <Navigate to="/home" />;
+};
 
 function AppContent() {
   const { fontSize } = useTheme();
@@ -67,229 +82,257 @@ function AppContent() {
         )}
 
         <Routes>
-        <Route path="/" element={<LoginForm />} />
-        <Route
-          path="/home"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <HomePage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/courses"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <StudentCoursesPage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/courses/:id"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <StudentCourseDetailPage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/tasks"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <TaskPage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/chatbot"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <ChatBotPage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/notes"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <NotesPage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <ProfilePage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/calendar"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <CalendarPage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/groups"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <GroupsPage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/stats"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <StatsPage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/achievements"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <AchievementsPage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <SettingsPage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-              path="/diagrams"
-              element={
-                <ProtectedRoute>
+          <Route path="/" element={<LoginForm />} />
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <HomePage />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/courses"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <StudentCoursesPage />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/courses/:id"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <StudentCourseDetailPage />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tasks"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <TaskPage />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/chatbot"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <ChatBotPage />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/notes"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <NotesPage />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <ProfilePage />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/calendar"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <CalendarPage />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/groups"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <GroupsPage />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/stats"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <StatsPage />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/achievements"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <AchievementsPage />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <SettingsPage />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/notifications"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <NotificationsPage />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/diagrams"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <StudentDiagramsPage />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          {/* Rutas docente */}
+          <Route
+            path="/teacher/home"
+            element={
+              <ProtectedRoute>
+                <TeacherRoute>
                   <MainLayout>
-                    <StudentDiagramsPage />
+                    <TeacherHomePage />
                   </MainLayout>
-                </ProtectedRoute>
-              }
-        />
-        {/* Rutas docente */}
-        <Route
-          path="/teacher/home"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <TeacherHomePage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/teacher/courses"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <TeacherCoursesPage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/teacher/courses/:id"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <TeacherCourseDetailPage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/teacher/tasks/:id/edit"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <TeacherEditTaskPage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/teacher/tasks"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <TeacherTasksCreatedPage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/teacher/reviews/:studentId"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <TeacherReviewsPage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/teacher/stats"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <TeacherStatsPage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/teacher/diagrams"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <TeacherDiagramsPage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/teacher/calendar"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <TeacherCalendarPage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route path="*" element={<Navigate to="/home" />} />
+                </TeacherRoute>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/courses"
+            element={
+              <ProtectedRoute>
+                <TeacherRoute>
+                  <MainLayout>
+                    <TeacherCoursesPage />
+                  </MainLayout>
+                </TeacherRoute>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/courses/:id"
+            element={
+              <ProtectedRoute>
+                <TeacherRoute>
+                  <MainLayout>
+                    <TeacherCourseDetailPage />
+                  </MainLayout>
+                </TeacherRoute>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/tasks/:id/edit"
+            element={
+              <ProtectedRoute>
+                <TeacherRoute>
+                  <MainLayout>
+                    <TeacherEditTaskPage />
+                  </MainLayout>
+                </TeacherRoute>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/tasks"
+            element={
+              <ProtectedRoute>
+                <TeacherRoute>
+                  <MainLayout>
+                    <TeacherTasksCreatedPage />
+                  </MainLayout>
+                </TeacherRoute>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/reviews/:studentId"
+            element={
+              <ProtectedRoute>
+                <TeacherRoute>
+                  <MainLayout>
+                    <TeacherReviewsPage />
+                  </MainLayout>
+                </TeacherRoute>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/stats"
+            element={
+              <ProtectedRoute>
+                <TeacherRoute>
+                  <MainLayout>
+                    <TeacherStatsPage />
+                  </MainLayout>
+                </TeacherRoute>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/diagrams"
+            element={
+              <ProtectedRoute>
+                <TeacherRoute>
+                  <MainLayout>
+                    <TeacherDiagramsPage />
+                  </MainLayout>
+                </TeacherRoute>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/calendar"
+            element={
+              <ProtectedRoute>
+                <TeacherRoute>
+                  <MainLayout>
+                    <TeacherCalendarPage />
+                  </MainLayout>
+                </TeacherRoute>
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/home" />} />
         </Routes>
       </div>
     </Router>

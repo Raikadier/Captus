@@ -11,7 +11,7 @@ const TaskCard = ({
   priorities = [],
   onToggleComplete,
   onEdit,
-  onDelete,
+  // onDelete,
   showActions = true
 }) => {
   const [showSubTasksModal, setShowSubTasksModal] = useState(false);
@@ -23,117 +23,92 @@ const TaskCard = ({
   const isOverdue = task.due_date && new Date(task.due_date) < new Date() && !task.completed;
 
   return (
-    <div className={`bg-card border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow ${
-      isOverdue ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-border'
-    }`}>
+    <div className={`bg-card border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow ${isOverdue ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-border'
+      }`}>
       <div className="flex items-start justify-between">
         <div className="flex items-start space-x-3 flex-1">
           <button
             onClick={() => onToggleComplete(task.id)}
             className="mt-1 flex-shrink-0"
             disabled={!showActions || isOverdue}
-            title={isOverdue ? "Esta tarea está vencida y no puede ser completada" : ""}
           >
             {task.completed ? (
-              <CheckCircle className="h-5 w-5 text-green-500" />
+              <CheckCircle className="h-5 w-5 text-primary" />
             ) : (
-              <Circle className="h-5 w-5 text-muted-foreground hover:text-green-500" />
+              <Circle className="h-5 w-5 text-muted-foreground hover:text-primary" />
             )}
           </button>
-
           <div className="flex-1 min-w-0">
-            <h3 className={`text-lg font-medium ${
-              task.completed ? 'line-through text-muted-foreground' : 'text-foreground'
-            }`}>
+            <h3 className={`text-base font-medium truncate ${task.completed ? 'text-muted-foreground line-through' : 'text-card-foreground'
+              }`}>
               {task.title}
             </h3>
-
             {task.description && (
-              <p className={`mt-1 text-sm ${
-                task.completed ? 'line-through text-muted-foreground' : 'text-muted-foreground'
-              }`}>
+              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
                 {task.description}
               </p>
             )}
 
-            <div className="flex items-center space-x-2 mt-2">
+            <div className="flex flex-wrap items-center gap-2 mt-3">
               {category && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                  <Tag className="h-3 w-3 mr-1" />
+                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-secondary text-secondary-foreground">
+                  <Tag size={12} className="mr-1" />
                   {category.name}
                 </span>
               )}
 
+              {task.due_date && (
+                <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${isOverdue
+                  ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                  : 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary'
+                  }`}>
+                  <Calendar size={12} className="mr-1" />
+                  {new Date(task.due_date).toLocaleDateString()}
+                </span>
+              )}
+
               {priority && (
-                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                  priority.name === 'Alta' ? 'bg-red-100 text-red-800' :
-                  priority.name === 'Media' ? 'bg-orange-100 text-orange-800' :
-                  priority.name === 'Baja' ? 'bg-green-100 text-green-800' :
-                  'bg-gray-100 text-gray-800'
-                }`}>
+                <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${priority.name === 'Alta' ? 'bg-red-100 text-red-800' :
+                  priority.name === 'Media' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-primary/10 text-primary'
+                  }`}>
+                  <AlertTriangle size={12} className="mr-1" />
                   {priority.name}
                 </span>
               )}
 
-              {task.due_date && (
-                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                  isOverdue ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
-                }`}>
-                  <Calendar className="h-3 w-3 mr-1" />
-                  {new Date(task.due_date).toLocaleDateString()}
-                  {isOverdue && <AlertTriangle className="h-3 w-3 ml-1" />}
-                </span>
+              {/* Subtasks Indicator */}
+              {totalCount > 0 && (
+                <button
+                  onClick={() => setShowSubTasksModal(true)}
+                  className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
+                >
+                  <ListChecks size={12} className="mr-1" />
+                  {completedCount}/{totalCount}
+                </button>
               )}
             </div>
 
-            {/* Subtasks Progress */}
+            {/* Subtasks Progress Bar (only if there are subtasks) */}
             {totalCount > 0 && (
-              <div className="mt-3">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-muted-foreground flex items-center">
-                    <ListChecks className="h-3 w-3 mr-1" />
-                    Subtareas: {completedCount}/{totalCount}
-                  </span>
-                  <span className="text-xs font-medium">{Math.round(progress)}%</span>
-                </div>
+              <div className="mt-2 w-full max-w-[200px]">
                 <Progress value={progress} className="h-1.5" />
               </div>
-            )}
-
-            {task.parent_task_id && (
-              <span className="inline-flex items-center px-2 py-1 mt-2 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                Subtarea
-              </span>
             )}
           </div>
         </div>
 
         {showActions && (
           <div className="flex items-center space-x-2 ml-4">
-            <button
-              onClick={() => setShowSubTasksModal(true)}
-              className={`${task.completed ? 'text-gray-600 hover:text-gray-900' : 'text-blue-600 hover:text-blue-900'} text-sm font-medium flex items-center`}
-              title="Gestionar subtareas"
-            >
-              <ListChecks size={16} className="mr-1" />
-              Subtareas
-            </button>
             {!task.completed && (
-              <>
-                <button
-                  onClick={() => onEdit(task)}
-                  className="text-green-600 hover:text-green-900 text-sm font-medium"
-                >
-                  Editar
-                </button>
-                <button
-                  onClick={() => onDelete(task.id)}
-                  className="text-red-600 hover:text-red-900 text-sm font-medium"
-                >
-                  Eliminar
-                </button>
-              </>
+              <button
+                onClick={() => onEdit(task)}
+                className="text-primary hover:text-primary/80 text-sm font-medium"
+              >
+                Editar
+              </button>
             )}
+            {/* Delete button could go here if needed, but usually handled in parent or context menu */}
           </div>
         )}
       </div>

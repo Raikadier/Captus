@@ -5,10 +5,11 @@ import { Button } from '../../../ui/button';
 import { Card } from '../../../ui/card';
 import { Progress } from '../../../ui/progress';
 import NotificationsDropdown from './NotificationsDropdown';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '../../../hooks/useAuth';
 import { useTheme } from '../../../context/themeContext';
 import apiClient from '../../../shared/api/client';
 import { useSubTasks } from '../../../hooks/useSubTasks';
+import { FadeIn, StaggerContainer, StaggerItem } from '../../../shared/components/animations/MotionComponents';
 
 function getCurrentDate() {
   const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
@@ -30,33 +31,6 @@ function getCurrentDate() {
   return `${days[now.getDay()]}, ${now.getDate()} de ${months[now.getMonth()]} de ${now.getFullYear()}`;
 }
 
-const mockTasks = [
-  {
-    id: 1,
-    title: 'Entregar ensayo de Literatura',
-    dueDate: '2025-10-26',
-    priority: 'Alta',
-    status: 'Pendiente',
-    subject: 'Literatura Española',
-  },
-  {
-    id: 2,
-    title: 'Estudiar para examen de Cálculo',
-    dueDate: '2025-10-28',
-    priority: 'Alta',
-    status: 'En progreso',
-    subject: 'Matemáticas III',
-  },
-  {
-    id: 3,
-    title: 'Presentación grupal de Historia',
-    dueDate: '2025-10-30',
-    priority: 'Media',
-    status: 'Pendiente',
-    subject: 'Historia Mundial',
-  },
-];
-
 function StatCard({ icon, label, value, bgColor }) {
   return (
     <Card className="p-4 border border-gray-200 rounded-xl hover:shadow-md transition-shadow">
@@ -71,13 +45,12 @@ function StatCard({ icon, label, value, bgColor }) {
   );
 }
 
-function TaskItem({ task, index, onClick }) {
+function TaskItem({ task, onClick }) {
   const { progress, completedCount, totalCount } = useSubTasks(task.id);
 
   return (
-    <div
-      className="p-4 border rounded-lg transition-all duration-200 cursor-pointer animate-in fade-in slide-in-from-left hover:scale-[1.02] hover:shadow-md border-border hover:border-green-500 bg-card"
-      style={{ animationDelay: `${index * 100}ms` }}
+    <StaggerItem
+      className="p-4 border rounded-lg transition-all duration-200 cursor-pointer hover:scale-[1.02] hover:shadow-md border-border hover:border-primary bg-card"
       onClick={onClick}
     >
       <div className="flex items-center gap-3 mb-1">
@@ -105,7 +78,7 @@ function TaskItem({ task, index, onClick }) {
 
       <div className="flex items-center gap-4 text-sm text-muted-foreground">
         <div className="flex items-center">
-          <CalendarIcon size={14} className="mr-1.5 text-green-600" />
+          <CalendarIcon size={14} className="mr-1.5 text-primary" />
           {task.due_date ? new Date(task.due_date).toLocaleDateString('es-ES', {
             day: 'numeric',
             month: 'short',
@@ -114,12 +87,12 @@ function TaskItem({ task, index, onClick }) {
         </div>
         {task.subject && (
           <div className="flex items-center">
-            <CheckSquare size={14} className="mr-1.5 text-green-600" />
+            <CheckSquare size={14} className="mr-1.5 text-primary" />
             {task.subject}
           </div>
         )}
       </div>
-    </div>
+    </StaggerItem>
   );
 }
 
@@ -136,7 +109,7 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
   const { user } = useAuth()
-  const { darkMode, accentColor } = useTheme()
+  const { darkMode } = useTheme()
   const [unreadCount, setUnreadCount] = useState(0)
 
   const handleToggleDropdown = useCallback(() => {
@@ -200,7 +173,7 @@ const HomePage = () => {
 
   return (
     <div className="p-8 bg-background">
-      <header className="sticky top-0 rounded-xl shadow-sm p-6 mb-6 z-10 animate-in slide-in-from-top duration-300 bg-card">
+      <FadeIn duration={0.6} className="sticky top-0 rounded-xl shadow-sm p-6 mb-6 z-10 bg-card">
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold text-foreground">
@@ -235,34 +208,33 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-      </header>
+      </FadeIn>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-3 space-y-6">
-          <Card className="p-6 rounded-xl shadow-sm animate-in fade-in slide-in-from-bottom duration-500 bg-card">
+          <FadeIn delay={0.2} className="p-6 rounded-xl shadow-sm bg-card">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold text-foreground">
                 Tareas Pendientes
               </h2>
               <Link to="/tasks">
-                <Button variant="ghost" className={`text-primary hover:text-primary/90 hover:bg-primary/10 transition-all duration-200 hover:scale-105 ${
-                  darkMode ? 'text-primary hover:text-primary hover:bg-primary/20' : ''
-                }`}>
+                <Button variant="ghost" className={`text-primary hover:text-primary/90 hover:bg-primary/10 transition-all duration-200 hover:scale-105 ${darkMode ? 'text-primary hover:text-primary hover:bg-primary/20' : ''
+                  }`}>
                   Ver todas
                 </Button>
               </Link>
             </div>
-            <div className="space-y-4">
+            <StaggerContainer className="space-y-4">
               {loading ? (
                 <div className="text-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
                   <p className="mt-2 text-gray-600">Cargando tareas...</p>
                 </div>
               ) : pendingTasks.length === 0 ? (
                 <div className="text-center py-8">
                   <p className="text-gray-600">No tienes tareas pendientes</p>
                   <Link to="/tasks">
-                    <Button className="mt-2 bg-green-600 hover:bg-green-700">
+                    <Button className="mt-2 bg-primary hover:bg-primary/90">
                       Crear tarea
                     </Button>
                   </Link>
@@ -272,42 +244,42 @@ const HomePage = () => {
                   <TaskItem key={task.id} task={task} index={index} onClick={() => navigate(`/tasks/${task.id}`)} />
                 ))
               )}
-            </div>
-          </Card>
+            </StaggerContainer>
+          </FadeIn>
 
-          <Card className="p-6 rounded-xl shadow-sm animate-in fade-in slide-in-from-bottom duration-500 delay-200 bg-card">
+          <FadeIn delay={0.4} className="p-6 rounded-xl shadow-sm bg-card">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold text-foreground">
                 Resumen General
               </h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-               <StatCard
-                 icon={<CheckSquare className="text-green-600" size={24} />}
-                 label="Total de Tareas"
-                 value={loading ? "..." : stats.totalTasks.toString()}
-                 bgColor="bg-green-50"
-               />
-               <StatCard
-                 icon={<CalendarIcon className="text-blue-600" size={24} />}
-                 label="Próximos Eventos"
-                 value={loading ? "..." : stats.upcomingEvents.toString()}
-                 bgColor="bg-blue-50"
-               />
-               <StatCard
-                 icon={<StickyNote className="text-orange-600" size={24} />}
-                 label="Notas Guardadas"
-                 value={loading ? "..." : stats.totalNotes.toString()}
-                 bgColor="bg-orange-50"
-               />
-               <StatCard
-                 icon={<Bell className="text-purple-600" size={24} />}
-                 label="Recordatorios Activos"
-                 value={loading ? "..." : stats.activeReminders.toString()}
-                 bgColor="bg-purple-50"
-               />
-             </div>
-          </Card>
+              <StatCard
+                icon={<CheckSquare className="text-green-600" size={24} />}
+                label="Total de Tareas"
+                value={loading ? "..." : stats.totalTasks.toString()}
+                bgColor="bg-green-50"
+              />
+              <StatCard
+                icon={<CalendarIcon className="text-blue-600" size={24} />}
+                label="Próximos Eventos"
+                value={loading ? "..." : stats.upcomingEvents.toString()}
+                bgColor="bg-blue-50"
+              />
+              <StatCard
+                icon={<StickyNote className="text-orange-600" size={24} />}
+                label="Notas Guardadas"
+                value={loading ? "..." : stats.totalNotes.toString()}
+                bgColor="bg-orange-50"
+              />
+              <StatCard
+                icon={<Bell className="text-purple-600" size={24} />}
+                label="Recordatorios Activos"
+                value={loading ? "..." : stats.activeReminders.toString()}
+                bgColor="bg-purple-50"
+              />
+            </div>
+          </FadeIn>
         </div>
       </div>
 

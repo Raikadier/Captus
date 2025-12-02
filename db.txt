@@ -130,6 +130,7 @@ CREATE TABLE public.events (
   type character varying NOT NULL,
   is_past boolean NOT NULL,
   notify boolean NOT NULL,
+  metadata jsonb DEFAULT '{}'::jsonb,
   CONSTRAINT events_pkey PRIMARY KEY (id),
   CONSTRAINT events_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
 );
@@ -190,6 +191,8 @@ CREATE TABLE public.notification_preferences (
   whatsapp text,
   quiet_hours jsonb,
   updated_at timestamp with time zone DEFAULT now(),
+  telegram_enabled boolean DEFAULT false,
+  telegram_chat_id text,
   CONSTRAINT notification_preferences_pkey PRIMARY KEY (user_id),
   CONSTRAINT notification_preferences_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
 );
@@ -333,13 +336,24 @@ CREATE TABLE public.tasks (
   CONSTRAINT tasks_subject_id_fkey FOREIGN KEY (subject_id) REFERENCES public.subjects(id),
   CONSTRAINT tasks_parent_task_id_fkey FOREIGN KEY (parent_task_id) REFERENCES public.tasks(id)
 );
+CREATE TABLE public.telegram_link_codes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  code text NOT NULL UNIQUE,
+  created_at timestamp with time zone DEFAULT now(),
+  expires_at timestamp with time zone DEFAULT (now() + '00:15:00'::interval),
+  used boolean DEFAULT false,
+  CONSTRAINT telegram_link_codes_pkey PRIMARY KEY (id),
+  CONSTRAINT telegram_link_codes_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
 CREATE TABLE public.userAchievements (
   achievementId character varying NOT NULL,
   unlockedAt timestamp with time zone,
   progress integer NOT NULL DEFAULT 0,
   isCompleted boolean NOT NULL DEFAULT false,
   id_User uuid NOT NULL,
-  CONSTRAINT userAchievements_pkey PRIMARY KEY (achievementId),
+  id integer NOT NULL DEFAULT nextval('"userAchievements_id_seq"'::regclass),
+  CONSTRAINT userAchievements_pkey PRIMARY KEY (id),
   CONSTRAINT userAchievements_id_User_fkey FOREIGN KEY (id_User) REFERENCES public.users(id)
 );
 CREATE TABLE public.users (

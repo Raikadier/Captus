@@ -1,21 +1,9 @@
 import NotesRepository from "../repositories/NotesRepository.js";
 import { OperationResult } from "../shared/OperationResult.js";
 
-const notesRepository = new NotesRepository();
-
 export class NotesService {
-  constructor() {
-    this.currentUser = null;
-  }
-
-  setCurrentUser(user) {
-    this.currentUser = user;
-  }
-
-  resolveUserId(user) {
-    if (!user) return this.currentUser?.id || this.currentUser?.user_id || null;
-    if (typeof user === "string") return user;
-    return user.id || user.user_id || null;
+  constructor(notesRepo) {
+    this.repo = notesRepo || new NotesRepository();
   }
 
   validateNote(note, isUpdate = false) {
@@ -34,23 +22,22 @@ export class NotesService {
     return new OperationResult(true);
   }
 
-  async create(note, userContext = null) {
-    return this.save(note, userContext);
+  async create(note, userId) {
+    return this.save(note, userId);
   }
 
-  async save(note, userContext = null) {
+  async save(note, userId) {
     try {
       const validation = this.validateNote(note);
       if (!validation.success) return validation;
 
-      const userId = this.resolveUserId(userContext);
       if (!userId) {
         return new OperationResult(false, "Usuario no autenticado.");
       }
 
       note.user_id = userId;
 
-      const savedNote = await notesRepository.save(note);
+      const savedNote = await this.repo.save(note);
       if (savedNote) {
         return new OperationResult(true, "Nota guardada exitosamente.", savedNote);
       } else {
@@ -61,27 +48,25 @@ export class NotesService {
     }
   }
 
-  async getAll(userContext = null) {
+  async getAll(userId) {
     try {
-      const userId = this.resolveUserId(userContext);
       if (!userId) return new OperationResult(false, "Usuario no autenticado.");
 
-      const notes = await notesRepository.getAllByUserId(userId);
+      const notes = await this.repo.getAllByUserId(userId);
       return new OperationResult(true, "Notas obtenidas exitosamente.", notes);
     } catch (error) {
       return new OperationResult(false, `Error al obtener notas: ${error.message}`);
     }
   }
 
-  async getById(id, userContext = null) {
+  async getById(id, userId) {
     try {
       if (!id) {
         return new OperationResult(false, "ID de nota inválido.");
       }
 
-      const note = await notesRepository.getById(id);
+      const note = await this.repo.getById(id);
       if (note) {
-        const userId = this.resolveUserId(userContext);
         if (userId && note.user_id === userId) {
           return new OperationResult(true, "Nota encontrada.", note);
         } else {
@@ -95,17 +80,16 @@ export class NotesService {
     }
   }
 
-  async update(note, userContext = null) {
+  async update(note, userId) {
     try {
       const validation = this.validateNote(note, true);
       if (!validation.success) return validation;
 
-      const existingNote = await notesRepository.getById(note.id);
+      const existingNote = await this.repo.getById(note.id);
       if (!existingNote) {
         return new OperationResult(false, "Nota no encontrada.");
       }
 
-      const userId = this.resolveUserId(userContext);
       if (!userId || existingNote.user_id !== userId) {
         return new OperationResult(false, "Nota no accesible.");
       }
@@ -113,7 +97,7 @@ export class NotesService {
       // Update the update_at timestamp
       note.update_at = new Date();
 
-      const updated = await notesRepository.update({ ...note, user_id: userId });
+      const updated = await this.repo.update({ ...note, user_id: userId });
       if (updated) {
         return new OperationResult(true, "Nota actualizada exitosamente.", updated);
       } else {
@@ -124,14 +108,13 @@ export class NotesService {
     }
   }
 
-  async togglePin(id, userContext = null) {
+  async togglePin(id, userId) {
     try {
       if (!id) {
         return new OperationResult(false, "ID de nota inválido.");
       }
 
-      const userId = this.resolveUserId(userContext);
-      const toggled = await notesRepository.togglePin(id, userId);
+      const toggled = await this.repo.togglePin(id, userId);
       if (toggled) {
         return new OperationResult(true, "Estado de fijación actualizado.", toggled);
       } else {
@@ -142,23 +125,22 @@ export class NotesService {
     }
   }
 
-  async delete(id, userContext = null) {
+  async delete(id, userId) {
     try {
       if (!id) {
         return new OperationResult(false, "ID de nota inválido.");
       }
 
-      const existingNote = await notesRepository.getById(id);
+      const existingNote = await this.repo.getById(id);
       if (!existingNote) {
         return new OperationResult(false, "Nota no encontrada.");
       }
 
-      const userId = this.resolveUserId(userContext);
       if (!userId || existingNote.user_id !== userId) {
         return new OperationResult(false, "Nota no accesible.");
       }
 
-      const deleted = await notesRepository.delete(id);
+      const deleted = await this.repo.delete(id);
       if (deleted) {
         return new OperationResult(true, "Nota eliminada exitosamente.");
       } else {

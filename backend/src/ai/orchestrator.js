@@ -38,9 +38,9 @@ const tryRunToolFromJson = async ({ content, userId }) => {
   return await executeTool({ name: parsed.tool, args, userId });
 };
 
-export const orchestrator = async ({ message, userId, intent }) => {
+export const orchestrator = async ({ message, userId, intent, contextData }) => {
   const started = Date.now();
-  const system = buildOrchestratorSystemPrompt({ userId, intent });
+  const system = buildOrchestratorSystemPrompt({ userId, intent, contextData });
 
   // Conversational path (no agent/tool) -> Groq
   const replyWithGroq = async () => {

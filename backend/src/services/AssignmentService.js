@@ -4,10 +4,10 @@ import CourseRepository from '../repositories/CourseRepository.js';
 import NotificationService from './NotificationService.js';
 
 export default class AssignmentService {
-  constructor() {
-    this.repo = new AssignmentRepository();
-    this.enrollmentRepo = new EnrollmentRepository();
-    this.courseRepo = new CourseRepository();
+  constructor(assignmentRepo, enrollmentRepo, courseRepo) {
+    this.repo = assignmentRepo || new AssignmentRepository();
+    this.enrollmentRepo = enrollmentRepo || new EnrollmentRepository();
+    this.courseRepo = courseRepo || new CourseRepository();
   }
 
   async createAssignment(data, teacherId) {
@@ -29,11 +29,11 @@ export default class AssignmentService {
   async getAssignmentsByCourse(courseId, userId, role) {
     // Access check
     if (role === 'teacher') {
-        const course = await this.courseRepo.getById(courseId);
-        if (course.teacher_id !== userId) throw new Error('No autorizado');
+      const course = await this.courseRepo.getById(courseId);
+      if (course.teacher_id !== userId) throw new Error('No autorizado');
     } else {
-        const isEnrolled = await this.enrollmentRepo.isEnrolled(courseId, userId);
-        if (!isEnrolled) throw new Error('No estás inscrito en este curso');
+      const isEnrolled = await this.enrollmentRepo.isEnrolled(courseId, userId);
+      if (!isEnrolled) throw new Error('No estás inscrito en este curso');
     }
 
     return await this.repo.findByCourse(courseId);
@@ -44,11 +44,11 @@ export default class AssignmentService {
     if (!assignment) throw new Error('Tarea no encontrada');
 
     if (role === 'teacher') {
-         const course = await this.courseRepo.getById(assignment.course_id);
-         if (course.teacher_id !== userId) throw new Error('No autorizado');
+      const course = await this.courseRepo.getById(assignment.course_id);
+      if (course.teacher_id !== userId) throw new Error('No autorizado');
     } else {
-         const isEnrolled = await this.enrollmentRepo.isEnrolled(assignment.course_id, userId);
-         if (!isEnrolled) throw new Error('No autorizado');
+      const isEnrolled = await this.enrollmentRepo.isEnrolled(assignment.course_id, userId);
+      if (!isEnrolled) throw new Error('No autorizado');
     }
 
     return assignment;
@@ -83,14 +83,14 @@ export default class AssignmentService {
     if (students.length === 0) return;
 
     for (const s of students) {
-        await NotificationService.notify({
-            user_id: s.id,
-            title,
-            body,
-            event_type: eventType,
-            entity_id: entityId,
-            metadata: { course_id: courseId }
-        });
+      await NotificationService.notify({
+        user_id: s.id,
+        title,
+        body,
+        event_type: eventType,
+        entity_id: entityId,
+        metadata: { course_id: courseId }
+      });
     }
   }
 }

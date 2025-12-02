@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useCourses } from '../../hooks/useCourses'
 import { useAssignments } from '../../hooks/useAssignments'
 import { useCourseGroups } from '../../hooks/useCourseGroups'
 import { useSubmissions } from '../../hooks/useSubmissions'
-import { useAuth } from '../../context/AuthContext'
+import { useAuth } from '../../hooks/useAuth'
 import { Button } from '../../ui/button'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../ui/card'
@@ -98,7 +98,7 @@ export default function StudentCourseDetailPage() {
     { id: 5, name: 'Sofia Ramirez', status: 'activo', progress: 95 },
   ]
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true)
       const c = await getCourse(id)
@@ -112,14 +112,14 @@ export default function StudentCourseDetailPage() {
 
       // Load submissions for assignments
       if (a && a.length > 0) {
-          const subs = {}
-          for (const assign of a) {
-             const sub = await getSubmissions(assign.id)
-             if (sub && sub.length > 0) {
-                 subs[assign.id] = sub[0] // Assuming one submission per student per assignment
-             }
+        const subs = {}
+        for (const assign of a) {
+          const sub = await getSubmissions(assign.id)
+          if (sub && sub.length > 0) {
+            subs[assign.id] = sub[0] // Assuming one submission per student per assignment
           }
-          setSubmissions(subs)
+        }
+        setSubmissions(subs)
       }
 
     } catch (err) {
@@ -128,13 +128,13 @@ export default function StudentCourseDetailPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [id, getCourse, getAssignments, getGroups, getSubmissions])
 
   useEffect(() => {
     if (id) {
-        loadData()
+      loadData()
     }
-  }, [id])
+  }, [id, loadData])
 
   const getTypeIcon = (type) => {
     switch (type) {
@@ -147,34 +147,34 @@ export default function StudentCourseDetailPage() {
   }
 
   const handleSubmit = async () => {
-      if (!fileUrl) return toast.error('Debes ingresar una URL del archivo');
-      if (!selectedAssignment) return;
+    if (!fileUrl) return toast.error('Debes ingresar una URL del archivo');
+    if (!selectedAssignment) return;
 
-      let groupId = null;
-      if (selectedAssignment.is_group_assignment) {
-          const myGroup = groups.find(g =>
-              g.members && g.members.some(m => m.student_id === user.id)
-          );
+    let groupId = null;
+    if (selectedAssignment.is_group_assignment) {
+      const myGroup = groups.find(g =>
+        g.members && g.members.some(m => m.student_id === user.id)
+      );
 
-          if (!myGroup) {
-              return toast.error('Debes pertenecer a un grupo para entregar esta tarea');
-          }
-          groupId = myGroup.id;
+      if (!myGroup) {
+        return toast.error('Debes pertenecer a un grupo para entregar esta tarea');
       }
+      groupId = myGroup.id;
+    }
 
-      try {
-          await submitAssignment({
-              assignment_id: selectedAssignment.id,
-              file_url: fileUrl,
-              group_id: groupId
-          });
-          toast.success('Tarea entregada');
-          setFileUrl('');
-          setSelectedAssignment(null);
-          loadData();
-      } catch (error) {
-          toast.error(error.message);
-      }
+    try {
+      await submitAssignment({
+        assignment_id: selectedAssignment.id,
+        file_url: fileUrl,
+        group_id: groupId
+      });
+      toast.success('Tarea entregada');
+      setFileUrl('');
+      setSelectedAssignment(null);
+      loadData();
+    } catch (error) {
+      toast.error(error.message);
+    }
   }
 
   const getStatusBadge = (status) => {
@@ -209,15 +209,15 @@ export default function StudentCourseDetailPage() {
 
   // Merge Assignments for display
   const displayedAssignments = [
-      ...realAssignments.map(a => ({
-          id: a.id,
-          name: a.title,
-          dueDate: new Date(a.due_date).toLocaleDateString(),
-          status: submissions[a.id] ? 'entregada' : 'pendiente', // Simple logic
-          grade: submissions[a.id]?.grade,
-          is_group_assignment: a.is_group_assignment
-      })),
-      ...mockAssignments
+    ...realAssignments.map(a => ({
+      id: a.id,
+      name: a.title,
+      dueDate: new Date(a.due_date).toLocaleDateString(),
+      status: submissions[a.id] ? 'entregada' : 'pendiente', // Simple logic
+      grade: submissions[a.id]?.grade,
+      is_group_assignment: a.is_group_assignment
+    })),
+    ...mockAssignments
   ]
 
   return (
@@ -226,13 +226,13 @@ export default function StudentCourseDetailPage() {
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-                <Link to="/home">Inicio</Link>
+              <Link to="/home">Inicio</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-                <Link to="/courses">Cursos</Link>
+              <Link to="/courses">Cursos</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -349,7 +349,7 @@ export default function StudentCourseDetailPage() {
         <TabsContent value="assignments">
           <Card className="p-6">
             <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-gray-900">Tareas del Curso</h2>
+              <h2 className="text-xl font-semibold text-gray-900">Tareas del Curso</h2>
             </div>
 
             <div className="space-y-3">
@@ -371,44 +371,44 @@ export default function StudentCourseDetailPage() {
                   <div className="flex items-center gap-3">
                     {getStatusBadge(assignment.status)}
                     <Dialog>
-                        <DialogTrigger asChild>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => setSelectedAssignment(assignment)}
-                            >
-                              {assignment.status === 'entregada' ? 'Ver entrega' : 'Entregar'}
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Entrega: {assignment.name}</DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-4 py-4">
-                                {assignment.status === 'entregada' ? (
-                                    <div className="text-center py-4">
-                                        <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-2" />
-                                        <p className="font-medium">Tarea entregada correctamente</p>
-                                        {assignment.grade && <p className="text-lg font-bold mt-2">Nota: {assignment.grade}</p>}
-                                    </div>
-                                ) : (
-                                    <>
-                                        <div className="space-y-2">
-                                            <Label>URL del archivo (Google Drive, Dropbox, etc)</Label>
-                                            <Input
-                                                placeholder="https://..."
-                                                value={fileUrl}
-                                                onChange={(e) => setFileUrl(e.target.value)}
-                                            />
-                                        </div>
-                                        <Button className="w-full" onClick={handleSubmit}>
-                                            <Upload className="w-4 h-4 mr-2" />
-                                            Enviar Tarea
-                                        </Button>
-                                    </>
-                                )}
+                      <DialogTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setSelectedAssignment(assignment)}
+                        >
+                          {assignment.status === 'entregada' ? 'Ver entrega' : 'Entregar'}
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Entrega: {assignment.name}</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4 py-4">
+                          {assignment.status === 'entregada' ? (
+                            <div className="text-center py-4">
+                              <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-2" />
+                              <p className="font-medium">Tarea entregada correctamente</p>
+                              {assignment.grade && <p className="text-lg font-bold mt-2">Nota: {assignment.grade}</p>}
                             </div>
-                        </DialogContent>
+                          ) : (
+                            <>
+                              <div className="space-y-2">
+                                <Label>URL del archivo (Google Drive, Dropbox, etc)</Label>
+                                <Input
+                                  placeholder="https://..."
+                                  value={fileUrl}
+                                  onChange={(e) => setFileUrl(e.target.value)}
+                                />
+                              </div>
+                              <Button className="w-full" onClick={handleSubmit}>
+                                <Upload className="w-4 h-4 mr-2" />
+                                Enviar Tarea
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </DialogContent>
                     </Dialog>
                   </div>
                 </div>

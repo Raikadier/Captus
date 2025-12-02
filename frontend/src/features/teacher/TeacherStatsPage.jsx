@@ -1,14 +1,44 @@
-import React from 'react'
-import { BarChart3 } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { BarChart3, CheckCircle, BookOpen, Clock } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card'
-
-const mockStats = [
-  { label: 'Tareas revisadas', value: 48 },
-  { label: 'Promedio de entrega', value: '85%' },
-  { label: 'Cursos activos', value: 5 },
-]
+import apiClient from '../../shared/api/client'
+import Loading from '../../ui/loading'
 
 export default function TeacherStatsPage() {
+  const [stats, setStats] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        // Fetch dashboard stats which includes subjects and general stats
+        const response = await apiClient.get('/statistics/dashboard')
+        setStats(response.data)
+      } catch (error) {
+        console.error('Error fetching stats:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchStats()
+  }, [])
+
+  if (loading) return <Loading message="Cargando estadísticas..." />
+
+  // Calculate teacher specific stats from the response
+  // Assuming 'subjects' are the courses the teacher teaches
+  const activeCourses = stats?.subjects?.length || 0
+  const totalStudents = stats?.subjects?.reduce((acc, sub) => acc + (sub.studentCount || 0), 0) || 0 // Assuming subject has studentCount
+
+  // For "Tasks reviewed", we might need a specific endpoint, but for now let's use completedTasks as a proxy or 0 if not available
+  const tasksReviewed = stats?.completedTasks || 0
+
+  const statCards = [
+    { label: 'Cursos Activos', value: activeCourses, icon: BookOpen, color: 'text-blue-600', bg: 'bg-blue-50' },
+    { label: 'Tareas Revisadas', value: tasksReviewed, icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-50' },
+    { label: 'Promedio General', value: `${stats?.averageGrade || 0}/10`, icon: BarChart3, color: 'text-purple-600', bg: 'bg-purple-50' },
+  ]
+
   return (
     <div className="p-6 space-y-6">
       <div className="bg-white rounded-xl shadow-sm p-6 flex items-center gap-3">
@@ -21,18 +51,23 @@ export default function TeacherStatsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {mockStats.map((s) => (
-          <Card key={s.label}>
-            <CardHeader>
-              <CardTitle className="text-sm text-gray-600">{s.label}</CardTitle>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {statCards.map((s) => (
+          <Card key={s.label} className="border-none shadow-sm hover:shadow-md transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">{s.label}</CardTitle>
+              <div className={`p-2 rounded-lg ${s.bg}`}>
+                <s.icon className={`w-4 h-4 ${s.color}`} />
+              </div>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold text-gray-900">{s.value}</p>
+              <div className="text-2xl font-bold">{s.value}</div>
             </CardContent>
           </Card>
         ))}
       </div>
+
+      {/* Additional detailed stats could go here */}
     </div>
   )
 }

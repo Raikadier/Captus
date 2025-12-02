@@ -7,15 +7,18 @@ Este frontend usa Vite + React y Tailwind con una configuración mínima para ma
 - Configuración:
   - [`tailwind.config.js`](./tailwind.config.js)
   - [`postcss.config.js`](./postcss.config.js)
+
 - Entrada CSS global:
   - [`src/index.css`](./src/index.css) con:
     - `@tailwind base;`
     - `@tailwind components;`
     - `@tailwind utilities;`
     - Reglas globales del proyecto movidas a `@layer base { ... }`
+
 - Entradas de la app:
   - [`src/main.jsx`](./src/main.jsx)
   - [`src/App.jsx`](./src/App.jsx)
+
 - Layout principal:
   - [`src/features/dashboard/components/MainLayout.jsx`](./src/features/dashboard/components/MainLayout.jsx)
   - [`src/features/dashboard/components/Sidebar.jsx`](./src/features/dashboard/components/Sidebar.jsx)
@@ -39,6 +42,7 @@ Ejecutar desde el directorio [`Captus/frontend`](./).
 - Se consolidó un Layout principal con Sidebar que envuelve las vistas protegidas.
 
 Rutas envueltas por Layout (protegidas):
+
 - Home [`HomePage.jsx`](./src/features/dashboard/components/HomePage.jsx)
 - Tasks [`TaskPage.jsx`](./src/features/tasks/TaskPage.jsx)
 - Chatbot [`ChatBotPage.jsx`](./src/features/chatbot/ChatBotPage.jsx)
@@ -65,17 +69,17 @@ Rutas envueltas por Layout (protegidas):
 
 ## Guía de verificación rápida
 
-1) Arranca backend:
-- Desde raíz del monorepo: `npm run backend:dev` (o desde carpeta backend)
+1. Arranca backend:
+   - Desde raíz del monorepo: `npm run backend:dev` (o desde carpeta backend)
 
-2) Arranca frontend:
-- `cd Captus/frontend && npm run dev`
-- Abre `http://localhost:5173`
+2. Arranca frontend:
+   - `cd Captus/frontend && npm run dev`
+   - Abre `http://localhost:5173`
 
-3) Verifica:
-- Login renderiza con estilo Tailwind (form semántico).
-- Navegación a `/home`, `/tasks`, `/calendar`, etc. dentro de `MainLayout`.
-- En Tasks, filtros y formularios muestran focos verdes (no indigo).
+3. Verifica:
+   - Login renderiza con estilo Tailwind (form semántico).
+   - Navegación a `/home`, `/tasks`, `/calendar`, etc. dentro de `MainLayout`.
+   - En Tasks, filtros y formularios muestran focos verdes (no indigo).
 
 ## Retirar estilos legacy
 
@@ -89,15 +93,15 @@ Rutas envueltas por Layout (protegidas):
 
 ## Rollback simple (si se requiere)
 
-1) Desinstalar Tailwind y PostCSS (en frontend):
-- `npm rm -D tailwindcss postcss autoprefixer`
+1. Desinstalar Tailwind y PostCSS (en frontend):
+   - `npm rm -D tailwindcss postcss autoprefixer`
 
-2) Remover archivos de configuración:
-- Eliminar [`tailwind.config.js`](./tailwind.config.js) y [`postcss.config.js`](./postcss.config.js)
+2. Remover archivos de configuración:
+   - Eliminar [`tailwind.config.js`](./tailwind.config.js) y [`postcss.config.js`](./postcss.config.js)
 
-3) Restaurar CSS:
-- En [`src/index.css`](./src/index.css), quitar `@tailwind ...` y volver a las reglas anteriores si fuera necesario.
-- Si lo preferías, restaurar import de `./App.css` en [`src/App.jsx`](./src/App.jsx) y reactivar su uso.
+3. Restaurar CSS:
+   - En [`src/index.css`](./src/index.css), quitar `@tailwind ...` y volver a las reglas anteriores si fuera necesario.
+   - Si lo preferías, restaurar import de `./App.css` en [`src/App.jsx`](./src/App.jsx) y reactivar su uso.
 
 ## Notas finales
 

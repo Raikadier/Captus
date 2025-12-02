@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react'
-import { useAuth } from '../../context/AuthContext'
 import apiClient from '../../shared/api/client'
 import { Card } from '../../ui/card'
 import { Button } from '../../ui/button'
 import { Badge } from '../../ui/badge'
-import { CheckCircle, Bell, Calendar, Clock } from 'lucide-react'
+import { CheckCircle, Bell, Calendar, Clock, Check, Trash2, Filter } from 'lucide-react'
 import Loading from '../../ui/loading'
+import { FadeIn, StaggerContainer, StaggerItem } from '../../shared/components/animations/MotionComponents'
+import { useTheme } from '../../context/themeContext'
 
 export default function NotificationsPage() {
-  const { user } = useAuth()
+  const { darkMode } = useTheme()
   const [notifications, setNotifications] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
@@ -19,14 +20,8 @@ export default function NotificationsPage() {
 
   const fetchNotifications = async () => {
     try {
-      // Use apiClient instead of api.get
-      // apiClient.get returns { data: responseData }
       const response = await apiClient.get('/notifications')
-      // If backend returns { success: true, data: [...] } or just [...]
-      // Usually apiClient wraps response in { data: response.data }
       const data = response.data
-      // Depending on backend, data might be the array or { data: array }
-      // Assuming array based on previous api.get usage
       setNotifications(Array.isArray(data) ? data : data.data || [])
     } catch (error) {
       console.error('Error fetching notifications', error)
@@ -45,8 +40,6 @@ export default function NotificationsPage() {
   }
 
   const handleMarkAllAsRead = async () => {
-    // In a real app, you'd have an endpoint for this, or loop.
-    // For simplicity, we loop but ideally optimize.
     const unread = notifications.filter(n => !n.read)
     await Promise.all(unread.map(n => handleMarkAsRead(n.id)))
   }
@@ -60,90 +53,137 @@ export default function NotificationsPage() {
   if (loading) return <Loading fullScreen message="Cargando notificaciones..." />
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Notificaciones</h1>
-          <p className="text-gray-500 mt-1">Mantente al día con tus actividades académicas y personales</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button variant="outline" onClick={handleMarkAllAsRead}>
-            Marcar todas como leídas
-          </Button>
-        </div>
-      </div>
+    <div className={`min-h-screen ${darkMode ? 'bg-background' : 'bg-[#F6F7FB]'}`}>
+      <div className="max-w-5xl mx-auto p-6 md:p-8 pb-24">
 
-      {/* Filters */}
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-        {['all', 'unread', 'read'].map((f) => (
-          <Button
-            key={f}
-            variant={filter === f ? 'default' : 'ghost'}
-            onClick={() => setFilter(f)}
-            className="capitalize"
-          >
-            {f === 'all' ? 'Todas' : f === 'unread' ? 'No leídas' : 'Leídas'}
-          </Button>
-        ))}
-      </div>
-
-      <div className="space-y-4">
-        {filteredNotifications.length === 0 ? (
-          <div className="text-center py-12 bg-gray-50 rounded-lg border border-dashed border-gray-200">
-            <Bell className="h-12 w-12 mx-auto text-gray-300 mb-3" />
-            <h3 className="text-lg font-medium text-gray-900">Sin notificaciones</h3>
-            <p className="text-gray-500">No tienes notificaciones {filter !== 'all' ? 'en esta categoría' : ''}</p>
+        <FadeIn>
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+            <div>
+              <h1 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Notificaciones</h1>
+              <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
+                Mantente al día con tus actividades académicas y personales
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                onClick={handleMarkAllAsRead}
+                className={`${darkMode ? 'bg-card border-gray-700 hover:bg-gray-800 text-gray-300' : 'bg-white hover:bg-gray-50'}`}
+              >
+                <CheckCircle className="w-4 h-4 mr-2" />
+                Marcar todas como leídas
+              </Button>
+            </div>
           </div>
-        ) : (
-          filteredNotifications.map((notification) => (
-            <Card
-              key={notification.id}
-              className={`p-4 transition-all hover:shadow-md ${!notification.read ? 'bg-blue-50/50 border-blue-100' : 'bg-white'}`}
-            >
-              <div className="flex items-start gap-4">
-                <div className={`p-2 rounded-full ${!notification.read ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500'}`}>
-                  <Bell size={20} />
+        </FadeIn>
+
+        {/* Filters */}
+        <FadeIn delay={0.1}>
+          <div className="flex gap-2 mb-8 overflow-x-auto pb-2 no-scrollbar">
+            {[
+              { id: 'all', label: 'Todas' },
+              { id: 'unread', label: 'No leídas' },
+              { id: 'read', label: 'Leídas' }
+            ].map((f) => (
+              <Button
+                key={f.id}
+                variant={filter === f.id ? 'default' : 'ghost'}
+                onClick={() => setFilter(f.id)}
+                className={`rounded-full px-6 ${filter === f.id
+                  ? 'bg-primary text-primary-foreground shadow-md'
+                  : `${darkMode ? 'text-gray-400 hover:bg-gray-800' : 'text-gray-600 hover:bg-white hover:shadow-sm'}`
+                  }`}
+              >
+                {f.label}
+              </Button>
+            ))}
+          </div>
+        </FadeIn>
+
+        <StaggerContainer className="space-y-4">
+          {filteredNotifications.length === 0 ? (
+            <FadeIn>
+              <div className={`text-center py-16 rounded-2xl border-2 border-dashed ${darkMode ? 'border-gray-800 bg-gray-900/50' : 'border-gray-200 bg-white/50'}`}>
+                <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4 ${darkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
+                  <Bell className={`h-8 w-8 ${darkMode ? 'text-gray-600' : 'text-gray-400'}`} />
                 </div>
-
-                <div className="flex-1">
-                  <div className="flex justify-between items-start">
-                    <h3 className={`font-semibold text-lg ${!notification.read ? 'text-gray-900' : 'text-gray-700'}`}>
-                      {notification.title}
-                    </h3>
-                    <span className="text-xs text-gray-400 flex items-center gap-1 whitespace-nowrap ml-2">
-                      <Clock size={12} />
-                      {new Date(notification.created_at).toLocaleString()}
-                    </span>
-                  </div>
-
-                  <p className="text-gray-600 mt-1 leading-relaxed">
-                    {notification.body}
-                  </p>
-
-                  {notification.event_type && (
-                    <div className="mt-3">
-                      <Badge variant="secondary" className="text-xs font-normal bg-gray-100 text-gray-600">
-                        {notification.event_type.replace('_', ' ')}
-                      </Badge>
-                    </div>
-                  )}
-                </div>
-
-                {!notification.read && (
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => handleMarkAsRead(notification.id)}
-                    title="Marcar como leída"
-                    className="text-gray-400 hover:text-primary"
-                  >
-                    <CheckCircle size={20} />
-                  </Button>
-                )}
+                <h3 className={`text-lg font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Sin notificaciones</h3>
+                <p className={`${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                  No tienes notificaciones {filter !== 'all' ? 'en esta categoría' : ''}
+                </p>
               </div>
-            </Card>
-          ))
-        )}
+            </FadeIn>
+          ) : (
+            filteredNotifications.map((notification) => (
+              <StaggerItem key={notification.id}>
+                <Card
+                  className={`p-5 transition-all duration-200 group relative overflow-hidden border-0 ${!notification.read
+                    ? darkMode
+                      ? 'bg-blue-900/10 border-l-4 border-l-blue-500 shadow-lg'
+                      : 'bg-white border-l-4 border-l-blue-500 shadow-md'
+                    : darkMode
+                      ? 'bg-card hover:bg-gray-800/80'
+                      : 'bg-white hover:shadow-md'
+                    }`}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className={`p-3 rounded-xl flex-shrink-0 ${!notification.read
+                      ? darkMode ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-50 text-blue-600'
+                      : darkMode ? 'bg-gray-800 text-gray-500' : 'bg-gray-100 text-gray-500'
+                      }`}>
+                      <Bell size={20} />
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start gap-4">
+                        <h3 className={`font-semibold text-lg leading-tight ${!notification.read
+                          ? darkMode ? 'text-white' : 'text-gray-900'
+                          : darkMode ? 'text-gray-300' : 'text-gray-700'
+                          }`}>
+                          {notification.title}
+                        </h3>
+                        <span className={`text-xs flex items-center gap-1 whitespace-nowrap ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                          <Clock size={12} />
+                          {new Date(notification.created_at).toLocaleString()}
+                        </span>
+                      </div>
+
+                      <p className={`mt-2 leading-relaxed ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                        {notification.body}
+                      </p>
+
+                      {notification.event_type && (
+                        <div className="mt-3 flex items-center gap-2">
+                          <Badge
+                            variant="secondary"
+                            className={`text-xs font-medium px-2.5 py-0.5 rounded-md ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-600'
+                              }`}
+                          >
+                            {notification.event_type.replace('_', ' ')}
+                          </Badge>
+                        </div>
+                      )}
+                    </div>
+
+                    {!notification.read && (
+                      <div className="flex flex-col gap-2">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => handleMarkAsRead(notification.id)}
+                          title="Marcar como leída"
+                          className={`h-8 w-8 ${darkMode ? 'text-gray-400 hover:text-blue-400 hover:bg-blue-900/20' : 'text-gray-400 hover:text-blue-600 hover:bg-blue-50'}`}
+                        >
+                          <CheckCircle size={18} />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              </StaggerItem>
+            ))
+          )}
+        </StaggerContainer>
       </div>
     </div>
   )

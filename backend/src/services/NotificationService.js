@@ -1,4 +1,3 @@
-import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 import EmailProvider from './notifications/providers/EmailProvider.js';
 import WhatsAppProvider from './notifications/providers/WhatsAppProvider.js';
@@ -91,7 +90,7 @@ export class NotificationService {
         // Fallback to auth email if using repository pattern might require auth admin access
         const { data: userData } = await this.repo.client.auth.admin.getUserById(user_id);
         if (userData && userData.user) {
-            finalEmail = userData.user.email;
+          finalEmail = userData.user.email;
         }
       }
 
@@ -131,20 +130,20 @@ export class NotificationService {
       if (!assignments || assignments.length === 0) return;
 
       for (const assignment of assignments) {
-          const courseTitle = assignment.courses?.title || 'Course';
-          const students = assignment.courses?.course_enrollments || [];
+        const courseTitle = assignment.courses?.title || 'Course';
+        const students = assignment.courses?.course_enrollments || [];
 
-          for (const enrollment of students) {
-              await this.notify({
-                  user_id: enrollment.user_id,
-                  title: 'Tarea Próxima a Vencer',
-                  body: `La tarea "${assignment.title}" del curso ${courseTitle} vence el ${new Date(assignment.due_date).toLocaleDateString()}.`,
-                  event_type: 'deadline_3d',
-                  entity_id: assignment.id,
-                  metadata: { due_date: assignment.due_date, course_id: assignment.course_id },
-                  is_auto: true
-              });
-          }
+        for (const enrollment of students) {
+          await this.notify({
+            user_id: enrollment.user_id,
+            title: 'Tarea Próxima a Vencer',
+            body: `La tarea "${assignment.title}" del curso ${courseTitle} vence el ${new Date(assignment.due_date).toLocaleDateString()}.`,
+            event_type: 'deadline_3d',
+            entity_id: assignment.id,
+            metadata: { due_date: assignment.due_date, course_id: assignment.course_id },
+            is_auto: true
+          });
+        }
       }
     } catch (error) {
       console.error('Error in checkDeadlines:', error);

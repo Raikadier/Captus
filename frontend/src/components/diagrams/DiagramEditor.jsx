@@ -69,49 +69,49 @@ export default function DiagramEditor({ open, onOpenChange, initialData, onSave 
         <DialogHeader>
           <DialogTitle>{initialData ? 'Editar Diagrama' : 'Nuevo Diagrama'}</DialogTitle>
           <DialogDescription>
-             Usa el editor de código para crear tu diagrama Mermaid.
+            Usa el editor de código para crear tu diagrama Mermaid.
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4 flex-1 min-h-0">
           <div className="flex flex-col gap-2">
-             <Label htmlFor="title">Título</Label>
-             <Input
-               id="title"
-               value={title}
-               onChange={(e) => setTitle(e.target.value)}
-               placeholder="Ej: Diagrama de flujo del proceso"
-             />
+            <Label htmlFor="title">Título</Label>
+            <Input
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Ej: Diagrama de flujo del proceso"
+            />
           </div>
 
           <div className="flex-1 flex flex-col lg:flex-row gap-4 min-h-0 border-t pt-4">
             {/* Editor Section */}
             <div className="flex-1 flex flex-col min-h-[300px] border rounded-md overflow-hidden">
-               <div className="bg-slate-100 px-4 py-2 text-sm font-medium border-b">Código Mermaid</div>
-               <div className="flex-1 relative">
-                  <Editor
-                    height="100%"
-                    defaultLanguage="mermaid"
-                    value={code}
-                    onChange={(value) => setCode(value || '')}
-                    theme="vs-light"
-                    options={{
-                      minimap: { enabled: false },
-                      lineNumbers: 'on',
-                      scrollBeyondLastLine: false,
-                      wordWrap: 'on',
-                    }}
-                    loading={<Loading message="Cargando editor..." fullScreen={false} />}
-                  />
-               </div>
+              <div className="bg-slate-100 px-4 py-2 text-sm font-medium border-b">Código Mermaid</div>
+              <div className="flex-1 relative">
+                <Editor
+                  height="100%"
+                  defaultLanguage="mermaid"
+                  value={code}
+                  onChange={(value) => setCode(value || '')}
+                  theme="vs-light"
+                  options={{
+                    minimap: { enabled: false },
+                    lineNumbers: 'on',
+                    scrollBeyondLastLine: false,
+                    wordWrap: 'on',
+                  }}
+                  loading={<Loading message="Cargando editor..." fullScreen={false} />}
+                />
+              </div>
             </div>
 
             {/* Preview Section */}
             <div className="flex-1 flex flex-col min-h-[300px] border rounded-md overflow-hidden bg-slate-50">
-               <div className="bg-slate-100 px-4 py-2 text-sm font-medium border-b">Vista Previa (Actualiza al pausar)</div>
-               <div className="flex-1 p-4 overflow-auto flex items-center justify-center">
-                  <MermaidRenderer code={debouncedCode} />
-               </div>
+              <div className="bg-slate-100 px-4 py-2 text-sm font-medium border-b">Vista Previa (Actualiza al pausar)</div>
+              <div className="flex-1 p-4 overflow-auto flex items-center justify-center">
+                <MermaidRenderer code={debouncedCode} />
+              </div>
             </div>
           </div>
         </div>
@@ -120,7 +120,7 @@ export default function DiagramEditor({ open, onOpenChange, initialData, onSave 
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
             Cancelar
           </Button>
-          <Button onClick={handleSave} disabled={!title.trim() || loading} className="bg-green-600 hover:bg-green-700">
+          <Button onClick={handleSave} disabled={!title.trim() || loading} className="bg-primary hover:bg-primary/90">
             {loading ? 'Guardando...' : 'Guardar Diagrama'}
           </Button>
         </DialogFooter>

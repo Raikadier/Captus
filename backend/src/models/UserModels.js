@@ -7,7 +7,8 @@ export default class User {
     created_at = null,
     updated_at = null,
     carrer = null,
-    bio = null
+    bio = null,
+    avatar_url = null
   }) {
     this.id = id;
     this.email = email;
@@ -17,6 +18,7 @@ export default class User {
     this.updated_at = updated_at;
     this.carrer = carrer;
     this.bio = bio;
+    this.avatar_url = avatar_url;
   }
 
   static fromDatabase(row) {
@@ -28,7 +30,8 @@ export default class User {
       created_at: row.created_at,
       updated_at: row.updated_at,
       carrer: row.carrer,
-      bio: row.bio
+      bio: row.bio,
+      avatar_url: row.avatar_url
     });
   }
 
@@ -40,7 +43,8 @@ export default class User {
       name: metadata.name || metadata.full_name,
       role: metadata.role || 'student',
       created_at: authUser.created_at,
-      updated_at: authUser.updated_at || new Date()
+      updated_at: authUser.updated_at || new Date(),
+      avatar_url: metadata.avatar_url || metadata.picture
     });
   }
 
@@ -59,6 +63,7 @@ export default class User {
     // Let's keep it simple:
     if (this.carrer) dbObj.carrer = this.carrer;
     if (this.bio) dbObj.bio = this.bio;
+    if (this.avatar_url) dbObj.avatar_url = this.avatar_url;
 
     return dbObj;
   }
