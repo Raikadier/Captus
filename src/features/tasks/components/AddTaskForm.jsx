@@ -4,40 +4,43 @@ import React, { useState, useEffect } from 'react';
 import { useTasks } from '../hooks/useTasks';
 import { X, RefreshCw } from 'lucide-react';
 
+// Random title suggestions (equivalent to TitleTaskRandom array)
+const titleSuggestions = [
+  "Estudiar para el parcial de Programacion III",
+  "Estudiar para el parcial de Electromagnetismo",
+  "Organizar apuntes de clase",
+  "Limpiar mi sitio de estudio",
+  "Ir al gym",
+  "Leer un capítulo del libro de programación",
+  "Preparar presentación para la clase",
+  "Lavar la ropa",
+  "Ver API's para implementar a mi proyecto",
+  "Hacer presupuesto semanal",
+  "Revisar tareas en AulaWeb",
+  "Asistir a clase virtual de Ingeniería de Software",
+  "Realizar el proyecto de seminario",
+  "Organizar horario semanal",
+  "Planear comidas de la semana",
+  "Hacer lista de compras",
+  "Limpiar la habitación",
+  "Preparar la presentación del proyecto",
+  "Revisar correos electrónicos",
+  "Hacer seguimiento a tareas pendientes"
+];
+
+const descriptionSuggestions = [
+  "Aquí puedes describir mejor tus ideas...",
+  "Pasos que debo seguir para esta tarea...",
+  "Aquí puedes colocar puntos clave de la tarea...",
+  "Resumen del tema para estudiar..."
+];
+
 const AddTaskForm = ({ onClose, onTaskAdded }) => {
   const { createTask, categories, priorities, loading } = useTasks();
   const [error, setError] = useState('');
 
   // Random title suggestions (equivalent to TitleTaskRandom array)
-  const titleSuggestions = [
-    "Estudiar para el parcial de Programacion III",
-    "Estudiar para el parcial de Electromagnetismo",
-    "Organizar apuntes de clase",
-    "Limpiar mi sitio de estudio",
-    "Ir al gym",
-    "Leer un capítulo del libro de programación",
-    "Preparar presentación para la clase",
-    "Lavar la ropa",
-    "Ver API's para implementar a mi proyecto",
-    "Hacer presupuesto semanal",
-    "Revisar tareas en AulaWeb",
-    "Asistir a clase virtual de Ingeniería de Software",
-    "Realizar el proyecto de seminario",
-    "Organizar horario semanal",
-    "Planear comidas de la semana",
-    "Hacer lista de compras",
-    "Limpiar la habitación",
-    "Preparar la presentación del proyecto",
-    "Revisar correos electrónicos",
-    "Hacer seguimiento a tareas pendientes"
-  ];
 
-  const descriptionSuggestions = [
-    "Aquí puedes describir mejor tus ideas...",
-    "Pasos que debo seguir para esta tarea...",
-    "Aquí puedes colocar puntos clave de la tarea...",
-    "Resumen del tema para estudiar..."
-  ];
 
   const [formData, setFormData] = useState(() => {
     const tomorrow = new Date();
@@ -187,7 +190,7 @@ const AddTaskForm = ({ onClose, onTaskAdded }) => {
     switch (priorityId) {
       case 1: return 'bg-red-200 border-red-500'; // Alta
       case 2: return 'bg-orange-200 border-orange-500'; // Media
-      case 3: return 'bg-green-200 border-green-500'; // Baja
+      case 3: return 'bg-primary/20 border-primary'; // Baja
       default: return 'bg-gray-200 border-gray-500';
     }
   };
@@ -196,7 +199,7 @@ const AddTaskForm = ({ onClose, onTaskAdded }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
         {/* Header with logo and close button */}
-        <div className="bg-green-100 p-4 rounded-t-lg flex items-center justify-between">
+        <div className="bg-primary/10 p-4 rounded-t-lg flex items-center justify-between">
           <img src="/LogoCaptusAddTask.png" alt="Captus Logo" className="h-12" />
           <button
             onClick={onClose}
@@ -215,7 +218,7 @@ const AddTaskForm = ({ onClose, onTaskAdded }) => {
               onChange={(e) => handleInputChange('title', e.target.value)}
               onFocus={handleTitleFocus}
               onBlur={handleTitleBlur}
-              className="w-full p-3 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full p-3 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-primary"
               rows="2"
               style={{ fontFamily: 'Arial', fontSize: '14px' }}
             />
@@ -235,7 +238,7 @@ const AddTaskForm = ({ onClose, onTaskAdded }) => {
               onChange={(e) => handleInputChange('description', e.target.value)}
               onFocus={handleDescriptionFocus}
               onBlur={handleDescriptionBlur}
-              className="w-full p-3 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full p-3 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-primary"
               rows="4"
               style={{ fontFamily: 'Segoe UI', fontSize: '14px', fontWeight: 'bold' }}
             />
@@ -247,7 +250,7 @@ const AddTaskForm = ({ onClose, onTaskAdded }) => {
               type="date"
               value={formData.due_date}
               onInput={(e) => handleInputChange('due_date', e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary"
               style={{ fontFamily: 'Segoe UI', fontSize: '12px' }}
             />
             {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
@@ -291,7 +294,7 @@ const AddTaskForm = ({ onClose, onTaskAdded }) => {
               <select
                 value={formData.priority_id}
                 onChange={(e) => handleInputChange('priority_id', parseInt(e.target.value))}
-                className={`w-full p-3 border-2 rounded focus:outline-none focus:ring-2 focus:ring-green-500 ${getPriorityColor(formData.priority_id)}`}
+                className={`w-full p-3 border-2 rounded focus:outline-none focus:ring-2 focus:ring-primary ${getPriorityColor(formData.priority_id)}`}
                 style={{ fontFamily: 'Century Gothic', fontSize: '14px' }}
               >
                 {priorities.map(priority => (
@@ -306,7 +309,7 @@ const AddTaskForm = ({ onClose, onTaskAdded }) => {
               <select
                 value={formData.category_id}
                 onChange={(e) => handleInputChange('category_id', parseInt(e.target.value))}
-                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary"
                 style={{ fontFamily: 'Century Gothic', fontSize: '14px' }}
               >
                 {categories.map(category => (
@@ -330,7 +333,7 @@ const AddTaskForm = ({ onClose, onTaskAdded }) => {
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50"
+              className="px-6 py-3 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors disabled:opacity-50"
               style={{ fontFamily: 'Century Gothic', fontSize: '14px' }}
             >
               {loading ? 'Creating...' : 'Add Task'}

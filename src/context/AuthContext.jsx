@@ -1,16 +1,9 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { supabase } from '../shared/api/supabase';
 import apiClient from '../shared/api/client';
+import { AuthContext } from './contextDefinitions';
 
-const AuthContext = createContext();
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+// useAuth hook moved to ../hooks/useAuth.js to fix HMR warnings
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -29,14 +22,21 @@ export const AuthProvider = ({ children }) => {
         if (!mounted) return;
 
         if (sessionData?.session?.user) {
-           setSession(sessionData.session);
-           setUser(sessionData.session.user);
+          setSession(sessionData.session);
+          setUser(sessionData.session.user);
         } else {
-           setSession(null);
-           setUser(null);
+          setSession(null);
+          setUser(null);
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
+
+        // Handle invalid refresh token by forcing sign out
+        if (error.message && (error.message.includes('Invalid Refresh Token') || error.message.includes('Refresh Token Not Found'))) {
+          console.warn('Invalid refresh token detected. Clearing session.');
+          await supabase.auth.signOut();
+        }
+
         if (mounted) {
           setSession(null);
           setUser(null);
@@ -49,7 +49,16 @@ export const AuthProvider = ({ children }) => {
     initAuth();
 
     // Subscribe to auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      // Handle token refresh failure
+      if (event === 'TOKEN_REFRESH_FAILED') {
+        console.warn('Token refresh failed. Signing out.');
+        await supabase.auth.signOut();
+        setSession(null);
+        setUser(null);
+        return;
+      }
+
       setSession(session);
       if (session?.user) {
         setUser(session.user);
@@ -82,6 +91,12 @@ export const AuthProvider = ({ children }) => {
         // We don't block login if sync fails, but we log it
       }
 
+      // Manually update state to avoid race conditions with ProtectedRoute
+      if (data.session) {
+        setSession(data.session);
+        setUser(data.session.user);
+      }
+
       return { success: true, data };
     } catch (err) {
       console.error('Login error:', err);
@@ -102,15 +117,15 @@ export const AuthProvider = ({ children }) => {
 
       // First check if email is already registered in our users table
       try {
-         // Using apiClient to check email existence (needs to be safe for unauthenticated calls if it's a public endpoint, or we handle the error)
-         // Assuming /users/check-email is public or handles missing auth gracefully if needed.
-         // But apiClient adds token if available. During registration, we might not have a token yet.
-         // If we don't have a token, apiClient just doesn't add the header, which is fine for public endpoints.
-         const response = await apiClient.post('/users/check-email', { email });
+        // Using apiClient to check email existence (needs to be safe for unauthenticated calls if it's a public endpoint, or we handle the error)
+        // Assuming /users/check-email is public or handles missing auth gracefully if needed.
+        // But apiClient adds token if available. During registration, we might not have a token yet.
+        // If we don't have a token, apiClient just doesn't add the header, which is fine for public endpoints.
+        const response = await apiClient.post('/users/check-email', { email });
 
-         if (response.data && response.data.registered) {
-            return { success: false, error: 'Este email ya está registrado' };
-         }
+        if (response.data && response.data.registered) {
+          return { success: false, error: 'Este email ya está registrado' };
+        }
       } catch (checkError) {
         // If check fails (e.g. 404 or 500), we proceed with registration attempt or handle specific errors.
         console.warn('Could not check email registration:', checkError);

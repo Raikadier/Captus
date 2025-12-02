@@ -1,6 +1,6 @@
 // Manage Subjects Dialog
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '../../../hooks/useAuth';
 import apiClient from '../../../shared/api/client';
 import {
   Dialog,
@@ -122,7 +122,7 @@ export function ManageSubjectsDialog({ trigger, onUpdate }) {
                       id="name"
                       placeholder="Ej: Matemáticas"
                       value={formData.name}
-                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       required
                     />
                   </div>
@@ -136,7 +136,7 @@ export function ManageSubjectsDialog({ trigger, onUpdate }) {
                       max="10"
                       placeholder="0.0"
                       value={formData.grade}
-                      onChange={(e) => setFormData({...formData, grade: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, grade: e.target.value })}
                     />
                   </div>
                 </div>
@@ -148,10 +148,9 @@ export function ManageSubjectsDialog({ trigger, onUpdate }) {
                       <button
                         key={c.value}
                         type="button"
-                        onClick={() => setFormData({...formData, color: c.value})}
-                        className={`w-6 h-6 rounded-full transition-all ${c.class} ${
-                          formData.color === c.value ? 'ring-2 ring-offset-2 ring-black' : 'opacity-70 hover:opacity-100'
-                        }`}
+                        onClick={() => setFormData({ ...formData, color: c.value })}
+                        className={`w-6 h-6 rounded-full transition-all ${c.class} ${formData.color === c.value ? 'ring-2 ring-offset-2 ring-black' : 'opacity-70 hover:opacity-100'
+                          }`}
                         title={c.name}
                       />
                     ))}
@@ -184,9 +183,8 @@ export function ManageSubjectsDialog({ trigger, onUpdate }) {
                   {subjects.map((subject) => (
                     <div key={subject.id} className="flex items-center justify-between p-3 bg-card rounded-lg border shadow-sm">
                       <div className="flex items-center gap-3">
-                        <div className={`w-3 h-10 rounded-full ${
-                          COLORS.find(c => c.value === subject.color)?.class || 'bg-gray-500'
-                        }`} />
+                        <div className={`w-3 h-10 rounded-full ${COLORS.find(c => c.value === subject.color)?.class || 'bg-gray-500'
+                          }`} />
                         <div>
                           <p className="font-medium leading-none">{subject.name}</p>
                           <p className="text-xs text-muted-foreground mt-1">

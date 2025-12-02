@@ -10,7 +10,7 @@ import { Card } from '../../ui/card';
 import apiClient from '../api/client';
 import { toast } from 'sonner';
 import { useStreakData, useEventsData, useProjectsData, useNotesData, usePriorityData, useTimeData, useAchievementsData } from '../../hooks/useConsolidatedStats';
-import { useAchievementsContext } from '../../context/AchievementContext';
+import { useAchievementsContext } from '../../hooks/useAchievementsContext';
 
 const StreakWidget = () => {
   const [streakData, setStreakData] = useState(null);
@@ -628,7 +628,7 @@ export const AverageTimeWidget = () => {
 // Recent Achievements Widget
 export const RecentAchievementsWidget = () => {
   const { userAchievements, loading } = useAchievementsContext();
-  
+
   // Filter only completed achievements and sort by most recent
   const recentAchievements = userAchievements
     .filter(achievement => achievement.isCompleted)

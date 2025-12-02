@@ -1,15 +1,32 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ClipboardList, Edit2 } from 'lucide-react'
+import { ClipboardList, Edit2, Calendar, CheckCircle2 } from 'lucide-react'
 import { Button } from '../../ui/button'
-
-const mockTasks = [
-  { id: 1, title: 'Ensayo cap. 2', course: 'Programación I', status: 'En revisión', dueDate: '2025-11-22' },
-  { id: 2, title: 'Quiz módulo 3', course: 'Matemáticas Aplicadas', status: 'Pendiente', dueDate: '2025-11-25' },
-]
+import apiClient from '../../shared/api/client'
+import Loading from '../../ui/loading'
 
 export default function TeacherTasksCreatedPage() {
   const navigate = useNavigate()
+  const [tasks, setTasks] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        // Fetch tasks created by the current user (teacher)
+        const response = await apiClient.get('/tasks')
+        // Filter or sort if necessary, assuming /tasks returns all user's tasks
+        setTasks(response.data.data || response.data)
+      } catch (error) {
+        console.error('Error fetching tasks:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchTasks()
+  }, [])
+
+  if (loading) return <Loading message="Cargando tareas..." />
 
   return (
     <div className="p-6 space-y-6">
@@ -24,14 +41,32 @@ export default function TeacherTasksCreatedPage() {
       </div>
 
       <div className="space-y-3">
-        {mockTasks.map((task) => (
-          <div key={task.id} className="p-4 bg-white rounded-xl shadow-sm border border-gray-200 flex items-center justify-between">
+        {tasks.length === 0 && (
+          <div className="text-center py-10 bg-white rounded-xl border border-dashed border-gray-300">
+            <p className="text-gray-500">No has creado ninguna tarea aún.</p>
+            <Button variant="link" onClick={() => navigate('/teacher/courses')}>Ir a mis cursos</Button>
+          </div>
+        )}
+        {tasks.map((task) => (
+          <div key={task.id || task.id_Task} className="p-4 bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:shadow-md transition-shadow">
             <div>
-              <p className="text-lg font-semibold text-gray-900">{task.title}</p>
-              <p className="text-sm text-gray-600">{task.course} • {task.status} • {task.dueDate}</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-1">{task.title}</h3>
+              <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
+                {task.Category && (
+                  <span className="bg-gray-100 px-2 py-0.5 rounded text-xs">{task.Category.name}</span>
+                )}
+                <span className="flex items-center gap-1">
+                  <Calendar className="w-3 h-3" />
+                  {new Date(task.due_date || task.endDate).toLocaleDateString()}
+                </span>
+                <span className={`flex items-center gap-1 ${task.state ? 'text-green-600' : 'text-orange-600'}`}>
+                  <CheckCircle2 className="w-3 h-3" />
+                  {task.state ? 'Completada' : 'Pendiente'}
+                </span>
+              </div>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => navigate(`/teacher/tasks/${task.id}/edit`)}>
+              <Button variant="outline" size="sm" onClick={() => navigate(`/teacher/tasks/${task.id || task.id_Task}/edit`)}>
                 <Edit2 className="w-4 h-4 mr-2" />
                 Editar
               </Button>

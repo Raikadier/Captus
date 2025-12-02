@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from './useAuth';
 import apiClient from '../shared/api/client';
 
 export function useAssignments() {
@@ -18,17 +18,17 @@ export function useAssignments() {
     } finally {
       setLoading(false);
     }
-  }, [session]); // session dependency not strictly needed for apiClient but okay to keep if hook logic depends on auth state presence
+  }, []);
 
   const getAssignment = useCallback(async (id) => {
-      setLoading(true);
-      try {
-        const response = await apiClient.get(`/assignments/${id}`);
-        return response.data;
-      } finally {
-          setLoading(false);
-      }
-  }, [session]);
+    setLoading(true);
+    try {
+      const response = await apiClient.get(`/assignments/${id}`);
+      return response.data;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const createAssignment = async (data) => {
     setLoading(true);
@@ -51,12 +51,12 @@ export function useAssignments() {
   };
 
   const deleteAssignment = async (id) => {
-      setLoading(true);
-      try {
-        await apiClient.delete(`/assignments/${id}`);
-      } finally {
-          setLoading(false);
-      }
+    setLoading(true);
+    try {
+      await apiClient.delete(`/assignments/${id}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return { getAssignments, getAssignment, createAssignment, updateAssignment, deleteAssignment, loading, error };

@@ -1,34 +1,57 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext'
+import { useAuth } from '../../hooks/useAuth'
 import { BookOpen, Users, Calendar, PlusCircle, ListChecks, BarChart3, Network, ClipboardList, Loader2 } from 'lucide-react'
 import { Button } from '../../ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card'
 
-const mockCourses = [
-  { id: '1', name: 'Matemáticas Aplicadas', students: 32, pendingTasks: 4 },
-  { id: '2', name: 'Programación I', students: 28, pendingTasks: 7 },
-]
-
-const mockUpcomingEvents = [
-  { id: 1, title: 'Revisión de proyecto', date: '2025-11-20', time: '3:00 PM' },
-  { id: 2, title: 'Entrega parcial', date: '2025-11-22', time: '11:59 PM' },
-]
-
-const mockPendingReviews = [
-  { id: 1, student: 'María Gómez', task: 'Ensayo cap. 2', course: 'Programación I' },
-  { id: 2, student: 'Juan Pérez', task: 'Problemas tema 3', course: 'Matemáticas Aplicadas' },
-]
+import { courseService } from '../../services/courseService'
+import { eventsService } from '../../services/eventsService'
+import { submissionService } from '../../services/submissionService'
 
 export default function TeacherHomePage() {
   const navigate = useNavigate()
   const { user } = useAuth()
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [courses, setCourses] = useState([])
+  const [upcomingEvents, setUpcomingEvents] = useState([])
+  const [pendingReviews, setPendingReviews] = useState([])
 
   useEffect(() => {
-    // Aquí irían las llamadas a servicios; usamos mocks
-    setIsLoading(false)
-  }, [])
+    const fetchData = async () => {
+      try {
+        setIsLoading(true)
+
+        // Fetch Courses
+        const coursesData = await courseService.getTeacherCourses()
+        setCourses(coursesData)
+
+        // Fetch Upcoming Events
+        const eventsResult = await eventsService.getUpcoming({ limit: 5 })
+        if (eventsResult.success) {
+          setUpcomingEvents(eventsResult.data)
+        }
+
+        // Fetch Pending Reviews
+        // Note: We need to ensure submissionService has this method
+        try {
+          const reviewsData = await submissionService.getPendingReviews()
+          setPendingReviews(reviewsData)
+        } catch (e) {
+          console.warn("Could not fetch pending reviews", e)
+        }
+
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    if (user) {
+      fetchData()
+    }
+  }, [user])
 
   if (isLoading) {
     return (
@@ -87,22 +110,29 @@ export default function TeacherHomePage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {mockCourses.map((course) => (
-                <div key={course.id} className="p-4 border border-gray-200 rounded-xl hover:shadow-md transition-all">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">{course.name}</h3>
-                      <p className="text-sm text-gray-600">{course.students} estudiantes</p>
+            {courses.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                No tienes cursos activos. ¡Crea uno nuevo!
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {courses.map((course) => (
+                  <div key={course.id} className="p-4 border border-gray-200 rounded-xl hover:shadow-md transition-all">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">{course.name}</h3>
+                        <p className="text-sm text-gray-600">{course.students} estudiantes</p>
+                      </div>
+                      <Button variant="ghost" size="sm" onClick={() => navigate(`/teacher/courses/${course.id}`)}>
+                        Ver curso
+                      </Button>
                     </div>
-                    <Button variant="ghost" size="sm" onClick={() => navigate(`/teacher/courses/${course.id}`)}>
-                      Ver curso
-                    </Button>
+                    {/* Pending tasks count is currently 0 from backend, we can hide it or calculate it if we fetch reviews differently */}
+                    {/* <div className="mt-3 text-sm text-gray-600">Tareas pendientes: {course.pendingTasks}</div> */}
                   </div>
-                  <div className="mt-3 text-sm text-gray-600">Tareas pendientes: {course.pendingTasks}</div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -114,17 +144,25 @@ export default function TeacherHomePage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {mockUpcomingEvents.map((event) => (
-              <div key={event.id} className="p-3 border border-gray-200 rounded-lg flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-gray-900">{event.title}</p>
-                  <p className="text-sm text-gray-600">{event.date} • {event.time}</p>
-                </div>
-                <Button variant="ghost" size="sm">
-                  Ver
-                </Button>
+            {upcomingEvents.length === 0 ? (
+              <div className="text-center py-4 text-gray-500">
+                No hay eventos próximos.
               </div>
-            ))}
+            ) : (
+              upcomingEvents.map((event) => (
+                <div key={event.id} className="p-3 border border-gray-200 rounded-lg flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-gray-900">{event.title}</p>
+                    <p className="text-sm text-gray-600">
+                      {new Date(event.start_date).toLocaleDateString()} • {new Date(event.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
+                  <Button variant="ghost" size="sm">
+                    Ver
+                  </Button>
+                </div>
+              ))
+            )}
           </CardContent>
         </Card>
 
@@ -136,17 +174,23 @@ export default function TeacherHomePage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {mockPendingReviews.map((review) => (
-              <div key={review.id} className="p-3 border border-gray-200 rounded-lg flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-gray-900">{review.student}</p>
-                  <p className="text-sm text-gray-600">{review.task} • {review.course}</p>
-                </div>
-                <Button variant="outline" size="sm" onClick={() => navigate(`/teacher/reviews/${review.id}`)}>
-                  Revisar
-                </Button>
+            {pendingReviews.length === 0 ? (
+              <div className="text-center py-4 text-gray-500">
+                No hay revisiones pendientes.
               </div>
-            ))}
+            ) : (
+              pendingReviews.map((review) => (
+                <div key={review.id} className="p-3 border border-gray-200 rounded-lg flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-gray-900">{review.student?.name || 'Estudiante'}</p>
+                    <p className="text-sm text-gray-600">{review.assignment?.title} • {review.assignment?.course?.name}</p>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => navigate(`/teacher/courses/${review.assignment?.course_id}/assignments/${review.assignment_id}/submissions`)}>
+                    Revisar
+                  </Button>
+                </div>
+              ))
+            )}
           </CardContent>
         </Card>
       </div>

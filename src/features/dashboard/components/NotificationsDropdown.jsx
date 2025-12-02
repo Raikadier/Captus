@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { CheckCircle, Loader2 } from 'lucide-react'
 import { ScrollArea } from '../../../ui/scroll-area'
 import { Button } from '../../../ui/button'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../../../context/AuthContext'
+import { useAuth } from '../../../hooks/useAuth'
 import apiClient from '../../../shared/api/client'
 
 export default function NotificationsDropdown({ isOpen, onClose, onUnreadChange }) {
@@ -13,22 +13,7 @@ export default function NotificationsDropdown({ isOpen, onClose, onUnreadChange 
   const [notifications, setNotifications] = useState([])
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    if (!isOpen) return
-
-    fetchNotifications()
-
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        onClose()
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [isOpen, onClose])
-
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     if (!user) return
     setLoading(true)
     try {
@@ -44,7 +29,22 @@ export default function NotificationsDropdown({ isOpen, onClose, onUnreadChange 
     } finally {
       setLoading(false)
     }
-  }
+  }, [user, onUnreadChange])
+
+  useEffect(() => {
+    if (!isOpen) return
+
+    fetchNotifications()
+
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        onClose()
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [isOpen, onClose, fetchNotifications])
 
   const handleMarkAsRead = async (e, id) => {
     e.stopPropagation()

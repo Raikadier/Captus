@@ -112,8 +112,8 @@ const SubTasksModal = ({ task, isOpen, onClose }) => {
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <CheckCircle size={24} className="text-blue-600" />
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                <CheckCircle size={24} className="text-primary" />
               </div>
               <div>
                 <h2 className="text-xl font-bold text-foreground">Subtareas de: {task.title}</h2>
@@ -205,7 +205,7 @@ const SubTasksModal = ({ task, isOpen, onClose }) => {
           <div className="space-y-3">
             {loading ? (
               <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
                 <p className="mt-2 text-sm text-muted-foreground">Cargando subtareas...</p>
               </div>
             ) : subTasks.length === 0 ? (
@@ -217,10 +217,9 @@ const SubTasksModal = ({ task, isOpen, onClose }) => {
               subTasks.map((subTask) => (
                 <div
                   key={subTask.id_SubTask}
-                  className={`p-4 border rounded-lg transition-all ${
-                    subTask.state ? 'bg-green-50 border-green-200 dark:bg-green-900/20' :
+                  className={`p-4 border rounded-lg transition-all ${subTask.state ? 'bg-green-50 border-green-200 dark:bg-green-900/20' :
                     (subTask.endDate && new Date(subTask.endDate) < new Date()) ? 'bg-red-50 border-red-200 dark:bg-red-900/20' : 'bg-card border-border'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start space-x-3 flex-1">
@@ -258,7 +257,7 @@ const SubTasksModal = ({ task, isOpen, onClose }) => {
                       <div className="flex items-center space-x-2 ml-4">
                         <button
                           onClick={() => handleEdit(subTask)}
-                          className="text-blue-600 hover:text-blue-900 text-sm"
+                          className="text-primary hover:text-primary/80 text-sm"
                           title="Editar subtarea"
                         >
                           <Edit size={16} />

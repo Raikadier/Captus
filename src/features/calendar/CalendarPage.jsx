@@ -16,7 +16,7 @@ function EditEventModal({ onClose, onUpdate, event }) {
   const [type, setType] = useState(event.type)
   const [notify, setNotify] = useState(event.notify || false)
   const [loading, setLoading] = useState(false)
-  const { darkMode } = useTheme()
+  // const { darkMode } = useTheme()
 
   const handleUpdate = async () => {
     if (title.trim() && date) {
@@ -55,8 +55,8 @@ function EditEventModal({ onClose, onUpdate, event }) {
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Edit size={24} className="text-blue-600" />
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                <Edit size={24} className="text-primary" />
               </div>
               <div>
                 <h2 className="text-xl font-bold text-foreground">Editar Evento</h2>
@@ -128,7 +128,7 @@ function EditEventModal({ onClose, onUpdate, event }) {
                 onCheckedChange={setNotify}
               />
               <Label htmlFor="notify-edit" className="flex items-center gap-2">
-                {notify ? <Bell size={16} className="text-green-600" /> : <BellOff size={16} />}
+                {notify ? <Bell size={16} className="text-primary" /> : <BellOff size={16} />}
                 Recibir notificaciones por email
               </Label>
             </div>
@@ -139,7 +139,7 @@ function EditEventModal({ onClose, onUpdate, event }) {
               <Button
                 onClick={handleUpdate}
                 disabled={!title.trim() || !date || loading}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-primary hover:bg-primary/90"
               >
                 {loading ? 'Actualizando...' : 'Actualizar Evento'}
               </Button>
@@ -159,7 +159,7 @@ function CreateEventModal({ onClose, onCreate, selectedDate }) {
   const [type, setType] = useState('Reunión')
   const [notify, setNotify] = useState(false)
   const [loading, setLoading] = useState(false)
-  const { darkMode } = useTheme()
+  // const { darkMode } = useTheme()
 
   const handleCreate = async () => {
     if (title.trim() && date) {
@@ -270,7 +270,7 @@ function CreateEventModal({ onClose, onCreate, selectedDate }) {
                 onCheckedChange={setNotify}
               />
               <Label htmlFor="notify" className="flex items-center gap-2">
-                {notify ? <Bell size={16} className="text-green-600" /> : <BellOff size={16} />}
+                {notify ? <Bell size={16} className="text-primary" /> : <BellOff size={16} />}
                 Recibir notificaciones por email
               </Label>
             </div>
@@ -281,7 +281,7 @@ function CreateEventModal({ onClose, onCreate, selectedDate }) {
               <Button
                 onClick={handleCreate}
                 disabled={!title.trim() || !date || loading}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-primary hover:bg-primary/90"
               >
                 {loading ? 'Creando...' : 'Crear Evento'}
               </Button>
@@ -426,6 +426,15 @@ export default function CalendarPage() {
     }
   }
 
+  const getEventColor = (type) => {
+    switch (type) {
+      case 'Examen': return 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100';
+      case 'Entrega': return 'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100';
+      case 'Clase': return 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100';
+      default: return 'bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100';
+    }
+  }
+
   const monthNames = [
     'Enero',
     'Febrero',
@@ -490,22 +499,20 @@ export default function CalendarPage() {
     return (
       <div className="grid grid-cols-7 gap-2">
         {weekDays.map((day, index) => (
-          <div key={index} className={`p-4 border-2 rounded-xl ${
-            day.toDateString() === selectedDate.toDateString()
-              ? 'ring-2 ring-primary bg-primary/10 border-primary/20'
-              : darkMode
-                ? 'border-gray-700 bg-gray-750'
-                : 'border-gray-200'
-          }`}>
+          <div key={index} className={`p-4 border-2 rounded-xl ${day.toDateString() === selectedDate.toDateString()
+            ? 'ring-2 ring-primary bg-primary/10 border-primary/20'
+            : darkMode
+              ? 'border-gray-700 bg-gray-750'
+              : 'border-gray-200'
+            }`}>
             <div className="text-center mb-2 text-foreground">
               <div className="text-xs font-medium text-muted-foreground">
                 {day.toLocaleDateString('es-ES', { weekday: 'short' })}
               </div>
-              <div className={`text-2xl font-bold ${
-                day.toDateString() === new Date().toDateString()
-                  ? 'text-primary'
-                  : ''
-              }`}>
+              <div className={`text-2xl font-bold ${day.toDateString() === new Date().toDateString()
+                ? 'text-primary'
+                : ''
+                }`}>
                 {day.getDate()}
               </div>
             </div>
@@ -528,7 +535,7 @@ export default function CalendarPage() {
               {getEventsForDate(day).slice(0, getTasksForDate(day).length > 0 ? 0 : 1).map((event) => (
                 <div
                   key={`event-${event.id}`}
-                  className="text-xs p-2 rounded-lg border border-blue-200 bg-blue-50 text-blue-800 cursor-pointer hover:opacity-80"
+                  className={`text-xs p-2 rounded-lg border cursor-pointer hover:opacity-80 ${getEventColor(event.type)}`}
                   onClick={(e) => {
                     e.stopPropagation()
                     handleEventClick(event)
@@ -581,14 +588,14 @@ export default function CalendarPage() {
                   {hourEvents.map((event) => (
                     <div
                       key={`event-${event.id}`}
-                      className="p-2 rounded-lg border border-blue-200 bg-blue-50 text-blue-800 cursor-pointer hover:opacity-80"
+                      className={`p-2 rounded-lg border cursor-pointer hover:opacity-80 ${getEventColor(event.type)}`}
                       onClick={() => handleEventClick(event)}
                     >
                       <div className="flex items-center gap-2">
                         <span className="text-sm">📅</span>
                         <div>
                           <h4 className="text-sm font-semibold">{event.title}</h4>
-                          <p className="text-xs text-blue-600">
+                          <p className="text-xs opacity-80">
                             {new Date(event.start_date).toLocaleTimeString('es-ES', {
                               hour: '2-digit',
                               minute: '2-digit'
@@ -627,9 +634,8 @@ export default function CalendarPage() {
                       </div>
                     </div>
                     <span
-                      className={`px-2 py-1 text-xs rounded-full font-medium ${
-                        task.state ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                      }`}
+                      className={`px-2 py-1 text-xs rounded-full font-medium ${task.state ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                        }`}
                     >
                       {task.state ? 'Completada' : 'Pendiente'}
                     </span>
@@ -653,7 +659,7 @@ export default function CalendarPage() {
       <div className="p-6 space-y-6">
         <div className="rounded-xl shadow-sm p-6 mb-6 bg-card border border-border">
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             <span className="ml-3 text-muted-foreground">Cargando calendario...</span>
           </div>
         </div>
@@ -669,7 +675,7 @@ export default function CalendarPage() {
             <div className="text-red-600 mb-4">Error: {error}</div>
             <button
               onClick={loadData}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
             >
               Reintentar
             </button>
@@ -708,13 +714,12 @@ export default function CalendarPage() {
             <button
               key={v}
               onClick={() => setView(v)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95 ${
-                view === v
-                  ? 'bg-primary/10 text-primary shadow-sm'
-                  : darkMode
-                    ? 'text-gray-400 hover:bg-gray-700'
-                    : 'text-gray-600 hover:bg-gray-50'
-              }`}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95 ${view === v
+                ? 'bg-primary/10 text-primary shadow-sm'
+                : darkMode
+                  ? 'text-gray-400 hover:bg-gray-700'
+                  : 'text-gray-600 hover:bg-gray-50'
+                }`}
             >
               {v === 'month' ? 'Mes' : 'Semana'}
             </button>
@@ -764,23 +769,21 @@ export default function CalendarPage() {
               return (
                 <div
                   key={index}
-                  className={`min-h-32 p-3 border-2 rounded-xl hover:shadow-md cursor-pointer transition-all duration-200 ${
-                    date && date.toDateString() === selectedDate.toDateString()
-                      ? 'ring-2 ring-green-500 bg-green-50 border-green-200'
-                      : date
-                        ? 'border-border hover:border-green-200 bg-card'
-                        : 'border-transparent'
-                  }`}
+                  className={`min-h-32 p-3 border-2 rounded-xl hover:shadow-md cursor-pointer transition-all duration-200 ${date && date.toDateString() === selectedDate.toDateString()
+                    ? 'ring-2 ring-primary bg-primary/10 border-primary/20'
+                    : date
+                      ? 'border-border hover:border-primary/20 bg-card'
+                      : 'border-transparent'
+                    }`}
                   onClick={() => date && handleDayClick(date)}
                 >
                   {date && (
                     <>
                       <div
-                        className={`text-sm font-semibold mb-2 ${
-                          date.toDateString() === new Date().toDateString()
-                            ? 'w-7 h-7 bg-green-600 text-white rounded-full flex items-center justify-center'
-                            : 'text-foreground'
-                        }`}
+                        className={`text-sm font-semibold mb-2 ${date.toDateString() === new Date().toDateString()
+                          ? 'w-7 h-7 bg-primary text-primary-foreground rounded-full flex items-center justify-center'
+                          : 'text-foreground'
+                          }`}
                       >
                         {date.getDate()}
                       </div>
@@ -789,9 +792,8 @@ export default function CalendarPage() {
                         {dayTasks.slice(0, 1).map((task) => (
                           <div
                             key={`task-${task.id}`}
-                            className={`text-xs p-1.5 rounded-lg border ${getPriorityColor(task.id_Priority || task.priority)} ${
-                              task.state ? 'line-through opacity-60' : ''
-                            } cursor-pointer hover:opacity-80`}
+                            className={`text-xs p-1.5 rounded-lg border ${getPriorityColor(task.id_Priority || task.priority)} ${task.state ? 'line-through opacity-60' : ''
+                              } cursor-pointer hover:opacity-80`}
                             title={task.title}
                             onClick={(e) => {
                               e.stopPropagation()
@@ -839,9 +841,8 @@ export default function CalendarPage() {
                 newDate.setDate(newDate.getDate() - 7)
                 setCurrentDate(newDate)
               }}
-              className={`p-2 rounded-lg transition-colors ${
-                darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
-              }`}
+              className={`p-2 rounded-lg transition-colors ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+                }`}
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
@@ -870,9 +871,8 @@ export default function CalendarPage() {
       {selectedDate && (
         <div className="rounded-xl shadow-sm p-6 bg-card border border-border">
           <div className="flex items-center space-x-3 mb-4">
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-              darkMode ? 'bg-primary/10' : 'bg-primary/10'
-            }`}>
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${darkMode ? 'bg-primary/10' : 'bg-primary/10'
+              }`}>
               <Clock className={`w-6 h-6 text-primary`} />
             </div>
             <div>
@@ -923,9 +923,8 @@ export default function CalendarPage() {
                         </div>
                       </div>
                       <span
-                        className={`px-3 py-1 text-xs rounded-full font-medium ${
-                          task.state ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                        }`}
+                        className={`px-3 py-1 text-xs rounded-full font-medium ${task.state ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                          }`}
                       >
                         {task.state ? 'Completada' : 'Pendiente'}
                       </span>
@@ -1002,9 +1001,8 @@ export default function CalendarPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className={`px-3 py-1 text-xs rounded-full font-medium ${
-                    showTaskDetails.state ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                  }`}>
+                  <span className={`px-3 py-1 text-xs rounded-full font-medium ${showTaskDetails.state ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                    }`}>
                     {showTaskDetails.state ? 'Completada' : 'Pendiente'}
                   </span>
                   {showTaskDetails.id_Priority && (

@@ -1,25 +1,14 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { useAuth } from './AuthContext';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '../hooks/useAuth';
 import apiClient from '../shared/api/client';
-
-// Global function to refresh achievements from anywhere
-let globalRefreshAchievements = null;
-
-const AchievementContext = createContext();
-
-export const useAchievementsContext = () => {
-  const context = useContext(AchievementContext);
-  if (!context) {
-    throw new Error('useAchievementsContext must be used within AchievementProvider');
-  }
-  return context;
-};
+import { AchievementContext } from './contextDefinitions';
 
 export const AchievementProvider = ({ children }) => {
   const { user } = useAuth();
   const [userAchievements, setUserAchievements] = useState([]);
   const [loading, setLoading] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(null);
+  const [globalRefreshAchievements, setGlobalRefreshAchievements] = useState(null);
   const [error, setError] = useState(null);
 
   // Function to refresh achievements
@@ -29,46 +18,46 @@ export const AchievementProvider = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-      console.log('🔄 Refreshing achievements...', { forceRecalculate, userId: user.id });
+      // console.log('🔄 Refreshing achievements...', { forceRecalculate, userId: user.id });
 
       if (forceRecalculate) {
-        console.log('🔄 Recalculating achievements...');
+        // console.log('🔄 Recalculating achievements...');
         try {
-          const recalcResponse = await apiClient.post('/achievements/recalculate');
-          console.log('✅ Recalculate response:', recalcResponse.data);
+          await apiClient.post('/achievements/recalculate');
+          // console.log('✅ Recalculate response:', recalcResponse.data);
         } catch (recalcError) {
           console.warn('⚠️ Recalculation failed, continuing anyway:', recalcError);
         }
       }
 
-      console.log('📡 Fetching achievements from /achievements/my...');
+      // console.log('📡 Fetching achievements from /achievements/my...');
       const response = await apiClient.get('/achievements/my');
-      console.log('📊 RAW API Response:', response);
-      console.log('📊 Response data:', response.data);
-      console.log('📊 Response data.success:', response.data?.success);
-      console.log('📊 Response data.data:', response.data?.data);
+      // console.log('📊 RAW API Response:', response);
+      // console.log('📊 Response data:', response.data);
+      // console.log('📊 Response data.success:', response.data?.success);
+      // console.log('📊 Response data.data:', response.data?.data);
 
       if (response.data?.success) {
         const achievements = response.data.data || [];
-        console.log('✅ Achievements to set in state:', achievements);
-        console.log('✅ Number of achievements:', achievements.length);
-        console.log('✅ Unlocked achievements:', achievements.filter(a => a.isCompleted === true).length);
+        // console.log('✅ Achievements to set in state:', achievements);
+        // console.log('✅ Number of achievements:', achievements.length);
+        // console.log('✅ Unlocked achievements:', achievements.filter(a => a.isCompleted === true).length);
 
         // Log each achievement's isCompleted status
-        achievements.forEach(a => {
-          console.log(`  - ${a.achievementId}: isCompleted=${a.isCompleted} (type: ${typeof a.isCompleted})`);
-        });
+        // achievements.forEach(a => {
+        //   console.log(`  - ${a.achievementId}: isCompleted=${a.isCompleted} (type: ${typeof a.isCompleted})`);
+        // });
 
         setUserAchievements(achievements);
         setLastUpdate(new Date());
-        console.log('✅ State updated successfully');
+        // console.log('✅ State updated successfully');
       } else {
-        console.error('❌ API returned success=false:', response.data);
+        // console.error('❌ API returned success=false:', response.data);
         setError(response.data?.message || 'Error al cargar logros');
       }
     } catch (error) {
       console.error('❌ Error refreshing achievements:', error);
-      console.error('❌ Error details:', error.response?.data);
+      // console.error('❌ Error details:', error.response?.data);
       setError(error.message || 'Error de conexión');
       // Keep existing achievements instead of clearing them
     } finally {
@@ -81,7 +70,7 @@ export const AchievementProvider = ({ children }) => {
     if (!user?.id) return;
 
     const interval = setInterval(() => {
-      console.log('🔄 Auto-refresh triggered (30s interval)');
+      // console.log('🔄 Auto-refresh triggered (30s interval)');
       refreshAchievements();
     }, 30000);
 
@@ -90,16 +79,16 @@ export const AchievementProvider = ({ children }) => {
 
   // Set global function
   useEffect(() => {
-    globalRefreshAchievements = refreshAchievements;
+    setGlobalRefreshAchievements(() => refreshAchievements);
     return () => {
-      globalRefreshAchievements = null;
+      setGlobalRefreshAchievements(null);
     };
   }, [refreshAchievements]);
 
   // Initial load - ALWAYS load on mount when user is available
   useEffect(() => {
     if (user?.id) {
-      console.log('🏆 AchievementProvider: Loading achievements for user', user.id);
+      // console.log('🏆 AchievementProvider: Loading achievements for user', user.id);
       refreshAchievements(true); // Force recalculate on first load
     }
   }, [user?.id, refreshAchievements]);
@@ -130,11 +119,4 @@ export const AchievementProvider = ({ children }) => {
       {children}
     </AchievementContext.Provider>
   );
-};
-
-// Export global refresh function
-export const refreshAchievementsGlobally = () => {
-  if (globalRefreshAchievements) {
-    globalRefreshAchievements();
-  }
 };

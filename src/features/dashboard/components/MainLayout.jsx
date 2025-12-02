@@ -4,10 +4,13 @@ import { Sparkles } from 'lucide-react'
 import Sidebar from './Sidebar'
 import TeacherSidebar from './TeacherSidebar'
 import { Button } from '../../../ui/button'
+import { useAuth } from '../../../hooks/useAuth'
 
 const MainLayout = ({ children }) => {
+  const { user } = useAuth()
   const location = useLocation()
-  const isTeacher = location.pathname.startsWith('/teacher')
+  // Show teacher sidebar if user has teacher role OR if on a teacher route
+  const isTeacher = user?.user_metadata?.role === 'teacher' || location.pathname.startsWith('/teacher')
   const [isCollapsed, setIsCollapsed] = useState(false)
 
   // Don't show the floating button on the chatbot page itself to avoid redundancy
@@ -16,14 +19,13 @@ const MainLayout = ({ children }) => {
   return (
     <div className="min-h-screen bg-background animate-in fade-in duration-500">
       {isTeacher ? (
-        <TeacherSidebar />
+        <TeacherSidebar onCollapseChange={setIsCollapsed} />
       ) : (
         <Sidebar onCollapseChange={setIsCollapsed} />
       )}
       <div
-        className={`min-h-screen transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-          isCollapsed ? 'ml-20' : 'ml-60'
-        }`}
+        className={`min-h-screen transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isCollapsed ? 'ml-20' : 'ml-60'
+          }`}
       >
         {children || <Outlet />}
       </div>

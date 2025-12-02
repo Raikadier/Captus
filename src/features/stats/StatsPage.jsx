@@ -82,8 +82,8 @@ function SubjectProgress({ subject }) {
 
 
 function StatsPageContent() {
-  const { streakData, loading: streakLoading } = useStreakData();
-  const { additionalStats, loading: additionalLoading } = useAdditionalStats();
+  const { streakData } = useStreakData();
+  const { additionalStats } = useAdditionalStats();
 
   const [stats, setStats] = useState({
     averageGrade: 0,
@@ -176,25 +176,25 @@ function StatsPageContent() {
 
 
   // Weekly performance by day
-  const weeklyPerformanceData = taskStats.productivityChart?.map(day => ({
-    day: day.day,
-    created: day.created,
-    completed: day.completed,
-    completionRate: day.created > 0 ? Math.round((day.completed / day.created) * 100) : 0
-  })) || [];
+  // const weeklyPerformanceData = taskStats.productivityChart?.map(day => ({
+  //   day: day.day,
+  //   created: day.created,
+  //   completed: day.completed,
+  //   completionRate: day.created > 0 ? Math.round((day.completed / day.created) * 100) : 0
+  // })) || [];
 
   // Cumulative completion data for area chart
-  const cumulativeData = taskStats.productivityChart?.reduce((acc, day, index) => {
-    const previousTotal = acc[index - 1]?.cumulativeCompleted || 0;
-    const newTotal = previousTotal + day.completed;
-    acc.push({
-      day: day.day,
-      dailyCompleted: day.completed,
-      cumulativeCompleted: newTotal,
-      created: day.created
-    });
-    return acc;
-  }, []) || [];
+  // const cumulativeData = taskStats.productivityChart?.reduce((acc, day, index) => {
+  //   const previousTotal = acc[index - 1]?.cumulativeCompleted || 0;
+  //   const newTotal = previousTotal + day.completed;
+  //   acc.push({
+  //     day: day.day,
+  //     dailyCompleted: day.completed,
+  //     cumulativeCompleted: newTotal,
+  //     created: day.created
+  //   });
+  //   return acc;
+  // }, []) || [];
 
   const circumference = 2 * Math.PI * 88;
   const strokeDasharray = `${(completionPercent / 100) * circumference} ${circumference}`;
@@ -441,7 +441,7 @@ function StatsPageContent() {
       {/* Floating AI Chat Button */}
       <Link to="/chatbot" title="Hablar con Captus">
         <Button
-          className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-xl transition-all"
+          className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all"
           size="icon"
         >
           <MessageSquare size={24} />
