@@ -45,13 +45,47 @@ export default class SubmissionRepository extends BaseRepository {
 
   async findByGroup(groupId, assignmentId) {
     const { data, error } = await this.client
-        .from(this.tableName)
-        .select('*')
-        .eq('group_id', groupId)
-        .eq('assignment_id', assignmentId)
-        .single();
+      .from(this.tableName)
+      .select('*')
+      .eq('group_id', groupId)
+      .eq('assignment_id', assignmentId)
+      .single();
 
     if (error && error.code !== 'PGRST116') throw new Error(error.message);
     return data;
+  }
+
+  async findPendingByTeacher(teacherId) {
+    // Join submissions -> assignments -> courses
+    // Filter by course.teacher_id = teacherId AND submission.graded = false
+    const { data, error } = await this.client
+      .from(this.tableName)
+      .select(`
+        *,
+        assignment:assignment_id (
+          id,
+          title,
+          course_id,
+          course:course_id (
+            id,
+            title,
+            teacher_id
+          )
+        ),
+        student:student_id (
+          name
+        ),
+        group:group_id (
+          name
+        )
+      `)
+      .eq('graded', false)
+      .not('submitted_at', 'is', null); // Ensure it's submitted
+
+    if (error) throw new Error(error.message);
+
+    // Client-side filter for teacher_id (Supabase deep filtering has limits)
+    // Or we could use !inner join if Supabase supports it well, but client filter is safer for now
+    return data.filter(sub => sub.assignment?.course?.teacher_id === teacherId);
   }
 }

@@ -40,7 +40,7 @@ export default class AcademicGroupService {
     const isEnrolled = await this.enrollmentRepo.isEnrolled(course_id, userId);
 
     if (isEnrolled) {
-        await this.repo.addMember(group.id, userId);
+      await this.repo.addMember(group.id, userId);
     }
 
     return group;
@@ -55,10 +55,10 @@ export default class AcademicGroupService {
 
     // Permission check
     if (role === 'teacher') {
-       if (course.teacher_id !== requesterId) throw new Error('No autorizado');
+      if (course.teacher_id !== requesterId) throw new Error('No autorizado');
     } else {
-       // Strict: Group creator.
-       if (group.created_by !== requesterId) throw new Error('Solo el creador del grupo puede agregar miembros');
+      // Strict: Group creator.
+      if (group.created_by !== requesterId) throw new Error('Solo el creador del grupo puede agregar miembros');
     }
 
     // Validate student is in the course
@@ -70,12 +70,16 @@ export default class AcademicGroupService {
 
   async getGroupsByCourse(courseId, userId, role) {
     if (role === 'teacher') {
-        const course = await this.courseRepo.getById(courseId);
-        if (course.teacher_id !== userId) throw new Error('No autorizado');
+      const course = await this.courseRepo.getById(courseId);
+      if (course.teacher_id !== userId) throw new Error('No autorizado');
     } else {
-        const isEnrolled = await this.enrollmentRepo.isEnrolled(courseId, userId);
-        if (!isEnrolled) throw new Error('No autorizado');
+      const isEnrolled = await this.enrollmentRepo.isEnrolled(courseId, userId);
+      if (!isEnrolled) throw new Error('No autorizado');
     }
     return await this.repo.findByCourse(courseId);
+  }
+
+  async getMyGroups(userId) {
+    return await this.repo.findByStudent(userId);
   }
 }

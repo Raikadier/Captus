@@ -14,6 +14,7 @@ router.use(statisticsController.injectUser);
 
 // Rutas de estadísticas
 router.get("/", statisticsController.getByUser.bind(statisticsController));
+router.get("/dashboard", statisticsController.getByUser.bind(statisticsController)); // ✅ Fix for 404
 router.get("/tasks", statisticsController.getTaskStats.bind(statisticsController)); // ✅ New route
 router.get("/additional", statisticsController.getAdditionalStats.bind(statisticsController)); // ✅ New route for widgets
 router.get("/home-page", statisticsController.getHomePageStats.bind(statisticsController));

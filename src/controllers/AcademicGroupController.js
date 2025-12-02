@@ -43,4 +43,14 @@ export class AcademicGroupController {
       res.status(403).json({ error: error.message });
     }
   }
+
+  async getMyGroups(req, res) {
+    try {
+      const userId = req.user.id;
+      const result = await this.service.getMyGroups(userId);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }

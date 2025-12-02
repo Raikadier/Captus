@@ -1,42 +1,36 @@
+import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 dotenv.config();
 
 export class EmailProvider {
   constructor() {
-    this.apiKey = process.env.RESEND_API_KEY;
-    this.from = process.env.RESEND_FROM || 'Captus <noreply@captus.app>';
+    this.transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD,
+      },
+    });
+    this.from = process.env.GMAIL_USER || 'Captus <noreply@captus.app>';
   }
 
   async sendEmail({ to, subject, html, text }) {
-    if (!this.apiKey) {
-      console.warn('Resend API Key is missing. Skipping email.');
-      return { success: false, error: 'Missing API Key' };
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+      console.warn('Gmail credentials missing. Skipping email.');
+      return { success: false, error: 'Missing Gmail Credentials' };
     }
 
     try {
-      const response = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`
-        },
-        body: JSON.stringify({
-          from: this.from,
-          to: [to],
-          subject: subject,
-          html: html,
-          text: text
-        })
+      const info = await this.transporter.sendMail({
+        from: `"Captus" <${this.from}>`,
+        to: to,
+        subject: subject,
+        text: text,
+        html: html,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Resend API Error:', errorData);
-        return { success: false, error: errorData };
-      }
-
-      const data = await response.json();
-      return { success: true, data };
+      console.log('Message sent: %s', info.messageId);
+      return { success: true, data: info };
     } catch (error) {
       console.error('Email sending failed:', error);
       return { success: false, error: error.message };

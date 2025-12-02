@@ -1,35 +1,33 @@
 import { NotesService } from "../services/NotesService.js";
+import NotesRepository from "../repositories/NotesRepository.js";
 import NotificationService from '../services/NotificationService.js';
-
-const notesService = new NotesService();
 
 export class NotesController {
   constructor() {
-    this.injectUser = (req, res, next) => {
-      if (req.user) {
-        notesService.setCurrentUser(req.user);
-      }
-      next();
-    };
+    const notesRepo = new NotesRepository();
+    this.service = new NotesService(notesRepo);
   }
 
   async getAll(req, res) {
-    const result = await notesService.getAll();
+    const userId = req.user.id;
+    const result = await this.service.getAll(userId);
     res.status(result.success ? 200 : 401).json(result);
   }
 
   async getById(req, res) {
     const { id } = req.params;
-    const result = await notesService.getById(parseInt(id));
+    const userId = req.user.id;
+    const result = await this.service.getById(parseInt(id), userId);
     res.status(result.success ? 200 : 404).json(result);
   }
 
   async create(req, res) {
-    const result = await notesService.create(req.body);
+    const userId = req.user.id;
+    const result = await this.service.create(req.body, userId);
 
     if (result.success) {
       await NotificationService.notify({
-        user_id: req.user.id,
+        user_id: userId,
         title: 'Nota Creada',
         body: `Has creado una nueva nota.`,
         event_type: 'note_created',
@@ -43,20 +41,23 @@ export class NotesController {
 
   async update(req, res) {
     const { id } = req.params;
+    const userId = req.user.id;
     const noteData = { ...req.body, id: parseInt(id) };
-    const result = await notesService.update(noteData);
+    const result = await this.service.update(noteData, userId);
     res.status(result.success ? 200 : 400).json(result);
   }
 
   async togglePin(req, res) {
     const { id } = req.params;
-    const result = await notesService.togglePin(parseInt(id));
+    const userId = req.user.id;
+    const result = await this.service.togglePin(parseInt(id), userId);
     res.status(result.success ? 200 : 400).json(result);
   }
 
   async delete(req, res) {
     const { id } = req.params;
-    const result = await notesService.delete(parseInt(id));
+    const userId = req.user.id;
+    const result = await this.service.delete(parseInt(id), userId);
     res.status(result.success ? 200 : 400).json(result);
   }
 }

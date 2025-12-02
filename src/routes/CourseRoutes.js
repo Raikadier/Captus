@@ -23,5 +23,6 @@ router.get('/:id', controller.getById.bind(controller));
 router.post('/', requireTeacherRole, controller.create.bind(controller));
 router.put('/:id', requireTeacherRole, controller.update.bind(controller));
 router.delete('/:id', requireTeacherRole, controller.delete.bind(controller));
+router.get('/:id/grades/download', requireTeacherRole, controller.downloadGrades.bind(controller));
 
 export default router;

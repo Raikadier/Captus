@@ -32,6 +32,7 @@ import TelegramRoutes from './routes/TelegramRoutes.js';
 import telegramController from './controllers/TelegramController.js';
 import aiRouter from './routes/ai.js';
 import { getSupabaseClient } from './lib/supabaseAdmin.js';
+import telegramProvider from './services/notifications/providers/TelegramProvider.js';
 
 // Ensure dotenv is configured before anything else if possible,
 // though imports are hoisted, side-effect imports like 'dotenv/config' are better.
@@ -39,7 +40,7 @@ import { getSupabaseClient } from './lib/supabaseAdmin.js';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(helmet());
@@ -182,7 +183,7 @@ app.get('/api', (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
   const apiBase = `http://localhost:${PORT}/api`;
   console.log('===================================');
@@ -191,5 +192,14 @@ app.listen(PORT, () => {
   console.log(`Swagger UI:   http://localhost:${PORT}/api-docs`);
   console.log(`API base:     ${apiBase}`);
   console.log(`Frontend:     ${frontendUrl}`);
+
+  // Automate Telegram Webhook if NGROK_URL is present
+  const publicUrl = process.env.NGROK_URL || process.env.PUBLIC_URL;
+  if (publicUrl) {
+    console.log('Configuring Telegram Webhook...');
+    await telegramProvider.setWebhook(publicUrl);
+  } else {
+    console.log('Skipping Telegram Webhook (No NGROK_URL/PUBLIC_URL provided)');
+  }
   console.log('===================================');
 });

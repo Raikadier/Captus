@@ -1,9 +1,9 @@
 import BaseRepository from "./BaseRepository.js";
-import StatisticsRepository from "./StatisticsRepository.js";
 
 const mapFromDb = (row) => ({
-  id_User: row.id,
-  userName: row.name || row.email?.split('@')[0], // Usar name o extraer de email
+  id: row.id, // Standardize on 'id' for compatibility with User model
+  id_User: row.id, // Keep for legacy compatibility
+  userName: row.name || row.email?.split('@')[0],
   email: row.email,
   name: row.name,
   carrer: row.carrer,
@@ -13,13 +13,13 @@ const mapFromDb = (row) => ({
 });
 
 const mapToDb = (entity) => ({
-  id: entity.id_User, // Para upsert
+  id: entity.id || entity.id_User, // Accept either
   email: entity.email,
   name: entity.name || entity.userName,
   carrer: entity.carrer,
   bio: entity.bio,
-  created_at: entity.createdAt || new Date(),
-  updated_at: entity.updatedAt || new Date(),
+  created_at: entity.createdAt || entity.created_at || new Date(), // Handle both camelCase and snake_case inputs
+  updated_at: entity.updatedAt || entity.updated_at || new Date(),
 });
 
 export default class UserRepository extends BaseRepository {
@@ -29,7 +29,6 @@ export default class UserRepository extends BaseRepository {
       mapFromDb,
       mapToDb,
     });
-    this.statisticsRepository = new StatisticsRepository();
   }
 
   async save(entity) {
@@ -48,20 +47,7 @@ export default class UserRepository extends BaseRepository {
         return null;
       }
 
-      const user = mapFromDb(data);
-
-      // Verificar si ya existen estadísticas, si no, crearlas
-      const existingStats = await this.statisticsRepository.getByUser(user.id_User);
-      if (!existingStats) {
-        const stats = this.statisticsRepository.defaultStatistics(user.id_User);
-        const statsCreated = await this.statisticsRepository.save(stats);
-        if (!statsCreated) {
-          console.error("Error al guardar estadísticas para usuario:", user.id_User);
-          // No eliminamos el usuario, solo logueamos el error
-        }
-      }
-
-      return user;
+      return mapFromDb(data);
     } catch (error) {
       console.error("Error saving user:", error.message);
       return null;
@@ -106,6 +92,75 @@ export default class UserRepository extends BaseRepository {
       return !!data;
     } catch (error) {
       console.error("Error checking email:", error.message);
+      return false;
+    }
+  }
+
+  async getById(id) {
+    try {
+      const { data, error } = await this.client
+        .from(this.tableName)
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') return null;
+        throw new Error(error.message);
+      }
+
+      return mapFromDb(data);
+    } catch (error) {
+      console.error("Error getting user by id:", error.message);
+      return null;
+    }
+  }
+
+  async getAll() {
+    try {
+      const { data, error } = await this.client
+        .from(this.tableName)
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw new Error(error.message);
+
+      return data.map(mapFromDb);
+    } catch (error) {
+      console.error("Error getting all users:", error.message);
+      return [];
+    }
+  }
+
+  async update(id, updates) {
+    try {
+      const { data, error } = await this.client
+        .from(this.tableName)
+        .update(mapToDb({ ...updates, id_User: id })) // Ensure ID is preserved/mapped
+        .eq("id", id)
+        .select("*")
+        .single();
+
+      if (error) throw new Error(error.message);
+
+      return mapFromDb(data);
+    } catch (error) {
+      console.error("Error updating user:", error.message);
+      return null;
+    }
+  }
+
+  async delete(id) {
+    try {
+      const { error } = await this.client
+        .from(this.tableName)
+        .delete()
+        .eq("id", id);
+
+      if (error) throw new Error(error.message);
+      return true;
+    } catch (error) {
+      console.error("Error deleting user:", error.message);
       return false;
     }
   }

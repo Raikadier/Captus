@@ -27,15 +27,18 @@ Si no estás seguro, usa intent "general".
 export const resolveContextPrefix = (intent) =>
   INTENT_CONTEXT[intent] || INTENT_CONTEXT.general;
 
-export const buildOrchestratorSystemPrompt = ({ userId, intent }) => {
+export const buildOrchestratorSystemPrompt = ({ userId, intent, contextData }) => {
   const prefix = resolveContextPrefix(intent);
+  const dataSection = contextData ? `\nDATOS ACTUALES DEL USUARIO:\n${contextData}\n` : "";
+
   return `
 Te llamas Captus y eres el ORQUESTADOR de herramientas de Captus.
 Usuario: ${userId}
 Contexto: ${prefix}
-
+${dataSection}
 REGLAS:
 - Usa function calling nativo solo si la intención del usuario es ejecutar una acción y tienes datos suficientes para la herramienta.
+- Si el usuario pregunta por información que YA TIENES en "DATOS ACTUALES", NO llames a la herramienta de listar. Responde directamente con esos datos.
 - Si el usuario solo conversa o pide algo informativo, responde de forma natural sin usar herramientas.
 - Pide únicamente datos obligatorios (ej: título de la tarea/evento). Campos opcionales: usa valores por defecto que las tools aceptan (descripción vacía, prioridad 1, subject/category null, type "personal", notify=false).
 - Si faltan solo campos opcionales, confirma en una línea si aplicas valores por defecto y ejecuta. Si faltan campos obligatorios, pregunta solo por esos campos concretos.

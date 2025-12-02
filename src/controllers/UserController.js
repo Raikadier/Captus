@@ -1,14 +1,17 @@
 import UserService from "../services/UserService.js";
+import UserRepository from "../repositories/UserRepository.js";
+import CategoryService from "../services/CategoryService.js";
+import { StatisticsService } from "../services/StatisticsService.js";
 import { getSupabaseClient } from "../lib/supabaseAdmin.js";
-
-// Initialize service with Supabase admin client
-const supabaseAdmin = getSupabaseClient();
-const userService = new UserService(supabaseAdmin);
 
 export class UserController {
   constructor() {
-    // Middleware to inject user into request if needed (legacy)
-    // But for the new approach, we just use the service directly.
+    const supabaseAdmin = getSupabaseClient();
+    const userRepo = new UserRepository();
+    const categorySvc = new CategoryService();
+    const statisticsSvc = new StatisticsService();
+
+    this.userService = new UserService(supabaseAdmin, userRepo, categorySvc, statisticsSvc);
   }
 
   // Middleware to verify user presence if needed for other controllers
@@ -38,7 +41,7 @@ export class UserController {
         updated_at: new Date()
       };
 
-      const result = await userService.syncUserFromAuth(authUserPayload);
+      const result = await this.userService.syncUserFromAuth(authUserPayload);
       res.status(200).json({ success: true, data: result });
     } catch (error) {
       console.error('Sync User Error:', error);
@@ -52,7 +55,7 @@ export class UserController {
       const userId = req.params.id || req.user?.id;
       if (!userId) return res.status(400).json({ error: 'User ID required' });
 
-      const user = await userService.getUserById(userId);
+      const user = await this.userService.getUserById(userId);
       res.status(200).json({ success: true, data: user });
     } catch (error) {
       // If user not found in public table, try to sync?
@@ -66,7 +69,7 @@ export class UserController {
       const userId = req.params.id || req.user?.id;
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
-      const result = await userService.updateUser(userId, req.body);
+      const result = await this.userService.updateUser(userId, req.body);
       res.status(200).json({ success: true, data: result });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -76,7 +79,7 @@ export class UserController {
   async changePassword(req, res) {
     const { currentPassword, newPassword } = req.body;
     // Note: Authentication check is done in middleware, but method itself validates strength.
-    const result = await userService.changePassword(currentPassword, newPassword);
+    const result = await this.userService.changePassword(currentPassword, newPassword);
     // result is OperationResult { success, message, data }
     res.status(result.success ? 200 : 400).json(result);
   }
@@ -86,7 +89,7 @@ export class UserController {
       const userId = req.user?.id;
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
-      const result = await userService.deleteAccount(userId);
+      const result = await this.userService.deleteAccount(userId);
       res.status(result.success ? 200 : 400).json(result);
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -96,7 +99,7 @@ export class UserController {
   async isEmailRegistered(req, res) {
     const { email } = req.body;
     try {
-      const result = await userService.isEmailRegistered(email);
+      const result = await this.userService.isEmailRegistered(email);
       res.status(200).json({ registered: result.data?.registered || false });
     } catch (error) {
       res.status(500).json({ registered: false, error: error.message });

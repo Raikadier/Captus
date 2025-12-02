@@ -42,4 +42,24 @@ export default class AcademicGroupRepository extends BaseRepository {
     if (error) throw new Error(error.message);
     return true;
   }
+  async findByStudent(studentId) {
+    const { data, error } = await this.client
+      .from('course_group_members')
+      .select(`
+        group_id,
+        group:group_id (
+          *,
+          members:course_group_members(count)
+        )
+      `)
+      .eq('student_id', studentId);
+
+    if (error) throw new Error(error.message);
+
+    // Flatten and format
+    return data.map(item => ({
+      ...item.group,
+      members: item.group.members[0].count // Approximate member count
+    }));
+  }
 }

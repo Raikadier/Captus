@@ -8,32 +8,38 @@ export default class CourseRepository extends BaseRepository {
   async findByTeacher(teacherId) {
     const { data, error } = await this.client
       .from(this.tableName)
-      .select('*')
+      .select(`
+        *,
+        enrollments:course_enrollments(count)
+      `)
       .eq('teacher_id', teacherId)
       .order('created_at', { ascending: false });
 
     if (error) throw new Error(error.message);
+
     return data;
   }
 
   async findByStudent(studentId) {
-    // Supabase join syntax: course_enrollments -> courses
+    // Supabase join syntax: course_enrollments -> courses -> users (teacher)
     const { data, error } = await this.client
       .from('course_enrollments')
       .select(`
         course_id,
         enrolled_at,
-        courses:course_id (*)
+        courses:course_id (
+          *,
+          teacher:teacher_id (
+            name,
+            email
+          )
+        )
       `)
       .eq('student_id', studentId);
 
     if (error) throw new Error(error.message);
 
-    // Map to return just the course objects with enrollment info if needed
-    return data.map(item => ({
-      ...item.courses,
-      enrolled_at: item.enrolled_at
-    }));
+    return data;
   }
 
   async findByInviteCode(code) {

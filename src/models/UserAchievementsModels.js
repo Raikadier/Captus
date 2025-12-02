@@ -1,13 +1,15 @@
 export default class UserAchievements {
   constructor({
+    id = null,
     id_User,
     achievementId,
     unlockedAt = new Date(),
     progress = 0,
     isCompleted = false,
   }) {
-    this.id_User = id_User; // PK (parte 1)
-    this.achievementId = achievementId; // PK (parte 2)
+    this.id = id; // PK
+    this.id_User = id_User; // FK
+    this.achievementId = achievementId;
     this.unlockedAt = unlockedAt;
     this.progress = progress;
     this.isCompleted = isCompleted;

@@ -20,6 +20,7 @@ const mapFromDb = (row) => ({
   id_Priority: row.priority_id,
   id_Category: row.category_id,
   id_User: row.user_id,
+  project_id: row.project_id, // New field
 });
 
 const mapToDb = (entity) => ({
@@ -31,6 +32,7 @@ const mapToDb = (entity) => ({
   category_id: entity.category_id ?? entity.id_Category ?? null,
   completed: entity.completed ?? entity.state ?? false,
   user_id: entity.user_id ?? entity.id_User,
+  project_id: entity.project_id, // New field
 });
 
 class TaskRepository extends BaseRepository {

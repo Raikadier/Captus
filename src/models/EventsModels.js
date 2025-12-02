@@ -11,6 +11,7 @@ export default class Event {
     type,
     is_past = false,
     notify = false,
+    metadata = null,
   }) {
     this.id = id;
     this.user_id = user_id;
@@ -23,5 +24,6 @@ export default class Event {
     this.type = type;
     this.is_past = is_past;
     this.notify = notify;
+    this.metadata = metadata;
   }
 }

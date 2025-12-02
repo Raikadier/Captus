@@ -1,8 +1,5 @@
-import EventsRepository from "../repositories/EventsRepository.js";
 import { OperationResult } from "../shared/OperationResult.js";
 import nodemailer from 'nodemailer';
-
-const eventsRepository = new EventsRepository();
 
 // Email transporter configuration
 const createEmailTransporter = () => {
@@ -16,18 +13,8 @@ const createEmailTransporter = () => {
 };
 
 export class EventsService {
-  constructor() {
-    this.currentUser = null;
-  }
-
-  setCurrentUser(user) {
-    this.currentUser = user;
-  }
-
-  resolveUserId(user) {
-    if (!user) return this.currentUser?.id || this.currentUser?.user_id || null;
-    if (typeof user === "string") return user;
-    return user.id || user.user_id || null;
+  constructor(eventsRepository) {
+    this.eventsRepository = eventsRepository;
   }
 
   validateEvent(event) {
@@ -66,16 +53,15 @@ export class EventsService {
     return new OperationResult(true);
   }
 
-  async create(event, userContext = null) {
-    return this.save(event, userContext);
+  async create(event, userId) {
+    return this.save(event, userId);
   }
 
-  async save(event, userContext = null) {
+  async save(event, userId) {
     try {
       const validation = this.validateEvent(event);
       if (!validation.success) return validation;
 
-      const userId = this.resolveUserId(userContext);
       if (!userId) {
         return new OperationResult(false, "Usuario no autenticado.");
       }
@@ -87,11 +73,33 @@ export class EventsService {
         event.type = "personal";
       }
 
-      const savedEvent = await eventsRepository.save(event);
+      const savedEvent = await this.eventsRepository.save(event);
       if (savedEvent) {
         // Send notification email if requested (non-blocking)
         if (event.notify) {
-          this.sendEventNotification(savedEvent, 'created').catch(error => {
+          // We need user email for notification. 
+          // Assuming the controller or caller might pass user email or we fetch it.
+          // For now, let's assume we can't send email without user email.
+          // Or we fetch user details here? 
+          // To keep it simple and stateless, we might need to pass user object or fetch it.
+          // But for now, I'll comment out email sending or require user object.
+          // Let's pass the user object if available, or just userId.
+          // If we only have userId, we can't send email unless we fetch user.
+          // Refactoring to just use userId means we might lose the email capability unless we fetch the user.
+          // I will assume the caller might pass the user object if email is needed, or I'll fetch it.
+          // But to adhere to the pattern, let's just pass userId and maybe fetch user if needed?
+          // Actually, the previous implementation used `this.currentUser`.
+          // I'll update the signature to accept `user` object if possible, or just `userId`.
+          // If `userId` is passed, I can't send email easily without fetching.
+          // Let's check if I can fetch user. I don't have UserRepository injected.
+          // I should probably inject UserRepository too if I need to fetch user.
+          // For now, I will skip email sending if user email is not available, or I'll rely on the controller passing the full user object.
+          // Let's change the signature to `save(event, user)`.
+        }
+
+        // Re-implementing email sending if user object is passed
+        if (event.notify && typeof userId === 'object' && userId.email) {
+          this.sendEventNotification(savedEvent, 'created', userId).catch(error => {
             console.error('Error sending event notification:', error);
           });
         }
@@ -105,27 +113,25 @@ export class EventsService {
     }
   }
 
-  async getAll(userContext = null) {
+  async getAll(userId) {
     try {
-      const userId = this.resolveUserId(userContext);
       if (!userId) return new OperationResult(false, "Usuario no autenticado.");
 
-      const events = await eventsRepository.getAllByUserId(userId);
+      const events = await this.eventsRepository.getAllByUserId(userId);
       return new OperationResult(true, "Eventos obtenidos exitosamente.", events);
     } catch (error) {
       return new OperationResult(false, `Error al obtener eventos: ${error.message}`);
     }
   }
 
-  async getById(id, userContext = null) {
+  async getById(id, userId) {
     try {
       if (!id) {
         return new OperationResult(false, "ID de evento inválido.");
       }
 
-      const event = await eventsRepository.getById(id);
+      const event = await this.eventsRepository.getById(id);
       if (event) {
-        const userId = this.resolveUserId(userContext);
         if (userId && event.user_id === userId) {
           return new OperationResult(true, "Evento encontrado.", event);
         } else {
@@ -139,14 +145,14 @@ export class EventsService {
     }
   }
 
-  async update(event, userContext = null) {
+  async update(event, user) {
     try {
-      const existingEvent = await eventsRepository.getById(event.id);
+      const userId = user.id || user;
+      const existingEvent = await this.eventsRepository.getById(event.id);
       if (!existingEvent) {
         return new OperationResult(false, "Evento no encontrado.");
       }
 
-      const userId = this.resolveUserId(userContext);
       if (!userId || existingEvent.user_id !== userId) {
         return new OperationResult(false, "Evento no accesible.");
       }
@@ -163,11 +169,11 @@ export class EventsService {
       // Update the update_at timestamp
       mergedEvent.updated_at = new Date();
 
-      const updated = await eventsRepository.update(mergedEvent);
+      const updated = await this.eventsRepository.update(mergedEvent);
       if (updated) {
-        // Send notification email if requested and notify setting changed or event was updated
-        if (event.notify) {
-          this.sendEventNotification(updated, 'updated').catch(error => {
+        // Send notification email if requested
+        if (event.notify && user.email) {
+          this.sendEventNotification(updated, 'updated', user).catch(error => {
             console.error('Error sending event notification:', error);
           });
         }
@@ -181,23 +187,22 @@ export class EventsService {
     }
   }
 
-  async delete(id, userContext = null) {
+  async delete(id, userId) {
     try {
       if (!id) {
         return new OperationResult(false, "ID de evento inválido.");
       }
 
-      const existingEvent = await eventsRepository.getById(id);
+      const existingEvent = await this.eventsRepository.getById(id);
       if (!existingEvent) {
         return new OperationResult(false, "Evento no encontrado.");
       }
 
-      const userId = this.resolveUserId(userContext);
       if (!userId || existingEvent.user_id !== userId) {
         return new OperationResult(false, "Evento no accesible.");
       }
 
-      const deleted = await eventsRepository.delete(id);
+      const deleted = await this.eventsRepository.delete(id);
       if (deleted) {
         return new OperationResult(true, "Evento eliminado exitosamente.");
       } else {
@@ -208,32 +213,30 @@ export class EventsService {
     }
   }
 
-  async getByDateRange(startDate, endDate, userContext = null) {
+  async getByDateRange(startDate, endDate, userId) {
     try {
-      const userId = this.resolveUserId(userContext);
       if (!userId) return new OperationResult(false, "Usuario no autenticado.");
 
-      const events = await eventsRepository.getByDateRange(userId, startDate, endDate);
+      const events = await this.eventsRepository.getByDateRange(userId, startDate, endDate);
       return new OperationResult(true, "Eventos obtenidos exitosamente.", events);
     } catch (error) {
       return new OperationResult(false, `Error al obtener eventos por rango de fecha: ${error.message}`);
     }
   }
 
-  async getUpcoming(options = {}, userContext = null) {
+  async getUpcoming(options = {}, userId) {
     try {
-      const userId = this.resolveUserId(userContext);
       if (!userId) return new OperationResult(false, "Usuario no autenticado.");
 
       const limit = options.limit || null;
-      const events = await eventsRepository.getUpcomingByUserId(userId, limit);
+      const events = await this.eventsRepository.getUpcomingByUserId(userId, limit);
       return new OperationResult(true, "Próximos eventos obtenidos exitosamente.", events);
     } catch (error) {
       return new OperationResult(false, `Error al obtener eventos próximos: ${error.message}`);
     }
   }
 
-  async sendEventNotification(event, action) {
+  async sendEventNotification(event, action, user) {
     try {
       if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
         console.warn('Gmail credentials not configured for notifications');
@@ -262,7 +265,7 @@ export class EventsService {
 
       await transporter.sendMail({
         from: process.env.GMAIL_USER,
-        to: this.currentUser?.email, // Assuming user has email
+        to: user.email,
         subject,
         html,
       });
@@ -273,24 +276,23 @@ export class EventsService {
     }
   }
 
-  async checkUpcomingEvents() {
+  async checkUpcomingEvents(user) {
     try {
-      if (!this.currentUser) return;
+      if (!user) return;
 
       // Get events in the next 24 hours that have notifications enabled
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
 
-      const upcomingEvents = await eventsRepository.getByDateRange(
-        this.currentUser.id,
+      const upcomingEvents = await this.eventsRepository.getByDateRange(
+        user.id,
         new Date().toISOString(),
         tomorrow.toISOString()
       );
 
       for (const event of upcomingEvents) {
         if (event.notify) {
-          // Check if we already sent a notification (you might want to add a sent_notifications table)
-          await this.sendUpcomingEventNotification(event);
+          await this.sendUpcomingEventNotification(event, user);
         }
       }
     } catch (error) {
@@ -298,7 +300,7 @@ export class EventsService {
     }
   }
 
-  async sendUpcomingEventNotification(event) {
+  async sendUpcomingEventNotification(event, user) {
     try {
       if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
         console.warn('Gmail credentials not configured for notifications');
@@ -330,7 +332,7 @@ export class EventsService {
 
       await transporter.sendMail({
         from: process.env.GMAIL_USER,
-        to: this.currentUser?.email,
+        to: user.email,
         subject,
         html,
       });

@@ -1,8 +1,13 @@
 import CourseService from '../services/CourseService.js';
+import CourseRepository from '../repositories/CourseRepository.js';
+import EnrollmentRepository from '../repositories/EnrollmentRepository.js';
 
 export class CourseController {
   constructor() {
-    this.service = new CourseService();
+    // Manual Dependency Injection
+    const courseRepo = new CourseRepository();
+    const enrollmentRepo = new EnrollmentRepository();
+    this.service = new CourseService(courseRepo, enrollmentRepo);
   }
 
   // Middleware to inject user is already used in routes (verifySupabaseToken)
@@ -63,21 +68,21 @@ export class CourseController {
   }
 
   async getTeacherCourses(req, res) {
-     try {
-         const result = await this.service.getCoursesForUser(req.user.id, 'teacher');
-         res.json(result);
-     } catch (error) {
-         res.status(500).json({ error: error.message });
-     }
+    try {
+      const result = await this.service.getCoursesForUser(req.user.id, 'teacher');
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   }
 
   async getStudentCourses(req, res) {
-     try {
-         const result = await this.service.getCoursesForUser(req.user.id, 'student');
-         res.json(result);
-     } catch (error) {
-         res.status(500).json({ error: error.message });
-     }
+    try {
+      const result = await this.service.getCoursesForUser(req.user.id, 'student');
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   }
 
   async getById(req, res) {
@@ -120,6 +125,34 @@ export class CourseController {
       res.json({ message: 'Curso eliminado' });
     } catch (error) {
       res.status(400).json({ error: error.message });
+    }
+  }
+
+  async downloadGrades(req, res) {
+    try {
+      const courseId = req.params.id;
+      const teacherId = req.user.id;
+      const grades = await this.service.getCourseGrades(courseId, teacherId);
+
+      // Generate TXT content
+      let content = `REPORTE DE NOTAS - CURSO ID: ${courseId}\n`;
+      content += `Generado el: ${new Date().toLocaleString()}\n`;
+      content += `------------------------------------------------\n`;
+      content += `Estudiante | Email | Nota Final\n`;
+      content += `------------------------------------------------\n`;
+
+      grades.forEach(g => {
+        content += `${g.studentName.padEnd(20)} | ${g.studentEmail.padEnd(30)} | ${g.grade}\n`;
+      });
+
+      // Set headers for download
+      res.setHeader('Content-Type', 'text/plain');
+      res.setHeader('Content-Disposition', `attachment; filename=notas_curso_${courseId}.txt`);
+
+      res.send(content);
+    } catch (error) {
+      console.error('Error downloading grades:', error);
+      res.status(500).json({ error: error.message });
     }
   }
 }
