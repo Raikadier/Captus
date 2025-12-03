@@ -1,8 +1,14 @@
 import AssignmentService from '../services/AssignmentService.js';
+import AssignmentRepository from '../repositories/AssignmentRepository.js';
+import EnrollmentRepository from '../repositories/EnrollmentRepository.js';
+import CourseRepository from '../repositories/CourseRepository.js';
 
 export class AssignmentController {
   constructor() {
-    this.service = new AssignmentService();
+    const assignmentRepo = new AssignmentRepository();
+    const enrollmentRepo = new EnrollmentRepository();
+    const courseRepo = new CourseRepository();
+    this.service = new AssignmentService(assignmentRepo, enrollmentRepo, courseRepo);
   }
 
   async create(req, res) {

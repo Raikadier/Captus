@@ -51,23 +51,24 @@ export class AchievementValidatorService {
    * Valida un logro específico para un usuario
    * @param {string} userId - ID del usuario
    * @param {string} achievementId - ID del logro
+   * @param {Array} preFetchedTasks - Tareas pre-cargadas para optimización
    * @returns {Promise<boolean>} - True si el logro debe ser desbloqueado
    */
-  async validateAchievement(userId, achievementId) {
-    console.log(`🏆 Validating achievement: ${achievementId} for user ${userId}`);
+  async validateAchievement(userId, achievementId, preFetchedTasks = null) {
+    // console.log(`🏆 Validating achievement: ${achievementId} for user ${userId}`);
 
     // Verificar si ya tiene el logro desbloqueado
     const existing = await userAchievementsRepository.getByUserAndAchievement(userId, achievementId);
     if (existing && existing.isCompleted) {
-      console.log(`✅ ${achievementId} already unlocked`);
+      // console.log(`✅ ${achievementId} already unlocked`);
       // Si ya está desbloqueado, solo actualizar el progreso si es mayor
       const achievement = achievements[achievementId];
       if (achievement) {
-        const progress = await this.calculateProgress(userId, achievement);
-        console.log(`📊 ${achievementId}: current progress ${existing.progress}, calculated ${progress}`);
+        const progress = await this.calculateProgress(userId, achievement, preFetchedTasks);
+        // console.log(`📊 ${achievementId}: current progress ${existing.progress}, calculated ${progress}`);
         if (progress > existing.progress) {
           await userAchievementsRepository.updateProgress(userId, achievementId, progress);
-          console.log(`📈 Updated progress for already unlocked achievement ${achievementId}`);
+          // console.log(`📈 Updated progress for already unlocked achievement ${achievementId}`);
         }
       }
       return false;
@@ -79,8 +80,8 @@ export class AchievementValidatorService {
       return false;
     }
 
-    const progress = await this.calculateProgress(userId, achievement);
-    console.log(`📊 ${achievementId}: ${progress}/${achievement.targetValue}`);
+    const progress = await this.calculateProgress(userId, achievement, preFetchedTasks);
+    // console.log(`📊 ${achievementId}: ${progress}/${achievement.targetValue}`);
 
     // Si el progreso alcanza el objetivo, desbloquear el logro
     if (progress >= achievement.targetValue) {
@@ -113,39 +114,40 @@ export class AchievementValidatorService {
    * Calcula el progreso actual de un logro para un usuario
    * @param {string} userId - ID del usuario
    * @param {Object} achievement - Configuración del logro
+   * @param {Array} preFetchedTasks - Tareas pre-cargadas
    * @returns {Promise<number>} - Progreso actual
    */
-  async calculateProgress(userId, achievement) {
+  async calculateProgress(userId, achievement, preFetchedTasks = null) {
     switch (achievement.type) {
       case 'completed_tasks':
-        return await this.getCompletedTasksCount(userId);
+        return await this.getCompletedTasksCount(userId, preFetchedTasks);
 
       case 'high_priority_tasks':
         return await this.getHighPriorityTasksCount(userId);
 
       case 'subtasks_created':
-        return await this.getSubtasksCreatedCount(userId);
+        return await this.getSubtasksCreatedCount(userId, preFetchedTasks);
 
       case 'tasks_created':
-        return await this.getTasksCreatedCount(userId);
+        return await this.getTasksCreatedCount(userId, preFetchedTasks);
 
       case 'streak':
         return await this.getCurrentStreak(userId);
 
       case 'early_tasks':
-        return await this.getEarlyTasksCount(userId);
+        return await this.getEarlyTasksCount(userId, preFetchedTasks);
 
       case 'subtasks_completed':
-        return await this.getSubtasksCompletedCount(userId);
+        return await this.getSubtasksCompletedCount(userId, preFetchedTasks);
 
       case 'tasks_in_day':
-        return await this.getMaxTasksInDay(userId);
+        return await this.getMaxTasksInDay(userId, preFetchedTasks);
 
       case 'solo_tasks':
-        return await this.getSoloTasksCount(userId);
+        return await this.getSoloTasksCount(userId, preFetchedTasks);
 
       case 'sunday_tasks':
-        return await this.getSundayTasksCount(userId);
+        return await this.getSundayTasksCount(userId, preFetchedTasks);
 
       default:
         return 0;
@@ -154,10 +156,12 @@ export class AchievementValidatorService {
 
   // Métodos auxiliares para calcular progreso de cada tipo de logro
 
-  async getCompletedTasksCount(userId) {
-    const tasks = await taskRepository.getAllByUserId(userId);
+  async getCompletedTasksCount(userId, tasks = null) {
+    if (!tasks) {
+      tasks = await taskRepository.getAllByUserId(userId);
+    }
     const completedCount = tasks.filter(task => task.completed === true).length;
-    console.log(`✅ Completed tasks: ${completedCount}`);
+    // console.log(`✅ Completed tasks: ${completedCount}`);
     return completedCount;
   }
 
@@ -182,13 +186,15 @@ export class AchievementValidatorService {
       task.priorities?.name === 'Alta'
     ).length;
 
-    console.log(`🔴 High priority tasks: ${highPriorityCount}`);
+    // console.log(`🔴 High priority tasks: ${highPriorityCount}`);
     return highPriorityCount;
   }
 
-  async getSubtasksCreatedCount(userId) {
+  async getSubtasksCreatedCount(userId, tasks = null) {
     // Obtener todas las tareas del usuario
-    const tasks = await taskRepository.getAllByUserId(userId);
+    if (!tasks) {
+      tasks = await taskRepository.getAllByUserId(userId);
+    }
     const taskIds = tasks.map(task => task.id);
 
     if (taskIds.length === 0) return 0;
@@ -207,13 +213,15 @@ export class AchievementValidatorService {
     return data.length;
   }
 
-  async getTasksCreatedCount(userId) {
-    const tasks = await taskRepository.getAllByUserId(userId);
+  async getTasksCreatedCount(userId, tasks = null) {
+    if (!tasks) {
+      tasks = await taskRepository.getAllByUserId(userId);
+    }
     return tasks.length;
   }
 
   async getCurrentStreak(userId) {
-    console.log(`🔥 Calculating current streak for user ${userId}`);
+    // console.log(`🔥 Calculating current streak for user ${userId}`);
 
     // Obtener de la tabla statistics (según el esquema que proporcionaste)
     const { data: statsData, error: statsError } = await this.client
@@ -223,16 +231,18 @@ export class AchievementValidatorService {
       .maybeSingle();
 
     if (!statsError && statsData) {
-      console.log(`🔥 Current streak from statistics table: ${statsData.racha}`);
+      // console.log(`🔥 Current streak from statistics table: ${statsData.racha}`);
       return statsData.racha || 0;
     }
 
-    console.log(`🔥 No streak data found in statistics table, returning 0`);
+    // console.log(`🔥 No streak data found in statistics table, returning 0`);
     return 0;
   }
 
-  async getEarlyTasksCount(userId) {
-    const tasks = await taskRepository.getAllByUserId(userId);
+  async getEarlyTasksCount(userId, tasks = null) {
+    if (!tasks) {
+      tasks = await taskRepository.getAllByUserId(userId);
+    }
     const earlyTasks = tasks.filter(task => {
       if (!task.due_date) return false;
       const endTime = new Date(task.due_date);
@@ -241,9 +251,11 @@ export class AchievementValidatorService {
     return earlyTasks.length;
   }
 
-  async getSubtasksCompletedCount(userId) {
+  async getSubtasksCompletedCount(userId, tasks = null) {
     // Para el logro "multitarea": verificar si alguna tarea tiene al menos 5 subtareas completadas
-    const tasks = await taskRepository.getAllByUserId(userId);
+    if (!tasks) {
+      tasks = await taskRepository.getAllByUserId(userId);
+    }
     const taskIds = tasks.map(task => task.id);
 
     if (taskIds.length === 0) return 0;
@@ -271,8 +283,10 @@ export class AchievementValidatorService {
     return maxCompletedInTask;
   }
 
-  async getMaxTasksInDay(userId) {
-    const tasks = await taskRepository.getAllByUserId(userId);
+  async getMaxTasksInDay(userId, tasks = null) {
+    if (!tasks) {
+      tasks = await taskRepository.getAllByUserId(userId);
+    }
     const completedTasks = tasks.filter(task => task.completed === true);
 
     // Agrupar por día
@@ -288,8 +302,10 @@ export class AchievementValidatorService {
     return Math.max(...Object.values(tasksByDay), 0);
   }
 
-  async getSoloTasksCount(userId) {
-    const tasks = await taskRepository.getAllByUserId(userId);
+  async getSoloTasksCount(userId, tasks = null) {
+    if (!tasks) {
+      tasks = await taskRepository.getAllByUserId(userId);
+    }
     const completedTasks = tasks.filter(task => task.completed === true);
 
     if (completedTasks.length === 0) return 0;
@@ -316,8 +332,10 @@ export class AchievementValidatorService {
     return soloTasksCount;
   }
 
-  async getSundayTasksCount(userId) {
-    const tasks = await taskRepository.getAllByUserId(userId);
+  async getSundayTasksCount(userId, tasks = null) {
+    if (!tasks) {
+      tasks = await taskRepository.getAllByUserId(userId);
+    }
     const sundayTasks = tasks.filter(task => {
       if (!task.due_date) return false;
       const endDate = new Date(task.due_date);
@@ -399,12 +417,16 @@ export class AchievementValidatorService {
   async recalculateAllAchievements(userId) {
     console.log(`🔄 Recalculating ALL achievements for user ${userId}`);
 
+    // Pre-fetch tasks to avoid N+1 queries
+    const tasks = await taskRepository.getAllByUserId(userId);
+    console.log(`📦 Pre-fetched ${tasks.length} tasks for recalculation`);
+
     const allAchievements = Object.keys(achievements);
     let updatedCount = 0;
 
     for (const achievementId of allAchievements) {
       try {
-        const wasUpdated = await this.validateAchievement(userId, achievementId);
+        const wasUpdated = await this.validateAchievement(userId, achievementId, tasks);
         if (wasUpdated) {
           updatedCount++;
           console.log(`✅ Achievement ${achievementId} was updated/unlocked`);

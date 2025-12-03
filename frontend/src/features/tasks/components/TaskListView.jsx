@@ -1,6 +1,6 @@
 // TaskListView - Equivalent to the task list display in frmMain.cs
 // Shows tasks grouped by date with the same visual style
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTasks } from '../hooks/useTasks';
 import { Check, Calendar, List } from 'lucide-react';
 import Loading from '../../../ui/loading';
@@ -53,7 +53,7 @@ const TaskListView = () => {
     switch (priorityName?.toLowerCase()) {
       case 'alta': return 'border-red-500';
       case 'media': return 'border-orange-500';
-      case 'baja': return 'border-green-500';
+      case 'baja': return 'border-primary';
       default: return 'border-gray-500';
     }
   };
@@ -84,7 +84,7 @@ const TaskListView = () => {
   }
 
   return (
-    <div className="min-h-screen bg-green-50 p-6">
+    <div className="min-h-screen bg-background p-6">
       {/* Header with view toggle */}
       <div className="max-w-4xl mx-auto mb-6">
         <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm">
@@ -103,22 +103,20 @@ const TaskListView = () => {
             <div className="flex bg-gray-100 rounded-lg p-1">
               <button
                 onClick={() => setViewMode('list')}
-                className={`px-4 py-2 rounded-md transition-colors ${
-                  viewMode === 'list'
-                    ? 'bg-white shadow-sm text-green-600'
-                    : 'text-gray-600 hover:bg-gray-200'
-                }`}
+                className={`px-4 py-2 rounded-md transition-colors ${viewMode === 'list'
+                  ? 'bg-white shadow-sm text-primary'
+                  : 'text-gray-600 hover:bg-gray-200'
+                  }`}
               >
                 <List size={18} className="inline mr-2" />
                 Lista
               </button>
               <button
                 onClick={() => setViewMode('calendar')}
-                className={`px-4 py-2 rounded-md transition-colors ${
-                  viewMode === 'calendar'
-                    ? 'bg-white shadow-sm text-green-600'
-                    : 'text-gray-600 hover:bg-gray-200'
-                }`}
+                className={`px-4 py-2 rounded-md transition-colors ${viewMode === 'calendar'
+                  ? 'bg-white shadow-sm text-primary'
+                  : 'text-gray-600 hover:bg-gray-200'
+                  }`}
               >
                 <Calendar size={18} className="inline mr-2" />
                 Calendario
@@ -128,7 +126,7 @@ const TaskListView = () => {
             {/* Add task button */}
             <button
               onClick={() => setShowAddForm(true)}
-              className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center"
+              className="bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center"
             >
               <Check size={18} className="mr-2" />
               Agregar Tarea
@@ -144,7 +142,7 @@ const TaskListView = () => {
             <div className="text-gray-500 text-lg mb-4">No hay tareas pendientes</div>
             <button
               onClick={() => setShowAddForm(true)}
-              className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
+              className="bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
             >
               Crear tu primera tarea
             </button>
@@ -154,8 +152,8 @@ const TaskListView = () => {
             {Object.entries(groupedTasks).map(([dateGroup, tasksInGroup]) => (
               <div key={dateGroup} className="bg-white rounded-lg shadow-sm overflow-hidden">
                 {/* Date header */}
-                <div className="bg-green-100 px-6 py-3 border-b">
-                  <h2 className="text-lg font-bold text-green-800">{dateGroup}</h2>
+                <div className="bg-primary/10 px-6 py-3 border-b">
+                  <h2 className="text-lg font-bold text-primary">{dateGroup}</h2>
                 </div>
 
                 {/* Tasks in this group */}
@@ -174,9 +172,9 @@ const TaskListView = () => {
                               e.stopPropagation();
                               handleTaskComplete(task.id);
                             }}
-                            className="w-6 h-6 border-2 border-green-500 rounded flex items-center justify-center hover:bg-green-50 transition-colors"
+                            className="w-6 h-6 border-2 border-primary rounded flex items-center justify-center hover:bg-primary/10 transition-colors"
                           >
-                            {task.completed && <Check size={16} className="text-green-600" />}
+                            {task.completed && <Check size={16} className="text-primary" />}
                           </button>
                         </div>
 
@@ -203,10 +201,9 @@ const TaskListView = () => {
                               </span>
                             )}
                             {task.priority && (
-                              <span className={`px-2 py-1 rounded text-xs text-white ${
-                                task.priority.name === 'Alta' ? 'bg-red-500' :
-                                task.priority.name === 'Media' ? 'bg-orange-500' : 'bg-green-500'
-                              }`}>
+                              <span className={`px-2 py-1 rounded text-xs text-white ${task.priority.name === 'Alta' ? 'bg-red-500' :
+                                task.priority.name === 'Media' ? 'bg-orange-500' : 'bg-primary'
+                                }`}>
                                 {task.priority.name}
                               </span>
                             )}

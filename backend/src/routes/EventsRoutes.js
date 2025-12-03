@@ -8,12 +8,12 @@ const eventsController = new EventsController();
 const supabaseAdmin = getSupabaseClient();
 const verifySupabaseToken = buildSupabaseAuthMiddleware(supabaseAdmin);
 
-// Aplicar middleware de autenticación y usuario a todas las rutas
+// Aplicar middleware de autenticación a todas las rutas
 router.use(verifySupabaseToken);
-router.use(eventsController.injectUser);
 
 // Rutas de eventos
 router.get("/", eventsController.getAll.bind(eventsController));
+router.get("/upcoming", eventsController.getUpcoming.bind(eventsController));
 router.get("/date-range", eventsController.getByDateRange.bind(eventsController));
 router.get("/:id", eventsController.getById.bind(eventsController));
 router.post("/", eventsController.create.bind(eventsController));

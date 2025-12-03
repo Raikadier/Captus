@@ -1,8 +1,13 @@
 // TaskForm - Form for creating and editing tasks
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { Button } from '../../../ui/button';
+import { Input } from '../../../ui/input';
+import { Label } from '../../../ui/label';
+import { Textarea } from '../../../ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../ui/select';
 
-const TaskForm = ({ task, categories, priorities, onSubmit, onCancel }) => {
+const TaskForm = ({ task, categories, priorities, onSubmit, onCancel, isModal = false }) => {
   const [formData, setFormData] = useState(() => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -124,7 +129,7 @@ const TaskForm = ({ task, categories, priorities, onSubmit, onCancel }) => {
 
   const getPriorityColor = (priorityId) => {
     switch (priorityId) {
-      case 1: return 'border-green-500 bg-green-50';  // Baja - Verde
+      case 1: return 'border-primary bg-primary/10';  // Baja
       case 2: return 'border-orange-500 bg-orange-50'; // Media - Naranja
       case 3: return 'border-red-500 bg-red-50';      // Alta - Roja
       default: return 'border-gray-500 bg-gray-50';
@@ -132,151 +137,154 @@ const TaskForm = ({ task, categories, priorities, onSubmit, onCancel }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-gray-900">
-          {task ? 'Editar Tarea' : 'Nueva Tarea'}
-        </h3>
-        <button
-          onClick={onCancel}
-          className="text-gray-400 hover:text-gray-600"
-        >
-          <X size={20} />
-        </button>
-      </div>
+    <div className={isModal ? "" : "bg-white rounded-lg shadow-sm border p-6"}>
+      {!isModal && (
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg font-semibold text-gray-900">
+            {task ? 'Editar Tarea' : 'Nueva Tarea'}
+          </h3>
+          <button
+            onClick={onCancel}
+            className="text-gray-400 hover:text-gray-600"
+          >
+            <X size={20} />
+          </button>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Title */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Título *
-          </label>
-          <input
-            type="text"
+          <Label className="mb-2 block">Título *</Label>
+          <Input
             value={formData.title}
             onChange={(e) => handleInputChange('title', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
             placeholder="Ingresa el título de la tarea"
             required
+            className="bg-background"
           />
         </div>
 
         {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Descripción
-          </label>
-          <textarea
+          <Label className="mb-2 block">Descripción</Label>
+          <Textarea
             value={formData.description}
             onChange={(e) => handleInputChange('description', e.target.value)}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
             placeholder="Describe la tarea (opcional)"
+            className="bg-background"
           />
         </div>
 
         {/* Due Date */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Fecha límite
-          </label>
-          <input
+          <Label className="mb-2 block">Fecha límite</Label>
+          <Input
             type="date"
             value={formData.due_date}
             onInput={(e) => handleInputChange('due_date', e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+            className="bg-background"
           />
           {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
         </div>
 
         {/* Quick date buttons */}
         <div className="flex gap-2 mb-4 flex-wrap">
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="sm"
             onClick={handleToday}
-            className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded text-sm transition-colors"
             title="Establecer para hoy"
           >
             Hoy
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="outline"
+            size="sm"
             onClick={handleTomorrow}
-            className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded text-sm transition-colors"
             title="Establecer para mañana"
           >
             Mañana
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="outline"
+            size="sm"
             onClick={handleWeekend}
-            className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded text-sm transition-colors"
             title="Establecer para el fin de semana"
           >
             Fin de semana
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="outline"
+            size="sm"
             onClick={handleNextWeek}
-            className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded text-sm transition-colors"
             title="Establecer para la próxima semana"
           >
             Próxima semana
-          </button>
+          </Button>
         </div>
 
         {/* Priority and Category */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Prioridad
-            </label>
-            <select
-              value={formData.priority_id}
-              onChange={(e) => handleInputChange('priority_id', e.target.value ? parseInt(e.target.value) : 1)}
-              className={`w-full px-3 py-2 border-2 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 ${getPriorityColor(formData.priority_id)}`}
+            <Label className="mb-2 block">Prioridad</Label>
+            <Select
+              value={formData.priority_id.toString()}
+              onValueChange={(value) => handleInputChange('priority_id', parseInt(value))}
             >
-              {priorities.map((priority) => (
-                <option key={`priority-${priority.id}`} value={priority.id}>
-                  {priority.name}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className={`w-full ${getPriorityColor(formData.priority_id)}`}>
+                <SelectValue placeholder="Selecciona prioridad" />
+              </SelectTrigger>
+              <SelectContent>
+                {priorities.map((priority) => (
+                  <SelectItem key={`priority-${priority.id}`} value={priority.id.toString()}>
+                    {priority.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Categoría
-            </label>
-            <select
-              value={formData.category_id}
-              onChange={(e) => handleInputChange('category_id', e.target.value ? parseInt(e.target.value) : 6)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+            <Label className="mb-2 block">Categoría</Label>
+            <Select
+              value={formData.category_id.toString()}
+              onValueChange={(value) => handleInputChange('category_id', parseInt(value))}
             >
-              {categories.map((category) => (
-                <option key={`category-${category.id}`} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Selecciona categoría" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((category) => (
+                  <SelectItem key={`category-${category.id}`} value={category.id.toString()}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
         {/* Action buttons */}
         <div className="flex justify-end space-x-3 pt-4">
-          <button
+          <Button
             type="button"
+            variant="outline"
             onClick={onCancel}
-            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
           >
             Cancelar
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground"
           >
             {task ? 'Actualizar' : 'Crear'} Tarea
-          </button>
+          </Button>
         </div>
       </form>
     </div>

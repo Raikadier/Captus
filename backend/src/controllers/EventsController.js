@@ -1,37 +1,33 @@
 import { EventsService } from "../services/EventsService.js";
-
-const eventsService = new EventsService();
+import EventsRepository from "../repositories/EventsRepository.js";
 import NotificationService from '../services/NotificationService.js';
 
 export class EventsController {
   constructor() {
-    this.injectUser = (req, res, next) => {
-      if (req.user) {
-        eventsService.setCurrentUser(req.user);
-      }
-      next();
-    };
+    this.eventsRepository = new EventsRepository();
+    this.eventsService = new EventsService(this.eventsRepository);
   }
 
   async getAll(req, res) {
-    const result = await eventsService.getAll();
+    const result = await this.eventsService.getAll(req.user.id);
     res.status(result.success ? 200 : 401).json(result);
   }
 
   async getById(req, res) {
     const { id } = req.params;
-    const result = await eventsService.getById(parseInt(id));
+    const result = await this.eventsService.getById(parseInt(id), req.user.id);
     res.status(result.success ? 200 : 404).json(result);
   }
 
   async getByDateRange(req, res) {
     const { startDate, endDate } = req.query;
-    const result = await eventsService.getByDateRange(startDate, endDate);
+    const result = await this.eventsService.getByDateRange(startDate, endDate, req.user.id);
     res.status(result.success ? 200 : 400).json(result);
   }
 
   async create(req, res) {
-    const result = await eventsService.create(req.body);
+    // Pass full user object for email notifications
+    const result = await this.eventsService.create(req.body, req.user);
 
     if (result.success) {
       await NotificationService.notify({
@@ -50,18 +46,26 @@ export class EventsController {
   async update(req, res) {
     const { id } = req.params;
     const eventData = { ...req.body, id: parseInt(id) };
-    const result = await eventsService.update(eventData);
+    // Pass full user object for email notifications
+    const result = await this.eventsService.update(eventData, req.user);
     res.status(result.success ? 200 : 400).json(result);
   }
 
   async delete(req, res) {
     const { id } = req.params;
-    const result = await eventsService.delete(parseInt(id));
+    const result = await this.eventsService.delete(parseInt(id), req.user.id);
+    res.status(result.success ? 200 : 400).json(result);
+  }
+
+  async getUpcoming(req, res) {
+    const { limit } = req.query;
+    const result = await this.eventsService.getUpcoming({ limit }, req.user.id);
     res.status(result.success ? 200 : 400).json(result);
   }
 
   async checkUpcomingEvents(req, res) {
-    await eventsService.checkUpcomingEvents();
+    // Pass full user object
+    await this.eventsService.checkUpcomingEvents(req.user);
     res.status(200).json({ success: true, message: "Upcoming events checked" });
   }
 }

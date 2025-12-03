@@ -5,17 +5,21 @@ import PriorityRepository from "../repositories/PriorityRepository.js";
 import CategoryRepository from "../repositories/CategoryRepository.js";
 import StatisticsRepository from "../repositories/StatisticsRepository.js";
 import { OperationResult } from "../shared/OperationResult.js";
-import { requireSupabaseClient } from "../lib/supabaseAdmin.js";
 import nodemailer from 'nodemailer';
 
-const taskRepository = new TaskRepository();
-const subTaskRepository = new SubTaskRepository();
-const priorityRepository = new PriorityRepository();
-const categoryRepository = new CategoryRepository();
-const statisticsRepository = new StatisticsRepository();
-
 export class TaskService {
-  constructor() {
+  constructor(
+    taskRepo,
+    subTaskRepo,
+    priorityRepo,
+    categoryRepo,
+    statisticsRepo
+  ) {
+    this.taskRepository = taskRepo || new TaskRepository();
+    this.subTaskRepository = subTaskRepo || new SubTaskRepository();
+    this.priorityRepository = priorityRepo || new PriorityRepository();
+    this.categoryRepository = categoryRepo || new CategoryRepository();
+    this.statisticsRepository = statisticsRepo || new StatisticsRepository();
     this.currentUser = null;
   }
 
@@ -82,7 +86,7 @@ export class TaskService {
         task.creationDate = new Date();
       }
 
-      const savedTask = await taskRepository.save(taskWithUser);
+      const savedTask = await this.taskRepository.save(taskWithUser);
       if (!savedTask) {
         return new OperationResult(false, "Error al guardar la tarea.");
       }
@@ -113,7 +117,7 @@ export class TaskService {
       const validation = this.validateTaskId(id);
       if (!validation.success) return validation;
 
-      const existingTask = await taskRepository.getById(id);
+      const existingTask = await this.taskRepository.getById(id);
       const userId = this.resolveUserId(userContext);
       if (!userId || !existingTask || existingTask.id_User !== userId) {
         return new OperationResult(false, "Tarea no encontrada.");
@@ -122,7 +126,7 @@ export class TaskService {
       // Eliminar subtareas asociadas primero
       await this.deleteSubTasksByParentTask(id);
 
-      await taskRepository.delete(id);
+      await this.taskRepository.delete(id);
 
       return new OperationResult(true, "¡Tarea eliminada exitosamente! La tarea y todas sus subtareas han sido removidas permanentemente de tu lista.");
     } catch (error) {
@@ -132,9 +136,9 @@ export class TaskService {
 
   async deleteSubTasksByParentTask(taskId) {
     try {
-      const subTasks = await subTaskRepository.getAllByTaskId(taskId);
+      const subTasks = await this.subTaskRepository.getAllByTaskId(taskId);
       for (const subTask of subTasks) {
-        await subTaskRepository.delete(subTask.id_SubTask);
+        await this.subTaskRepository.delete(subTask.id_SubTask);
       }
     } catch (error) {
       console.error("Error eliminando subtareas:", error);
@@ -147,7 +151,7 @@ export class TaskService {
         return new OperationResult(false, "ID de usuario inválido.");
       }
 
-      await taskRepository.deleteByUser(userId);
+      await this.taskRepository.deleteByUser(userId);
       return new OperationResult(true, "Tareas del usuario eliminadas exitosamente.");
     } catch (error) {
       return new OperationResult(false, `Error al eliminar tareas del usuario: ${error.message}`);
@@ -160,7 +164,7 @@ export class TaskService {
         return new OperationResult(false, "ID de categoría inválido.");
       }
 
-      await taskRepository.deleteByCategory(categoryId);
+      await this.taskRepository.deleteByCategory(categoryId);
       return new OperationResult(true, "Tareas de la categoría eliminadas exitosamente.");
     } catch (error) {
       return new OperationResult(false, `Error al eliminar tareas de la categoría: ${error.message}`);
@@ -172,7 +176,7 @@ export class TaskService {
       const userId = this.resolveUserId(userContext);
       if (!userId) return [];
 
-      let tasks = await taskRepository.getAllByUserId(userId);
+      let tasks = await this.taskRepository.getAllByUserId(userId);
 
       if (filter) {
         tasks = tasks.filter(filter);
@@ -244,7 +248,7 @@ export class TaskService {
       const userId = this.resolveUserId(userContext);
       if (!userId) return new OperationResult(false, "Usuario no autenticado.");
 
-      const tasks = await taskRepository.getCompletedToday(userId);
+      const tasks = await this.taskRepository.getCompletedToday(userId);
       return new OperationResult(true, "Tareas completadas hoy obtenidas exitosamente.", tasks);
     } catch (error) {
       return new OperationResult(false, `Error al obtener tareas completadas hoy: ${error.message}`);
@@ -259,7 +263,7 @@ export class TaskService {
       const includeCompleted = Boolean(options.includeCompleted);
       const limit = options.limit || 10;
 
-      const tasks = await taskRepository.getAllByUserId(userId);
+      const tasks = await this.taskRepository.getAllByUserId(userId);
       const filtered = includeCompleted ? tasks : tasks.filter((task) => !task.state && !task.completed);
 
       // Order by due_date ascending when present
@@ -280,7 +284,7 @@ export class TaskService {
       const validation = this.validateTaskId(id);
       if (!validation.success) return validation;
 
-      const task = await taskRepository.getById(id);
+      const task = await this.taskRepository.getById(id);
       const userId = this.resolveUserId(userContext);
       if (task && userId && task.id_User === userId) {
         return new OperationResult(true, "Tarea encontrada.", task);
@@ -302,7 +306,7 @@ export class TaskService {
       const validation = this.validateTask(task, true); // isUpdate = true
       if (!validation.success) return validation;
 
-      const existingTask = await taskRepository.getById(task.id_Task);
+      const existingTask = await this.taskRepository.getById(task.id_Task);
       if (!existingTask) {
         return new OperationResult(false, "Tarea no encontrada.");
       }
@@ -321,7 +325,7 @@ export class TaskService {
         await this.markAllSubTasksAsCompleted(task.id_Task);
       }
 
-      const updated = await taskRepository.update(task);
+      const updated = await this.taskRepository.update(task);
 
       if (updated) {
         // Load relations for email notification
@@ -343,11 +347,11 @@ export class TaskService {
 
   async markAllSubTasksAsCompleted(taskId) {
     try {
-      const subTasks = await subTaskRepository.getAllByTaskId(taskId);
+      const subTasks = await this.subTaskRepository.getAllByTaskId(taskId);
       for (const subTask of subTasks) {
         if (!subTask.state) {
           subTask.state = true;
-          await subTaskRepository.update(subTask);
+          await this.subTaskRepository.update(subTask);
         }
       }
     } catch (error) {
@@ -360,7 +364,7 @@ export class TaskService {
       const userId = this.resolveUserId(userContext);
       if (!userId) return new OperationResult(false, "Usuario no autenticado.");
 
-      const tasks = await taskRepository.getOverdueByUser(userId);
+      const tasks = await this.taskRepository.getOverdueByUser(userId);
       return new OperationResult(true, "Tareas vencidas obtenidas exitosamente.", tasks);
     } catch (error) {
       return new OperationResult(false, `Error al obtener tareas vencidas: ${error.message}`);
@@ -375,7 +379,7 @@ export class TaskService {
       const userId = this.resolveUserId(userContext);
       if (!userId) return new OperationResult(false, "Usuario no autenticado.");
 
-      const task = await taskRepository.getById(taskId);
+      const task = await this.taskRepository.getById(taskId);
       if (!task || task.id_User !== userId) {
         return new OperationResult(false, "Tarea no encontrada.");
       }
@@ -391,7 +395,7 @@ export class TaskService {
 
       // Check if any subtasks are overdue (if trying to complete parent task)
       if (state) {
-        const subTasks = await subTaskRepository.getAllByTaskId(taskId);
+        const subTasks = await this.subTaskRepository.getAllByTaskId(taskId);
         const hasOverdueSubTasks = subTasks.some(subTask => {
           if (subTask.endDate) {
             const now = new Date();
@@ -512,7 +516,7 @@ export class TaskService {
 
     try {
       if (priorityText) {
-        const priorities = await priorityRepository.getAll();
+        const priorities = await this.priorityRepository.getAll();
         const priority = priorities.find((p) => p.name.toLowerCase() === priorityText.toLowerCase());
         if (priority) {
           priorityId = priority.id_Priority;
@@ -520,7 +524,7 @@ export class TaskService {
       }
 
       if (categoryText) {
-        const categories = await categoryRepository.getByUser(userId);
+        const categories = await this.categoryRepository.getByUser(userId);
         const category = categories.find((c) => c.name.toLowerCase() === categoryText.toLowerCase());
         if (category) {
           categoryId = category.id_Category;
@@ -537,7 +541,7 @@ export class TaskService {
     try {
       if (task.id_Category) {
         try {
-          task.Category = await categoryRepository.getById(task.id_Category);
+          task.Category = await this.categoryRepository.getById(task.id_Category);
         } catch (error) {
           console.error("Error cargando categoría de tarea:", error);
           task.Category = null;
@@ -546,7 +550,7 @@ export class TaskService {
 
       if (task.id_Priority) {
         try {
-          task.Priority = await priorityRepository.getById(task.id_Priority);
+          task.Priority = await this.priorityRepository.getById(task.id_Priority);
         } catch (error) {
           console.error("Error cargando prioridad de tarea:", error);
           task.Priority = null;

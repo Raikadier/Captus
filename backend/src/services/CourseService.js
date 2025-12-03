@@ -3,9 +3,9 @@ import EnrollmentRepository from '../repositories/EnrollmentRepository.js';
 import crypto from 'crypto';
 
 export default class CourseService {
-  constructor() {
-    this.courseRepo = new CourseRepository();
-    this.enrollmentRepo = new EnrollmentRepository();
+  constructor(courseRepo, enrollmentRepo) {
+    this.courseRepo = courseRepo || new CourseRepository();
+    this.enrollmentRepo = enrollmentRepo || new EnrollmentRepository();
   }
 
   async createCourse(data, teacherId) {
@@ -30,9 +30,22 @@ export default class CourseService {
 
   async getCoursesForUser(userId, role) {
     if (role === 'teacher') {
-      return await this.courseRepo.findByTeacher(userId);
+      const courses = await this.courseRepo.findByTeacher(userId);
+      // Transform data for teacher view (add counts)
+      return courses.map(course => ({
+        ...course,
+        students: course.enrollments?.[0]?.count || 0,
+        pendingTasks: 0 // Placeholder as per original logic
+      }));
     } else {
-      return await this.courseRepo.findByStudent(userId);
+      const enrollments = await this.courseRepo.findByStudent(userId);
+      // Transform data for student view
+      return enrollments.map(item => ({
+        ...item.courses,
+        professor: item.courses?.teacher?.name || 'Profesor',
+        progress: 0,
+        enrolled_at: item.enrolled_at
+      }));
     }
   }
 
@@ -65,5 +78,22 @@ export default class CourseService {
     if (course.teacher_id !== teacherId) throw new Error('No tienes permiso para eliminar este curso');
 
     return await this.courseRepo.delete(courseId);
+  }
+
+  async getCourseGrades(courseId, teacherId) {
+    const course = await this.courseRepo.getById(courseId);
+    if (!course) throw new Error('Curso no encontrado');
+    if (course.teacher_id !== teacherId) throw new Error('No tienes permiso para descargar las notas de este curso');
+
+    // Get enrollments with student details
+    const enrollments = await this.enrollmentRepo.getCourseStudents(courseId);
+
+    // Map to a simpler structure
+    return enrollments.map(e => ({
+      studentName: e.name || 'Estudiante',
+      studentEmail: e.email || 'N/A',
+      grade: e.grade || 0, // Ensure repository returns grade
+      enrolledAt: e.enrolled_at
+    }));
   }
 }

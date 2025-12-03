@@ -1,8 +1,25 @@
 import SubmissionService from '../services/SubmissionService.js';
+import SubmissionRepository from '../repositories/SubmissionRepository.js';
+import AssignmentRepository from '../repositories/AssignmentRepository.js';
+import CourseRepository from '../repositories/CourseRepository.js';
+import EnrollmentRepository from '../repositories/EnrollmentRepository.js';
+import AcademicGroupRepository from '../repositories/AcademicGroupRepository.js';
 
 export class SubmissionController {
   constructor() {
-    this.service = new SubmissionService();
+    const submissionRepo = new SubmissionRepository();
+    const assignmentRepo = new AssignmentRepository();
+    const courseRepo = new CourseRepository();
+    const enrollmentRepo = new EnrollmentRepository();
+    const groupRepo = new AcademicGroupRepository();
+
+    this.service = new SubmissionService(
+      submissionRepo,
+      assignmentRepo,
+      courseRepo,
+      enrollmentRepo,
+      groupRepo
+    );
   }
 
   async submit(req, res) {
@@ -34,6 +51,16 @@ export class SubmissionController {
       const { grade, feedback } = req.body;
       const teacherId = req.user.id;
       const result = await this.service.gradeSubmission(id, grade, feedback, teacherId);
+      res.json(result);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+
+  async getPendingReviews(req, res) {
+    try {
+      const teacherId = req.user.id;
+      const result = await this.service.getPendingReviews(teacherId);
       res.json(result);
     } catch (error) {
       res.status(400).json({ error: error.message });

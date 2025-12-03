@@ -14,6 +14,7 @@ router.use(verifySupabaseToken);
 router.use(injectUserRole);
 
 router.post('/submit', controller.submit.bind(controller));
+router.get('/pending', requireTeacherRole, controller.getPendingReviews.bind(controller));
 router.get('/assignment/:id', controller.getByAssignment.bind(controller)); // Teacher gets all, Student gets theirs
 router.put('/grade/:id', requireTeacherRole, controller.grade.bind(controller));
 

@@ -1,9 +1,9 @@
 import { useState, useCallback } from 'react';
-import { useAuth } from '../context/AuthContext';
+// import { useAuth } from './useAuth';
 import apiClient from '../shared/api/client';
 
 export function useSubmissions() {
-  const { session } = useAuth();
+  // const { session } = useAuth(); // session not needed for client calls
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -18,7 +18,7 @@ export function useSubmissions() {
     } finally {
       setLoading(false);
     }
-  }, [session]);
+  }, []);
 
   const submitAssignment = async (data) => {
     // data: { assignment_id, file_url, group_id }
@@ -27,10 +27,10 @@ export function useSubmissions() {
       const response = await apiClient.post('/submissions/submit', data);
       return response.data;
     } catch (err) {
-        // apiClient throws on error, but we want to catch it to rethrow or handle specific errors if needed
-        // The original code was throwing `resJson.error`. apiClient error might have `error.response.data.error`.
-        const message = err.response?.data?.error || err.message || 'Error submitting assignment';
-        throw new Error(message);
+      // apiClient throws on error, but we want to catch it to rethrow or handle specific errors if needed
+      // The original code was throwing `resJson.error`. apiClient error might have `error.response.data.error`.
+      const message = err.response?.data?.error || err.message || 'Error submitting assignment';
+      throw new Error(message);
     } finally {
       setLoading(false);
     }

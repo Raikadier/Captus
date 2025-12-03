@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '../../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Eye, EyeOff, GraduationCap, User } from 'lucide-react';
 import { supabase } from '../../../shared/api/supabase';
@@ -57,6 +57,7 @@ const LoginForm = () => {
         }
       }
     } catch (err) {
+      console.error(err);
       setError('Ocurrió un error inesperado');
     } finally {
       setLoading(false);
@@ -113,11 +114,10 @@ const LoginForm = () => {
                   <button
                     type="button"
                     onClick={() => setUserRole('student')}
-                    className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
-                      userRole === 'student'
-                        ? 'border-primary bg-primary/10'
-                        : 'border-gray-200 bg-white hover:border-gray-300'
-                    }`}
+                    className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${userRole === 'student'
+                      ? 'border-primary bg-primary/10'
+                      : 'border-gray-200 bg-white hover:border-gray-300'
+                      }`}
                   >
                     <GraduationCap className={`h-6 w-6 ${userRole === 'student' ? 'text-primary' : 'text-gray-400'}`} />
                     <span className={`text-sm font-medium ${userRole === 'student' ? 'text-primary' : 'text-gray-700'}`}>
@@ -127,11 +127,10 @@ const LoginForm = () => {
                   <button
                     type="button"
                     onClick={() => setUserRole('teacher')}
-                    className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
-                      userRole === 'teacher'
-                        ? 'border-primary bg-primary/10'
-                        : 'border-gray-200 bg-white hover:border-gray-300'
-                    }`}
+                    className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${userRole === 'teacher'
+                      ? 'border-primary bg-primary/10'
+                      : 'border-gray-200 bg-white hover:border-gray-300'
+                      }`}
                   >
                     <User className={`h-6 w-6 ${userRole === 'teacher' ? 'text-primary' : 'text-gray-400'}`} />
                     <span className={`text-sm font-medium ${userRole === 'teacher' ? 'text-primary' : 'text-gray-700'}`}>

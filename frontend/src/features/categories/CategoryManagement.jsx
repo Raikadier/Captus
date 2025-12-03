@@ -172,7 +172,7 @@ const CategoryManagement = () => {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Tag className="text-green-600" size={24} />
+            <Tag className="text-primary" size={24} />
             Gestión de Categorías
           </h2>
           <p className="text-gray-600 mt-1">
@@ -181,7 +181,7 @@ const CategoryManagement = () => {
         </div>
         <Button
           onClick={() => setShowForm(true)}
-          className="bg-green-600 hover:bg-green-700"
+          className="bg-primary hover:bg-primary/90"
         >
           <Plus size={18} className="mr-2" />
           Nueva Categoría
@@ -216,7 +216,7 @@ const CategoryManagement = () => {
               <Button
                 type="submit"
                 disabled={saving}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-primary hover:bg-primary/90"
               >
                 {saving ? (
                   'Guardando...'
@@ -254,7 +254,7 @@ const CategoryManagement = () => {
             </p>
             <Button
               onClick={() => setShowForm(true)}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-primary hover:bg-primary/90"
             >
               <Plus size={18} className="mr-2" />
               Crear Primera Categoría
@@ -265,7 +265,7 @@ const CategoryManagement = () => {
             <Card key={category.id_Category} className="p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
                     <Tag className="text-white" size={18} />
                   </div>
                   <div className="flex-1">
@@ -277,11 +277,10 @@ const CategoryManagement = () => {
                       {getCategoryStats(category.id_Category).totalTasks > 0 && (
                         <Badge
                           variant={getCategoryStats(category.id_Category).completionRate === 100 ? "default" : "outline"}
-                          className={`text-xs ${
-                            getCategoryStats(category.id_Category).completionRate === 100
+                          className={`text-xs ${getCategoryStats(category.id_Category).completionRate === 100
                               ? "bg-green-100 text-green-800 border-green-200"
                               : "text-gray-600 border-gray-200"
-                          }`}
+                            }`}
                         >
                           {getCategoryStats(category.id_Category).completionRate}% completado
                         </Badge>
@@ -311,7 +310,7 @@ const CategoryManagement = () => {
                     variant="ghost"
                     size="sm"
                     onClick={() => handleEdit(category)}
-                    className="text-gray-600 hover:text-green-600"
+                    className="text-gray-600 hover:text-primary"
                   >
                     <Edit2 size={16} />
                   </Button>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronRight, Globe, Lock, MessageSquare, Palette, Shield, User, Bell, Eye, EyeOff, Check, Sparkles, Award, Star, Flame, Zap, Crown, Trophy, Target, CheckCircle, Lock as LockIcon } from 'lucide-react'
+import { ChevronRight, Globe, Lock, MessageSquare, Palette, Shield, User, Bell, Eye, EyeOff, Check, Sparkles, Award, Star, Flame, Zap, Crown, Trophy, Target, CheckCircle, Lock as LockIcon, Mail, Phone, Save, Loader2 } from 'lucide-react'
 import { Button } from '../../ui/button'
 import { Card } from '../../ui/card'
 import { Label } from '../../ui/label'
@@ -13,17 +13,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../ui/dialog'
-import { useTheme } from '../../context/themeContext'
-import { useAuth } from '../../context/AuthContext'
-import { supabase } from '../../shared/api/supabase'
-import apiClient from '../../shared/api/client'
-import Loading from '../../ui/loading'
-import { toast } from 'sonner'
-import { useAchievementsContext } from '../../context/AchievementContext'
-import { Progress } from '../../ui/progress'
 import { Badge } from '../../ui/badge'
 import { Filter } from 'lucide-react'
 import { achievements as achievementsConfig, difficultyOrder, difficultyLabels, difficultyColors } from '../../shared/achievementsConfig'
+import { FadeIn, StaggerContainer, StaggerItem } from '../../shared/components/animations/MotionComponents'
+import { useTheme } from '../../context/themeContext'
+// import { useAuth } from '../../hooks/useAuth'
+import { useAchievementsContext } from '../../hooks/useAchievementsContext'
+import apiClient from '../../shared/api/client'
+import { toast } from 'sonner'
+import Loading from '../../ui/loading'
+import { supabase } from '../../shared/api/supabase'
+import { Progress } from '../../ui/progress'
 
 function getCurrentDate() {
   const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
@@ -75,7 +76,7 @@ function SettingsMenuItem({
 
 export default function SettingsPage() {
   const { darkMode, toggleTheme, compactView, setCompactView, fontSize, changeFontSize, accentColor, changeAccentColor } = useTheme()
-  const { user } = useAuth()
+  // const { user } = useAuth() // Unused
   const { userAchievements, loading: achievementsLoading, error: achievementsError, refreshAchievements } = useAchievementsContext()
 
   const [activeSection, setActiveSection] = useState('perfil')
@@ -108,10 +109,23 @@ export default function SettingsPage() {
   const [telegramStatus, setTelegramStatus] = useState({ connected: false, username: null })
   const [telegramCode, setTelegramCode] = useState(null)
   const [telegramLoading, setTelegramLoading] = useState(false)
+  const fileInputRef = React.useRef(null)
+  const [uploadingPhoto, setUploadingPhoto] = useState(false)
+
+  // Notification Preferences State
+  const [notificationPrefs, setNotificationPrefs] = useState({
+    email_enabled: true,
+    whatsapp_enabled: false,
+    email: '',
+    whatsapp: ''
+  })
+  // const [notificationsLoading, setNotificationsLoading] = useState(false)
+  const [notificationsSaving, setNotificationsSaving] = useState(false)
 
   useEffect(() => {
     if (activeSection === 'notificaciones') {
       fetchTelegramStatus()
+      fetchNotificationPreferences()
     }
   }, [activeSection])
 
@@ -134,6 +148,7 @@ export default function SettingsPage() {
         setTelegramCode(response.data.data)
       }
     } catch (error) {
+      console.error(error)
       toast.error('Error al generar código de vinculación')
     } finally {
       setTelegramLoading(false)
@@ -148,9 +163,43 @@ export default function SettingsPage() {
       setTelegramCode(null)
       toast.success('Cuenta de Telegram desvinculada')
     } catch (error) {
+      console.error(error)
       toast.error('Error al desvincular cuenta')
     } finally {
       setTelegramLoading(false)
+    }
+  }
+
+  const fetchNotificationPreferences = async () => {
+    // setNotificationsLoading(true)
+    try {
+      const response = await apiClient.get('/notifications/preferences')
+      const data = response.data
+      // Ensure we have default values if data is missing
+      setNotificationPrefs({
+        email_enabled: data.email_enabled ?? true,
+        whatsapp_enabled: data.whatsapp_enabled ?? false,
+        email: data.email || '',
+        whatsapp: data.whatsapp || ''
+      })
+    } catch (error) {
+      console.error('Error fetching preferences', error)
+      // Don't show error toast on initial load to avoid spamming if endpoint doesn't exist yet
+    } finally {
+      // setNotificationsLoading(false)
+    }
+  }
+
+  const handleSaveNotificationPreferences = async () => {
+    setNotificationsSaving(true)
+    try {
+      await apiClient.put('/notifications/preferences', notificationPrefs)
+      toast.success('Preferencias de notificación actualizadas')
+    } catch (error) {
+      console.error('Error updating preferences', error)
+      toast.error('Error al guardar preferencias')
+    } finally {
+      setNotificationsSaving(false)
     }
   }
 
@@ -274,6 +323,57 @@ export default function SettingsPage() {
       toast.error(message)
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0]
+    if (!file) return
+
+    // Validar tipo y tamaño
+    if (!file.type.startsWith('image/')) {
+      toast.error('Por favor selecciona un archivo de imagen')
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) { // 5MB
+      toast.error('La imagen no debe superar los 5MB')
+      return
+    }
+
+    setUploadingPhoto(true)
+    try {
+      const { data: sessionData } = await supabase.auth.getSession()
+      const userId = sessionData?.session?.user?.id
+      if (!userId) throw new Error('No user session')
+
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${userId}-${Math.random()}.${fileExt}`
+      const filePath = `${fileName}`
+
+      // Upload to Supabase Storage 'avatars' bucket
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file)
+
+      if (uploadError) throw uploadError
+
+      // Get Public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath)
+
+      // Update User Profile with new avatar_url
+      await apiClient.put(`/users/${userId}`, { avatar_url: publicUrl })
+
+      // Update local state
+      setUserData(prev => ({ ...prev, avatar_url: publicUrl }))
+      toast.success('Foto de perfil actualizada')
+
+    } catch (error) {
+      console.error('Error uploading photo:', error)
+      toast.error('Error al subir la foto')
+    } finally {
+      setUploadingPhoto(false)
     }
   }
 
@@ -408,7 +508,8 @@ export default function SettingsPage() {
           firstName,
           lastName,
           fullName: user.name,
-          createdAt: user.createdAt || user.created_at
+          createdAt: user.createdAt || user.created_at,
+          avatar_url: user.avatar_url
         }
 
         console.log('Setting user data:', userWithSplitName)
@@ -456,17 +557,17 @@ export default function SettingsPage() {
   return (
     <div className={`${darkMode ? 'bg-background' : 'bg-[#F6F7FB]'}`}>
       <div className={`max-w-7xl mx-auto ${compactView ? 'p-4' : 'p-8'} ${compactView ? 'pb-24' : 'pb-8'}`}>
-        <header className={`sticky top-0 ${darkMode ? 'bg-card' : 'bg-white'} rounded-xl shadow-sm ${compactView ? 'p-4' : 'p-6'} mb-6 z-10 animate-in slide-in-from-top duration-300`}>
+        <FadeIn className={`sticky top-0 ${darkMode ? 'bg-card' : 'bg-white'} rounded-xl shadow-sm ${compactView ? 'p-4' : 'p-6'} mb-6 z-10`}>
           <div className="flex justify-between items-center">
             <div>
               <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>⚙️ Configuración</h1>
               <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>{getCurrentDate()}</p>
             </div>
           </div>
-        </header>
+        </FadeIn>
 
         <div className={`grid grid-cols-1 lg:grid-cols-3 ${compactView ? 'gap-4' : 'gap-6'}`}>
-          <div className="lg:col-span-1 animate-in slide-in-from-left duration-500">
+          <FadeIn delay={0.2} className="lg:col-span-1">
             <Card className={`${compactView ? 'p-3' : 'p-4'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
               <nav className={compactView ? 'space-y-1' : 'space-y-2'}>
                 <SettingsMenuItem
@@ -507,9 +608,9 @@ export default function SettingsPage() {
                 />
               </nav>
             </Card>
-          </div>
+          </FadeIn>
 
-          <div className={`lg:col-span-2 ${compactView ? 'space-y-4' : 'space-y-6'} animate-in fade-in slide-in-from-right duration-500`}>
+          <FadeIn delay={0.4} className={`lg:col-span-2 ${compactView ? 'space-y-4' : 'space-y-6'}`}>
 
             {/* PERFIL SECTION */}
             {activeSection === 'perfil' && (
@@ -531,12 +632,39 @@ export default function SettingsPage() {
                 ) : (
                   <div className={compactView ? 'space-y-3' : 'space-y-4'}>
                     <div className="flex items-center space-x-4">
-                      <div className={`${compactView ? 'w-16 h-16' : 'w-20 h-20'} rounded-full overflow-hidden bg-primary flex items-center justify-center`}>
-                        <span className={`text-primary-foreground ${compactView ? 'text-xl' : 'text-2xl'} font-semibold`}>MG</span>
+                      <div className={`${compactView ? 'w-16 h-16' : 'w-20 h-20'} rounded-full overflow-hidden bg-primary flex items-center justify-center relative group`}>
+                        {userData?.avatar_url ? (
+                          <img
+                            src={userData.avatar_url}
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span className={`text-primary-foreground ${compactView ? 'text-xl' : 'text-2xl'} font-semibold`}>
+                            {userData?.firstName?.[0]}{userData?.lastName?.[0]}
+                          </span>
+                        )}
+                        {uploadingPhoto && (
+                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                            <Loader2 className="w-6 h-6 text-white animate-spin" />
+                          </div>
+                        )}
                       </div>
                       <div>
-                        <Button variant="outline" size="sm">
-                          Cambiar Foto
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          onChange={handleFileChange}
+                          className="hidden"
+                          accept="image/*"
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={uploadingPhoto}
+                        >
+                          {uploadingPhoto ? 'Subiendo...' : 'Cambiar Foto'}
                         </Button>
                       </div>
                     </div>
@@ -620,8 +748,8 @@ export default function SettingsPage() {
                     {userData?.createdAt && (
                       <div className={`mt-6 text-center ${compactView ? 'py-3' : 'py-4'}`}>
                         <div className={`inline-flex items-center gap-3 px-6 py-3 rounded-full border-2 ${darkMode
-                          ? 'bg-gradient-to-r from-primary/20 to-blue-900/20 border-primary/30'
-                          : 'bg-gradient-to-r from-primary/10 to-blue-50 border-primary/20'
+                          ? 'bg-gradient-to-r from-primary/20 to-primary/10 border-primary/30'
+                          : 'bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20'
                           } backdrop-blur-sm`}>
                           <div className="flex items-center gap-2">
                             <div className={`w-2 h-2 rounded-full bg-primary animate-pulse`}></div>
@@ -642,11 +770,11 @@ export default function SettingsPage() {
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className={`text-sm font-medium ${darkMode ? 'text-blue-300' : 'text-blue-700'
+                            <span className={`text-sm font-medium ${darkMode ? 'text-primary/80' : 'text-primary'
                               }`}>
                               🎉
                             </span>
-                            <div className={`w-2 h-2 rounded-full ${darkMode ? 'bg-blue-400' : 'bg-blue-500'
+                            <div className={`w-2 h-2 rounded-full ${darkMode ? 'bg-primary' : 'bg-primary'
                               } animate-pulse`}></div>
                           </div>
                         </div>
@@ -887,7 +1015,7 @@ export default function SettingsPage() {
                             <Button
                               onClick={generateTelegramCode}
                               disabled={telegramLoading}
-                              className="bg-blue-500 hover:bg-blue-600 text-white"
+                              className="bg-primary hover:bg-primary/90 text-primary-foreground"
                             >
                               {telegramLoading ? 'Generando...' : 'Generar Código de Vinculación'}
                             </Button>
@@ -925,6 +1053,104 @@ export default function SettingsPage() {
                         )}
                       </div>
                     )}
+                  </div>
+
+                  <div className={`p-4 rounded-xl border ${darkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-white border-gray-200'}`}>
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-lg ${darkMode ? 'bg-purple-900/30 text-purple-400' : 'bg-purple-100 text-purple-600'}`}>
+                          <Mail size={24} />
+                        </div>
+                        <div>
+                          <h3 className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Correo Electrónico</h3>
+                          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Recibe resúmenes y alertas importantes
+                          </p>
+                        </div>
+                      </div>
+                      <Switch
+                        checked={notificationPrefs.email_enabled}
+                        onCheckedChange={(checked) => setNotificationPrefs(prev => ({ ...prev, email_enabled: checked }))}
+                      />
+                    </div>
+
+                    {notificationPrefs.email_enabled && (
+                      <div className="pl-14 space-y-3">
+                        <div>
+                          <Label className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            Correo alternativo (opcional)
+                          </Label>
+                          <input
+                            type="email"
+                            value={notificationPrefs.email}
+                            onChange={(e) => setNotificationPrefs(prev => ({ ...prev, email: e.target.value }))}
+                            placeholder="ejemplo@correo.com"
+                            className={`mt-1 w-full px-3 py-2 border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Si se deja vacío, se usará tu correo de cuenta principal.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className={`p-4 rounded-xl border ${darkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-white border-gray-200'}`}>
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-lg ${darkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-600'}`}>
+                          <Phone size={24} />
+                        </div>
+                        <div>
+                          <h3 className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>WhatsApp</h3>
+                          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Recibe alertas urgentes en tu celular
+                          </p>
+                        </div>
+                      </div>
+                      <Switch
+                        checked={notificationPrefs.whatsapp_enabled}
+                        onCheckedChange={(checked) => setNotificationPrefs(prev => ({ ...prev, whatsapp_enabled: checked }))}
+                      />
+                    </div>
+
+                    {notificationPrefs.whatsapp_enabled && (
+                      <div className="pl-14 space-y-3">
+                        <div>
+                          <Label className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            Número de WhatsApp
+                          </Label>
+                          <input
+                            type="tel"
+                            value={notificationPrefs.whatsapp}
+                            onChange={(e) => setNotificationPrefs(prev => ({ ...prev, whatsapp: e.target.value }))}
+                            placeholder="+52 123 456 7890"
+                            className={`mt-1 w-full px-3 py-2 border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Incluye el código de país (ej. +54, +52).
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex justify-end pt-4">
+                    <Button
+                      onClick={handleSaveNotificationPreferences}
+                      disabled={notificationsSaving}
+                      className="bg-primary hover:bg-primary/90"
+                    >
+                      {notificationsSaving ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Guardando...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="mr-2 h-4 w-4" /> Guardar Preferencias
+                        </>
+                      )}
+                    </Button>
                   </div>
                 </div>
               </Card>
@@ -1246,7 +1472,7 @@ export default function SettingsPage() {
               </DialogContent>
             </Dialog>
 
-          </div>
+          </FadeIn>
         </div>
       </div>
     </div>

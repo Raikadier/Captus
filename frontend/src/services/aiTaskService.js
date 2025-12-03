@@ -18,5 +18,25 @@ export const aiTaskService = {
       console.error("Error en aiTaskService.sendMessage:", error);
       throw error;
     }
+  },
+
+  async getConversations() {
+    try {
+      const response = await apiClient.get('/ai/conversations');
+      return response.data;
+    } catch (error) {
+      console.error("Error en aiTaskService.getConversations:", error);
+      throw error;
+    }
+  },
+
+  async getMessages(conversationId) {
+    try {
+      const response = await apiClient.get(`/ai/conversations/${conversationId}/messages`);
+      return response.data;
+    } catch (error) {
+      console.error("Error en aiTaskService.getMessages:", error);
+      throw error;
+    }
   }
 };

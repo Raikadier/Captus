@@ -10,7 +10,6 @@ const verifySupabaseToken = buildSupabaseAuthMiddleware(supabaseAdmin);
 
 // Aplicar middleware de autenticación y usuario a todas las rutas
 router.use(verifySupabaseToken);
-router.use(notesController.injectUser);
 
 // Rutas de notas
 router.get("/", notesController.getAll.bind(notesController));

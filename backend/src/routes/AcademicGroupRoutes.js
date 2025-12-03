@@ -14,6 +14,7 @@ router.use(injectUserRole);
 
 router.post('/', controller.create.bind(controller));
 router.post('/add-member', controller.addMember.bind(controller));
+router.get('/my-groups', controller.getMyGroups.bind(controller));
 router.get('/course/:id', controller.getByCourse.bind(controller));
 
 export default router;
