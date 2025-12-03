@@ -55,8 +55,8 @@ export class UserController {
       const user = await userService.getUserById(userId);
       res.status(200).json({ success: true, data: user });
     } catch (error) {
-        // If user not found in public table, try to sync?
-        // For now, just return error
+      // If user not found in public table, try to sync?
+      // For now, just return error
       res.status(404).json({ success: false, error: error.message });
     }
   }

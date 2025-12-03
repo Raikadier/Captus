@@ -5,7 +5,8 @@
 
 :root {
   /* Base Colors - Light Mode */
-  --background: oklch(0.985 0 0); /* Slightly off-white for better eye comfort */
+  --background: oklch(0.985 0 0);
+  /* Slightly off-white for better eye comfort */
   --foreground: oklch(0.145 0 0);
 
   /* Card & Surfaces */
@@ -38,7 +39,8 @@
   /* Borders & Inputs */
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.55 0.15 145); /* Matches Primary */
+  --ring: oklch(0.55 0.15 145);
+  /* Matches Primary */
 
   /* Charts */
   --chart-1: oklch(0.55 0.15 145);
@@ -47,7 +49,8 @@
   --chart-4: oklch(0.85 0.15 145);
   --chart-5: oklch(0.95 0.15 145);
 
-  --radius: 0.75rem; /* Slightly more rounded for modern feel */
+  --radius: 0.75rem;
+  /* Slightly more rounded for modern feel */
 
   /* Sidebar */
   --sidebar: oklch(1 0 0);
@@ -62,16 +65,19 @@
 
 .dark {
   /* Base Colors - Dark Mode */
-  --background: oklch(0.21 0.04 265); /* Bluish dark (Gray 900) */
+  --background: oklch(0.21 0.04 265);
+  /* Bluish dark (Gray 900) */
   --foreground: oklch(0.985 0 0);
 
-  --card: oklch(0.28 0.04 260); /* Slightly lighter bluish dark (Gray 800) */
+  --card: oklch(0.28 0.04 260);
+  /* Slightly lighter bluish dark (Gray 800) */
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.28 0.04 260);
   --popover-foreground: oklch(0.985 0 0);
 
   /* Brand Colors - Dark Mode */
-  --primary: oklch(0.65 0.15 145); /* Lighter green for dark mode contrast */
+  --primary: oklch(0.65 0.15 145);
+  /* Lighter green for dark mode contrast */
   --primary-foreground: oklch(0.145 0 0);
 
   --secondary: oklch(0.25 0.05 145);
@@ -96,7 +102,8 @@
   --chart-4: oklch(0.35 0.15 145);
   --chart-5: oklch(0.25 0.15 145);
 
-  --sidebar: oklch(0.21 0.04 265); /* Matches background */
+  --sidebar: oklch(0.21 0.04 265);
+  /* Matches background */
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.65 0.15 145);
   --sidebar-primary-foreground: oklch(0.145 0 0);
@@ -107,8 +114,8 @@
 }
 
 @theme inline {
-  --font-sans: 'Geist', 'Geist Fallback';
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -151,6 +158,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground antialiased;
   }

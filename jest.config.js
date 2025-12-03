@@ -1,6 +1,8 @@
 export default {
   testEnvironment: 'node',
   testMatch: ['**/__tests__/**/*.test.js'],
+  extensionsToTreatAsEsm: ['.js'],
+  transform: {},
   collectCoverageFrom: [
     'backend/src/**/*.js',
     '!backend/src/**/*.test.js'
@@ -10,5 +12,6 @@ export default {
   setupFilesAfterEnv: [],
   transformIgnorePatterns: [
     'node_modules/(?!(supabase-js|@supabase)/)'
-  ]
+  ],
+  testRunner: '@jest/test-runner'
 };

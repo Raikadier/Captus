@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { ChevronLeft, ChevronRight, Calendar, Plus, Clock, X, Bell, BellOff, Edit, Trash2 } from 'lucide-react'
 import { useTheme } from '../../context/themeContext'
 import { Button } from '../../ui/button'
@@ -308,11 +308,7 @@ export default function CalendarPage() {
   const [error, setError] = useState(null)
   const { darkMode } = useTheme()
 
-  useEffect(() => {
-    loadData()
-  }, [])
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -339,7 +335,15 @@ export default function CalendarPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    loadData()
+
+    const handleEventUpdate = () => loadData()
+    window.addEventListener('event-update', handleEventUpdate)
+    return () => window.removeEventListener('event-update', handleEventUpdate)
+  }, [loadData])
 
   const getDaysInMonth = (date) => {
     const year = date.getFullYear()

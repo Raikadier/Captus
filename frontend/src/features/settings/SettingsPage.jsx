@@ -56,13 +56,12 @@ function SettingsMenuItem({
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-colors ${
-        active
-          ? 'bg-primary/10 text-primary'
-          : darkMode
-            ? 'text-gray-300 hover:bg-gray-700'
-            : 'text-gray-700 hover:bg-gray-50'
-      }`}
+      className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-colors ${active
+        ? 'bg-primary/10 text-primary'
+        : darkMode
+          ? 'text-gray-300 hover:bg-gray-700'
+          : 'text-gray-700 hover:bg-gray-50'
+        }`}
       type="button"
     >
       <div className="flex items-center space-x-3">
@@ -104,6 +103,56 @@ export default function SettingsPage() {
     career: '',
     bio: ''
   })
+
+  // Telegram state
+  const [telegramStatus, setTelegramStatus] = useState({ connected: false, username: null })
+  const [telegramCode, setTelegramCode] = useState(null)
+  const [telegramLoading, setTelegramLoading] = useState(false)
+
+  useEffect(() => {
+    if (activeSection === 'notificaciones') {
+      fetchTelegramStatus()
+    }
+  }, [activeSection])
+
+  const fetchTelegramStatus = async () => {
+    try {
+      const response = await apiClient.get('/telegram/status')
+      if (response.data.success) {
+        setTelegramStatus(response.data.data)
+      }
+    } catch (error) {
+      console.error('Error fetching Telegram status:', error)
+    }
+  }
+
+  const generateTelegramCode = async () => {
+    setTelegramLoading(true)
+    try {
+      const response = await apiClient.post('/telegram/generate-code')
+      if (response.data.success) {
+        setTelegramCode(response.data.data)
+      }
+    } catch (error) {
+      toast.error('Error al generar código de vinculación')
+    } finally {
+      setTelegramLoading(false)
+    }
+  }
+
+  const unlinkTelegram = async () => {
+    setTelegramLoading(true)
+    try {
+      await apiClient.delete('/telegram/unlink')
+      setTelegramStatus({ connected: false, username: null })
+      setTelegramCode(null)
+      toast.success('Cuenta de Telegram desvinculada')
+    } catch (error) {
+      toast.error('Error al desvincular cuenta')
+    } finally {
+      setTelegramLoading(false)
+    }
+  }
 
   useEffect(() => {
     fetchUserProfile()
@@ -433,6 +482,12 @@ export default function SettingsPage() {
                   onClick={() => setActiveSection('seguridad')}
                 />
                 <SettingsMenuItem
+                  icon={<Bell size={18} />}
+                  label="Notificaciones"
+                  active={activeSection === 'notificaciones'}
+                  onClick={() => setActiveSection('notificaciones')}
+                />
+                <SettingsMenuItem
                   icon={<Palette size={18} />}
                   label="Apariencia"
                   active={activeSection === 'apariencia'}
@@ -476,8 +531,8 @@ export default function SettingsPage() {
                 ) : (
                   <div className={compactView ? 'space-y-3' : 'space-y-4'}>
                     <div className="flex items-center space-x-4">
-                    <div className={`${compactView ? 'w-16 h-16' : 'w-20 h-20'} rounded-full overflow-hidden bg-primary flex items-center justify-center`}>
-                      <span className={`text-primary-foreground ${compactView ? 'text-xl' : 'text-2xl'} font-semibold`}>MG</span>
+                      <div className={`${compactView ? 'w-16 h-16' : 'w-20 h-20'} rounded-full overflow-hidden bg-primary flex items-center justify-center`}>
+                        <span className={`text-primary-foreground ${compactView ? 'text-xl' : 'text-2xl'} font-semibold`}>MG</span>
                       </div>
                       <div>
                         <Button variant="outline" size="sm">
@@ -496,7 +551,7 @@ export default function SettingsPage() {
                           value={formData.firstName}
                           onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
                           placeholder="Tu nombre"
-                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
+                          className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
                         />
                       </div>
                       <div>
@@ -509,7 +564,7 @@ export default function SettingsPage() {
                           value={formData.lastName}
                           onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
                           placeholder="Tu apellido"
-                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
+                          className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
                         />
                       </div>
                     </div>
@@ -522,7 +577,7 @@ export default function SettingsPage() {
                         type="email"
                         value={formData.email}
                         disabled
-                      className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary opacity-60 cursor-not-allowed`}
+                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary opacity-60 cursor-not-allowed`}
                       />
                     </div>
                     <div>
@@ -535,7 +590,7 @@ export default function SettingsPage() {
                         value={formData.career}
                         onChange={(e) => setFormData(prev => ({ ...prev, career: e.target.value }))}
                         placeholder="Ej: Ingeniería de Sistemas"
-                      className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
+                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
                       />
                     </div>
                     <div>
@@ -548,14 +603,14 @@ export default function SettingsPage() {
                         value={formData.bio}
                         onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
                         placeholder="Cuéntanos un poco sobre ti..."
-                      className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
+                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
                       />
                     </div>
                     <div className={compactView ? 'mt-4' : 'mt-6'}>
                       <Button
                         onClick={handleSave}
                         disabled={saving}
-                      className="bg-primary hover:bg-primary/90 disabled:opacity-50"
+                        className="bg-primary hover:bg-primary/90 disabled:opacity-50"
                       >
                         {saving ? 'Guardando...' : 'Guardar Cambios'}
                       </Button>
@@ -564,25 +619,21 @@ export default function SettingsPage() {
                     {/* Fecha de registro decorativa */}
                     {userData?.createdAt && (
                       <div className={`mt-6 text-center ${compactView ? 'py-3' : 'py-4'}`}>
-                        <div className={`inline-flex items-center gap-3 px-6 py-3 rounded-full border-2 ${
-                          darkMode
-                            ? 'bg-gradient-to-r from-primary/20 to-blue-900/20 border-primary/30'
-                            : 'bg-gradient-to-r from-primary/10 to-blue-50 border-primary/20'
-                        } backdrop-blur-sm`}>
+                        <div className={`inline-flex items-center gap-3 px-6 py-3 rounded-full border-2 ${darkMode
+                          ? 'bg-gradient-to-r from-primary/20 to-blue-900/20 border-primary/30'
+                          : 'bg-gradient-to-r from-primary/10 to-blue-50 border-primary/20'
+                          } backdrop-blur-sm`}>
                           <div className="flex items-center gap-2">
                             <div className={`w-2 h-2 rounded-full bg-primary animate-pulse`}></div>
-                            <span className={`text-sm font-medium ${
-                              darkMode ? 'text-primary/80' : 'text-primary'
-                            }`}>
+                            <span className={`text-sm font-medium ${darkMode ? 'text-primary/80' : 'text-primary'
+                              }`}>
                               Miembro desde
                             </span>
                           </div>
-                          <div className={`px-3 py-1 rounded-lg ${
-                            darkMode ? 'bg-gray-800/50' : 'bg-white/70'
-                          } border border-primary/20`}>
-                            <span className={`font-bold ${
-                              darkMode ? 'text-white' : 'text-gray-800'
-                            }`}>
+                          <div className={`px-3 py-1 rounded-lg ${darkMode ? 'bg-gray-800/50' : 'bg-white/70'
+                            } border border-primary/20`}>
+                            <span className={`font-bold ${darkMode ? 'text-white' : 'text-gray-800'
+                              }`}>
                               {new Date(userData.createdAt).toLocaleDateString('es-ES', {
                                 day: 'numeric',
                                 month: 'long',
@@ -591,19 +642,16 @@ export default function SettingsPage() {
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className={`text-sm font-medium ${
-                              darkMode ? 'text-blue-300' : 'text-blue-700'
-                            }`}>
+                            <span className={`text-sm font-medium ${darkMode ? 'text-blue-300' : 'text-blue-700'
+                              }`}>
                               🎉
                             </span>
-                            <div className={`w-2 h-2 rounded-full ${
-                              darkMode ? 'bg-blue-400' : 'bg-blue-500'
-                            } animate-pulse`}></div>
+                            <div className={`w-2 h-2 rounded-full ${darkMode ? 'bg-blue-400' : 'bg-blue-500'
+                              } animate-pulse`}></div>
                           </div>
                         </div>
-                        <p className={`text-xs mt-2 ${
-                          darkMode ? 'text-gray-400' : 'text-gray-500'
-                        }`}>
+                        <p className={`text-xs mt-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'
+                          }`}>
                           ¡Gracias por ser parte de Captus!
                         </p>
                       </div>
@@ -631,7 +679,7 @@ export default function SettingsPage() {
                         value={passwordData.currentPassword}
                         onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
                         placeholder="Ingresa tu contraseña actual"
-                          className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} pr-10 border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
+                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} pr-10 border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
                       />
                       <button
                         type="button"
@@ -652,7 +700,7 @@ export default function SettingsPage() {
                       value={passwordData.newPassword}
                       onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
                       placeholder="Ingresa tu nueva contraseña"
-                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
+                      className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
                     />
                   </div>
                   <div>
@@ -665,7 +713,7 @@ export default function SettingsPage() {
                       value={passwordData.confirmPassword}
                       onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
                       placeholder="Confirma tu nueva contraseña"
-                        className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
+                      className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
                     />
                   </div>
                   <div className={`p-3 ${darkMode ? 'bg-blue-900/20 border-blue-600/30' : 'bg-blue-50 border-blue-200'} border rounded-lg`}>
@@ -678,7 +726,7 @@ export default function SettingsPage() {
                   <Button
                     onClick={handleChangePassword}
                     disabled={changingPassword}
-                      className="bg-primary hover:bg-primary/90 disabled:opacity-50"
+                    className="bg-primary hover:bg-primary/90 disabled:opacity-50"
                   >
                     {changingPassword ? 'Cambiando...' : 'Actualizar Contraseña'}
                   </Button>
@@ -748,11 +796,10 @@ export default function SettingsPage() {
                         <button
                           key={color.name}
                           onClick={() => changeAccentColor(color.name)}
-                          className={`w-10 h-10 rounded-full ${color.bg} flex items-center justify-center transition-all ${
-                            accentColor === color.name
-                              ? `border-2 ${darkMode ? 'border-white' : 'border-gray-900'} ring-2 ${darkMode ? 'ring-gray-700' : 'ring-gray-200'}`
-                              : 'hover:scale-110'
-                          }`}
+                          className={`w-10 h-10 rounded-full ${color.bg} flex items-center justify-center transition-all ${accentColor === color.name
+                            ? `border-2 ${darkMode ? 'border-white' : 'border-gray-900'} ring-2 ${darkMode ? 'ring-gray-700' : 'ring-gray-200'}`
+                            : 'hover:scale-110'
+                            }`}
                         >
                           {accentColor === color.name && <Check size={20} className="text-white" />}
                         </button>
@@ -786,6 +833,99 @@ export default function SettingsPage() {
                     ⚠️ <strong>Advertencia importante:</strong> La eliminación de tu cuenta es <strong>permanente</strong> e <strong>irreversible</strong>.
                     Perderás acceso a todas tus tareas, estadísticas, rachas y datos almacenados. Esta acción no se puede deshacer.
                   </p>
+                </div>
+              </Card>
+            )}
+
+            {/* NOTIFICACIONES SECTION */}
+            {activeSection === 'notificaciones' && (
+              <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
+                <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} ${compactView ? 'mb-4' : 'mb-6'}`}>
+                  Notificaciones
+                </h2>
+
+                <div className={compactView ? 'space-y-4' : 'space-y-6'}>
+                  <div className={`p-4 rounded-xl border ${darkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-blue-50 border-blue-100'}`}>
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-lg ${darkMode ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-100 text-blue-600'}`}>
+                          <MessageSquare size={24} />
+                        </div>
+                        <div>
+                          <h3 className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Telegram Bot</h3>
+                          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Recibe notificaciones de tareas y eventos directamente en Telegram
+                          </p>
+                        </div>
+                      </div>
+                      <Badge variant={telegramStatus.connected ? "success" : "secondary"}>
+                        {telegramStatus.connected ? "Conectado" : "Desconectado"}
+                      </Badge>
+                    </div>
+
+                    {telegramStatus.connected ? (
+                      <div className="mt-4 pl-14">
+                        <p className={`text-sm mb-3 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                          Tu cuenta está vinculada correctamente. Recibirás notificaciones importantes a través del bot.
+                        </p>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={unlinkTelegram}
+                          disabled={telegramLoading}
+                        >
+                          {telegramLoading ? 'Procesando...' : 'Desvincular Cuenta'}
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="mt-4 pl-14">
+                        {!telegramCode ? (
+                          <div>
+                            <p className={`text-sm mb-3 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                              Para vincular tu cuenta, genera un código y envíalo al bot.
+                            </p>
+                            <Button
+                              onClick={generateTelegramCode}
+                              disabled={telegramLoading}
+                              className="bg-blue-500 hover:bg-blue-600 text-white"
+                            >
+                              {telegramLoading ? 'Generando...' : 'Generar Código de Vinculación'}
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="space-y-4">
+                            <div className={`p-4 rounded-lg border-2 border-dashed ${darkMode ? 'border-gray-600 bg-gray-800' : 'border-gray-300 bg-gray-50'}`}>
+                              <p className={`text-center text-sm mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                Envía este código al bot de Telegram:
+                              </p>
+                              <div className={`text-3xl font-mono font-bold text-center tracking-wider ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                                {telegramCode.code}
+                              </div>
+                              <p className={`text-center text-xs mt-2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                                Expira en 15 minutos
+                              </p>
+                            </div>
+                            <div className="flex flex-col gap-2">
+                              <Button
+                                variant="outline"
+                                className="w-full"
+                                onClick={() => window.open(`https://t.me/${import.meta.env.VITE_TELEGRAM_BOT_NAME || 'CaptusBot'}?start=${telegramCode.code}`, '_blank')}
+                              >
+                                Abrir Bot en Telegram
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setTelegramCode(null)}
+                              >
+                                Cancelar
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </Card>
             )}
@@ -917,11 +1057,10 @@ export default function SettingsPage() {
                                 variant={difficultyFilter === difficulty ? 'default' : 'outline'}
                                 size="sm"
                                 onClick={() => setDifficultyFilter(difficulty)}
-                                className={`${
-                                  difficultyFilter === difficulty
-                                    ? `${getDifficultyColor(difficulty).split(' ')[0]} hover:opacity-90 text-white`
-                                    : `${getDifficultyColor(difficulty)} border-opacity-50`
-                                }`}
+                                className={`${difficultyFilter === difficulty
+                                  ? `${getDifficultyColor(difficulty).split(' ')[0]} hover:opacity-90 text-white`
+                                  : `${getDifficultyColor(difficulty)} border-opacity-50`
+                                  }`}
                               >
                                 {difficultyLabels[difficulty]}
                               </Button>
@@ -940,9 +1079,8 @@ export default function SettingsPage() {
                         return (
                           <div key={difficulty}>
                             <div className="flex items-center mb-4">
-                              <div className={`px-3 py-1 rounded-full border font-semibold text-sm ${
-                                getDifficultyColor(difficulty)
-                              }`}>
+                              <div className={`px-3 py-1 rounded-full border font-semibold text-sm ${getDifficultyColor(difficulty)
+                                }`}>
                                 {difficultyLabels[difficulty]}
                               </div>
                               <div className="ml-3 h-px bg-gradient-to-r from-gray-300 to-transparent flex-1"></div>
@@ -960,11 +1098,10 @@ export default function SettingsPage() {
                                 const progressPercent = Math.min((progress / (config?.targetValue || 1)) * 100, 100);
 
                                 return (
-                                  <Card key={achievement.achievementId} className={`p-4 hover:shadow-md transition-shadow relative overflow-hidden ${
-                                    isCompleted
-                                      ? 'border-green-300 bg-gradient-to-br from-green-50 to-emerald-50'
-                                      : 'border-gray-200'
-                                  }`}>
+                                  <Card key={achievement.achievementId} className={`p-4 hover:shadow-md transition-shadow relative overflow-hidden ${isCompleted
+                                    ? 'border-green-300 bg-gradient-to-br from-green-50 to-emerald-50'
+                                    : 'border-gray-200'
+                                    }`}>
                                     {!isCompleted && (
                                       <div className="absolute top-0 left-0 right-0 h-3/4 bg-gradient-to-b from-black/60 via-black/40 to-transparent flex items-start justify-center pt-6 rounded-t-lg">
                                         <div className="bg-gray-800/95 text-white px-3 py-1 rounded-full font-semibold text-xs shadow-lg">

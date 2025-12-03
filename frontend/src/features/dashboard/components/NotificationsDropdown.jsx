@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../../context/AuthContext'
 import apiClient from '../../../shared/api/client'
 
-export default function NotificationsDropdown({ isOpen, onClose }) {
+export default function NotificationsDropdown({ isOpen, onClose, onUnreadChange }) {
   const dropdownRef = useRef(null)
   const navigate = useNavigate()
   const { user } = useAuth()
@@ -34,7 +34,11 @@ export default function NotificationsDropdown({ isOpen, onClose }) {
     try {
       const response = await apiClient.get('/notifications')
       const data = response.data
-      setNotifications(Array.isArray(data) ? data : data.data || [])
+      const list = Array.isArray(data) ? data : data.data || []
+      setNotifications(list)
+      if (onUnreadChange) {
+        onUnreadChange(list.filter((n) => !n.read).length)
+      }
     } catch (error) {
       console.error('Error loading notifications', error)
     } finally {
@@ -49,6 +53,10 @@ export default function NotificationsDropdown({ isOpen, onClose }) {
       setNotifications((prev) =>
         prev.map(n => n.id === id ? { ...n, read: true } : n)
       )
+      if (onUnreadChange) {
+        const nextCount = notifications.filter((n) => n.id !== id && !n.read).length
+        onUnreadChange(nextCount)
+      }
     } catch (error) {
       console.error('Error marking as read', error)
     }

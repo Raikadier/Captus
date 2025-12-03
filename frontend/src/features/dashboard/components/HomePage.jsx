@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Bell, Calendar as CalendarIcon, CheckSquare, Sparkles, StickyNote, Clock } from 'lucide-react';
 import { Button } from '../../../ui/button';
@@ -137,7 +137,15 @@ const HomePage = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
   const { darkMode, accentColor } = useTheme()
-  const unreadCount = 3
+  const [unreadCount, setUnreadCount] = useState(0)
+
+  const handleToggleDropdown = useCallback(() => {
+    setIsDropdownOpen((prev) => !prev)
+  }, [])
+
+  const handleCloseDropdown = useCallback(() => {
+    setIsDropdownOpen(false)
+  }, [])
 
   useEffect(() => {
     const name = user?.user_metadata?.name || user?.name;
@@ -145,6 +153,7 @@ const HomePage = () => {
       setUserName(name.split(' ')[0]) // Solo el primer nombre
     }
     loadData()
+    loadUnread()
   }, [user])
 
   const loadData = async () => {
@@ -179,6 +188,16 @@ const HomePage = () => {
     }
   }
 
+  const loadUnread = async () => {
+    try {
+      const response = await apiClient.get('/notifications')
+      const list = Array.isArray(response.data) ? response.data : response.data?.data || []
+      setUnreadCount(list.filter((n) => !n.read).length)
+    } catch (error) {
+      console.error('Error loading unread notifications:', error)
+    }
+  }
+
   return (
     <div className="p-8 bg-background">
       <header className="sticky top-0 rounded-xl shadow-sm p-6 mb-6 z-10 animate-in slide-in-from-top duration-300 bg-card">
@@ -202,7 +221,7 @@ const HomePage = () => {
               <Button
                 variant="outline"
                 className="border-gray-300 relative bg-transparent"
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                onClick={handleToggleDropdown}
               >
                 <Bell size={18} className="text-gray-500" />
                 {unreadCount > 0 && (
@@ -216,7 +235,8 @@ const HomePage = () => {
               </Button>
               <NotificationsDropdown
                 isOpen={isDropdownOpen}
-                onClose={() => setIsDropdownOpen(false)}
+                onClose={handleCloseDropdown}
+                onUnreadChange={setUnreadCount}
               />
             </div>
           </div>
