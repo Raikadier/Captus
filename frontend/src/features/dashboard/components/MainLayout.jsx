@@ -30,8 +30,8 @@ const MainLayout = ({ children }) => {
         {children || <Outlet />}
       </div>
 
-      {showFloatingButton && (
-        <Link to="/chatbot" title="Hablar con Captus AI">
+        {showFloatingButton && (
+          <Link to="/chatbot" title="Hablar con Captus AI">
           <Button
             className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110 active:scale-95 animate-pulse z-50"
             size="icon"
@@ -41,6 +41,7 @@ const MainLayout = ({ children }) => {
         </Link>
       )}
     </div>
+    </TaskProvider>
   )
 }
 

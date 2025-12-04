@@ -9,7 +9,7 @@ const supabaseAdmin = getSupabaseClient();
 const verifySupabaseToken = buildSupabaseAuthMiddleware(supabaseAdmin);
 
 // Aplicar middleware de autenticación y usuario a todas las rutas
-router.use(verifySupabaseToken);
+// router.use(verifySupabaseToken); // Middleware is already applied in server.js
 router.use(taskController.injectUser);
 
 // Rutas de tareas

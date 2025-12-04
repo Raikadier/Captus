@@ -149,7 +149,7 @@ const ProfilePage = () => {
           {/* Profile Header */}
           <div className="bg-gradient-to-r from-primary to-primary/80 p-8 text-white">
             <div className="flex items-center space-x-6">
-              <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-24 h-24 bg-card/20 rounded-full flex items-center justify-center">
                 <User size={48} />
               </div>
               <div>
@@ -172,7 +172,7 @@ const ProfilePage = () => {
               {!isEditing ? (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                  className="inline-flex items-center px-4 py-2 border border-border rounded-md shadow-sm text-sm font-medium text-foreground bg-card hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                 >
                   <Edit3 className="h-4 w-4 mr-2" />
                   Editar
@@ -189,7 +189,7 @@ const ProfilePage = () => {
                   </button>
                   <button
                     onClick={handleCancel}
-                    className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                    className="inline-flex items-center px-4 py-2 border border-border rounded-md shadow-sm text-sm font-medium text-foreground bg-card hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                   >
                     <X className="h-4 w-4 mr-2" />
                     Cancelar
@@ -327,13 +327,13 @@ const ProfilePage = () => {
                   <div className="text-2xl font-bold text-primary">0</div>
                   <div className="text-sm text-primary/80">Tareas Completadas</div>
                 </div>
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <div className="text-2xl font-bold text-blue-600">0</div>
-                  <div className="text-sm text-blue-700">Racha Actual</div>
+                <div className="bg-blue-500/10 p-4 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-500">0</div>
+                  <div className="text-sm text-blue-500/80">Racha Actual</div>
                 </div>
-                <div className="bg-purple-50 p-4 rounded-lg">
-                  <div className="text-2xl font-bold text-purple-600">0</div>
-                  <div className="text-sm text-purple-700">Días Activos</div>
+                <div className="bg-purple-500/10 p-4 rounded-lg">
+                  <div className="text-2xl font-bold text-purple-500">0</div>
+                  <div className="text-sm text-purple-500/80">Días Activos</div>
                 </div>
               </div>
             </div>

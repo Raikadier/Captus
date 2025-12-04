@@ -85,14 +85,15 @@ const TaskListView = () => {
 
   return (
     <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-background p-6">
       {/* Header with view toggle */}
       <div className="max-w-4xl mx-auto mb-6">
-        <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm">
-          <h1 className="text-2xl font-bold text-gray-800">Mis Tareas</h1>
+        <div className="flex items-center justify-between bg-card p-4 rounded-lg shadow-sm">
+          <h1 className="text-2xl font-bold text-foreground">Mis Tareas</h1>
 
           <div className="flex items-center space-x-4">
             {/* View toggle buttons */}
-            <div className="flex bg-gray-100 rounded-lg p-1">
+            <div className="flex bg-muted rounded-lg p-1">
               <button
                 onClick={() => setViewMode('list')}
                 className={`px-4 py-2 rounded-md transition-colors ${viewMode === 'list'
@@ -119,6 +120,7 @@ const TaskListView = () => {
             <button
               onClick={() => setShowAddForm(true)}
               className="bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center"
+              className="bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center"
             >
               <Check size={18} className="mr-2" />
               Agregar Tarea
@@ -130,10 +132,11 @@ const TaskListView = () => {
       {/* Task list content */}
       <div className="max-w-4xl mx-auto">
         {Object.keys(groupedTasks).length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-            <div className="text-gray-500 text-lg mb-4">No hay tareas pendientes</div>
+          <div className="bg-card rounded-lg shadow-sm p-8 text-center">
+            <div className="text-muted-foreground text-lg mb-4">No hay tareas pendientes</div>
             <button
               onClick={() => setShowAddForm(true)}
+              className="bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
               className="bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
             >
               Crear tu primera tarea
@@ -142,18 +145,18 @@ const TaskListView = () => {
         ) : (
           <div className="space-y-6">
             {Object.entries(groupedTasks).map(([dateGroup, tasksInGroup]) => (
-              <div key={dateGroup} className="bg-white rounded-lg shadow-sm overflow-hidden">
+              <div key={dateGroup} className="bg-card rounded-lg shadow-sm overflow-hidden">
                 {/* Date header */}
                 <div className="bg-primary/10 px-6 py-3 border-b">
                   <h2 className="text-lg font-bold text-primary">{dateGroup}</h2>
                 </div>
 
                 {/* Tasks in this group */}
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-border">
                   {tasksInGroup.map(task => (
                     <div
                       key={task.id}
-                      className={`p-4 hover:bg-gray-50 transition-colors cursor-pointer border-l-4 ${getPriorityColor(task.priority?.name)}`}
+                      className={`p-4 hover:bg-muted transition-colors cursor-pointer border-l-4 ${getPriorityColor(task.priority?.name)}`}
                       onClick={() => handleTaskComplete(task.id)}
                     >
                       <div className="flex items-start space-x-4">
@@ -165,30 +168,32 @@ const TaskListView = () => {
                               handleTaskComplete(task.id);
                             }}
                             className="w-6 h-6 border-2 border-primary rounded flex items-center justify-center hover:bg-primary/10 transition-colors"
+                            className="w-6 h-6 border-2 border-primary rounded flex items-center justify-center hover:bg-primary/10 transition-colors"
                           >
+                            {task.completed && <Check size={16} className="text-primary" />}
                             {task.completed && <Check size={16} className="text-primary" />}
                           </button>
                         </div>
 
                         {/* Task content */}
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                          <h3 className="text-lg font-semibold text-foreground mb-1">
                             {task.title}
                           </h3>
                           {task.description && (
-                            <p className="text-gray-600 text-sm mb-2 line-clamp-2">
+                            <p className="text-muted-foreground text-sm mb-2 line-clamp-2">
                               {task.description.length > 100
                                 ? task.description.substring(0, 100) + '...'
                                 : task.description}
                             </p>
                           )}
-                          <div className="flex items-center space-x-4 text-sm text-gray-500">
+                          <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                             <span className="flex items-center">
                               <Calendar size={14} className="mr-1" />
                               {new Date(task.due_date).toLocaleDateString('es-ES')}
                             </span>
                             {task.category && (
-                              <span className="bg-gray-100 px-2 py-1 rounded text-xs">
+                              <span className="bg-muted px-2 py-1 rounded text-xs">
                                 {task.category.name}
                               </span>
                             )}

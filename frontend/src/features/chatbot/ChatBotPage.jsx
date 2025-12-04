@@ -14,6 +14,15 @@ const ChatBotPage = () => {
   const [showSidebar, setShowSidebar] = useState(true);
   const messagesEndRef = useRef(null);
 
+  // Use the events hook to trigger refreshes if needed,
+  // although this hook state is local to this component instance.
+  // Ideally, if the Calendar page is separate, it will refresh on its own when visited.
+  // But if we want to confirm action here, we don't strictly need the hook unless we want to display the new event here.
+  // The prompt says "El chat debe mostrar un mensaje de confirmación".
+  // The response from backend "result" field will serve as this confirmation.
+  const { fetchEvents } = useEvents();
+  const { fetchTasks } = useTaskContext();
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -87,13 +96,12 @@ const ChatBotPage = () => {
     setIsLoading(true);
 
     try {
-      // Use the service instead of direct fetch
-      const data = await aiTaskService.sendMessage(userMessage.content, activeConversation);
+      // Use the new service that wraps the AI endpoint
+      const responseData = await aiEventsService.sendMessage(userMessage.content, activeConversation);
 
       // If we started a new conversation, update the state
-      if (!activeConversation && data.conversationId) {
-        setActiveConversation(data.conversationId);
-        // Refresh conversations list to show the new title
+      if (!activeConversation && responseData.conversationId) {
+        setActiveConversation(responseData.conversationId);
         fetchConversations();
       }
 
@@ -115,7 +123,7 @@ const ChatBotPage = () => {
       const botResponse = {
         id: 'temp-bot-' + Date.now(),
         type: 'bot',
-        content: data.result,
+        content: responseData.result,
         timestamp: new Date(),
         action: data.actionPerformed // Store action for UI
       };
@@ -155,7 +163,7 @@ const ChatBotPage = () => {
   };
 
   return (
-    <div className="h-screen flex bg-white overflow-hidden">
+    <div className="h-screen flex bg-background text-foreground overflow-hidden">
       <AnimatePresence>
         {showSidebar && (
           <Motion.div
@@ -163,9 +171,9 @@ const ChatBotPage = () => {
             animate={{ width: 260, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-            className="bg-gray-50 border-r border-gray-200 flex flex-col overflow-hidden"
+            className="bg-secondary border-r border-border flex flex-col overflow-hidden"
           >
-            <div className="p-4 border-b border-gray-200">
+            <div className="p-4 border-b border-border">
               <button
                 onClick={handleNewConversation}
                 className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
@@ -196,11 +204,11 @@ const ChatBotPage = () => {
 
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <div className="h-16 border-b border-gray-200 flex items-center justify-between px-6">
+        <div className="h-16 border-b border-border flex items-center justify-between px-6">
           <div className="flex items-center space-x-3">
             <button
               onClick={() => setShowSidebar(!showSidebar)}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-accent rounded-lg transition-colors"
             >
               <Menu size={20} />
             </button>
@@ -209,8 +217,8 @@ const ChatBotPage = () => {
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="font-semibold text-gray-900">Captus AI</h1>
-                <p className="text-xs text-gray-500">Tu asistente académico</p>
+                <h1 className="font-semibold text-foreground">Captus AI</h1>
+                <p className="text-xs text-muted-foreground">Tu asistente académico</p>
               </div>
             </div>
           </div>
@@ -304,7 +312,7 @@ const ChatBotPage = () => {
           </div>
         </div>
 
-        <div className="border-t border-gray-200 p-4 bg-white">
+        <div className="border-t border-border p-4 bg-background">
           <div className="max-w-3xl mx-auto">
             <div className="flex items-end space-x-3">
               <div className="flex-1 relative">
@@ -313,7 +321,7 @@ const ChatBotPage = () => {
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Escribe tu mensaje..."
-                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none shadow-sm transition-all duration-200"
+                  className="w-full bg-background px-4 py-3 pr-12 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none shadow-sm transition-all duration-200"
                   rows="1"
                   disabled={isLoading}
                   style={{ minHeight: '48px', maxHeight: '200px' }}
@@ -327,7 +335,7 @@ const ChatBotPage = () => {
                 <Send className="w-5 h-5" />
               </button>
             </div>
-            <p className="text-xs text-gray-400 mt-2 text-center">
+            <p className="text-xs text-muted-foreground mt-2 text-center">
               Captus AI puede cometer errores. Verifica la información importante.
             </p>
           </div>

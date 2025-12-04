@@ -41,13 +41,13 @@ export default function TeacherStatsPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="bg-white rounded-xl shadow-sm p-6 flex items-center gap-3">
+      <div className="bg-card rounded-xl shadow-sm p-6 flex items-center gap-3">
         <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
           <BarChart3 className="text-primary" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Estadísticas del profesor</h1>
-          <p className="text-sm text-gray-600">Rendimiento de cursos y tareas</p>
+          <h1 className="text-2xl font-bold text-foreground">Estadísticas del profesor</h1>
+          <p className="text-sm text-muted-foreground">Rendimiento de cursos y tareas</p>
         </div>
       </div>
 

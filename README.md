@@ -1,6 +1,12 @@
-# 🎓 Captus - Plataforma de Gestión de Tareas para Estudiantes
+# 🎓 Captus - Plataforma de Gestión Académica Inteligente
 
-Una aplicación web moderna para estudiantes de ingeniería de sistemas que permite gestionar tareas, mantener rachas de productividad y organizar el trabajo académico.
+Una aplicación web moderna para estudiantes de ingeniería que integra gestión de tareas, rachas de productividad, notificaciones inteligentes y asistencia con IA.
+
+**Desarrollado por:** Estudiantes de Ingeniería de Sistemas - 6º semestre  
+**Universidad:** Universidad Popular del Cesar  
+**Tutor:** Wilman Jose Vega Castilla
+
+---
 
 ## 🚀 Inicio Rápido
 
@@ -105,4 +111,16 @@ Este proyecto está diseñado específicamente para estudiantes de la Universida
 
 ## 📄 Licencia
 
-Este proyecto es parte del currículo académico de ingeniería de sistemas.
+Este proyecto es parte del currículo académico de Ingeniería de Sistemas en la Universidad Popular del Cesar.
+
+---
+
+## 🙏 Agradecimientos
+
+- **Tutor:** Wilman Jose Vega Castilla
+- **Estudiantes de 6º semestre** - Equipo de desarrollo
+- **Universidad Popular del Cesar** - Infraestructura y soporte
+
+---
+
+**💡 Tip:** Mantén ambos servicios (frontend y backend) ejecutándose durante el desarrollo para una mejor experiencia.

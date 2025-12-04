@@ -63,14 +63,14 @@ export default function TeacherHomePage() {
 
   return (
     <div className="p-6 space-y-6 animate-in fade-in duration-500">
-      <div className="bg-white rounded-xl shadow-sm p-6">
+      <div className="bg-card rounded-xl shadow-sm p-6">
         <div className="flex items-start space-x-4">
           <div className="bg-primary/10 p-3 rounded-xl">
             <BookOpen className="text-primary" size={32} />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Bienvenid@ {(user?.user_metadata?.name || user?.name || 'Profesor').split(' ')[0]}</h1>
-            <p className="text-gray-600 mt-1">Revisa tus cursos y actividades académicas</p>
+            <h1 className="text-3xl font-bold text-foreground">Bienvenid@ {(user?.user_metadata?.name || user?.name || 'Profesor').split(' ')[0]}</h1>
+            <p className="text-muted-foreground mt-1">Revisa tus cursos y actividades académicas</p>
           </div>
         </div>
       </div>

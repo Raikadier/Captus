@@ -17,39 +17,27 @@ export class EventsService {
     this.eventsRepository = eventsRepository;
   }
 
+  /**
+   * Valida los datos de un evento.
+   * @param {object} event - El objeto del evento.
+   * @returns {OperationResult} - El resultado de la validación.
+   */
   validateEvent(event) {
     if (!event) {
       return new OperationResult(false, "El evento no puede ser nulo.");
     }
-
     if (!event.title || event.title.trim() === "") {
       return new OperationResult(false, "El título del evento no puede estar vacío.");
     }
-
     if (!event.start_date) {
       return new OperationResult(false, "La fecha de inicio es requerida.");
     }
-
     if (!event.type || event.type.trim() === "") {
       return new OperationResult(false, "El tipo de evento es requerido.");
     }
-
-    // Validate date logic
-    const startDate = new Date(event.start_date);
-    const now = new Date();
-
-    if (startDate < now && !event.is_past) {
-      // If event is in the past, mark it as past
-      event.is_past = true;
+    if (event.end_date && new Date(event.end_date) < new Date(event.start_date)) {
+      return new OperationResult(false, "La fecha de fin no puede ser anterior a la fecha de inicio.");
     }
-
-    if (event.end_date) {
-      const endDate = new Date(event.end_date);
-      if (endDate < startDate) {
-        return new OperationResult(false, "La fecha de fin no puede ser anterior a la fecha de inicio.");
-      }
-    }
-
     return new OperationResult(true);
   }
 
@@ -59,7 +47,7 @@ export class EventsService {
 
   async save(event, userId) {
     try {
-      const validation = this.validateEvent(event);
+      const validation = this.validateEvent(eventData);
       if (!validation.success) return validation;
 
       if (!userId) {
@@ -178,12 +166,10 @@ export class EventsService {
           });
         }
 
-        return new OperationResult(true, "Evento actualizado exitosamente.", updated);
-      } else {
-        return new OperationResult(false, "Error al actualizar el evento.");
-      }
+      return new OperationResult(true, "Evento actualizado exitosamente.", updatedEvent);
     } catch (error) {
-      return new OperationResult(false, `Error al actualizar evento: ${error.message}`);
+      console.error(`Error inesperado en EventsService.update: ${error.message}`);
+      throw new Error("Ocurrió un error inesperado al actualizar el evento.");
     }
   }
 
@@ -296,9 +282,12 @@ export class EventsService {
         }
       }
     } catch (error) {
-      console.error('Error checking upcoming events:', error);
+      console.error(`Error inesperado en EventsService.getByDateRange: ${error.message}`);
+      throw new Error("Ocurrió un error inesperado al obtener los eventos por fecha.");
     }
   }
+
+  // --- Métodos de Ayuda (Helper Methods) ---
 
   async sendUpcomingEventNotification(event, user) {
     try {

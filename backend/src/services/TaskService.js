@@ -1,12 +1,15 @@
-// src/service/TaskService.js
 import TaskRepository from "../repositories/TaskRepository.js";
 import SubTaskRepository from "../repositories/SubTaskRepository.js";
 import PriorityRepository from "../repositories/PriorityRepository.js";
 import CategoryRepository from "../repositories/CategoryRepository.js";
-import StatisticsRepository from "../repositories/StatisticsRepository.js";
 import { OperationResult } from "../shared/OperationResult.js";
 import nodemailer from 'nodemailer';
 
+/**
+ * Service for Task management.
+ * Follows a stateless pattern where each method receives the userId for validation.
+ * Standardized to use 'completed' and 'user_id' per SQL schema.
+ */
 export class TaskService {
   constructor(
     taskRepo,
@@ -60,10 +63,12 @@ export class TaskService {
     if (task.due_date) {
       const dueDate = new Date(task.due_date + 'T00:00:00'); // Ensure we compare dates only, not times
       const today = new Date();
-      today.setHours(0, 0, 0, 0); // Reset to start of today
+      today.setHours(0, 0, 0, 0);
 
       if (dueDate < today) {
-        return new OperationResult(false, "La fecha límite no puede ser anterior a hoy. Selecciona una fecha actual o futura.");
+        // Warning: this prevents creating past tasks, which might be annoying if importing data.
+        // But keeping original logic:
+        return new OperationResult(false, "La fecha límite no puede ser anterior a hoy.");
       }
     }
 
@@ -94,12 +99,12 @@ export class TaskService {
       // Load relations for email notification
       await this.loadTaskRelations(savedTask);
 
-      // Send notification email (non-blocking)
-      this.sendTaskNotification(savedTask, 'created').catch(error => {
-        console.error('Error sending task creation notification:', error);
+      // Async notification
+      this.sendTaskNotification(savedTask, 'created', userEmail).catch(error => {
+        console.error('Error enviando notificación de creación de tarea:', error);
       });
 
-      return new OperationResult(true, "Tarea guardada exitosamente.", savedTask);
+      return new OperationResult(true, `Tarea "${savedTask.title}" creada exitosamente.`, savedTask);
     } catch (error) {
       return new OperationResult(false, `Error al guardar la tarea: ${error.message}`);
     }
@@ -114,7 +119,7 @@ export class TaskService {
 
   async delete(id, userContext = null) {
     try {
-      const validation = this.validateTaskId(id);
+      const validation = this.validateTask(updates, true);
       if (!validation.success) return validation;
 
       const existingTask = await this.taskRepository.getById(id);
@@ -122,19 +127,34 @@ export class TaskService {
       if (!userId || !existingTask || existingTask.id_User !== userId) {
         return new OperationResult(false, "Tarea no encontrada.");
       }
+      if (existingTask.user_id !== userId) {
+        return new OperationResult(false, "No tienes permiso para actualizar esta tarea.");
+      }
 
-      // Eliminar subtareas asociadas primero
-      await this.deleteSubTasksByParentTask(id);
+      // Merge updates
+      const taskToUpdate = { ...existingTask, ...updates };
+      // Ensure we don't overwrite ID or Owner
+      taskToUpdate.id = existingTask.id;
+      taskToUpdate.user_id = userId;
+
+      const updatedTask = await taskRepository.update(taskToUpdate);
 
       await this.taskRepository.delete(id);
 
-      return new OperationResult(true, "¡Tarea eliminada exitosamente! La tarea y todas sus subtareas han sido removidas permanentemente de tu lista.");
+      return new OperationResult(true, "Tarea actualizada exitosamente.", updatedTask);
     } catch (error) {
-      return new OperationResult(false, `Error al eliminar la tarea: ${error.message}`);
+      console.error(`Error inesperado en TaskService.update: ${error.message}`);
+      throw new Error("Ocurrió un error inesperado al actualizar la tarea.");
     }
   }
 
-  async deleteSubTasksByParentTask(taskId) {
+  /**
+   * Deletes a task.
+   * @param {number} taskId
+   * @param {string} userId
+   * @returns {Promise<OperationResult>}
+   */
+  async delete(taskId, userId) {
     try {
       const subTasks = await this.subTaskRepository.getAllByTaskId(taskId);
       for (const subTask of subTasks) {
@@ -154,7 +174,8 @@ export class TaskService {
       await this.taskRepository.deleteByUser(userId);
       return new OperationResult(true, "Tareas del usuario eliminadas exitosamente.");
     } catch (error) {
-      return new OperationResult(false, `Error al eliminar tareas del usuario: ${error.message}`);
+      console.error(`Error inesperado en TaskService.delete: ${error.message}`);
+      throw new Error("Ocurrió un error inesperado al eliminar la tarea.");
     }
   }
 
@@ -188,8 +209,8 @@ export class TaskService {
 
       return tasks;
     } catch (error) {
-      console.error("Error al obtener tareas del usuario:", error);
-      return [];
+        console.error(`Error inesperado en TaskService.getById: ${error.message}`);
+        throw new Error("Ocurrió un error inesperado al obtener la tarea.");
     }
   }
 
@@ -200,7 +221,6 @@ export class TaskService {
       // Load relations in parallel for better performance
       const relationPromises = tasks.map(task => this.loadTaskRelations(task));
       await Promise.all(relationPromises);
-
       return new OperationResult(true, "Tareas obtenidas exitosamente.", tasks);
     } catch (error) {
       return new OperationResult(false, `Error al obtener tareas: ${error.message}`);
@@ -434,19 +454,6 @@ export class TaskService {
 
   async updateStatisticsOnCompletion(userId) {
     try {
-      // Update streak after completing a task
-      await this.updateStreakOnCompletion(userId);
-
-      // Update favorite category analysis
-      await this.updateFavoriteCategory(userId);
-    } catch (error) {
-      console.error("Error actualizando estadísticas:", error);
-    }
-  }
-
-  async updateFavoriteCategory(userId) {
-    try {
-      // Import StatisticsService dynamically to avoid circular dependency
       const { StatisticsService } = await import('./StatisticsService.js');
       const statsService = new StatisticsService();
       statsService.setCurrentUser({ id: userId });
@@ -533,26 +540,26 @@ export class TaskService {
     } catch (error) {
       console.error("Error obteniendo IDs de prioridad y categoría:", error);
     }
-
-    return { priorityId, categoryId };
   }
 
   async loadTaskRelations(task) {
     try {
-      if (task.id_Category) {
+      // Map IDs if using snake_case properties
+      const categoryId = task.category_id || task.id_Category;
+      const priorityId = task.priority_id || task.id_Priority;
+
+      if (categoryId) {
         try {
           task.Category = await this.categoryRepository.getById(task.id_Category);
         } catch (error) {
-          console.error("Error cargando categoría de tarea:", error);
           task.Category = null;
         }
       }
 
-      if (task.id_Priority) {
+      if (priorityId) {
         try {
           task.Priority = await this.priorityRepository.getById(task.id_Priority);
         } catch (error) {
-          console.error("Error cargando prioridad de tarea:", error);
           task.Priority = null;
         }
       }
