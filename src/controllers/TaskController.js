@@ -1,4 +1,4 @@
-import { TaskService } from "../services/TaskService.js";
+import TaskService from "../services/TaskService.js";
 import NotificationService from '../services/NotificationService.js';
 import { AchievementValidatorService } from '../services/AchievementValidatorService.js';
 import TaskRepository from "../repositories/TaskRepository.js";
@@ -52,6 +52,7 @@ export class TaskController {
   }
 
   async getById(req, res) {
+    if (!req.user || !req.user.id) return res.status(401).json({ success: false, message: "Unauthorized" });
     const { id } = req.params;
     const result = await this.taskService.getById(parseInt(id));
     res.status(result.success ? 200 : 404).json(result);
@@ -88,6 +89,7 @@ export class TaskController {
   }
 
   async update(req, res) {
+    if (!req.user || !req.user.id) return res.status(401).json({ success: false, message: "Unauthorized" });
     const { id } = req.params;
     const taskData = { ...req.body, id_Task: parseInt(id) };
     const result = await this.taskService.update(taskData);
@@ -95,12 +97,14 @@ export class TaskController {
   }
 
   async delete(req, res) {
+    if (!req.user || !req.user.id) return res.status(401).json({ success: false, message: "Unauthorized" });
     const { id } = req.params;
     const result = await this.taskService.delete(parseInt(id));
     res.status(result.success ? 200 : 400).json(result);
   }
 
   async complete(req, res) {
+    if (!req.user || !req.user.id) return res.status(401).json({ success: false, message: "Unauthorized" });
     const { id } = req.params;
     const result = await this.taskService.complete(parseInt(id));
 
@@ -117,12 +121,14 @@ export class TaskController {
   }
 
   async deleteByCategory(req, res) {
+    // Warning: DeleteByCategory needs safety checks!
     const { categoryId } = req.params;
     const result = await this.taskService.deleteByCategory(parseInt(categoryId));
     res.status(result.success ? 200 : 400).json(result);
   }
 
   async getPending(req, res) {
+    if (!req.user || !req.user.id) return res.status(401).json({ success: false, message: "Unauthorized" });
     const limit = parseInt(req.query.limit) || 3;
     const result = await this.taskService.getPendingTasks(limit);
     res.status(result.success ? 200 : 400).json(result);
