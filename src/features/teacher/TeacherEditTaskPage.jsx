@@ -103,17 +103,17 @@ export default function TeacherEditTaskPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center gap-3 bg-white rounded-xl shadow-sm p-6">
+      <div className="flex items-center gap-3 bg-card rounded-xl shadow-sm p-6">
         <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
           <ClipboardList className="text-primary" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{isEditing ? `Editar tarea #${id}` : 'Crear Nueva Tarea'}</h1>
-          <p className="text-sm text-gray-600">Actualiza la información de la tarea</p>
+          <h1 className="text-2xl font-bold text-foreground">{isEditing ? `Editar tarea #${id}` : 'Crear Nueva Tarea'}</h1>
+          <p className="text-sm text-muted-foreground">Actualiza la información de la tarea</p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-4">
+      <form onSubmit={handleSubmit} className="bg-card rounded-xl shadow-sm p-6 space-y-4">
         <div className="flex items-center gap-2 mb-4">
           <Button type="button" variant="ghost" onClick={() => navigate(-1)}>
             <ArrowLeft className="w-4 h-4 mr-2" /> Volver
@@ -121,7 +121,7 @@ export default function TeacherEditTaskPage() {
         </div>
 
         <div className="space-y-2">
-          <Label className="text-sm font-medium text-gray-700">Título</Label>
+          <Label className="text-sm font-medium text-foreground">Título</Label>
           <Input
             value={formData.title}
             onChange={handleChange('title')}
@@ -131,18 +131,18 @@ export default function TeacherEditTaskPage() {
         </div>
 
         <div className="space-y-2">
-          <Label className="text-sm font-medium text-gray-700">Descripción</Label>
+          <Label className="text-sm font-medium text-foreground">Descripción</Label>
           <Textarea
             value={formData.description}
             onChange={handleChange('description')}
             rows={4}
             placeholder="Instrucciones para la tarea..."
-            className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
           />
         </div>
 
         <div className="space-y-2">
-          <Label className="text-sm font-medium text-gray-700">Fecha límite</Label>
+          <Label className="text-sm font-medium text-foreground">Fecha límite</Label>
           <Input
             type="date"
             value={formData.due_date}

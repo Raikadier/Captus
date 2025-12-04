@@ -555,13 +555,13 @@ export default function SettingsPage() {
 
 
   return (
-    <div className={`${darkMode ? 'bg-background' : 'bg-[#F6F7FB]'}`}>
+    <div className="bg-background">
       <div className={`max-w-7xl mx-auto ${compactView ? 'p-4' : 'p-8'} ${compactView ? 'pb-24' : 'pb-8'}`}>
         <FadeIn className={`sticky top-0 ${darkMode ? 'bg-card' : 'bg-white'} rounded-xl shadow-sm ${compactView ? 'p-4' : 'p-6'} mb-6 z-10`}>
           <div className="flex justify-between items-center">
             <div>
-              <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>⚙️ Configuración</h1>
-              <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} mt-1`}>{getCurrentDate()}</p>
+              <h1 className="text-2xl font-bold text-foreground">⚙️ Configuración</h1>
+              <p className="text-muted-foreground mt-1">{getCurrentDate()}</p>
             </div>
           </div>
         </FadeIn>
@@ -569,6 +569,7 @@ export default function SettingsPage() {
         <div className={`grid grid-cols-1 lg:grid-cols-3 ${compactView ? 'gap-4' : 'gap-6'}`}>
           <FadeIn delay={0.2} className="lg:col-span-1">
             <Card className={`${compactView ? 'p-3' : 'p-4'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
+>>>>>>> parent of e0adcf41 (Vista de los logros)
               <nav className={compactView ? 'space-y-1' : 'space-y-2'}>
                 <SettingsMenuItem
                   icon={<User size={18} />}
@@ -600,12 +601,15 @@ export default function SettingsPage() {
                   active={activeSection === 'privacidad'}
                   onClick={() => setActiveSection('privacidad')}
                 />
+<<<<<<< HEAD
                 <SettingsMenuItem
                   icon={<Award size={18} />}
                   label="Logros"
                   active={activeSection === 'logros'}
                   onClick={() => setActiveSection('logros')}
                 />
+=======
+>>>>>>> parent of e0adcf41 (Vista de los logros)
               </nav>
             </Card>
           </FadeIn>
@@ -614,8 +618,8 @@ export default function SettingsPage() {
 
             {/* PERFIL SECTION */}
             {activeSection === 'perfil' && (
-              <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
-                <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} ${compactView ? 'mb-4' : 'mb-6'}`}>
+              <Card className={`${compactView ? 'p-4' : 'p-6'} bg-card rounded-xl shadow-sm`}>
+                <h2 className={`text-xl font-semibold text-foreground ${compactView ? 'mb-4' : 'mb-6'}`}>
                   Información Personal
                 </h2>
                 {loading ? (
@@ -670,7 +674,7 @@ export default function SettingsPage() {
                     </div>
                     <div className={`grid grid-cols-1 md:grid-cols-2 ${compactView ? 'gap-3' : 'gap-4'}`}>
                       <div>
-                        <Label htmlFor="nombre" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        <Label htmlFor="nombre" className="text-sm font-medium text-foreground">
                           Nombre
                         </Label>
                         <input
@@ -683,7 +687,7 @@ export default function SettingsPage() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="apellido" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        <Label htmlFor="apellido" className="text-sm font-medium text-foreground">
                           Apellido
                         </Label>
                         <input
@@ -697,7 +701,7 @@ export default function SettingsPage() {
                       </div>
                     </div>
                     <div>
-                      <Label htmlFor="email" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <Label htmlFor="email" className="text-sm font-medium text-foreground">
                         Email
                       </Label>
                       <input
@@ -709,7 +713,7 @@ export default function SettingsPage() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="carrera" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <Label htmlFor="carrera" className="text-sm font-medium text-foreground">
                         Carrera
                       </Label>
                       <input
@@ -722,7 +726,7 @@ export default function SettingsPage() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="bio" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <Label htmlFor="bio" className="text-sm font-medium text-foreground">
                         Biografía
                       </Label>
                       <textarea
@@ -791,13 +795,13 @@ export default function SettingsPage() {
 
             {/* SEGURIDAD SECTION */}
             {activeSection === 'seguridad' && (
-              <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
-                <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} ${compactView ? 'mb-4' : 'mb-6'}`}>
+              <Card className={`${compactView ? 'p-4' : 'p-6'} bg-card rounded-xl shadow-sm`}>
+                <h2 className={`text-xl font-semibold text-foreground ${compactView ? 'mb-4' : 'mb-6'}`}>
                   Cambiar Contraseña
                 </h2>
                 <div className={compactView ? 'space-y-3' : 'space-y-4'}>
                   <div>
-                    <Label htmlFor="current-password" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <Label htmlFor="current-password" className="text-sm font-medium text-foreground">
                       Contraseña Actual
                     </Label>
                     <div className="relative">
@@ -812,14 +816,14 @@ export default function SettingsPage() {
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                       >
                         {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                       </button>
                     </div>
                   </div>
                   <div>
-                    <Label htmlFor="new-password" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <Label htmlFor="new-password" className="text-sm font-medium text-foreground">
                       Nueva Contraseña
                     </Label>
                     <input
@@ -832,7 +836,7 @@ export default function SettingsPage() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="confirm-password" className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <Label htmlFor="confirm-password" className="text-sm font-medium text-foreground">
                       Confirmar Nueva Contraseña
                     </Label>
                     <input
@@ -844,8 +848,8 @@ export default function SettingsPage() {
                       className={`mt-1 w-full px-3 ${compactView ? 'py-1.5' : 'py-2'} border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
                     />
                   </div>
-                  <div className={`p-3 ${darkMode ? 'bg-blue-900/20 border-blue-600/30' : 'bg-blue-50 border-blue-200'} border rounded-lg`}>
-                    <p className={`text-sm ${darkMode ? 'text-blue-300' : 'text-blue-700'}`}>
+                  <div className="p-3 bg-blue-50 border-blue-200 border rounded-lg">
+                    <p className="text-sm text-blue-700">
                       <strong>Requisitos de contraseña:</strong> Mínimo 8 caracteres, una mayúscula, una minúscula y un número.
                     </p>
                   </div>
@@ -865,27 +869,27 @@ export default function SettingsPage() {
 
             {/* APARIENCIA SECTION */}
             {activeSection === 'apariencia' && (
-              <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
-                <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} ${compactView ? 'mb-4' : 'mb-6'}`}>
+              <Card className={`${compactView ? 'p-4' : 'p-6'} bg-card rounded-xl shadow-sm`}>
+                <h2 className={`text-xl font-semibold text-foreground ${compactView ? 'mb-4' : 'mb-6'}`}>
                   Personalización de la Interfaz
                 </h2>
                 <div className={compactView ? 'space-y-3' : 'space-y-4'}>
-                  <div className={`flex items-center justify-between ${compactView ? 'py-2' : 'py-3'} border-b ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+                  <div className={`flex items-center justify-between ${compactView ? 'py-2' : 'py-3'} border-b border-border`}>
                     <div>
-                      <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Modo oscuro</p>
-                      <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Activa el tema oscuro en toda la aplicación</p>
+                      <p className="font-medium text-foreground">Modo oscuro</p>
+                      <p className="text-sm text-muted-foreground">Activa el tema oscuro en toda la aplicación</p>
                     </div>
                     <Switch checked={darkMode} onCheckedChange={toggleTheme} />
                   </div>
-                  <div className={`flex items-center justify-between ${compactView ? 'py-2' : 'py-3'} border-b ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+                  <div className={`flex items-center justify-between ${compactView ? 'py-2' : 'py-3'} border-b border-border`}>
                     <div>
-                      <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>Vista compacta</p>
-                      <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Reduce el espaciado entre elementos</p>
+                      <p className="font-medium text-foreground">Vista compacta</p>
+                      <p className="text-sm text-muted-foreground">Reduce el espaciado entre elementos</p>
                     </div>
                     <Switch checked={compactView} onCheckedChange={setCompactView} />
                   </div>
                   <div className={compactView ? 'py-2' : 'py-3'}>
-                    <Label className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-3 block`}>
+                    <Label className="text-sm font-medium text-foreground mb-3 block">
                       Tamaño de fuente
                     </Label>
                     <div className="flex gap-2">
@@ -916,7 +920,7 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   <div className={compactView ? 'py-2' : 'py-3'}>
-                    <Label className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-3 block`}>
+                    <Label className="text-sm font-medium text-foreground mb-3 block">
                       Color de acento
                     </Label>
                     <div className="flex gap-2">
@@ -942,8 +946,8 @@ export default function SettingsPage() {
 
             {/* PRIVACIDAD SECTION */}
             {activeSection === 'privacidad' && (
-              <Card className={`${compactView ? 'p-4' : 'p-6'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
-                <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'} ${compactView ? 'mb-4' : 'mb-6'}`}>
+              <Card className={`${compactView ? 'p-4' : 'p-6'} bg-card rounded-xl shadow-sm`}>
+                <h2 className={`text-xl font-semibold text-foreground ${compactView ? 'mb-4' : 'mb-6'}`}>
                   Gestión de Datos
                 </h2>
                 <div className={compactView ? 'space-y-2' : 'space-y-3'}>
@@ -956,8 +960,8 @@ export default function SettingsPage() {
                     {deletingAccount ? 'Eliminando cuenta...' : 'Eliminar mi cuenta'}
                   </Button>
                 </div>
-                <div className={`${compactView ? 'mt-3' : 'mt-4'} p-3 ${darkMode ? 'bg-red-900/20 border-red-600/30' : 'bg-red-50 border-red-200'} border rounded-lg`}>
-                  <p className={`text-sm ${darkMode ? 'text-red-300' : 'text-red-700'}`}>
+                <div className={`${compactView ? 'mt-3' : 'mt-4'} p-3 bg-red-50 border-red-200 border rounded-lg`}>
+                  <p className="text-sm text-red-700">
                     ⚠️ <strong>Advertencia importante:</strong> La eliminación de tu cuenta es <strong>permanente</strong> e <strong>irreversible</strong>.
                     Perderás acceso a todas tus tareas, estadísticas, rachas y datos almacenados. Esta acción no se puede deshacer.
                   </p>
@@ -1385,22 +1389,24 @@ export default function SettingsPage() {
               </Card>
             )}
 
+=======
+>>>>>>> parent of e0adcf41 (Vista de los logros)
             {/* Delete Account Modal */}
             <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
-              <DialogContent className={`${darkMode ? 'bg-card border-gray-700' : 'bg-white'} max-w-md`}>
+              <DialogContent className={`bg-card max-w-md`}>
                 <DialogHeader>
-                  <DialogTitle className={`text-xl font-bold ${darkMode ? 'text-red-400' : 'text-red-600'}`}>
+                  <DialogTitle className="text-xl font-bold text-red-600">
                     ⚠️ Eliminar Cuenta
                   </DialogTitle>
-                  <DialogDescription className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  <DialogDescription className="text-muted-foreground">
                     {deleteStep === 1 ? (
                       <div className="space-y-3">
                         <p>¿Estás seguro de que quieres eliminar tu cuenta?</p>
-                        <div className={`p-3 rounded-lg ${darkMode ? 'bg-red-900/30' : 'bg-red-50'}`}>
-                          <p className={`text-sm font-medium ${darkMode ? 'text-red-300' : 'text-red-700'} mb-2`}>
+                        <div className="p-3 rounded-lg bg-red-50">
+                          <p className="text-sm font-medium text-red-700 mb-2">
                             Esta acción es <strong>IRREVERSIBLE</strong> y eliminará:
                           </p>
-                          <ul className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'} space-y-1`}>
+                          <ul className="text-sm text-muted-foreground space-y-1">
                             <li>• Todas tus tareas y subtareas</li>
                             <li>• Tus estadísticas y rachas de productividad</li>
                             <li>• Tus logros y medallas desbloqueadas</li>
@@ -1410,23 +1416,23 @@ export default function SettingsPage() {
                       </div>
                     ) : (
                       <div className="space-y-3">
-                        <div className={`p-4 rounded-lg border-2 ${darkMode ? 'bg-red-900/30 border-red-600' : 'bg-red-50 border-red-300'}`}>
-                          <h3 className={`font-bold text-lg ${darkMode ? 'text-red-400' : 'text-red-600'} mb-2`}>
+                        <div className="p-4 rounded-lg border-2 bg-red-50 border-red-300">
+                          <h3 className="font-bold text-lg text-red-600 mb-2">
                             🚨 ÚLTIMA ADVERTENCIA 🚨
                           </h3>
-                          <p className={`${darkMode ? 'text-red-300' : 'text-red-700'} font-medium`}>
+                          <p className="text-red-700 font-medium">
                             Esta es tu última oportunidad para cancelar.
                           </p>
-                          <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'} mt-2`}>
+                          <p className="text-muted-foreground mt-2">
                             ¿Realmente quieres <strong>ELIMINAR DEFINITIVAMENTE</strong> tu cuenta de Captus?
                           </p>
-                          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'} mt-2`}>
+                          <p className="text-sm text-muted-foreground mt-2">
                             No podrás recuperar ningún dato después de esto.
                           </p>
                         </div>
                         {countdownActive && (
-                          <div className={`text-center p-3 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                            <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                          <div className="text-center p-3 rounded-lg bg-muted">
+                            <p className="text-sm text-muted-foreground">
                               El botón se habilitará en: <span className="font-bold text-red-500">{countdown}s</span>
                             </p>
                             <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
@@ -1446,7 +1452,7 @@ export default function SettingsPage() {
                     variant="outline"
                     onClick={handleCancelDelete}
                     disabled={deletingAccount}
-                    className={darkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : ''}
+                    className=""
                   >
                     Cancelar
                   </Button>

@@ -49,7 +49,7 @@ const getColorClass = (color) => {
       'bg-red-50': 'bg-red-50 border-red-200',
       'bg-yellow-50': 'bg-yellow-50 border-yellow-200',
     }
-    return map[color] || 'bg-white border-gray-200'
+    return map[color] || 'bg-card border-border'
 }
 
 function NoteDetailModal({ note, onClose, onSave, onDelete, onTogglePin }) {
@@ -68,7 +68,7 @@ function NoteDetailModal({ note, onClose, onSave, onDelete, onTogglePin }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-card rounded-xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto border border-border">
         <div className="p-6">
           <div className="flex justify-between items-start mb-6">
@@ -187,7 +187,7 @@ function CreateNoteModal({ onClose, onCreate }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-card rounded-xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto border border-border">
         <div className="p-6">
           <div className="flex justify-between items-start mb-6">
@@ -277,18 +277,18 @@ function NoteCard({ note, index, onClick, onTogglePin }) {
       >
         <button
           onClick={handlePinClick}
-          className="absolute top-2 right-2 p-1 rounded-full hover:bg-white/50 transition-colors"
+          className="absolute top-2 right-2 p-1 rounded-full hover:bg-card/50 transition-colors"
           title={note.pinned ? 'Desfijar nota' : 'Fijar nota'}
         >
-          <Pin size={14} className={note.pinned ? 'text-primary' : 'text-gray-400'} />
+          <Pin size={14} className={note.pinned ? 'text-primary' : 'text-muted-foreground'} />
         </button>
         <div className="flex justify-between items-start mb-3 pr-8">
           <h3 className="font-semibold text-gray-900 text-base flex-1">{note.title}</h3>
         </div>
-        <p className="text-gray-600 text-sm mb-3 line-clamp-3">{note.content}</p>
+        <p className="text-muted-foreground text-sm mb-3 line-clamp-3">{note.content}</p>
         <div className="flex justify-between items-center">
           {note.subject ? (
-            <Badge variant="outline" className="bg-white">
+            <Badge variant="outline" className="bg-card">
               {note.subject}
             </Badge>
           ) : (<div></div>)}
@@ -436,10 +436,10 @@ export default function NotesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F6F7FB] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando notas...</p>
+          <p className="mt-4 text-muted-foreground">Cargando notas...</p>
         </div>
       </div>
     )
@@ -447,7 +447,7 @@ export default function NotesPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#F6F7FB] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 mb-4">Error: {error}</p>
           <Button onClick={loadNotes} className="bg-primary hover:bg-primary/90">
@@ -493,7 +493,7 @@ export default function NotesPage() {
         {/* Pinned Notes */}
         {filteredPinnedNotes.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center">
               <Pin size={18} className="mr-2 text-primary" />
               Notas Fijadas
             </h2>
@@ -537,7 +537,7 @@ export default function NotesPage() {
       {showCreateModal && <CreateNoteModal onClose={() => setShowCreateModal(false)} onCreate={handleCreateNote} />}
 
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-card rounded-xl shadow-2xl w-full max-w-md max-h-[85vh] overflow-y-auto border border-border">
             <div className="p-6">
               <div className="flex justify-between items-start mb-6">

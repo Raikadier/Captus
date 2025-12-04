@@ -175,7 +175,7 @@ const CategoryManagement = () => {
             <Tag className="text-primary" size={24} />
             Gestión de Categorías
           </h2>
-          <p className="text-gray-600 mt-1">
+          <p className="text-muted-foreground mt-1">
             Organiza tus tareas con categorías personalizadas
           </p>
         </div>
@@ -190,13 +190,13 @@ const CategoryManagement = () => {
 
       {/* Form */}
       {showForm && (
-        <Card className="p-6 bg-white rounded-xl shadow-sm">
-          <h3 className="text-lg font-semibold mb-4">
+        <Card className="p-6 bg-card rounded-xl shadow-sm">
+          <h3 className="text-lg font-semibold mb-4 text-foreground">
             {editingCategory ? 'Editar Categoría' : 'Crear Nueva Categoría'}
           </h3>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Nombre de la Categoría
               </label>
               <Input
@@ -208,7 +208,7 @@ const CategoryManagement = () => {
                 maxLength={50}
                 autoFocus
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 Máximo 50 caracteres
               </p>
             </div>
@@ -244,12 +244,12 @@ const CategoryManagement = () => {
       {/* Categories List */}
       <div className="grid gap-4">
         {categories.length === 0 ? (
-          <Card className="p-12 text-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl">
-            <Tag className="mx-auto text-gray-400 mb-4" size={48} />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <Card className="p-12 text-center bg-card rounded-xl border border-dashed">
+            <Tag className="mx-auto text-muted-foreground mb-4" size={48} />
+            <h3 className="text-lg font-medium text-foreground mb-2">
               No hay categorías
             </h3>
-            <p className="text-gray-600 mb-4">
+            <p className="text-muted-foreground mb-4">
               Crea tu primera categoría para empezar a organizar tus tareas
             </p>
             <Button
@@ -262,14 +262,14 @@ const CategoryManagement = () => {
           </Card>
         ) : (
           categories.map((category) => (
-            <Card key={category.id_Category} className="p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
+            <Card key={category.id_Category} className="p-4 bg-card rounded-xl shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
                     <Tag className="text-white" size={18} />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">{category.name}</h3>
+                    <h3 className="font-semibold text-foreground">{category.name}</h3>
                     <div className="flex items-center gap-2 mt-1">
                       <Badge variant="secondary" className="text-xs">
                         {getCategoryStats(category.id_Category).totalTasks} tareas
@@ -293,7 +293,7 @@ const CategoryManagement = () => {
                     </div>
                     {getCategoryStats(category.id_Category).totalTasks > 0 && (
                       <div className="mt-2">
-                        <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+                        <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
                           <span>Progreso</span>
                           <span>{getCategoryStats(category.id_Category).completedTasks}/{getCategoryStats(category.id_Category).totalTasks}</span>
                         </div>
@@ -319,7 +319,7 @@ const CategoryManagement = () => {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDelete(category)}
-                      className="text-gray-600 hover:text-red-600"
+                      className="text-muted-foreground hover:text-destructive"
                     >
                       <Trash2 size={16} />
                     </Button>
@@ -348,7 +348,7 @@ const CategoryManagement = () => {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialog.open} onOpenChange={(open) => !open && cancelDelete()}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md bg-card">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-red-600">
               <AlertTriangle size={20} />

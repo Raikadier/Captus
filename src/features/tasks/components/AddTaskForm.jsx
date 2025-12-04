@@ -196,14 +196,15 @@ const AddTaskForm = ({ onClose, onTaskAdded }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="bg-card rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
         {/* Header with logo and close button */}
+        <div className="bg-primary/10 p-4 rounded-t-lg flex items-center justify-between">
         <div className="bg-primary/10 p-4 rounded-t-lg flex items-center justify-between">
           <img src="/LogoCaptusAddTask.png" alt="Captus Logo" className="h-12" />
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-red-500 transition-colors"
+            className="text-muted-foreground hover:text-destructive transition-colors"
           >
             <X size={24} />
           </button>
@@ -224,7 +225,7 @@ const AddTaskForm = ({ onClose, onTaskAdded }) => {
             />
             <button
               onClick={refreshTitle}
-              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+              className="absolute top-2 right-2 text-muted-foreground hover:text-foreground"
               title="Refrescar tarea"
             >
               <RefreshCw size={20} />
@@ -260,28 +261,28 @@ const AddTaskForm = ({ onClose, onTaskAdded }) => {
           <div className="flex gap-2 mb-6 flex-wrap">
             <button
               onClick={handleToday}
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded text-sm transition-colors"
+              className="px-4 py-2 bg-muted hover:bg-muted/80 rounded text-sm transition-colors"
               title="Establecer para hoy"
             >
               Hoy
             </button>
             <button
               onClick={handleTomorrow}
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded text-sm transition-colors"
+              className="px-4 py-2 bg-muted hover:bg-muted/80 rounded text-sm transition-colors"
               title="Establecer para mañana"
             >
               Mañana
             </button>
             <button
               onClick={handleWeekend}
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded text-sm transition-colors"
+              className="px-4 py-2 bg-muted hover:bg-muted/80 rounded text-sm transition-colors"
               title="Establecer para el fin de semana"
             >
               Fin de semana
             </button>
             <button
               onClick={handleNextWeek}
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded text-sm transition-colors"
+              className="px-4 py-2 bg-muted hover:bg-muted/80 rounded text-sm transition-colors"
               title="Establecer para la próxima semana"
             >
               Próxima semana
@@ -325,7 +326,7 @@ const AddTaskForm = ({ onClose, onTaskAdded }) => {
           <div className="flex gap-4 justify-end">
             <button
               onClick={handleCancel}
-              className="px-6 py-3 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+              className="px-6 py-3 bg-muted text-muted-foreground rounded hover:bg-muted/80 transition-colors"
               style={{ fontFamily: 'Century Gothic', fontSize: '14px' }}
             >
               Cancel
@@ -333,6 +334,7 @@ const AddTaskForm = ({ onClose, onTaskAdded }) => {
             <button
               onClick={handleSubmit}
               disabled={loading}
+              className="px-6 py-3 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors disabled:opacity-50"
               className="px-6 py-3 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors disabled:opacity-50"
               style={{ fontFamily: 'Century Gothic', fontSize: '14px' }}
             >
