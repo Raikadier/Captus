@@ -303,7 +303,7 @@ export default function CalendarPage() {
   const [showTaskDetails, setShowTaskDetails] = useState(null)
   const [showEventDetails, setShowEventDetails] = useState(null)
   const [showDeleteEventConfirm, setShowDeleteEventConfirm] = useState(null)
-  const [view, setView] = useState('month')
+  const [view, setView] = useState('week')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const { darkMode } = useTheme()
@@ -486,6 +486,36 @@ export default function CalendarPage() {
     }
   }
 
+  const getEventBlockColor = (type, index = 0) => {
+    const colors = [
+      { bg: 'bg-[#039BE5]', hover: 'hover:bg-[#0288D1]', text: 'text-white' },
+      { bg: 'bg-[#7CB342]', hover: 'hover:bg-[#689F38]', text: 'text-white' },
+      { bg: 'bg-[#8E24AA]', hover: 'hover:bg-[#7B1FA2]', text: 'text-white' },
+      { bg: 'bg-[#E67C73]', hover: 'hover:bg-[#D32F2F]', text: 'text-white' },
+      { bg: 'bg-[#F4511E]', hover: 'hover:bg-[#E64A19]', text: 'text-white' },
+      { bg: 'bg-[#33B679]', hover: 'hover:bg-[#2E7D32]', text: 'text-white' },
+    ]
+    switch (type) {
+      case 'Examen': return colors[3]
+      case 'Entrega': return colors[4]
+      case 'Clase': return colors[0]
+      case 'Reunión': return colors[2]
+      default: return colors[index % colors.length]
+    }
+  }
+
+  const getTaskBlockColor = (priority) => {
+    if (typeof priority === 'number') {
+      switch (priority) {
+        case 3: return { bg: 'bg-[#E67C73]', hover: 'hover:bg-[#D32F2F]', text: 'text-white' }
+        case 2: return { bg: 'bg-[#D4AC0D]', hover: 'hover:bg-[#C7A500]', text: 'text-white' }
+        case 1: return { bg: 'bg-[#33B679]', hover: 'hover:bg-[#2E7D32]', text: 'text-white' }
+        default: return { bg: 'bg-[#9E9E9E]', hover: 'hover:bg-[#757575]', text: 'text-white' }
+      }
+    }
+    return { bg: 'bg-[#039BE5]', hover: 'hover:bg-[#0288D1]', text: 'text-white' }
+  }
+
   const renderWeekView = () => {
     const startOfWeek = new Date(currentDate)
     startOfWeek.setDate(currentDate.getDate() - currentDate.getDay())
@@ -496,63 +526,174 @@ export default function CalendarPage() {
       return day
     })
 
+    const dayNames = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB']
+    const hours = Array.from({ length: 15 }, (_, i) => i + 7)
+    const hourHeight = 60
+
+    const getEventsWithPositions = (day) => {
+      const dayEvents = getEventsForDate(day)
+      const dayTasks = getTasksForDate(day)
+
+      const processedEvents = dayEvents.map((event, idx) => {
+        const eventDate = new Date(event.start_date)
+        const startHour = eventDate.getHours()
+        const startMinute = eventDate.getMinutes()
+
+        let duration = 1
+        if (event.end_date) {
+          const endDate = new Date(event.end_date)
+          duration = (endDate - eventDate) / (1000 * 60 * 60)
+        }
+
+        const top = ((startHour - 7) * hourHeight) + ((startMinute / 60) * hourHeight)
+        const height = Math.max(duration * hourHeight, 25)
+        const color = getEventBlockColor(event.type, idx)
+
+        return {
+          ...event,
+          top,
+          height,
+          color,
+          isEvent: true,
+          displayTime: eventDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+        }
+      })
+
+      const processedTasks = dayTasks.map((task) => {
+        const taskDate = new Date(task.endDate || task.creationDate)
+        const startHour = taskDate.getHours() || 9
+        const startMinute = taskDate.getMinutes() || 0
+
+        const top = ((startHour - 7) * hourHeight) + ((startMinute / 60) * hourHeight)
+        const height = 30
+        const color = getTaskBlockColor(task.id_Priority || task.priority)
+
+        return {
+          ...task,
+          top,
+          height,
+          color,
+          isTask: true,
+          isEvent: false,
+          displayTime: taskDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+        }
+      })
+
+      return [...processedEvents, ...processedTasks]
+    }
+
     return (
-      <div className="grid grid-cols-7 gap-2">
-        {weekDays.map((day, index) => (
-          <div key={index} className={`p-4 border-2 rounded-xl ${day.toDateString() === selectedDate.toDateString()
-            ? 'ring-2 ring-primary bg-primary/10 border-primary/20'
-            : darkMode
-              ? 'border-gray-700 bg-gray-750'
-              : 'border-gray-200'
-            }`}>
-            <div className="text-center mb-2 text-foreground">
-              <div className="text-xs font-medium text-muted-foreground">
-                {day.toLocaleDateString('es-ES', { weekday: 'short' })}
+      <div className="flex flex-col h-full">
+        <div className="flex-1 overflow-y-auto">
+          <div className="flex flex-col">
+            <div className="flex border-b border-border sticky top-0 bg-card z-10">
+              <div className="w-16 flex-shrink-0 py-2 text-center text-xs text-muted-foreground border-r border-border">
+                GMT-05
               </div>
-              <div className={`text-2xl font-bold ${day.toDateString() === new Date().toDateString()
-                ? 'text-primary'
-                : ''
-                }`}>
-                {day.getDate()}
-              </div>
+              {weekDays.map((day, index) => {
+                const isToday = day.toDateString() === new Date().toDateString()
+                const isSelected = day.toDateString() === selectedDate.toDateString()
+                return (
+                  <div
+                    key={index}
+                    className={`flex-1 text-center py-2 border-r border-border last:border-r-0 cursor-pointer transition-colors ${isSelected ? 'bg-primary/5' : ''}`}
+                    onClick={() => setSelectedDate(day)}
+                  >
+                    <div className="text-xs font-medium text-muted-foreground">
+                      {dayNames[day.getDay()]}
+                    </div>
+                    <div className={`text-2xl font-medium mt-1 ${isToday
+                      ? 'w-10 h-10 mx-auto rounded-full bg-primary text-primary-foreground flex items-center justify-center'
+                      : 'text-foreground'
+                      }`}>
+                      {day.getDate()}
+                    </div>
+                  </div>
+                )
+              })}
             </div>
-            <div className="space-y-1">
-              {/* Tasks - Show max 1 */}
-              {getTasksForDate(day).slice(0, 1).map((task) => (
-                <div
-                  key={`task-${task.id}`}
-                  className={`text-xs p-2 rounded-lg border ${getPriorityColor(task.id_Priority || task.priority)} cursor-pointer hover:opacity-80`}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleTaskClick(task)
-                  }}
-                >
-                  📋 {task.title.length > 10 ? `${task.title.substring(0, 10)}...` : task.title}
-                </div>
-              ))}
 
-              {/* Events - Show max 1 if no tasks, or max 1 total */}
-              {getEventsForDate(day).slice(0, getTasksForDate(day).length > 0 ? 0 : 1).map((event) => (
-                <div
-                  key={`event-${event.id}`}
-                  className={`text-xs p-2 rounded-lg border cursor-pointer hover:opacity-80 ${getEventColor(event.type)}`}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleEventClick(event)
-                  }}
-                >
-                  📅 {event.title.length > 10 ? `${event.title.substring(0, 10)}...` : event.title}
-                </div>
-              ))}
+            <div className="flex">
+              <div className="w-16 flex-shrink-0 border-r border-border">
+                {hours.map((hour) => (
+                  <div
+                    key={hour}
+                    className="relative border-b border-border"
+                    style={{ height: `${hourHeight}px` }}
+                  >
+                    <span className="absolute -top-2.5 right-2 text-xs text-muted-foreground font-medium">
+                      {hour.toString().padStart(2, '0')}:00
+                    </span>
+                  </div>
+                ))}
+              </div>
 
-              {(getTasksForDate(day).length + getEventsForDate(day).length) > 1 && (
-                <div className="text-xs text-muted-foreground font-medium">
-                  +{(getTasksForDate(day).length + getEventsForDate(day).length) - 1} más
-                </div>
-              )}
+              {weekDays.map((day, dayIndex) => {
+                const items = getEventsWithPositions(day)
+                const isSelected = day.toDateString() === selectedDate.toDateString()
+
+                return (
+                  <div
+                    key={dayIndex}
+                    className={`flex-1 relative border-r border-border last:border-r-0 ${isSelected ? 'bg-primary/5' : ''}`}
+                    style={{ minHeight: `${hours.length * hourHeight}px` }}
+                    onClick={() => setSelectedDate(day)}
+                  >
+                    {hours.map((hour) => (
+                      <div
+                        key={hour}
+                        className="absolute w-full border-b border-border/50"
+                        style={{ top: `${(hour - 7) * hourHeight}px`, height: `${hourHeight}px` }}
+                      />
+                    ))}
+
+                    {day.toDateString() === new Date().toDateString() && (
+                      <div
+                        className="absolute w-full flex items-center z-20"
+                        style={{
+                          top: `${((new Date().getHours() - 7) * hourHeight) + ((new Date().getMinutes() / 60) * hourHeight)}px`
+                        }}
+                      >
+                        <div className="w-2 h-2 rounded-full bg-red-500 -ml-1"></div>
+                        <div className="flex-1 h-0.5 bg-red-500"></div>
+                      </div>
+                    )}
+
+                    {items.map((item, itemIndex) => (
+                      <div
+                        key={item.isTask ? `task-${item.id}` : `event-${item.id}`}
+                        className={`absolute left-1 right-1 rounded-lg px-2 py-1 cursor-pointer transition-all shadow-sm overflow-hidden ${item.color.bg} ${item.color.hover} ${item.color.text}`}
+                        style={{
+                          top: `${item.top}px`,
+                          height: `${item.height}px`,
+                          minHeight: '24px',
+                          zIndex: 10 + itemIndex
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          if (item.isTask) {
+                            handleTaskClick(item)
+                          } else {
+                            handleEventClick(item)
+                          }
+                        }}
+                      >
+                        <div className="text-xs font-semibold truncate">
+                          {item.title}
+                        </div>
+                        {item.height > 35 && (
+                          <div className="text-xs opacity-90 truncate">
+                            {item.displayTime}{item.type && !item.isTask ? ` • ${item.type}` : ''}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )
+              })}
             </div>
           </div>
-        ))}
+        </div>
       </div>
     )
   }
