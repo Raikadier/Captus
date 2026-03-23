@@ -1,5 +1,5 @@
 import express from "express";
-import { handleRoutedMessage } from "../ai/routerAgent.js";
+import { routerAgent } from "../ai/routerAgent.js";
 import ConversationRepository from "../repositories/ConversationRepository.js";
 import MessageRepository from "../repositories/MessageRepository.js";
 
@@ -91,13 +91,7 @@ router.post("/chat", async (req, res) => {
     }
 
     // 4. Get AI Response
-    // Pass full user object along with message
-    const responseObj = await handleRoutedMessage({
-        userId,
-        message,
-        conversationId,
-        user: req.user
-    });
+    const responseObj = await routerAgent(message, userId);
 
     const resultText = typeof responseObj?.result === "string"
       ? responseObj.result

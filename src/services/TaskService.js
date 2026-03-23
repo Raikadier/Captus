@@ -2,6 +2,7 @@ import TaskRepository from "../repositories/TaskRepository.js";
 import SubTaskRepository from "../repositories/SubTaskRepository.js";
 import PriorityRepository from "../repositories/PriorityRepository.js";
 import CategoryRepository from "../repositories/CategoryRepository.js";
+import StatisticsRepository from "../repositories/StatisticsRepository.js";
 import { OperationResult } from "../shared/OperationResult.js";
 import nodemailer from 'nodemailer';
 
@@ -209,8 +210,8 @@ export class TaskService {
 
       return tasks;
     } catch (error) {
-        console.error(`Error inesperado en TaskService.getById: ${error.message}`);
-        throw new Error("Ocurrió un error inesperado al obtener la tarea.");
+      console.error(`Error inesperado en TaskService.getById: ${error.message}`);
+      throw new Error("Ocurrió un error inesperado al obtener la tarea.");
     }
   }
 
