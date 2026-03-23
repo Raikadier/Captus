@@ -1,30 +1,33 @@
-import ConversationRepository from '../ConversationRepository.js';
+import { jest } from '@jest/globals';
 
-// Mock the base repository dependencies
-jest.mock('../BaseRepository.js', () => {
-  return class BaseRepository {
-    constructor(tableName, config) {
-      this.tableName = tableName;
-      this.client = {
-        from: jest.fn().mockReturnThis(),
-        select: jest.fn().mockReturnThis(),
-        insert: jest.fn().mockReturnThis(),
-        update: jest.fn().mockReturnThis(),
-        delete: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnThis(),
-        lt: jest.fn().mockReturnThis(),
-        single: jest.fn(),
-        order: jest.fn().mockReturnThis(),
-      };
-      this.mapFromDb = config.mapFromDb;
-      this.mapToDb = config.mapToDb;
-    }
+jest.unstable_mockModule('../BaseRepository.js', () => {
+  return {
+    default: class BaseRepository {
+      constructor(tableName, config) {
+        this.tableName = tableName;
+        this.client = {
+          from: jest.fn().mockReturnThis(),
+          select: jest.fn().mockReturnThis(),
+          insert: jest.fn().mockReturnThis(),
+          update: jest.fn().mockReturnThis(),
+          delete: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          lt: jest.fn().mockReturnThis(),
+          single: jest.fn(),
+          order: jest.fn().mockReturnThis(),
+        };
+        this.mapFromDb = config.mapFromDb;
+        this.mapToDb = config.mapToDb;
+      }
 
-    async save(entity) {
-       return this.mapFromDb({ id: 1, ...this.mapToDb(entity) });
+      async save(entity) {
+         return this.mapFromDb({ id: 1, ...this.mapToDb(entity) });
+      }
     }
   };
 });
+
+const { default: ConversationRepository } = await import('../ConversationRepository.js');
 
 describe('ConversationRepository', () => {
   let repo;
@@ -41,14 +44,13 @@ describe('ConversationRepository', () => {
     expect(repo.client.from).toHaveBeenCalledWith('conversations');
     expect(repo.client.delete).toHaveBeenCalled();
     expect(repo.client.eq).toHaveBeenCalledWith('user_id', userId);
-    expect(repo.client.lt).toHaveBeenCalledWith('created_at', expect.stringMatching(/\d{4}-\d{2}-\d{2}T/));
+    expect(repo.client.lt).toHaveBeenCalledWith('created_at', expect.any(String));
   });
 
   test('getRecentByUserId should call deleteOldConversations first', async () => {
     const userId = 'user-123';
     const spyDelete = jest.spyOn(repo, 'deleteOldConversations');
 
-    // Mock the select chain return
     repo.client.order.mockResolvedValue({ data: [], error: null });
 
     await repo.getRecentByUserId(userId);

@@ -1,4 +1,4 @@
-import TaskService from "../services/TaskService.js";
+import { TaskService } from "../services/TaskService.js";
 import NotificationService from '../services/NotificationService.js';
 import { AchievementValidatorService } from '../services/AchievementValidatorService.js';
 import TaskRepository from "../repositories/TaskRepository.js";

@@ -166,7 +166,10 @@ export class EventsService {
           });
         }
 
-      return new OperationResult(true, "Evento actualizado exitosamente.", updatedEvent);
+        return new OperationResult(true, "Evento actualizado exitosamente.", updated);
+      } else {
+        return new OperationResult(false, "Error al actualizar el evento.");
+      }
     } catch (error) {
       console.error(`Error inesperado en EventsService.update: ${error.message}`);
       throw new Error("Ocurrió un error inesperado al actualizar el evento.");

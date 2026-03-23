@@ -569,7 +569,6 @@ export default function SettingsPage() {
         <div className={`grid grid-cols-1 lg:grid-cols-3 ${compactView ? 'gap-4' : 'gap-6'}`}>
           <FadeIn delay={0.2} className="lg:col-span-1">
             <Card className={`${compactView ? 'p-3' : 'p-4'} ${darkMode ? 'bg-card border-gray-700' : 'bg-white'} rounded-xl shadow-sm`}>
->>>>>>> parent of e0adcf41 (Vista de los logros)
               <nav className={compactView ? 'space-y-1' : 'space-y-2'}>
                 <SettingsMenuItem
                   icon={<User size={18} />}
@@ -601,15 +600,12 @@ export default function SettingsPage() {
                   active={activeSection === 'privacidad'}
                   onClick={() => setActiveSection('privacidad')}
                 />
-<<<<<<< HEAD
                 <SettingsMenuItem
                   icon={<Award size={18} />}
                   label="Logros"
                   active={activeSection === 'logros'}
                   onClick={() => setActiveSection('logros')}
                 />
-=======
->>>>>>> parent of e0adcf41 (Vista de los logros)
               </nav>
             </Card>
           </FadeIn>
@@ -1389,8 +1385,6 @@ export default function SettingsPage() {
               </Card>
             )}
 
-=======
->>>>>>> parent of e0adcf41 (Vista de los logros)
             {/* Delete Account Modal */}
             <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
               <DialogContent className={`bg-card max-w-md`}>
