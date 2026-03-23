@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { aiTaskService } from '../../services/aiTaskService';
+import { aiEventsService } from '../../services/aiEventsService';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { Send, Sparkles, User, Plus, Menu, CheckCircle } from 'lucide-react';
 
@@ -20,8 +21,6 @@ const ChatBotPage = () => {
   // But if we want to confirm action here, we don't strictly need the hook unless we want to display the new event here.
   // The prompt says "El chat debe mostrar un mensaje de confirmación".
   // The response from backend "result" field will serve as this confirmation.
-  const { fetchEvents } = useEvents();
-  const { fetchTasks } = useTaskContext();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -106,10 +105,10 @@ const ChatBotPage = () => {
       }
 
       // Check for tool action
-      if (data.actionPerformed) {
-        console.log('AI Performed action:', data.actionPerformed);
+      if (responseData.actionPerformed) {
+        console.log('AI Performed action:', responseData.actionPerformed);
         // Infer domain and dispatch targeted event so other components can react (tasks/calendar/notes)
-        const action = data.actionPerformed;
+        const action = responseData.actionPerformed;
         if (action.includes('task')) {
           window.dispatchEvent(new CustomEvent('task-update', { detail: { action } }));
         } else if (action.includes('event')) {
@@ -125,7 +124,7 @@ const ChatBotPage = () => {
         type: 'bot',
         content: responseData.result,
         timestamp: new Date(),
-        action: data.actionPerformed // Store action for UI
+        action: responseData.actionPerformed // Store action for UI
       };
       setMessages((prev) => [...prev, botResponse]);
 

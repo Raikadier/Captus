@@ -294,8 +294,8 @@ export default function CalendarPage() {
   const [showEventDetails, setShowEventDetails] = useState(null)
   const [showDeleteEventConfirm, setShowDeleteEventConfirm] = useState(null)
   const [view, setView] = useState('week')
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [tasksLoading, setTasksLoading] = useState(true)
+  const [tasksError, setTasksError] = useState(null)
   const { darkMode } = useTheme()
   const { events, loading: eventsLoading, error: eventsError, createEvent, updateEvent, deleteEvent } = useEvents()
 
@@ -427,11 +427,11 @@ export default function CalendarPage() {
     if (!result.success) {
       alert(result.message)
     } else {
-        setShowEditModal(null)
-        // Also update the detail view if open
-        if (showEventDetails && showEventDetails.id === id) {
-            setShowEventDetails(result.data)
-        }
+      setShowEditModal(null)
+      // Also update the detail view if open
+      if (showEventDetails && showEventDetails.id === id) {
+        setShowEventDetails(result.data)
+      }
     }
   }
 
@@ -442,11 +442,12 @@ export default function CalendarPage() {
   const confirmDeleteEvent = async () => {
     const eventId = showDeleteEventConfirm
     setShowDeleteEventConfirm(null)
-    const result = await deleteEvent(eventId)
-    if (result.success) {
+    try {
+      const result = await deleteEvent(eventId)
+      if (result.success) {
         setShowEventDetails(null)
       } else {
-        alert('Error al eliminar el evento: ' + response.data.message)
+        alert('Error al eliminar el evento: ' + result.message)
       }
     } catch (err) {
       alert('Error al eliminar el evento')
@@ -702,36 +703,36 @@ export default function CalendarPage() {
                       className={`p-2 rounded-lg border cursor-pointer hover:opacity-80 ${getEventColor(event.type)}`}
                       onClick={() => handleEventClick(event)}
                     >
-                        <div className="p-2 bg-card/50 rounded-lg backdrop-blur-sm">
-                            <Clock size={16} />
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-semibold">{event.title}</h4>
-                          <p className="text-xs opacity-80">
-                            {new Date(event.start_date).toLocaleTimeString('es-ES', {
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
-                            {event.type && ` • ${event.type}`}
-                          </p>
-                        </div>
+                      <div className="p-2 bg-card/50 rounded-lg backdrop-blur-sm">
+                        <Clock size={16} />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-semibold">{event.title}</h4>
+                        <p className="text-xs opacity-80">
+                          {new Date(event.start_date).toLocaleTimeString('es-ES', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                          {event.type && ` • ${event.type}`}
+                        </p>
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
             )
           })}
-           {/* If no events, show empty state for schedule */}
-           {dayEvents.length === 0 && (
-               <div className="text-center py-8 text-muted-foreground italic">No hay eventos programados para hoy</div>
-           )}
+          {/* If no events, show empty state for schedule */}
+          {dayEvents.length === 0 && (
+            <div className="text-center py-8 text-muted-foreground italic">No hay eventos programados para hoy</div>
+          )}
         </div>
 
         {/* Tasks section below */}
         {dayTasks.length > 0 && (
           <div className="mt-8 pt-6 border-t border-border">
             <h4 className="text-lg font-semibold mb-4 text-foreground flex items-center gap-2">
-                <span>📋</span> Tareas del día
+              <span>📋</span> Tareas del día
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {dayTasks.map((task) => (
@@ -740,18 +741,18 @@ export default function CalendarPage() {
                   className={`p-3 rounded-xl border transition-all hover:shadow-md cursor-pointer flex items-start justify-between gap-3 ${getPriorityColor(task.id_Priority || task.priority)} ${task.state ? 'opacity-60 grayscale' : ''}`}
                   onClick={() => handleTaskClick(task)}
                 >
-                    <div className="flex-1 min-w-0">
-                        <h4 className={`font-semibold text-sm truncate ${task.state ? 'line-through' : ''}`}>{task.title}</h4>
-                        {task.description && (
-                          <p className="text-xs opacity-80 mt-1 line-clamp-1">{task.description}</p>
-                        )}
-                    </div>
-                    <span
-                      className={`px-2 py-1 text-xs rounded-full font-medium ${task.state ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                        }`}
-                    >
-                      {task.state ? 'Listo' : 'Pendiente'}
-                    </span>
+                  <div className="flex-1 min-w-0">
+                    <h4 className={`font-semibold text-sm truncate ${task.state ? 'line-through' : ''}`}>{task.title}</h4>
+                    {task.description && (
+                      <p className="text-xs opacity-80 mt-1 line-clamp-1">{task.description}</p>
+                    )}
+                  </div>
+                  <span
+                    className={`px-2 py-1 text-xs rounded-full font-medium ${task.state ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                      }`}
+                  >
+                    {task.state ? 'Listo' : 'Pendiente'}
+                  </span>
                 </div>
               ))}
             </div>
@@ -784,13 +785,14 @@ export default function CalendarPage() {
       <div className="p-6 space-y-6">
         <div className="rounded-xl shadow-sm p-6 mb-6 bg-card border border-border">
           <div className="flex items-center justify-center py-12">
-            <div className="text-red-600 mb-4">Error: {error}</div>
+            <div className="text-red-600 mb-4">Error: {tasksError || eventsError}</div>
             <button
               onClick={loadData}
               className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
             >
               Reintentar
-            </Button>
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -800,14 +802,14 @@ export default function CalendarPage() {
     <div className="p-6 space-y-6 animate-in fade-in duration-500">
       <div className="rounded-xl shadow-sm p-6 mb-6 bg-card border border-border flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h1 className="text-3xl font-bold text-foreground tracking-tight">
-              Calendario
-            </h1>
-            <p className="mt-1 text-muted-foreground flex items-center gap-2">
-              <span>{events.length} Eventos</span>
-              <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-              <span>{tasks.length} Tareas</span>
-            </p>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">
+            Calendario
+          </h1>
+          <p className="mt-1 text-muted-foreground flex items-center gap-2">
+            <span>{events.length} Eventos</span>
+            <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+            <span>{tasks.length} Tareas</span>
+          </p>
         </div>
 
         <div className="flex space-x-2">
@@ -832,28 +834,28 @@ export default function CalendarPage() {
         <div className="rounded-xl shadow-sm p-6 mb-6 bg-card border border-border">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-                <h2 className="text-2xl font-bold text-foreground capitalize">
+              <h2 className="text-2xl font-bold text-foreground capitalize">
                 {monthNames[currentDate.getMonth()]} <span className="text-muted-foreground">{currentDate.getFullYear()}</span>
-                </h2>
-                <div className="flex items-center border rounded-md bg-background">
-                    <button
-                        onClick={() => navigateMonth(-1)}
-                        className="p-1.5 hover:bg-muted rounded-l-md transition-colors"
-                    >
-                        <ChevronLeft className="w-5 h-5 text-foreground" />
-                    </button>
-                    <div className="w-[1px] h-4 bg-border"></div>
-                    <button
-                        onClick={() => navigateMonth(1)}
-                        className="p-1.5 hover:bg-muted rounded-r-md transition-colors"
-                    >
-                        <ChevronRight className="w-5 h-5 text-foreground" />
-                    </button>
-                </div>
+              </h2>
+              <div className="flex items-center border rounded-md bg-background">
+                <button
+                  onClick={() => navigateMonth(-1)}
+                  className="p-1.5 hover:bg-muted rounded-l-md transition-colors"
+                >
+                  <ChevronLeft className="w-5 h-5 text-foreground" />
+                </button>
+                <div className="w-[1px] h-4 bg-border"></div>
+                <button
+                  onClick={() => navigateMonth(1)}
+                  className="p-1.5 hover:bg-muted rounded-r-md transition-colors"
+                >
+                  <ChevronRight className="w-5 h-5 text-foreground" />
+                </button>
+              </div>
             </div>
 
             <Button variant="outline" size="sm" onClick={() => { setCurrentDate(new Date()); setSelectedDate(new Date()); }}>
-                Hoy
+              Hoy
             </Button>
           </div>
 
@@ -916,27 +918,28 @@ export default function CalendarPage() {
                           </div>
                         ))}
 
-                    {/* Tasks */}
-                    {dayTasks.slice(0, Math.max(0, 2 - dayEvents.slice(0, 2).length)).map((task) => (
-                      <div
-                        key={`task-${task.id}`}
-                        className={`text-[10px] px-1.5 py-1 rounded border truncate transition-opacity hover:opacity-80 ${getPriorityColor(task.id_Priority || task.priority)} ${
-                          task.state ? 'line-through opacity-60' : ''
-                        }`}
-                        title={task.title}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleTaskClick(task)
-                        }}
-                      >
-                         {task.title}
-                      </div>
-                    ))}
+                        {/* Tasks */}
+                        {dayTasks.slice(0, Math.max(0, 2 - dayEvents.slice(0, 2).length)).map((task) => (
+                          <div
+                            key={`task-${task.id}`}
+                            className={`text-[10px] px-1.5 py-1 rounded border truncate transition-opacity hover:opacity-80 ${getPriorityColor(task.id_Priority || task.priority)} ${task.state ? 'line-through opacity-60' : ''
+                              }`}
+                            title={task.title}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleTaskClick(task)
+                            }}
+                          >
+                            {task.title}
+                          </div>
+                        ))}
 
-                    {totalItems > 2 && (
-                      <div className="text-[10px] text-muted-foreground font-medium pl-1">+{totalItems - 2} más</div>
-                    )}
-                  </div>
+                        {totalItems > 2 && (
+                          <div className="text-[10px] text-muted-foreground font-medium pl-1">+{totalItems - 2} más</div>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
               )
             })}
@@ -945,325 +948,325 @@ export default function CalendarPage() {
       )}
 
       {view === 'week' && (
-        <div className="rounded-xl shadow-sm p-6 mb-6 bg-card border border-border">
-          <div className="flex items-center justify-between mb-6">
-            <button
-              onClick={() => {
-                const newDate = new Date(currentDate)
-                newDate.setDate(newDate.getDate() - 7)
-                setCurrentDate(newDate)
-              }}
-              className={`p-2 rounded-lg transition-colors ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
-                }`}
-            >
-              <ChevronLeft className="w-5 h-5 text-foreground" />
-            </button>
-
-            <h2 className="text-2xl font-bold text-foreground">
-              Semana del {currentDate.toLocaleDateString('es-ES')}
-            </h2>
-
-            <button
-              onClick={() => {
-                const newDate = new Date(currentDate)
-                newDate.setDate(newDate.getDate() + 7)
-                setCurrentDate(newDate)
-              }}
-              className="p-2 rounded-lg transition-colors hover:bg-muted"
-            >
-              <ChevronRight className="w-5 h-5 text-foreground" />
-            </button>
-          </div>
-          {renderWeekView()}
-        </div>
-      )}
-
-      {view === 'day' && renderDayView()}
-
-      {selectedDate && (
-        <div className="rounded-xl shadow-sm p-6 bg-card border border-border">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${darkMode ? 'bg-primary/10' : 'bg-primary/10'
-              }`}>
-              <Clock className={`w-6 h-6 text-primary`} />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-foreground">
-                {selectedDate.toLocaleDateString('es-ES', {
-                  weekday: 'long',
-                  day: 'numeric',
-                  month: 'long',
-                })}
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {getTasksForDate(selectedDate).length + getEventsForDate(selectedDate).length} elementos programados
-              </p>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            {getTasksForDate(selectedDate).length === 0 && getEventsForDate(selectedDate).length === 0 ? (
-              <div className="text-center py-12">
-                <Calendar className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
-                <p className="text-muted-foreground">
-                  No hay elementos para este día
-                </p>
+            <div className="rounded-xl shadow-sm p-6 mb-6 bg-card border border-border">
+              <div className="flex items-center justify-between mb-6">
                 <button
-                  className="mt-4 text-green-600 hover:text-green-700 font-medium text-sm"
-                  onClick={() => setShowCreateModal(true)}
+                  onClick={() => {
+                    const newDate = new Date(currentDate)
+                    newDate.setDate(newDate.getDate() - 7)
+                    setCurrentDate(newDate)
+                  }}
+                  className={`p-2 rounded-lg transition-colors ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+                    }`}
                 >
-                  Agregar evento
+                  <ChevronLeft className="w-5 h-5 text-foreground" />
+                </button>
+
+                <h2 className="text-2xl font-bold text-foreground">
+                  Semana del {currentDate.toLocaleDateString('es-ES')}
+                </h2>
+
+                <button
+                  onClick={() => {
+                    const newDate = new Date(currentDate)
+                    newDate.setDate(newDate.getDate() + 7)
+                    setCurrentDate(newDate)
+                  }}
+                  className="p-2 rounded-lg transition-colors hover:bg-muted"
+                >
+                  <ChevronRight className="w-5 h-5 text-foreground" />
                 </button>
               </div>
-            ) : (
-              <>
-                {/* Tasks */}
-                {getTasksForDate(selectedDate).map((task) => (
-                  <div
-                    key={`task-${task.id}`}
-                    className={`p-4 rounded-xl border-2 ${getPriorityColor(task.id_Priority || task.priority)} ${task.state ? 'opacity-60' : ''} cursor-pointer`}
-                    onClick={() => handleTaskClick(task)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg">📋</span>
-                        <div>
-                          <h4 className={`font-semibold ${task.state ? 'line-through' : ''}`}>{task.title}</h4>
-                          {task.description && (
-                            <p className="text-sm text-muted-foreground mt-1">{task.description}</p>
-                          )}
-                        </div>
-                      </div>
-                      <span
-                        className={`px-3 py-1 text-xs rounded-full font-medium ${task.state ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                          }`}
-                      >
-                        {task.state ? 'Completada' : 'Pendiente'}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+              {renderWeekView()}
+            </div>
+          )}
 
-                {/* Events */}
-                {getEventsForDate(selectedDate).map((event) => (
-                  <div
-                    key={`event-${event.id}`}
-                    className="p-4 rounded-xl border-2 border-blue-200 bg-blue-50 cursor-pointer"
-                    onClick={() => handleEventClick(event)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg">📅</span>
-                        <div>
-                          <h4 className="font-semibold">{event.title}</h4>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {new Date(event.start_date).toLocaleTimeString('es-ES', {
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
-                            {event.type && ` • ${event.type}`}
-                          </p>
-                          {event.description && (
-                            <p className="text-sm text-muted-foreground mt-1">{event.description}</p>
+          {view === 'day' && renderDayView()}
+
+          {selectedDate && (
+            <div className="rounded-xl shadow-sm p-6 bg-card border border-border">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${darkMode ? 'bg-primary/10' : 'bg-primary/10'
+                  }`}>
+                  <Clock className={`w-6 h-6 text-primary`} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-foreground">
+                    {selectedDate.toLocaleDateString('es-ES', {
+                      weekday: 'long',
+                      day: 'numeric',
+                      month: 'long',
+                    })}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {getTasksForDate(selectedDate).length + getEventsForDate(selectedDate).length} elementos programados
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {getTasksForDate(selectedDate).length === 0 && getEventsForDate(selectedDate).length === 0 ? (
+                  <div className="text-center py-12">
+                    <Calendar className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
+                    <p className="text-muted-foreground">
+                      No hay elementos para este día
+                    </p>
+                    <button
+                      className="mt-4 text-green-600 hover:text-green-700 font-medium text-sm"
+                      onClick={() => setShowCreateModal(true)}
+                    >
+                      Agregar evento
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    {/* Tasks */}
+                    {getTasksForDate(selectedDate).map((task) => (
+                      <div
+                        key={`task-${task.id}`}
+                        className={`p-4 rounded-xl border-2 ${getPriorityColor(task.id_Priority || task.priority)} ${task.state ? 'opacity-60' : ''} cursor-pointer`}
+                        onClick={() => handleTaskClick(task)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">📋</span>
+                            <div>
+                              <h4 className={`font-semibold ${task.state ? 'line-through' : ''}`}>{task.title}</h4>
+                              {task.description && (
+                                <p className="text-sm text-muted-foreground mt-1">{task.description}</p>
+                              )}
+                            </div>
+                          </div>
+                          <span
+                            className={`px-3 py-1 text-xs rounded-full font-medium ${task.state ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                              }`}
+                          >
+                            {task.state ? 'Completada' : 'Pendiente'}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Events */}
+                    {getEventsForDate(selectedDate).map((event) => (
+                      <div
+                        key={`event-${event.id}`}
+                        className="p-4 rounded-xl border-2 border-blue-200 bg-blue-50 cursor-pointer"
+                        onClick={() => handleEventClick(event)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">📅</span>
+                            <div>
+                              <h4 className="font-semibold">{event.title}</h4>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {new Date(event.start_date).toLocaleTimeString('es-ES', {
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                                {event.type && ` • ${event.type}`}
+                              </p>
+                              {event.description && (
+                                <p className="text-sm text-muted-foreground mt-1">{event.description}</p>
+                              )}
+                            </div>
+                          </div>
+                          {event.notify && (
+                            <span className="px-3 py-1 text-xs rounded-full font-medium bg-green-100 text-green-800">
+                              🔔 Notificaciones
+                            </span>
                           )}
                         </div>
                       </div>
-                      {event.notify && (
-                        <span className="px-3 py-1 text-xs rounded-full font-medium bg-green-100 text-green-800">
-                          🔔 Notificaciones
+                    ))}
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Task Details Modal */}
+          {showTaskDetails && (
+            <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div className="bg-card rounded-xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-300 border border-border">
+                <div className="p-6">
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <span className="text-2xl">📋</span>
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-bold text-foreground">Detalles de Tarea</h2>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(showTaskDetails.endDate || showTaskDetails.creationDate).toLocaleDateString('es-ES')}
+                        </p>
+                      </div>
+                    </div>
+                    <Button variant="ghost" size="icon" onClick={() => setShowTaskDetails(null)}>
+                      <X size={20} />
+                    </Button>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-lg font-semibold text-foreground">{showTaskDetails.title}</h3>
+                      {showTaskDetails.description && (
+                        <p className="text-muted-foreground mt-2">{showTaskDetails.description}</p>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className={`px-3 py-1 text-xs rounded-full font-medium ${showTaskDetails.state ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                        }`}>
+                        {showTaskDetails.state ? 'Completada' : 'Pendiente'}
+                      </span>
+                      {showTaskDetails.id_Priority && (
+                        <span className={`px-3 py-1 text-xs rounded-full font-medium ${getPriorityColor(showTaskDetails.id_Priority)}`}>
+                          Prioridad {showTaskDetails.id_Priority}
                         </span>
                       )}
                     </div>
-                  </div>
-                ))}
-              </>
-            )}
-          </div>
-        </div>
-      )}
 
-      {/* Task Details Modal */}
-      {showTaskDetails && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-card rounded-xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-300 border border-border">
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <span className="text-2xl">📋</span>
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-foreground">Detalles de Tarea</h2>
-                    <p className="text-sm text-muted-foreground">
-                      {new Date(showTaskDetails.endDate || showTaskDetails.creationDate).toLocaleDateString('es-ES')}
-                    </p>
+                    {showTaskDetails.Category && (
+                      <div className="text-sm text-muted-foreground">
+                        <strong>Categoría:</strong> {showTaskDetails.Category.name}
+                      </div>
+                    )}
                   </div>
                 </div>
-                <Button variant="ghost" size="icon" onClick={() => setShowTaskDetails(null)}>
-                  <X size={20} />
-                </Button>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-foreground">{showTaskDetails.title}</h3>
-                  {showTaskDetails.description && (
-                    <p className="text-muted-foreground mt-2">{showTaskDetails.description}</p>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <span className={`px-3 py-1 text-xs rounded-full font-medium ${showTaskDetails.state ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                    }`}>
-                    {showTaskDetails.state ? 'Completada' : 'Pendiente'}
-                  </span>
-                  {showTaskDetails.id_Priority && (
-                    <span className={`px-3 py-1 text-xs rounded-full font-medium ${getPriorityColor(showTaskDetails.id_Priority)}`}>
-                      Prioridad {showTaskDetails.id_Priority}
-                    </span>
-                  )}
-                </div>
-
-                {showTaskDetails.Category && (
-                  <div className="text-sm text-muted-foreground">
-                    <strong>Categoría:</strong> {showTaskDetails.Category.name}
-                  </div>
-                )}
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          )}
 
-      {/* Event Details Modal */}
-      {showEventDetails && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-card rounded-xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-300 border border-border">
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-6">
-                <div className="flex items-center gap-3">
-                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${getEventColor(showEventDetails.type).split(' ')[0]}`}>
-                    <Calendar size={24} className={getEventColor(showEventDetails.type).split(' ')[1]} />
+          {/* Event Details Modal */}
+          {showEventDetails && (
+            <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div className="bg-card rounded-xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-300 border border-border">
+                <div className="p-6">
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${getEventColor(showEventDetails.type).split(' ')[0]}`}>
+                        <Calendar size={24} className={getEventColor(showEventDetails.type).split(' ')[1]} />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-bold text-foreground">Detalles del Evento</h2>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(showEventDetails.start_date).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                        </p>
+                      </div>
+                    </div>
+                    <Button variant="ghost" size="icon" onClick={() => setShowEventDetails(null)}>
+                      <X size={20} />
+                    </Button>
                   </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-foreground">Detalles del Evento</h2>
-                    <p className="text-sm text-muted-foreground">
-                      {new Date(showEventDetails.start_date).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                    </p>
-                  </div>
-                </div>
-                <Button variant="ghost" size="icon" onClick={() => setShowEventDetails(null)}>
-                  <X size={20} />
-                </Button>
-              </div>
 
-              <div className="space-y-5">
-                <div>
-                  <h3 className="text-xl font-semibold text-foreground mb-1">{showEventDetails.title}</h3>
-                  <div className="flex items-center gap-2 mt-2">
-                      <span className={`text-xs px-2 py-1 rounded border font-medium ${getEventColor(showEventDetails.type)}`}>
-                        {showEventDetails.type || 'Evento'}
-                      </span>
-                      <span className="text-sm text-muted-foreground flex items-center gap-1">
-                        <Clock size={14} />
-                        {new Date(showEventDetails.start_date).toLocaleTimeString('es-ES', {
+                  <div className="space-y-5">
+                    <div>
+                      <h3 className="text-xl font-semibold text-foreground mb-1">{showEventDetails.title}</h3>
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className={`text-xs px-2 py-1 rounded border font-medium ${getEventColor(showEventDetails.type)}`}>
+                          {showEventDetails.type || 'Evento'}
+                        </span>
+                        <span className="text-sm text-muted-foreground flex items-center gap-1">
+                          <Clock size={14} />
+                          {new Date(showEventDetails.start_date).toLocaleTimeString('es-ES', {
                             hour: '2-digit',
                             minute: '2-digit'
-                        })}
-                      </span>
-                  </div>
+                          })}
+                        </span>
+                      </div>
 
-                  {showEventDetails.description && (
-                    <div className="mt-4 p-3 bg-muted/50 rounded-lg text-sm text-foreground/80 leading-relaxed">
-                        {showEventDetails.description}
+                      {showEventDetails.description && (
+                        <div className="mt-4 p-3 bg-muted/50 rounded-lg text-sm text-foreground/80 leading-relaxed">
+                          {showEventDetails.description}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
 
-                {showEventDetails.notify && (
-                  <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 p-2 rounded-lg border border-green-100">
-                    <Bell size={14} />
-                    <span className="font-medium">Notificaciones activadas</span>
+                    {showEventDetails.notify && (
+                      <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 p-2 rounded-lg border border-green-100">
+                        <Bell size={14} />
+                        <span className="font-medium">Notificaciones activadas</span>
+                      </div>
+                    )}
+
+                    <div className="flex gap-3 pt-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => handleEditEvent(showEventDetails)}
+                        className="flex-1"
+                      >
+                        <Edit size={16} className="mr-2" />
+                        Editar
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleDeleteEvent(showEventDetails.id)}
+                        className="flex-1 text-red-600 hover:bg-red-50 hover:text-red-700"
+                      >
+                        <Trash2 size={16} className="mr-2" />
+                        Eliminar
+                      </Button>
+                    </div>
                   </div>
-                )}
-
-                <div className="flex gap-3 pt-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => handleEditEvent(showEventDetails)}
-                    className="flex-1"
-                  >
-                    <Edit size={16} className="mr-2" />
-                    Editar
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleDeleteEvent(showEventDetails.id)}
-                    className="flex-1 text-red-600 hover:bg-red-50 hover:text-red-700"
-                  >
-                    <Trash2 size={16} className="mr-2" />
-                    Eliminar
-                  </Button>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          )}
 
-      {showCreateModal && (
-        <CreateEventModal
-          onClose={() => setShowCreateModal(false)}
-          onCreate={handleCreateEvent}
-          selectedDate={selectedDate}
-        />
-      )}
+          {showCreateModal && (
+            <CreateEventModal
+              onClose={() => setShowCreateModal(false)}
+              onCreate={handleCreateEvent}
+              selectedDate={selectedDate}
+            />
+          )}
 
-      {showEditModal && (
-        <EditEventModal
-          onClose={() => setShowEditModal(null)}
-          onUpdate={handleUpdateEvent}
-          event={showEditModal}
-        />
-      )}
+          {showEditModal && (
+            <EditEventModal
+              onClose={() => setShowEditModal(null)}
+              onUpdate={handleUpdateEvent}
+              event={showEditModal}
+            />
+          )}
 
-      {showDeleteEventConfirm && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-card rounded-xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-300 border border-border">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                    <Trash2 size={24} className="text-red-600" />
+          {showDeleteEventConfirm && (
+            <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div className="bg-card rounded-xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-300 border border-border">
+                <div className="p-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                        <Trash2 size={24} className="text-red-600" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-bold text-foreground">Eliminar Evento</h2>
+                        <p className="text-sm text-muted-foreground">Esta acción no se puede deshacer</p>
+                      </div>
+                    </div>
+                    <Button variant="ghost" size="icon" onClick={() => setShowDeleteEventConfirm(null)}>
+                      <X size={20} />
+                    </Button>
                   </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-foreground">Eliminar Evento</h2>
-                    <p className="text-sm text-muted-foreground">Esta acción no se puede deshacer</p>
+
+                  <p className="text-muted-foreground mb-6">
+                    ¿Estás seguro de que quieres eliminar el evento <strong className="text-foreground">{events.find(e => e.id === showDeleteEventConfirm)?.title}</strong>?
+                    Se perderá permanentemente.
+                  </p>
+
+                  <div className="flex gap-2 justify-end">
+                    <Button variant="outline" onClick={() => setShowDeleteEventConfirm(null)}>
+                      Cancelar
+                    </Button>
+                    <Button onClick={confirmDeleteEvent} className="bg-red-600 hover:bg-red-700">
+                      <Trash2 size={16} className="mr-2" />
+                      Eliminar
+                    </Button>
                   </div>
                 </div>
-                <Button variant="ghost" size="icon" onClick={() => setShowDeleteEventConfirm(null)}>
-                  <X size={20} />
-                </Button>
-              </div>
-
-              <p className="text-muted-foreground mb-6">
-                ¿Estás seguro de que quieres eliminar el evento <strong className="text-foreground">{events.find(e => e.id === showDeleteEventConfirm)?.title}</strong>?
-                Se perderá permanentemente.
-              </p>
-
-              <div className="flex gap-2 justify-end">
-                <Button variant="outline" onClick={() => setShowDeleteEventConfirm(null)}>
-                  Cancelar
-                </Button>
-                <Button onClick={confirmDeleteEvent} className="bg-red-600 hover:bg-red-700">
-                  <Trash2 size={16} className="mr-2" />
-                  Eliminar
-                </Button>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          )}
     </div>
   )
 }
