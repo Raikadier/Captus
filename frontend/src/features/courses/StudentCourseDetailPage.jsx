@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
+import { COURSE_DEFAULT_COLOR } from '../../shared/constants/colors'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useCourses } from '../../hooks/useCourses'
 import { useAssignments } from '../../hooks/useAssignments'
@@ -66,7 +67,7 @@ export default function StudentCourseDetailPage() {
   const mockCourse = {
     name: 'Cálculo Diferencial (Mock)',
     professor: 'Dr. Juan Pérez',
-    color: '#3b82f6',
+    color: COURSE_DEFAULT_COLOR,
   }
 
   const contentItems = [
@@ -257,7 +258,7 @@ export default function StudentCourseDetailPage() {
         <div className="flex items-center gap-4">
           <div
             className="w-16 h-16 rounded-lg"
-            style={{ backgroundColor: displayCourse.color || '#3b82f6' }}
+            style={{ backgroundColor: displayCourse.color || COURSE_DEFAULT_COLOR }}
           />
           <div>
             <h1 className="text-2xl font-bold text-foreground">{displayCourse.title || displayCourse.name}</h1>

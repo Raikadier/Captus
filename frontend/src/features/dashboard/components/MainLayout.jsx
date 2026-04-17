@@ -5,6 +5,7 @@ import Sidebar from './Sidebar'
 import TeacherSidebar from './TeacherSidebar'
 import { Button } from '../../../ui/button'
 import { useAuth } from '../../../hooks/useAuth'
+import ErrorBoundary from '../../../components/shared/ErrorBoundary'
 
 const MainLayout = ({ children }) => {
   const { user } = useAuth()
@@ -27,14 +28,17 @@ const MainLayout = ({ children }) => {
         className={`min-h-screen transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isCollapsed ? 'ml-20' : 'ml-60'
           }`}
       >
-        {children || <Outlet />}
+        <ErrorBoundary>
+          {children || <Outlet />}
+        </ErrorBoundary>
       </div>
 
       {showFloatingButton && (
-        <Link to="/chatbot" title="Hablar con Captus AI">
+        <Link to="/chatbot" title="Hablar con Captus AI" aria-label="Abrir asistente de IA Captus">
           <Button
             className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110 active:scale-95 animate-pulse z-50"
             size="icon"
+            aria-label="Abrir asistente de IA Captus"
           >
             <Sparkles size={24} />
           </Button>

@@ -6,10 +6,11 @@ import { Input } from '../../ui/input'
 import { Label } from '../../ui/label'
 import { Textarea } from '../../ui/textarea'
 import { Switch } from '../../ui/switch'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../../ui/dialog'
 import apiClient from '../../shared/api/client'
 import { useEvents } from '../../hooks/useEvents'
 
-function EditEventModal({ onClose, onUpdate, event }) {
+function EditEventModal({ open, onClose, onUpdate, event }) {
   const [title, setTitle] = useState(event.title)
   const [description, setDescription] = useState(event.description || '')
   const [date, setDate] = useState(new Date(event.start_date).toISOString().split('T')[0])
@@ -52,108 +53,97 @@ function EditEventModal({ onClose, onUpdate, event }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-      <div className="bg-card rounded-xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-300 border border-border">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                <Edit size={24} className="text-primary" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-foreground">Editar Evento</h2>
-                <p className="text-sm text-muted-foreground">Modifica los detalles del evento</p>
-              </div>
+    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose() }}>
+      <DialogContent className="w-full max-w-md">
+        <DialogHeader>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+              <Edit size={20} className="text-primary" />
             </div>
-            <Button variant="ghost" size="icon" onClick={onClose}>
-              <X size={20} />
+            <div>
+              <DialogTitle>Editar Evento</DialogTitle>
+              <DialogDescription>Modifica los detalles del evento</DialogDescription>
+            </div>
+          </div>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          <div>
+            <Label>Título *</Label>
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Título del evento"
+              className="mt-1 bg-background border-border text-foreground"
+            />
+          </div>
+          <div>
+            <Label>Tipo</Label>
+            <select
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              className="w-full mt-1 px-3 py-2 rounded-lg border border-border bg-background text-foreground"
+            >
+              <option>Reunión</option>
+              <option>Examen</option>
+              <option>Entrega</option>
+              <option>Clase</option>
+            </select>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Fecha *</Label>
+              <Input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="mt-1 bg-background border-border text-foreground"
+              />
+            </div>
+            <div>
+              <Label>Hora</Label>
+              <Input
+                type="time"
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+                className="mt-1 bg-background border-border text-foreground"
+              />
+            </div>
+          </div>
+          <div>
+            <Label>Descripción</Label>
+            <Textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Describe tu evento..."
+              className="mt-1 bg-background border-border text-foreground"
+              rows={3}
+            />
+          </div>
+          <div className="flex items-center space-x-2">
+            <Switch id="notify-edit" checked={notify} onCheckedChange={setNotify} />
+            <Label htmlFor="notify-edit" className="flex items-center gap-2">
+              {notify ? <Bell size={16} className="text-primary" /> : <BellOff size={16} />}
+              Recibir notificaciones por email
+            </Label>
+          </div>
+          <div className="flex gap-2 justify-end pt-2">
+            <Button variant="outline" onClick={onClose}>Cancelar</Button>
+            <Button
+              onClick={handleSubmit}
+              disabled={!title.trim() || !date || loading}
+              className="bg-primary hover:bg-primary/90"
+            >
+              {loading ? 'Actualizando...' : 'Actualizar Evento'}
             </Button>
           </div>
-
-          <div className="space-y-4">
-            <div>
-              <Label>Título *</Label>
-              <Input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Título del evento"
-                className="mt-1 bg-background border-border text-foreground"
-              />
-            </div>
-            <div>
-              <Label>Tipo</Label>
-              <select
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-                className="w-full mt-1 px-3 py-2 rounded-lg border border-border bg-background text-foreground"
-              >
-                <option>Reunión</option>
-                <option>Examen</option>
-                <option>Entrega</option>
-                <option>Clase</option>
-              </select>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Fecha *</Label>
-                <Input
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="mt-1 bg-background border-border text-foreground"
-                />
-              </div>
-              <div>
-                <Label>Hora</Label>
-                <Input
-                  type="time"
-                  value={time}
-                  onChange={(e) => setTime(e.target.value)}
-                  className="mt-1 bg-background border-border text-foreground"
-                />
-              </div>
-            </div>
-            <div>
-              <Label>Descripción</Label>
-              <Textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Describe tu evento..."
-                className="mt-1 bg-background border-border text-foreground"
-                rows={3}
-              />
-            </div>
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="notify-edit"
-                checked={notify}
-                onCheckedChange={setNotify}
-              />
-              <Label htmlFor="notify-edit" className="flex items-center gap-2">
-                {notify ? <Bell size={16} className="text-primary" /> : <BellOff size={16} />}
-                Recibir notificaciones por email
-              </Label>
-            </div>
-            <div className="flex gap-2 justify-end pt-4">
-              <Button variant="outline" onClick={onClose}>
-                Cancelar
-              </Button>
-              <Button
-                onClick={handleSubmit}
-                disabled={!title.trim() || !date || loading}
-                className="bg-primary hover:bg-primary/90"
-              >
-                {loading ? 'Actualizando...' : 'Actualizar Evento'}
-              </Button>
-            </div>
-          </div>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }
 
-function CreateEventModal({ onClose, onCreate, selectedDate }) {
+function CreateEventModal({ open, onClose, onCreate, selectedDate }) {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [date, setDate] = useState(selectedDate?.toISOString().split('T')[0] || '')
@@ -182,104 +172,93 @@ function CreateEventModal({ onClose, onCreate, selectedDate }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-      <div className="bg-card rounded-xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-300 border border-border">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                <Plus size={24} className="text-primary" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-foreground">Nuevo Evento</h2>
-                <p className="text-sm text-muted-foreground">Crea un evento en tu calendario</p>
-              </div>
+    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose() }}>
+      <DialogContent className="w-full max-w-md">
+        <DialogHeader>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+              <Plus size={20} className="text-primary" />
             </div>
-            <Button variant="ghost" size="icon" onClick={onClose}>
-              <X size={20} />
+            <div>
+              <DialogTitle>Nuevo Evento</DialogTitle>
+              <DialogDescription>Crea un evento en tu calendario</DialogDescription>
+            </div>
+          </div>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          <div>
+            <Label>Título *</Label>
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Título del evento"
+              className="mt-1 bg-background border-border text-foreground"
+            />
+          </div>
+          <div>
+            <Label>Tipo</Label>
+            <select
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              className="w-full mt-1 px-3 py-2 rounded-lg border border-border bg-background text-foreground"
+            >
+              <option>Reunión</option>
+              <option>Examen</option>
+              <option>Entrega</option>
+              <option>Clase</option>
+            </select>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Fecha *</Label>
+              <Input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="mt-1 bg-background border-border text-foreground"
+              />
+            </div>
+            <div>
+              <Label>Hora</Label>
+              <Input
+                type="time"
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+                className="mt-1 bg-background border-border text-foreground"
+              />
+            </div>
+          </div>
+          <div>
+            <Label>Descripción</Label>
+            <Textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Describe tu evento..."
+              className="mt-1 bg-background border-border text-foreground"
+              rows={3}
+            />
+          </div>
+          <div className="flex items-center space-x-2">
+            <Switch id="notify" checked={notify} onCheckedChange={setNotify} />
+            <Label htmlFor="notify" className="flex items-center gap-2">
+              {notify ? <Bell size={16} className="text-primary" /> : <BellOff size={16} />}
+              Recibir notificaciones por email
+            </Label>
+          </div>
+          <div className="flex gap-2 justify-end pt-2">
+            <Button variant="outline" onClick={onClose}>Cancelar</Button>
+            <Button
+              onClick={handleCreate}
+              disabled={!title.trim() || !date || loading}
+              className="bg-primary hover:bg-primary/90"
+            >
+              {loading ? 'Creando...' : 'Crear Evento'}
             </Button>
           </div>
-
-          <div className="space-y-4">
-            <div>
-              <Label>Título *</Label>
-              <Input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Título del evento"
-                className="mt-1 bg-background border-border text-foreground"
-              />
-            </div>
-            <div>
-              <Label>Tipo</Label>
-              <select
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-                className="w-full mt-1 px-3 py-2 rounded-lg border border-border bg-background text-foreground"
-              >
-                <option>Reunión</option>
-                <option>Examen</option>
-                <option>Entrega</option>
-                <option>Clase</option>
-              </select>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Fecha *</Label>
-                <Input
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="mt-1 bg-background border-border text-foreground"
-                />
-              </div>
-              <div>
-                <Label>Hora</Label>
-                <Input
-                  type="time"
-                  value={time}
-                  onChange={(e) => setTime(e.target.value)}
-                  className="mt-1 bg-background border-border text-foreground"
-                />
-              </div>
-            </div>
-            <div>
-              <Label>Descripción</Label>
-              <Textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Describe tu evento..."
-                className="mt-1 bg-background border-border text-foreground"
-                rows={3}
-              />
-            </div>
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="notify"
-                checked={notify}
-                onCheckedChange={setNotify}
-              />
-              <Label htmlFor="notify" className="flex items-center gap-2">
-                {notify ? <Bell size={16} className="text-primary" /> : <BellOff size={16} />}
-                Recibir notificaciones por email
-              </Label>
-            </div>
-            <div className="flex gap-2 justify-end pt-4">
-              <Button variant="outline" onClick={onClose}>
-                Cancelar
-              </Button>
-              <Button
-                onClick={handleCreate}
-                disabled={!title.trim() || !date || loading}
-                className="bg-primary hover:bg-primary/90"
-              >
-                {loading ? 'Creando...' : 'Crear Evento'}
-              </Button>
-            </div>
-          </div>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -1214,16 +1193,16 @@ export default function CalendarPage() {
             </div>
           )}
 
-          {showCreateModal && (
-            <CreateEventModal
-              onClose={() => setShowCreateModal(false)}
-              onCreate={handleCreateEvent}
-              selectedDate={selectedDate}
-            />
-          )}
+          <CreateEventModal
+            open={showCreateModal}
+            onClose={() => setShowCreateModal(false)}
+            onCreate={handleCreateEvent}
+            selectedDate={selectedDate}
+          />
 
           {showEditModal && (
             <EditEventModal
+              open={!!showEditModal}
               onClose={() => setShowEditModal(null)}
               onUpdate={handleUpdateEvent}
               event={showEditModal}

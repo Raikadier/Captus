@@ -1,6 +1,7 @@
 import CourseRepository from '../repositories/CourseRepository.js';
 import EnrollmentRepository from '../repositories/EnrollmentRepository.js';
 import crypto from 'crypto';
+import { OperationResult } from '../shared/OperationResult.js';
 
 export default class CourseService {
   constructor(courseRepo, enrollmentRepo) {
@@ -9,91 +10,127 @@ export default class CourseService {
   }
 
   async createCourse(data, teacherId) {
-    // Generate unique invite code
-    let inviteCode;
-    let isUnique = false;
+    try {
+      if (!data?.title || data.title.trim() === '') {
+        return new OperationResult(false, 'El título del curso es requerido.');
+      }
+      if (!teacherId) {
+        return new OperationResult(false, 'El ID del profesor es requerido.');
+      }
 
-    while (!isUnique) {
-      inviteCode = crypto.randomBytes(3).toString('hex').toUpperCase(); // 6 chars
-      const existing = await this.courseRepo.findByInviteCode(inviteCode);
-      if (!existing) isUnique = true;
+      let inviteCode;
+      let isUnique = false;
+      while (!isUnique) {
+        inviteCode = crypto.randomBytes(3).toString('hex').toUpperCase();
+        const existing = await this.courseRepo.findByInviteCode(inviteCode);
+        if (!existing) isUnique = true;
+      }
+
+      const courseData = { ...data, teacher_id: teacherId, invite_code: inviteCode };
+      const course = await this.courseRepo.save(courseData);
+      return new OperationResult(true, 'Curso creado exitosamente.', course);
+    } catch (error) {
+      return new OperationResult(false, `Error al crear el curso: ${error.message}`);
     }
-
-    const courseData = {
-      ...data,
-      teacher_id: teacherId,
-      invite_code: inviteCode
-    };
-
-    return await this.courseRepo.save(courseData);
   }
 
   async getCoursesForUser(userId, role) {
-    if (role === 'teacher') {
-      const courses = await this.courseRepo.findByTeacher(userId);
-      // Transform data for teacher view (add counts)
-      return courses.map(course => ({
-        ...course,
-        students: course.enrollments?.[0]?.count || 0,
-        pendingTasks: 0 // Placeholder as per original logic
-      }));
-    } else {
-      const enrollments = await this.courseRepo.findByStudent(userId);
-      // Transform data for student view
-      return enrollments.map(item => ({
-        ...item.courses,
-        professor: item.courses?.teacher?.name || 'Profesor',
-        progress: 0,
-        enrolled_at: item.enrolled_at
-      }));
+    try {
+      if (!userId) return new OperationResult(false, 'ID de usuario requerido.');
+
+      let courses;
+      if (role === 'teacher') {
+        const rawCourses = await this.courseRepo.findByTeacher(userId);
+        courses = rawCourses.map(course => ({
+          ...course,
+          students: course.enrollments?.[0]?.count || 0,
+          pendingTasks: 0
+        }));
+      } else {
+        const enrollments = await this.courseRepo.findByStudent(userId);
+        courses = enrollments.map(item => ({
+          ...item.courses,
+          professor: item.courses?.teacher?.name || 'Profesor',
+          progress: 0,
+          enrolled_at: item.enrolled_at
+        }));
+      }
+
+      return new OperationResult(true, 'Cursos obtenidos exitosamente.', courses);
+    } catch (error) {
+      return new OperationResult(false, `Error al obtener cursos: ${error.message}`);
     }
   }
 
   async getCourseDetail(courseId, userId, role) {
-    const course = await this.courseRepo.getById(courseId);
-    if (!course) throw new Error('Curso no encontrado');
+    try {
+      const course = await this.courseRepo.getById(courseId);
+      if (!course) return new OperationResult(false, 'Curso no encontrado.');
 
-    // Access Control
-    if (role === 'teacher') {
-      if (course.teacher_id !== userId) throw new Error('No tienes permiso para ver este curso');
-    } else {
-      const isEnrolled = await this.enrollmentRepo.isEnrolled(courseId, userId);
-      if (!isEnrolled) throw new Error('No estás inscrito en este curso');
+      if (role === 'teacher') {
+        if (course.teacher_id !== userId) {
+          return new OperationResult(false, 'No tienes permiso para ver este curso.');
+        }
+      } else {
+        const isEnrolled = await this.enrollmentRepo.isEnrolled(courseId, userId);
+        if (!isEnrolled) return new OperationResult(false, 'No estás inscrito en este curso.');
+      }
+
+      return new OperationResult(true, 'Curso encontrado.', course);
+    } catch (error) {
+      return new OperationResult(false, `Error al obtener el curso: ${error.message}`);
     }
-
-    return course;
   }
 
   async updateCourse(courseId, data, teacherId) {
-    const course = await this.courseRepo.getById(courseId);
-    if (!course) throw new Error('Curso no encontrado');
-    if (course.teacher_id !== teacherId) throw new Error('No tienes permiso para editar este curso');
+    try {
+      const course = await this.courseRepo.getById(courseId);
+      if (!course) return new OperationResult(false, 'Curso no encontrado.');
+      if (course.teacher_id !== teacherId) {
+        return new OperationResult(false, 'No tienes permiso para editar este curso.');
+      }
 
-    return await this.courseRepo.update(courseId, data);
+      const updated = await this.courseRepo.update(courseId, data);
+      return new OperationResult(true, 'Curso actualizado exitosamente.', updated);
+    } catch (error) {
+      return new OperationResult(false, `Error al actualizar el curso: ${error.message}`);
+    }
   }
 
   async deleteCourse(courseId, teacherId) {
-    const course = await this.courseRepo.getById(courseId);
-    if (!course) throw new Error('Curso no encontrado');
-    if (course.teacher_id !== teacherId) throw new Error('No tienes permiso para eliminar este curso');
+    try {
+      const course = await this.courseRepo.getById(courseId);
+      if (!course) return new OperationResult(false, 'Curso no encontrado.');
+      if (course.teacher_id !== teacherId) {
+        return new OperationResult(false, 'No tienes permiso para eliminar este curso.');
+      }
 
-    return await this.courseRepo.delete(courseId);
+      await this.courseRepo.delete(courseId);
+      return new OperationResult(true, 'Curso eliminado exitosamente.');
+    } catch (error) {
+      return new OperationResult(false, `Error al eliminar el curso: ${error.message}`);
+    }
   }
 
   async getCourseGrades(courseId, teacherId) {
-    const course = await this.courseRepo.getById(courseId);
-    if (!course) throw new Error('Curso no encontrado');
-    if (course.teacher_id !== teacherId) throw new Error('No tienes permiso para descargar las notas de este curso');
+    try {
+      const course = await this.courseRepo.getById(courseId);
+      if (!course) return new OperationResult(false, 'Curso no encontrado.');
+      if (course.teacher_id !== teacherId) {
+        return new OperationResult(false, 'No tienes permiso para descargar las notas de este curso.');
+      }
 
-    // Get enrollments with student details
-    const enrollments = await this.enrollmentRepo.getCourseStudents(courseId);
+      const enrollments = await this.enrollmentRepo.getCourseStudents(courseId);
+      const grades = enrollments.map(e => ({
+        studentName: e.name || 'Estudiante',
+        studentEmail: e.email || 'N/A',
+        grade: e.grade || 0,
+        enrolledAt: e.enrolled_at
+      }));
 
-    // Map to a simpler structure
-    return enrollments.map(e => ({
-      studentName: e.name || 'Estudiante',
-      studentEmail: e.email || 'N/A',
-      grade: e.grade || 0, // Ensure repository returns grade
-      enrolledAt: e.enrolled_at
-    }));
+      return new OperationResult(true, 'Notas obtenidas exitosamente.', grades);
+    } catch (error) {
+      return new OperationResult(false, `Error al obtener notas: ${error.message}`);
+    }
   }
 }

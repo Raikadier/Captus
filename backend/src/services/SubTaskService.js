@@ -3,6 +3,7 @@ import SubTaskRepository from "../repositories/SubTaskRepository.js";
 import TaskRepository from "../repositories/TaskRepository.js";
 import { TaskService } from "./TaskService.js";
 import { OperationResult } from "../shared/OperationResult.js";
+import { validateRequired, validateFutureDate } from "../shared/validators.js";
 
 const subTaskRepository = new SubTaskRepository();
 const taskRepository = new TaskRepository();
@@ -25,9 +26,8 @@ export class SubTaskService {
       return new OperationResult(false, "La subtarea no puede ser nula.");
     }
 
-    if (!subTask.title || subTask.title.trim() === "") {
-      return new OperationResult(false, "El título de la subtarea no puede estar vacío.");
-    }
+    const titleError = validateRequired(subTask.title, 'título');
+    if (titleError) return new OperationResult(false, titleError);
 
     if (!subTask.id_Task) {
       return new OperationResult(false, "La subtarea debe tener una tarea padre asignada.");
@@ -35,17 +35,13 @@ export class SubTaskService {
 
     // Validar fecha límite si se proporciona
     if (subTask.endDate) {
-      const endDate = new Date(subTask.endDate + 'T00:00:00'); // Ensure we compare dates only, not times
-      const today = new Date();
-      today.setHours(0, 0, 0, 0); // Reset to start of today
-
-      if (endDate < today) {
-        return new OperationResult(false, "La fecha límite de la subtarea no puede ser anterior a hoy.");
-      }
+      const dateError = validateFutureDate(subTask.endDate, 'fecha límite');
+      if (dateError) return new OperationResult(false, dateError);
 
       // Validar que la fecha límite de la subtarea no exceda la fecha límite de la tarea padre
       const parentTask = await taskRepository.getById(subTask.id_Task);
       if (parentTask && parentTask.endDate) {
+        const endDate = new Date(subTask.endDate + 'T00:00:00');
         const parentEndDate = new Date(parentTask.endDate + 'T00:00:00');
         if (endDate > parentEndDate) {
           return new OperationResult(false, "La fecha límite de la subtarea no puede ser posterior a la fecha límite de la tarea padre.");

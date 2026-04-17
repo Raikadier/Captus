@@ -9,6 +9,7 @@ import { ManageSubjectsDialog } from '../subjects/components/ManageSubjectsDialo
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, AreaChart, Area, ComposedChart } from 'recharts'
 import StreakWidget, { FavoriteCategoryWidget, EventsOverviewWidget, ProjectsOverviewWidget, NotesStatsWidget, CategoriesStatsWidget, AverageTimeWidget, RecentAchievementsWidget, BestStreakWidget } from '../../shared/components/StreakWidget'
 import { StatsProvider, useStreakData, useAdditionalStats } from '../../hooks/useConsolidatedStats'
+import { CHART_COLORS, PRIORITY_CHART_COLORS, TASK_STATUS_COLORS } from '../../shared/constants/colors'
 
 function getCurrentDate() {
   const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
@@ -159,9 +160,9 @@ function StatsPageContent() {
   }, 0) || 0;
 
   const priorityDistribution = additionalStats?.priorityStats ? [
-    { name: 'Alta', value: additionalStats.priorityStats.high, color: '#ef4444' },
-    { name: 'Media', value: additionalStats.priorityStats.medium, color: '#f59e0b' },
-    { name: 'Baja', value: additionalStats.priorityStats.low, color: '#10b981' }
+    { name: 'Alta', value: additionalStats.priorityStats.high, color: PRIORITY_CHART_COLORS.Alta },
+    { name: 'Media', value: additionalStats.priorityStats.medium, color: PRIORITY_CHART_COLORS.Media },
+    { name: 'Baja', value: additionalStats.priorityStats.low, color: PRIORITY_CHART_COLORS.Baja }
   ].filter(item => item.value > 0) : [];
 
   if (loading) {
@@ -169,9 +170,9 @@ function StatsPageContent() {
   }
 
   const completionRateData = [
-    { name: 'Completadas', value: totalCompleted, color: '#22c55e', percentage: totalCreated > 0 ? Math.round((totalCompleted / totalCreated) * 100) : 0 },
-    { name: 'Pendientes', value: Math.max(0, pendingTasks - expiredTasks), color: '#f59e0b', percentage: totalCreated > 0 ? Math.round(((pendingTasks - expiredTasks) / totalCreated) * 100) : 0 },
-    { name: 'Expiradas', value: expiredTasks, color: '#ef4444', percentage: totalCreated > 0 ? Math.round((expiredTasks / totalCreated) * 100) : 0 }
+    { name: 'Completadas', value: totalCompleted, color: TASK_STATUS_COLORS.completed, percentage: totalCreated > 0 ? Math.round((totalCompleted / totalCreated) * 100) : 0 },
+    { name: 'Pendientes', value: Math.max(0, pendingTasks - expiredTasks), color: TASK_STATUS_COLORS.pending, percentage: totalCreated > 0 ? Math.round(((pendingTasks - expiredTasks) / totalCreated) * 100) : 0 },
+    { name: 'Expiradas', value: expiredTasks, color: TASK_STATUS_COLORS.expired, percentage: totalCreated > 0 ? Math.round((expiredTasks / totalCreated) * 100) : 0 }
   ].filter(item => item.value > 0);
 
 
@@ -334,7 +335,7 @@ function StatsPageContent() {
                     ))}
                   </Pie>
                   <Tooltip
-                    contentStyle={{ backgroundColor: 'white', borderRadius: '8px', border: '1px solid #e5e7eb' }}
+                    contentStyle={{ backgroundColor: CHART_COLORS.tooltipBg, borderRadius: '8px', border: `1px solid ${CHART_COLORS.border}` }}
                     formatter={(value, name) => [`${value} tareas`, name]}
                   />
                 </PieChart>
@@ -356,14 +357,14 @@ function StatsPageContent() {
             <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={taskStats.productivityChart}>
-                  <XAxis dataKey="day" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}`} />
+                  <XAxis dataKey="day" stroke={CHART_COLORS.muted} fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis stroke={CHART_COLORS.muted} fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}`} />
                   <Tooltip
                     cursor={{ fill: 'transparent' }}
                     contentStyle={{ backgroundColor: 'var(--card)', borderRadius: '8px', border: '1px solid var(--border)' }}
                   />
-                  <Bar dataKey="created" name="Creadas" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="completed" name="Completadas" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="created" name="Creadas" fill={CHART_COLORS.primary} radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="completed" name="Completadas" fill={CHART_COLORS.success} radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -378,12 +379,12 @@ function StatsPageContent() {
             <div className="flex items-center justify-center h-64">
               <div className="relative w-48 h-48">
                 <svg className="transform -rotate-90 w-48 h-48">
-                  <circle cx="96" cy="96" r="88" stroke="#E5E7EB" strokeWidth="16" fill="none" className="opacity-30" />
+                  <circle cx="96" cy="96" r="88" stroke={CHART_COLORS.border} strokeWidth="16" fill="none" className="opacity-30" />
                   <circle
                     cx="96"
                     cy="96"
                     r="88"
-                    stroke="#10b981"
+                    stroke={CHART_COLORS.success}
                     strokeWidth="16"
                     fill="none"
                     strokeDasharray={strokeDasharray}
@@ -405,10 +406,10 @@ function StatsPageContent() {
               {priorityDistribution.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={priorityDistribution}>
-                    <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}`} />
+                    <XAxis dataKey="name" stroke={CHART_COLORS.muted} fontSize={12} tickLine={false} axisLine={false} />
+                    <YAxis stroke={CHART_COLORS.muted} fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}`} />
                     <Tooltip
-                      contentStyle={{ backgroundColor: 'white', borderRadius: '8px', border: '1px solid #e5e7eb' }}
+                      contentStyle={{ backgroundColor: CHART_COLORS.tooltipBg, borderRadius: '8px', border: `1px solid ${CHART_COLORS.border}` }}
                       formatter={(value, name) => [`${value} tareas`, name]}
                     />
                     <Bar dataKey="value" radius={[4, 4, 0, 0]}>

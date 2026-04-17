@@ -107,6 +107,7 @@ const HomePage = () => {
     activeReminders: 0
   })
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(null)
   const navigate = useNavigate()
   const { user } = useAuth()
   const { darkMode } = useTheme()
@@ -132,30 +133,32 @@ const HomePage = () => {
   const loadData = async () => {
     try {
       setLoading(true)
+      setLoadError(null)
 
-      // Load both tasks and stats in parallel for better performance
       const [tasksResponse, statsResponse] = await Promise.allSettled([
         apiClient.get('/tasks/pending?limit=3'),
         apiClient.get('/statistics/home-page')
       ])
 
-      // Handle tasks response
+      const errors = []
+
       if (tasksResponse.status === 'fulfilled' && tasksResponse.value.data.success) {
         setPendingTasks(tasksResponse.value.data.data)
       } else {
-        console.error('Error loading tasks:', tasksResponse.reason || tasksResponse.value?.data)
-        // Don't fail completely if tasks fail to load
+        errors.push('tareas pendientes')
       }
 
-      // Handle stats response
       if (statsResponse.status === 'fulfilled' && statsResponse.value.data.success) {
         setStats(statsResponse.value.data.data)
       } else {
-        console.error('Error loading stats:', statsResponse.reason || statsResponse.value?.data)
-        // Don't fail completely if stats fail to load
+        errors.push('estadísticas')
+      }
+
+      if (errors.length > 0) {
+        setLoadError(`No se pudieron cargar: ${errors.join(', ')}. Algunos datos pueden estar desactualizados.`)
       }
     } catch (error) {
-      console.error('Error in loadData:', error)
+      setLoadError('Error al cargar el panel. Por favor, recarga la página.')
     } finally {
       setLoading(false)
     }
@@ -173,6 +176,17 @@ const HomePage = () => {
 
   return (
     <div className="p-8 bg-background">
+      {loadError && (
+        <div className="mb-4 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm flex items-center justify-between">
+          <span>{loadError}</span>
+          <button
+            onClick={loadData}
+            className="ml-4 underline text-destructive hover:text-destructive/80 text-sm font-medium"
+          >
+            Reintentar
+          </button>
+        </div>
+      )}
       <FadeIn duration={0.6} className="sticky top-0 rounded-xl shadow-sm p-6 mb-6 z-10 bg-card">
         <div className="flex justify-between items-center">
           <div>

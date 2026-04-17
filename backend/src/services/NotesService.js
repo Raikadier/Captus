@@ -28,7 +28,7 @@ export class NotesService {
 
   async save(note, userId) {
     try {
-      const validation = this.validateNote(noteData);
+      const validation = this.validateNote(note);
       if (!validation.success) return validation;
 
       if (!userId) {
@@ -66,21 +66,13 @@ export class NotesService {
       }
 
       const note = await this.repo.getById(id);
-      if (note) {
-        if (userId && note.user_id === userId) {
-          return new OperationResult(true, "Nota encontrada.", note);
-        } else {
-          return new OperationResult(false, "Nota no accesible.");
-        }
-      } else {
+      if (!note) {
         return new OperationResult(false, "Nota no encontrada.");
       }
-      if (existingNote.user_id !== userId) {
-        return new OperationResult(false, "No tienes permiso para eliminar esta nota.");
+      if (userId && note.user_id !== userId) {
+        return new OperationResult(false, "Nota no accesible.");
       }
-
-      await notesRepository.delete(noteId);
-      return new OperationResult(true, "Nota eliminada exitosamente.");
+      return new OperationResult(true, "Nota encontrada.", note);
     } catch (error) {
       return new OperationResult(false, `Error al obtener nota: ${error.message}`);
     }
@@ -150,12 +142,10 @@ export class NotesService {
       if (deleted) {
         return new OperationResult(true, "Nota eliminada exitosamente.");
       } else {
-        // Esto podría pasar si la nota no se encuentra o no pertenece al usuario.
-        return new OperationResult(false, "No se pudo actualizar el estado de fijación de la nota.");
+        return new OperationResult(false, "Error al eliminar la nota.");
       }
     } catch (error) {
-      console.error(`Error inesperado en NotesService.togglePin: ${error.message}`);
-      throw new Error("Ocurrió un error inesperado al cambiar el estado de fijación.");
+      return new OperationResult(false, `Error al eliminar la nota: ${error.message}`);
     }
   }
 }

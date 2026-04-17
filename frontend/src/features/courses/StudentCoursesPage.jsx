@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { COURSE_DEFAULT_COLOR } from '../../shared/constants/colors'
 import { useNavigate } from 'react-router-dom'
 import { BookOpen, Clock, ChevronRight, Plus, GraduationCap, BarChart3, Calendar } from 'lucide-react'
 import { Button } from '../../ui/button'
@@ -148,7 +149,7 @@ export default function StudentCoursesPage() {
                 >
                   <div
                     className="h-32 w-full relative overflow-hidden"
-                    style={{ backgroundColor: course.color || '#3b82f6' }}
+                    style={{ backgroundColor: course.color || COURSE_DEFAULT_COLOR }}
                   >
                     <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors" />
                     <div className="absolute bottom-4 left-4 right-4">

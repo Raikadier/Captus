@@ -5,14 +5,22 @@ import { aiEventsService } from '../../services/aiEventsService';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { Send, Sparkles, User, Plus, Menu, CheckCircle } from 'lucide-react';
 
+const WELCOME_MESSAGE = {
+  id: 'welcome',
+  type: 'bot',
+  content: '¡Hola! Soy Captus AI, tu asistente personal de productividad académica. ¿En qué puedo ayudarte hoy?',
+  timestamp: new Date(),
+};
+
 const ChatBotPage = () => {
   const { user } = useAuth();
   const [conversations, setConversations] = useState([]);
   const [activeConversation, setActiveConversation] = useState(null);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([WELCOME_MESSAGE]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
+  const [conversationsError, setConversationsError] = useState(null);
   const messagesEndRef = useRef(null);
 
   // Use the events hook to trigger refreshes if needed,
@@ -32,10 +40,13 @@ const ChatBotPage = () => {
 
   const fetchConversations = async () => {
     try {
+      setConversationsError(null);
       const data = await aiTaskService.getConversations();
-      setConversations(data);
+      // Guard: ensure data is always an array before setting state
+      setConversations(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching conversations:', error);
+      setConversationsError('No se pudieron cargar las conversaciones.');
     }
   };
 
@@ -66,7 +77,8 @@ const ChatBotPage = () => {
     if (activeConversation) {
       fetchMessages(activeConversation);
     } else {
-      setMessages([]);
+      // No active conversation → show welcome message
+      setMessages([{ ...WELCOME_MESSAGE, timestamp: new Date() }]);
     }
   }, [activeConversation]);
 
@@ -98,11 +110,12 @@ const ChatBotPage = () => {
       // Use the new service that wraps the AI endpoint
       const responseData = await aiEventsService.sendMessage(userMessage.content, activeConversation);
 
-      // If we started a new conversation, update the state
+      // If we started a new conversation, set it as active
       if (!activeConversation && responseData.conversationId) {
         setActiveConversation(responseData.conversationId);
-        fetchConversations();
       }
+      // Always refresh the sidebar so titles and order stay current
+      fetchConversations();
 
       // Check for tool action
       if (responseData.actionPerformed) {
@@ -150,15 +163,8 @@ const ChatBotPage = () => {
   };
 
   const handleNewConversation = () => {
+    // Setting activeConversation to null triggers the useEffect which shows the welcome message
     setActiveConversation(null);
-    setMessages([
-      {
-        id: Date.now(),
-        type: 'bot',
-        content: '¡Hola! Soy Captus AI, tu asistente personal de productividad académica. ¿En qué puedo ayudarte hoy?',
-        timestamp: new Date(),
-      },
-    ]);
   };
 
   return (
@@ -183,16 +189,25 @@ const ChatBotPage = () => {
             </div>
 
             <div className="flex-1 overflow-y-auto p-2">
+              {conversationsError && (
+                <p className="text-xs text-destructive text-center px-3 py-2">{conversationsError}</p>
+              )}
+              {!conversationsError && conversations.length === 0 && (
+                <p className="text-xs text-muted-foreground text-center px-3 py-4">
+                  Envía un mensaje para iniciar tu primera conversación.
+                </p>
+              )}
               {conversations.map((conv) => (
                 <button
                   key={conv.id}
                   onClick={() => setActiveConversation(conv.id)}
-                  className={`w-full text-left p-3 rounded-xl mb-1 transition-all duration-200 ${activeConversation === conv.id ? 'bg-white shadow-sm' : 'hover:bg-gray-100'
-                    }`}
+                  className={`w-full text-left p-3 rounded-xl mb-1 transition-all duration-200 ${
+                    activeConversation === conv.id ? 'bg-white shadow-sm' : 'hover:bg-gray-100'
+                  }`}
                 >
                   <p className="font-medium text-gray-900 text-sm truncate">{conv.title || 'Nueva conversación'}</p>
                   <p className="text-xs text-gray-500 truncate mt-1">
-                    {new Date(conv.updatedAt).toLocaleDateString()}
+                    {conv.updatedAt ? new Date(conv.updatedAt).toLocaleDateString() : ''}
                   </p>
                 </button>
               ))}

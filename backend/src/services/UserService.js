@@ -65,7 +65,6 @@ class UserService {
           id_User: syncedUser.id
         };
         await this.categoryService.save(generalCategory);
-        console.log(`Category "General" initialized for user: ${syncedUser.email}`);
       } catch (initError) {
         console.warn("Note: Could not initialize default category (might already exist):", initError.message);
       }
