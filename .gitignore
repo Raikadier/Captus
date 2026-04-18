@@ -36,3 +36,7 @@ yarn-error.log*
 v0/
 code/
 captus-main/
+
+# NPM Cache
+.npm-cache/
+.npm/
